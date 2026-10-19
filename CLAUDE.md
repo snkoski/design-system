@@ -160,6 +160,13 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
 
+## Pull requests
+
+- Work on a branch and open a pull request into `main`. See `CONTRIBUTING.md` for the workflow, the required checks, and how to review.
+- Fill in `.github/pull_request_template.md` honestly. Never tick a checklist item that isn't true, and say what you did not check.
+- Chromatic posts the Storybook preview and the visual diff, so don't add screenshots. Add a recording only for motion or multi-step interactions.
+- Keep a pull request to one thing, and call out breaking changes (renamed or removed props, tokens, or exports).
+
 ## Foundations pages
 
 - Each page in `src/foundations/` renders a `docs/brand/*.md` file with Storybook's `Markdown` block, then adds visual blocks from `src/foundations/blocks.tsx`.

@@ -90,6 +90,10 @@ Set the theme with `data-theme="light" | "dark" | "hotdog"` on `<html>`. With no
 4. Add an `AllThemes` story so Chromatic snapshots it in every theme.
 5. Run `pnpm typecheck` and `pnpm test`. Copy the structure of `Button.test.tsx`.
 
+## Contributing
+
+See `CONTRIBUTING.md` for the pull request workflow and the checks every change must pass.
+
 ## Publishing Storybook to Chromatic
 
 1. Sign in at chromatic.com with GitHub and create a project from this repo.
