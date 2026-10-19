@@ -11,6 +11,7 @@ Motion explains something: where an element came from, what changed, or what can
   --duration-fast: 120ms;   /* hover, press, color, and small state changes */
   --duration-base: 200ms;   /* popovers, menus, tooltips, accordions */
   --duration-slow: 320ms;   /* dialogs, drawers, page-level reveals */
+  --duration-loop: 700ms;   /* one cycle of a looping animation: spinners, skeleton shimmer */
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);    /* things entering */
   --ease-in: cubic-bezier(0.4, 0, 1, 1);         /* things leaving */
@@ -27,6 +28,7 @@ Motion explains something: where an element came from, what changed, or what can
     --motion-scale: 1;
     --duration-base: 120ms;
     --duration-slow: 120ms;
+    --duration-loop: 1600ms;
     --ease-bounce: var(--ease-out);
   }
 }
@@ -37,6 +39,7 @@ To override the visitor's system setting for part of a page, for example a site'
 ## Rules
 
 - Interface motion runs 100–320ms. Exits are faster than entrances: an element leaves with `--ease-in` at the next shorter duration.
+- Looping animations (spinners, skeleton shimmer) use `--duration-loop` for one cycle. Reduced motion slows them down rather than stopping them, so a loading indicator stays visible.
 - Animate only `transform` and `opacity`. Never animate width, height, top, or left.
 - Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.

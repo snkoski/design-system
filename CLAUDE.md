@@ -108,7 +108,7 @@ One convention per job. Never mix them.
 
 - Durations 100–320ms using the motion tokens. Exits are faster than entrances and use `--ease-in`.
 - Animate only `transform` and `opacity`.
-- Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Under `prefers-reduced-motion` they become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
+- Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Looping animations (spinner, skeleton) use `--duration-loop`, which gets slower under reduced motion. Under `prefers-reduced-motion` slides and pops become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
 - `data-motion="full"` or `data-motion="reduced"` on any element overrides the system setting for that subtree (generated in `tokens.css`).
 - `--ease-bounce` only for chips, toggles, and success states.
 - Base UI marks entering and leaving elements with `data-starting-style` and `data-ending-style`. Use them for enter and exit transitions in plain CSS.

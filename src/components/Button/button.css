@@ -15,7 +15,7 @@
     background: var(--action);
     color: var(--on-action);
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 600;
     line-height: 1.2;
     text-decoration: none;
@@ -73,7 +73,7 @@
     min-width: var(--control-sm);
     padding-inline: var(--space-3);
     gap: var(--space-1);
-    font-size: 0.875rem;
+    font-size: var(--text-small);
   }
   /* Small buttons are 32px tall but keep a 44px hit area */
   .button[data-size="sm"]::after {
@@ -86,7 +86,7 @@
   .button[data-size="lg"] {
     min-height: var(--control-lg);
     padding-inline: var(--space-6);
-    font-size: 1.0625rem;
+    font-size: var(--text-body-lg);
   }
 
   /* Icons */
@@ -134,16 +134,11 @@
     cursor: progress;
   }
   .button__spinner {
-    animation: button-spin 700ms linear infinite;
+    animation: button-spin var(--duration-loop) linear infinite;
   }
   @keyframes button-spin {
     to {
       transform: rotate(1turn);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .button__spinner {
-      animation-duration: 1.6s;
     }
   }
 

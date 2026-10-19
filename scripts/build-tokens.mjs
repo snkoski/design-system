@@ -46,6 +46,7 @@ const motionFull = `
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 320ms;
+  --duration-loop: 700ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -58,6 +59,7 @@ const motionReduced = `
   --motion-scale: 1;
   --duration-base: 120ms;
   --duration-slow: 120ms;
+  --duration-loop: 1600ms;
   --ease-bounce: var(--ease-out);`;
 
 // Fluid heading sizes (the token file stores the widest-screen size)
