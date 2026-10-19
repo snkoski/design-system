@@ -122,6 +122,7 @@ One convention per job. Never mix them.
 
 1. If Base UI has a matching primitive, build on it. shadcn's version is a good reference for structure; replace its Tailwind styling with a CSS file that follows the rules above.
 2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.stories.tsx`, and `index.ts`.
+   A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx` and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
 3. Write JSDoc on the component and every prop. It becomes the Storybook docs.
 4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
 5. Stories: a `Playground` with controls, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).

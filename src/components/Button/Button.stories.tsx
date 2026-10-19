@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, Heart, Plus } from "lucide-react";
 import { expect, fn } from "storybook/test";
-import { Button, ButtonLink } from "./Button";
+import { Button } from "./Button";
 
 const meta = {
   title: "Components/Button",
@@ -89,16 +89,6 @@ export const Disabled: Story = {
       <Button {...args} disabled variant="primary">Primary</Button>
       <Button {...args} disabled variant="secondary">Secondary</Button>
       <Button {...args} disabled variant="ghost">Ghost</Button>
-    </div>
-  ),
-};
-
-/** For navigation, `ButtonLink` renders a real `<a>`: it can open in a new tab and is announced as a link. */
-export const AsLink: Story = {
-  render: () => (
-    <div className="flex flex-wrap items-center gap-4">
-      <ButtonLink href="#work" iconEnd={<ArrowRight />}>See my work</ButtonLink>
-      <ButtonLink href="#contact" variant="secondary">Get in touch</ButtonLink>
     </div>
   ),
 };
