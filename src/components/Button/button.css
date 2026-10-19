@@ -1,0 +1,174 @@
+/* Button: what it is (color, type, shape, inner padding, states, variants).
+   Where it sits (margin, width, alignment) is the layout's job: use Tailwind in the markup. */
+@layer components {
+  .button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--control-md);
+    min-width: var(--target-min);
+    padding-inline: var(--space-5);
+    border: var(--border-thick) solid transparent; /* visible in forced-colors mode */
+    border-radius: var(--radius-full);
+    background: var(--action);
+    color: var(--on-action);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .button:visited {
+    color: var(--on-action);
+  }
+
+  .button:hover {
+    background: var(--action-hover);
+    transform: translateY(calc(var(--motion-distance) * -0.125)); /* 1px lift; none with reduced motion */
+  }
+
+  .button:active {
+    transform: translateY(0);
+  }
+
+  .button:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Variants */
+  .button[data-variant="secondary"] {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--border-strong);
+  }
+  .button[data-variant="secondary"]:hover {
+    background: var(--surface-tint);
+  }
+
+  .button[data-variant="ghost"] {
+    background: transparent;
+    color: var(--ink);
+  }
+  .button[data-variant="ghost"]:hover {
+    background: var(--surface-tint);
+  }
+
+  /* Sizes */
+  .button[data-size="sm"] {
+    min-height: var(--control-sm);
+    min-width: var(--control-sm);
+    padding-inline: var(--space-3);
+    gap: var(--space-1);
+    font-size: 0.875rem;
+  }
+  /* Small buttons are 32px tall but keep a 44px hit area */
+  .button[data-size="sm"]::after {
+    content: "";
+    position: absolute;
+    inset-block: calc((var(--control-sm) - var(--target-min)) / 2);
+    inset-inline: min(0px, calc((var(--control-sm) - var(--target-min)) / 2));
+  }
+
+  .button[data-size="lg"] {
+    min-height: var(--control-lg);
+    padding-inline: var(--space-6);
+    font-size: 1.0625rem;
+  }
+
+  /* Icons */
+  .button__icon {
+    display: inline-flex;
+    flex: none;
+    width: var(--icon-md);
+    height: var(--icon-md);
+  }
+  .button[data-size="sm"] .button__icon {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+  .button__icon > svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .button[data-icon-only] {
+    padding-inline: 0;
+    aspect-ratio: 1;
+  }
+
+  /* Disabled (but not loading) */
+  .button[data-disabled]:not([data-loading]) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .button[data-disabled]:hover {
+    transform: none;
+  }
+  .button[data-disabled]:not([data-loading]):hover {
+    background: var(--action);
+  }
+  .button[data-disabled][data-variant="secondary"]:not([data-loading]):hover {
+    background: var(--surface);
+  }
+  .button[data-disabled][data-variant="ghost"]:not([data-loading]):hover {
+    background: transparent;
+  }
+
+  /* Loading */
+  .button[data-loading] {
+    cursor: progress;
+  }
+  .button__spinner {
+    animation: button-spin 700ms linear infinite;
+  }
+  @keyframes button-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .button__spinner {
+      animation-duration: 1.6s;
+    }
+  }
+
+  /* Hot dog mode: chunky outlines and a hard shadow to press into */
+  [data-theme="hotdog"] .button:not([data-variant="ghost"]) {
+    border-color: var(--ink);
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .button:hover {
+    transform: none;
+  }
+  [data-theme="hotdog"] .button:not([data-variant="ghost"]):active:not([data-disabled]) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Windows Contrast themes */
+  @media (forced-colors: active) {
+    .button {
+      border-color: ButtonText;
+    }
+    .button[data-disabled]:not([data-loading]) {
+      border-color: GrayText;
+      color: GrayText;
+      opacity: 1;
+    }
+  }
+}

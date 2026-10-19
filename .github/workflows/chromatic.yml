@@ -1,0 +1,28 @@
+# Publishes Storybook to Chromatic on every push and runs visual tests.
+# Needs one repository secret: CHROMATIC_PROJECT_TOKEN (from chromatic.com → your project → Manage → Configure).
+name: Chromatic
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  chromatic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Chromatic needs git history to compare builds
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Publish to Chromatic
+        run: pnpm chromatic --project-token="${{ secrets.CHROMATIC_PROJECT_TOKEN }}"

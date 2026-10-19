@@ -1,0 +1,26 @@
+/* Minimal base styles. Kept small on purpose: the consuming site owns its own reset. */
+@layer base {
+  :where(html) {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  :where(body) {
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+
+  /* One focus style everywhere: an outline, so it survives forced-colors mode */
+  :where(:focus-visible) {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  :where(a) {
+    color: var(--link);
+    text-underline-offset: 0.2em;
+  }
+}

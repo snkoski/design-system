@@ -1,0 +1,228 @@
+/* Generated from tokens/tokens.json by scripts/build-tokens.mjs. Do not edit by hand. */
+
+@layer theme {
+  :root,
+  [data-theme="light"] {
+  --cream-50: hsl(35 60% 97%);
+  --white: hsl(0 0% 100%);
+  --oat-200: hsl(30 25% 86%);
+  --peach-100: hsl(20 95% 90%);
+  --peach-200: hsl(20 95% 84%);
+  --tangerine-400: hsl(22 92% 60%);
+  --tangerine-500: hsl(22 92% 55%);
+  --tangerine-600: hsl(22 92% 49%);
+  --tangerine-700: hsl(18 80% 36%);
+  --mint-200: hsl(158 50% 80%);
+  --mint-300: hsl(158 55% 72%);
+  --latte-100: hsl(35 50% 94%);
+  --latte-300: hsl(25 12% 72%);
+  --espresso-500: hsl(20 12% 36%);
+  --espresso-700: hsl(20 14% 24%);
+  --espresso-800: hsl(20 18% 16%);
+  --espresso-850: hsl(20 18% 13%);
+  --espresso-900: hsl(20 22% 9%);
+  --espresso-950: hsl(20 30% 13%);
+  --mustard-200: hsl(55 100% 78%);
+  --mustard-400: hsl(50 100% 52%);
+  --ketchup-600: hsl(0 90% 40%);
+  --ketchup-700: hsl(0 90% 32%);
+  --char-950: hsl(0 0% 4%);
+  --bg: var(--cream-50);
+  --surface: var(--white);
+  --surface-tint: var(--peach-100);
+  --ink: var(--espresso-950);
+  --ink-muted: var(--espresso-500);
+  --border: var(--oat-200);
+  --border-strong: var(--espresso-500);
+  --action: var(--tangerine-500);
+  --action-hover: var(--tangerine-600);
+  --on-action: var(--espresso-950);
+  --link: var(--tangerine-700);
+  --highlight: var(--mint-200);
+  --on-highlight: var(--espresso-950);
+  --focus: var(--tangerine-700);
+  --success: hsl(185 80% 24%);
+  --success-soft: hsl(182 50% 92%);
+  --warning: hsl(35 95% 30%);
+  --warning-soft: hsl(45 100% 90%);
+  --danger: hsl(350 75% 40%);
+  --danger-soft: hsl(350 90% 95%);
+  --shadow-sm: 0 1px 2px hsla(20, 30%, 13%, 0.08);
+  --shadow-md: 0 4px 12px hsla(20, 30%, 13%, 0.10), 0 1px 3px hsla(20, 30%, 13%, 0.08);
+  --shadow-lg: 0 16px 40px hsla(20, 30%, 13%, 0.14), 0 4px 12px hsla(20, 30%, 13%, 0.08);
+  color-scheme: light;
+  }
+
+  /* With no data-theme, dark follows the visitor's system setting */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+    --bg: var(--espresso-900);
+    --surface: var(--espresso-850);
+    --surface-tint: var(--espresso-800);
+    --ink: var(--latte-100);
+    --ink-muted: var(--latte-300);
+    --border: var(--espresso-700);
+    --border-strong: var(--latte-300);
+    --action: var(--tangerine-400);
+    --action-hover: hsl(22 92% 67%);
+    --on-action: var(--espresso-900);
+    --link: var(--mint-300);
+    --highlight: var(--peach-200);
+    --on-highlight: var(--espresso-900);
+    --focus: var(--mint-300);
+    --success: hsl(182 55% 60%);
+    --success-soft: hsl(185 30% 16%);
+    --warning: hsl(40 95% 62%);
+    --warning-soft: hsl(40 40% 16%);
+    --danger: hsl(350 90% 74%);
+    --danger-soft: hsl(350 35% 17%);
+    --shadow-sm: 0 1px 2px hsla(20, 40%, 2%, 0.5);
+    --shadow-md: 0 4px 12px hsla(20, 40%, 2%, 0.55);
+    --shadow-lg: 0 16px 40px hsla(20, 40%, 2%, 0.65);
+    color-scheme: dark;
+    }
+  }
+
+  [data-theme="dark"] {
+  --bg: var(--espresso-900);
+  --surface: var(--espresso-850);
+  --surface-tint: var(--espresso-800);
+  --ink: var(--latte-100);
+  --ink-muted: var(--latte-300);
+  --border: var(--espresso-700);
+  --border-strong: var(--latte-300);
+  --action: var(--tangerine-400);
+  --action-hover: hsl(22 92% 67%);
+  --on-action: var(--espresso-900);
+  --link: var(--mint-300);
+  --highlight: var(--peach-200);
+  --on-highlight: var(--espresso-900);
+  --focus: var(--mint-300);
+  --success: hsl(182 55% 60%);
+  --success-soft: hsl(185 30% 16%);
+  --warning: hsl(40 95% 62%);
+  --warning-soft: hsl(40 40% 16%);
+  --danger: hsl(350 90% 74%);
+  --danger-soft: hsl(350 35% 17%);
+  --shadow-sm: 0 1px 2px hsla(20, 40%, 2%, 0.5);
+  --shadow-md: 0 4px 12px hsla(20, 40%, 2%, 0.55);
+  --shadow-lg: 0 16px 40px hsla(20, 40%, 2%, 0.65);
+  color-scheme: dark;
+  }
+
+  [data-theme="hotdog"] {
+  --bg: var(--mustard-400);
+  --surface: var(--white);
+  --surface-tint: var(--mustard-200);
+  --ink: var(--char-950);
+  --ink-muted: hsl(0 45% 18%);
+  --border: var(--char-950);
+  --border-strong: var(--char-950);
+  --action: var(--ketchup-600);
+  --action-hover: var(--ketchup-700);
+  --on-action: var(--mustard-200);
+  --link: var(--ketchup-700);
+  --highlight: var(--ketchup-600);
+  --on-highlight: var(--white);
+  --focus: var(--char-950);
+  --success: hsl(190 90% 18%);
+  --success-soft: var(--white);
+  --warning: hsl(25 90% 22%);
+  --warning-soft: var(--white);
+  --danger: hsl(345 90% 26%);
+  --danger-soft: var(--white);
+  --shadow-sm: 2px 2px 0 hsl(0, 0%, 4%);
+  --shadow-md: 4px 4px 0 hsl(0, 0%, 4%);
+  --shadow-lg: 6px 6px 0 hsl(0, 0%, 4%);
+  color-scheme: light;
+  }
+
+  :root {
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+  --target-min: 2.75rem;
+  --control-sm: 2rem;
+  --control-md: 2.75rem;
+  --control-lg: 3.25rem;
+  --icon-sm: 1rem;
+  --icon-md: 1.25rem;
+  --measure: 40rem;
+  --content-max: 72rem;
+  --border-thin: 1px;
+  --border-thick: 2px;
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --font-sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --text-display: clamp(2.441rem, 1.749rem + 3.075vw, 4.209rem);
+  --text-heading-xl: clamp(1.953rem, 1.482rem + 2.094vw, 3.157rem);
+  --text-heading-lg: clamp(1.563rem, 1.248rem + 1.402vw, 2.369rem);
+  --text-heading-md: clamp(1.25rem, 1.044rem + 0.917vw, 1.777rem);
+  --text-heading-sm: clamp(1.125rem, 1.044rem + 0.362vw, 1.333rem);
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-body-strong: 1rem;
+  --text-small: 0.875rem;
+  --text-label: 0.75rem;
+  --text-code: 0.9375rem;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-distance: 0.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-distance: 0rem;
+      --duration-base: 120ms;
+      --duration-slow: 120ms;
+      --ease-bounce: var(--ease-out);
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    :root,
+    [data-theme] {
+      --ink-muted: var(--ink);
+      --border: var(--border-strong);
+      --focus-width: 3px;
+    }
+  }
+}
+
+@layer base {
+  .text-display { font-family: var(--font-sans); font-size: var(--text-display); line-height: 1; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
+  .text-heading-xl { font-family: var(--font-sans); font-size: var(--text-heading-xl); line-height: 1.05; font-weight: 750; letter-spacing: -0.025em; text-wrap: balance; }
+  .text-heading-lg { font-family: var(--font-sans); font-size: var(--text-heading-lg); line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+  .text-heading-md { font-family: var(--font-sans); font-size: var(--text-heading-md); line-height: 1.2; font-weight: 650; letter-spacing: -0.015em; text-wrap: balance; }
+  .text-heading-sm { font-family: var(--font-sans); font-size: var(--text-heading-sm); line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  .text-body-lg { font-family: var(--font-sans); font-size: var(--text-body-lg); line-height: 1.6; font-weight: 400; }
+  .text-body { font-family: var(--font-sans); font-size: var(--text-body); line-height: 1.6; font-weight: 400; }
+  .text-body-strong { font-family: var(--font-sans); font-size: var(--text-body-strong); line-height: 1.6; font-weight: 600; }
+  .text-small { font-family: var(--font-sans); font-size: var(--text-small); line-height: 1.5; font-weight: 400; }
+  .text-label { font-family: var(--font-sans); font-size: var(--text-label); line-height: 1.4; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .text-code { font-family: var(--font-mono); font-size: var(--text-code); line-height: 1.6; font-weight: 400; }
+}
