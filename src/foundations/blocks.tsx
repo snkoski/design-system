@@ -244,10 +244,27 @@ const EASINGS = [
   { name: "Bounce", token: "--ease-bounce", note: "Chips, toggles, and success", curve: [0.34, 1.56, 0.64, 1] },
 ] as const;
 const DURATIONS = [
-  { name: "Fast", token: "--duration-fast" },
-  { name: "Base", token: "--duration-base" },
-  { name: "Slow", token: "--duration-slow" },
+  { name: "Fast", token: "--duration-fast", note: "Hover, press, and color" },
+  { name: "Base", token: "--duration-base", note: "Popovers, menus, and tooltips" },
+  { name: "Slow", token: "--duration-slow", note: "Dialogs and drawers" },
 ] as const;
+const EASE_DEMO_MS = 900;
+
+type MotionMode = "system" | "full" | "reduced";
+
+/** Converts ".12s" or "120ms" to milliseconds. */
+const toMs = (v: string) => (v.endsWith("ms") ? parseFloat(v) : v.endsWith("s") ? parseFloat(v) * 1000 : 0);
+
+function useSystemReducedMotion() {
+  const [reduced, setReduced] = useState(() => matchMedia("(prefers-reduced-motion: reduce)").matches);
+  useEffect(() => {
+    const mq = matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
 
 function Curve({ c }: { c: readonly number[] }) {
   const [x1 = 0, y1 = 0, x2 = 0, y2 = 0] = c;
@@ -259,80 +276,129 @@ function Curve({ c }: { c: readonly number[] }) {
   );
 }
 
+/**
+ * One animation lane: a pill at the start of a track that slides to the end when played,
+ * holds, then snaps back. With reduced motion it fades in at the end instead of sliding.
+ */
+function Lane({ label, duration, easing, reduced, playKey }: {
+  label: string;
+  duration: string;
+  easing: string;
+  reduced: boolean;
+  playKey: number;
+}) {
+  const puck = useRef<HTMLSpanElement>(null);
+  const timer = useRef<number | undefined>(undefined);
+
+  function play() {
+    const el = puck.current;
+    const track = el?.parentElement;
+    if (!el || !track) return;
+    window.clearTimeout(timer.current);
+    const dist = track.clientWidth - el.offsetWidth - 8;
+    const ms = toMs(duration);
+    el.style.transition = "none";
+    el.style.transform = reduced ? `translateX(${dist}px)` : "translateX(0)";
+    el.style.opacity = reduced ? "0" : "1";
+    void el.offsetWidth; // restart from the start position
+    if (reduced) {
+      el.style.transition = `opacity ${ms}ms ${easing}`;
+      el.style.opacity = "1";
+    } else {
+      el.style.transition = `transform ${ms}ms ${easing}`;
+      el.style.transform = `translateX(${dist}px)`;
+    }
+    // Hold at the end so the result is visible, then return to the start
+    timer.current = window.setTimeout(() => {
+      el.style.transition = "none";
+      el.style.transform = "translateX(0)";
+      el.style.opacity = "1";
+    }, ms + 900);
+  }
+
+  useEffect(() => {
+    if (playKey > 0) play();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playKey]);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  return (
+    <div className="fd-lane">
+      <Button size="sm" variant="secondary" onClick={play} aria-label={`Play ${label}`}>Play</Button>
+      <div className="fd-track" aria-hidden="true">
+        <span className="fd-track-end" />
+        <span ref={puck} className="fd-puck" />
+      </div>
+    </div>
+  );
+}
+
 export function MotionDemo() {
   const root = useRef<HTMLDivElement>(null);
-  const [reduced, setReduced] = useState(false);
+  const systemReduced = useSystemReducedMotion();
+  const [mode, setMode] = useState<MotionMode>("system");
+  const reduced = mode === "reduced" || (mode === "system" && systemReduced);
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [playKey, setPlayKey] = useState(0);
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState(false);
   const chip = useRef<HTMLButtonElement>(null);
-  const [values, setValues] = useState<Record<string, string>>({});
 
-  const css = (name: string) => (root.current ? getComputedStyle(root.current).getPropertyValue(name).trim() : "");
-  const isReduced = () => reduced || matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  function play(puck: HTMLElement) {
-    const track = puck.parentElement;
-    if (!track) return;
-    const dist = track.clientWidth - puck.offsetWidth - 8;
-    const durAttr = puck.dataset.dur ?? "";
-    const dur = durAttr.startsWith("--") ? css(durAttr) : durAttr;
-    const ease = css(puck.dataset.ease ?? "--ease-out");
-    puck.style.transition = "none";
-    if (isReduced()) {
-      puck.style.transform = `translateX(${dist}px)`;
-      puck.style.opacity = "0";
-      void puck.offsetWidth;
-      puck.style.transition = `opacity ${durAttr.startsWith("--") ? css("--duration-fast") : dur} ${css("--ease-out")}`;
-      puck.style.opacity = "1";
-    } else {
-      puck.style.opacity = "1";
-      puck.style.transform = "translateX(0)";
-      void puck.offsetWidth;
-      puck.style.transition = `transform ${dur} ${ease}`;
-      puck.style.transform = `translateX(${dist}px)`;
-    }
-  }
-  const playAll = () => root.current?.querySelectorAll<HTMLElement>(".fd-puck").forEach(play);
-
+  // Read the live token values (they change with the motion mode)
   useEffect(() => {
-    // Minified CSS may store "120ms" as ".12s", so show milliseconds either way
-    const ms = (v: string) => (v.endsWith("ms") ? v : v.endsWith("s") ? `${Math.round(parseFloat(v) * 1000)}ms` : v);
-    setValues(Object.fromEntries(DURATIONS.map((d) => [d.token, ms(css(d.token))])));
-    const id = setTimeout(playAll, 300);
-    return () => clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced]);
+    const el = root.current;
+    if (!el) return;
+    const cs = getComputedStyle(el);
+    const read = (t: string) => cs.getPropertyValue(t).trim();
+    setValues({
+      ...Object.fromEntries(DURATIONS.map((d) => [d.token, `${Math.round(toMs(read(d.token)))}ms`])),
+      ...Object.fromEntries(EASINGS.map((e) => [e.token, read(e.token)])),
+    });
+  }, [mode, systemReduced]);
+
+  const statusText = reduced
+    ? mode === "system"
+      ? "Your device has Reduce motion turned on, so this shows the reduced versions: slides become fades, durations shorten, and nothing bounces. Choose Full to preview the full animations."
+      : "Showing reduced motion: slides become fades, durations shorten, and nothing bounces."
+    : "Showing full motion.";
 
   return (
     <ThemeFrame label="Motion">
-      <div ref={root} className={`fd-motion${reduced ? " sim-reduced" : ""}`}>
-        <div className="fd-row">
-          <Button onClick={playAll}>Replay all</Button>
-          <Button variant="secondary" aria-pressed={reduced} onClick={() => setReduced((r) => !r)}>Simulate reduced motion</Button>
-          <span className="fd-note" role="status">{reduced ? "Reduced motion: slides become fades, nothing bounces" : "Full motion"}</span>
+      <div ref={root} className="fd-motion" data-motion={mode === "system" ? undefined : mode}>
+        <div className="fd-stack sm">
+          <div className="fd-row">
+            <span className="fd-group">Motion</span>
+            <div className="fd-switch" role="group" aria-label="Motion preview">
+              {(["system", "full", "reduced"] as const).map((m) => (
+                <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}>
+                  {m === "system" ? `System (${systemReduced ? "reduced" : "full"})` : m === "full" ? "Full" : "Reduced"}
+                </button>
+              ))}
+            </div>
+            <Button onClick={() => setPlayKey((k) => k + 1)}>Play all</Button>
+          </div>
+          <p className="fd-note" role="status">{statusText}</p>
         </div>
 
         <section className="fd-panel">
-          <h3 className="fd-group">Durations · real speed</h3>
+          <h3 className="fd-group">Durations, at real speed with ease out</h3>
+          <p className="fd-note">Press Play to send the pill from start to finish. These are short on purpose: interface motion should feel quick.</p>
           {DURATIONS.map((d) => (
             <div key={d.token} className="fd-motion-row">
-              <span className="fd-meta"><b>{d.name}</b><code>{d.token} · {values[d.token]}</code></span>
-              <div className="fd-track" onClick={(e) => play(e.currentTarget.querySelector(".fd-puck") as HTMLElement)}>
-                <span className="fd-puck" data-dur={d.token} data-ease="--ease-out" />
-              </div>
+              <span className="fd-meta"><b>{d.name} · {values[d.token]}</b><code>{d.token}</code><span className="fd-note">{d.note}</span></span>
+              <Lane label={`${d.name} duration`} duration={values[d.token] ?? "0ms"} easing={values["--ease-out"] ?? "ease-out"} reduced={reduced} playKey={playKey} />
             </div>
           ))}
         </section>
 
         <section className="fd-panel">
-          <h3 className="fd-group">Easing · slowed to 900ms so the curve is visible</h3>
+          <h3 className="fd-group">Easing curves, slowed to {EASE_DEMO_MS}ms</h3>
+          <p className="fd-note">Slowed down so you can see the shape of each curve. Watch where the pill speeds up and slows down; Bounce overshoots the end and settles back.</p>
           {EASINGS.map((e) => (
             <div key={e.token} className="fd-motion-row ease">
-              <span className="fd-meta"><b>{e.name}</b><code>{e.note}</code></span>
-              <Curve c={e.token === "--ease-bounce" && reduced ? [0.2, 0.8, 0.2, 1] : e.curve} />
-              <div className="fd-track" onClick={(ev) => play(ev.currentTarget.querySelector(".fd-puck") as HTMLElement)}>
-                <span className="fd-puck" data-dur="900ms" data-ease={e.token} />
-              </div>
+              <span className="fd-meta"><b>{e.name}</b><code>{e.token}</code><span className="fd-note">{e.note}</span></span>
+              <Curve c={e.token === "--ease-bounce" && reduced ? EASINGS[0].curve : e.curve} />
+              <Lane label={e.name} duration={`${reduced ? 120 : EASE_DEMO_MS}ms`} easing={values[e.token] ?? "ease"} reduced={reduced} playKey={playKey} />
             </div>
           ))}
         </section>
@@ -340,14 +406,14 @@ export function MotionDemo() {
         <section className="fd-demos">
           <div className="fd-panel">
             <b>Button lift</b>
-            <Button>Hover or press me</Button>
-            <p className="fd-note">Lifts on hover with the fast duration. In hot dog mode it pushes into its hard shadow instead.</p>
+            <Button>Hover over me</Button>
+            <p className="fd-note">Rises 1px on hover and settles when pressed. It's meant to be subtle; you'll feel it more than see it. Reduced motion keeps the color change only. In hot dog mode the button presses into its hard shadow instead.</p>
           </div>
           <div className="fd-panel">
             <b>Popover</b>
             <div className="fd-pop-wrap">
               <Button variant="secondary" aria-expanded={open} onClick={() => setOpen((o) => !o)}>{open ? "Close popover" : "Open popover"}</Button>
-              <div className="fd-pop" data-closed={open ? undefined : ""}>Enters with ease out at the base duration and leaves faster with ease in.</div>
+              <div className="fd-pop" data-closed={open ? undefined : ""}>Slides up and fades in with ease out, then leaves faster with ease in.</div>
             </div>
           </div>
           <div className="fd-panel">
@@ -365,7 +431,7 @@ export function MotionDemo() {
             >
               Hot dog fan
             </button>
-            <p className="fd-note">Selecting it pops with the bounce curve, the system's one playful flourish.</p>
+            <p className="fd-note">Press it: it pops from small to full size with the bounce curve, the system's one playful flourish. Reduced motion skips the pop.</p>
           </div>
         </section>
       </div>

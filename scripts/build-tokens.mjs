@@ -42,7 +42,7 @@ const staticLines = staticFamilies.flatMap((f) => (tokens[f]?.tokens ?? []).map(
 for (const [k, v] of Object.entries(tokens.type.families)) staticLines.push(`  --font-${k}: ${v};`);
 
 // Motion tokens live here because tokens.json has no motion family
-const motion = `
+const motionFull = `
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 320ms;
@@ -50,7 +50,15 @@ const motion = `
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --motion-distance: 0.5rem;`;
+  --motion-distance: 0.5rem;
+  --motion-scale: 0.85;`;
+// Reduced motion: no slides, no bounce, no scale, shorter durations
+const motionReduced = `
+  --motion-distance: 0rem;
+  --motion-scale: 1;
+  --duration-base: 120ms;
+  --duration-slow: 120ms;
+  --ease-bounce: var(--ease-out);`;
 
 // Fluid heading sizes (the token file stores the widest-screen size)
 const fluid = {
@@ -100,16 +108,20 @@ ${themes
   :root {
 ${staticLines.join("\n")}
 ${typeLines.join("\n")}
-${motion}
+  }
+
+  /* Motion follows the visitor's system setting. data-motion="full" or "reduced" on any
+     element overrides it for that element and everything inside it. */
+  :root,
+  [data-motion="full"] {${motionFull}
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :root {
-      --motion-distance: 0rem;
-      --duration-base: 120ms;
-      --duration-slow: 120ms;
-      --ease-bounce: var(--ease-out);
+    :root:not([data-motion="full"]) {${motionReduced.replace(/\n/g, "\n  ")}
     }
+  }
+
+  [data-motion="reduced"] {${motionReduced}
   }
 
   @media (prefers-contrast: more) {

@@ -96,18 +96,19 @@
 
 /* Motion */
 .fd-motion { display: grid; gap: var(--space-5); }
-.fd-motion.sim-reduced { --motion-distance: 0rem; --duration-base: 120ms; --duration-slow: 120ms; --ease-bounce: var(--ease-out); }
-.fd-motion-row { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: var(--space-4); align-items: center; }
-.fd-motion-row.ease { grid-template-columns: 11rem 3.5rem minmax(0, 1fr); }
-.fd-track { position: relative; height: 2rem; border-radius: var(--radius-full); background: var(--bg); border: var(--border-thin) solid var(--border); cursor: pointer; }
-.fd-puck { position: absolute; top: 0.25rem; left: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); background: var(--action); border: var(--border-thin) solid transparent; }
+.fd-motion-row { display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: var(--space-4); align-items: center; }
+.fd-motion-row.ease { grid-template-columns: 12rem 3.5rem minmax(0, 1fr); }
+.fd-lane { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.fd-track { position: relative; flex: 1; height: 2rem; border-radius: var(--radius-full); background: var(--bg); border: var(--border-thin) dashed var(--border-strong); }
+.fd-track-end { position: absolute; top: 0.25rem; right: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); border: var(--border-thin) dashed var(--border-strong); }
+.fd-puck { position: absolute; top: 0.25rem; left: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); background: var(--action); border: var(--border-thin) solid var(--ink); }
 .fd-curve { width: 3.5rem; height: 3.5rem; overflow: visible; }
 .fd-curve .axis { stroke: var(--border-strong); stroke-width: 1; fill: none; }
 .fd-curve .line { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-linecap: round; }
 .fd-demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--space-4); }
-.fd-demos .fd-panel { min-height: 11rem; }
+.fd-demos .fd-panel { min-height: 12rem; } /* leaves room for the open popover */
 .fd-panel > .button { justify-self: start; }
-.fd-pop-wrap { position: relative; }
+.fd-pop-wrap { position: relative; justify-self: start; }
 .fd-pop {
   position: absolute; left: 0; top: calc(100% + var(--space-2)); width: 12rem; z-index: 1;
   background: var(--surface); color: var(--ink); border: var(--border-thin) solid var(--border-strong);
@@ -125,9 +126,7 @@
 }
 .fd-chip-toggle[aria-pressed="true"] { background: var(--highlight); color: var(--on-highlight); border-color: var(--ink); }
 .fd-chip-toggle.popping { animation: fd-pop var(--duration-slow) var(--ease-bounce); }
-@keyframes fd-pop { from { transform: scale(0.85); } to { transform: scale(1); } }
-.fd-motion.sim-reduced .fd-chip-toggle.popping { animation: none; }
-@media (prefers-reduced-motion: reduce) { .fd-chip-toggle.popping { animation: none; } }
+@keyframes fd-pop { from { transform: scale(var(--motion-scale)); } to { transform: scale(1); } }
 
 @media (max-width: 40em) {
   .fd-type-row, .fd-motion-row, .fd-motion-row.ease, .fd-space-row { grid-template-columns: 1fr; }

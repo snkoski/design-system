@@ -18,11 +18,13 @@ Motion explains something: where an element came from, what changed, or what can
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* playful overshoot, sparingly */
 
   --motion-distance: 0.5rem; /* how far things slide when entering */
+  --motion-scale: 0.85;      /* where things pop in from */
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-distance: 0rem;
+    --motion-scale: 1;
     --duration-base: 120ms;
     --duration-slow: 120ms;
     --ease-bounce: var(--ease-out);
@@ -30,11 +32,13 @@ Motion explains something: where an element came from, what changed, or what can
 }
 ```
 
+To override the visitor's system setting for part of a page, for example a site's own motion preference switch, set `data-motion="full"` or `data-motion="reduced"` on an element. Everything inside it follows that setting.
+
 ## Rules
 
 - Interface motion runs 100–320ms. Exits are faster than entrances: an element leaves with `--ease-in` at the next shorter duration.
 - Animate only `transform` and `opacity`. Never animate width, height, top, or left.
-- Slides and shifts use `--motion-distance`, so reduced motion turns them into fades with no component changes.
+- Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.
 - Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels.
 
