@@ -2,7 +2,7 @@
 
 Tokens, styles, and React components for a playful, accessible design system. The current palette is called Sherbet (tangerine, peach, and mint with espresso ink) and ships with three themes: light, dark, and hot dog.
 
-The brand book (principles, voice, color, type, accessibility, and motion rules) lives in the Sherbet design system artifact on claude.ai. This repo is the code that implements it.
+The brand book (principles, voice, color, type, layout, motion, iconography, accessibility, and how to build with it) lives in `docs/brand/`, and Storybook shows it under **Foundations**, next to visual pages for every token. This repo is the source of truth for both the code and the guidelines.
 
 ## Getting started
 
@@ -36,6 +36,8 @@ tokens/tokens.json           the single source for every color, size, and font
 scripts/build-tokens.mjs     turns tokens.json into CSS (don't edit the generated CSS)
 src/styles/                  tokens.css, base.css, fonts.css, and the Tailwind theme
 src/components/<Name>/       Name.tsx, name.css, Name.stories.tsx, index.ts
+docs/brand/                  the brand book, one Markdown file per topic
+src/foundations/             Storybook Foundations pages: the brand book plus token visuals
 .storybook/                  Storybook config, with a Light / Dark / Hot dog theme switch
 ```
 

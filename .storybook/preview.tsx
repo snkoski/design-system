@@ -17,7 +17,15 @@ const preview: Preview = {
     backgrounds: { disable: true }, // the theme sets the background
     controls: { expanded: true, sort: "requiredFirst" },
     a11y: { test: "error" }, // accessibility violations fail the story
-    options: { storySort: { order: ["Foundations", "Components"] } },
+    options: {
+      storySort: {
+        order: [
+          "Foundations",
+          ["Introduction", "Voice and copy", "Color", "Typography", "Spacing, layout, and shape", "Motion", "Iconography", "Accessibility", "Building"],
+          "Components",
+        ],
+      },
+    },
   },
   tags: ["autodocs"],
 };

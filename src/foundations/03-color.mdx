@@ -1,0 +1,19 @@
+import { Markdown, Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import { PrimitiveColors, SemanticColors } from "./blocks";
+import text from "../../docs/brand/color.md?raw";
+
+<Meta title="Foundations/Color" />
+
+<Markdown>{text}</Markdown>
+
+## Primitives
+
+The raw palette. Components never use these directly.
+
+<Unstyled><PrimitiveColors /></Unstyled>
+
+## Semantic tokens
+
+What components use. Each swatch is drawn in its own theme, with the primitive it points to and its HSL value.
+
+<Unstyled><SemanticColors /></Unstyled>
