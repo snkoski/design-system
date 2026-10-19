@@ -11,6 +11,7 @@ You need Node 22 or newer. The pnpm version is pinned in `package.json` (`packag
 ```sh
 corepack enable       # once per machine, if pnpm isn't set up yet
 pnpm install
+pnpm exec playwright install chromium   # once, for the story tests
 pnpm storybook        # opens http://localhost:6006
 ```
 
@@ -25,7 +26,12 @@ pnpm 11 refuses packages published less than a day ago, as protection against hi
 | `pnpm storybook` | Runs Storybook locally with live reload |
 | `pnpm build` | Builds the package into `dist/` (JavaScript, types, and CSS) |
 | `pnpm build-storybook` | Builds a static Storybook into `storybook-static/` |
-| `pnpm typecheck` | Checks TypeScript |
+| `pnpm typecheck` | Checks TypeScript, including the type assertions in test files |
+| `pnpm test` | Runs the unit tests (jsdom) and the story tests (Chromium, including accessibility checks) |
+| `pnpm test:unit` | Runs only the unit tests; fast |
+| `pnpm test:watch` | Runs the unit tests and reruns them as files change |
+| `pnpm test:stories` | Runs only the story tests |
+| `pnpm test:coverage` | Runs everything and writes a coverage report to `coverage/` |
 | `pnpm tokens` | Regenerates the token CSS from `tokens/tokens.json` (the other scripts run this for you) |
 | `pnpm chromatic` | Publishes Storybook to Chromatic (needs a project token) |
 
@@ -35,7 +41,7 @@ pnpm 11 refuses packages published less than a day ago, as protection against hi
 tokens/tokens.json           the single source for every color, size, and font
 scripts/build-tokens.mjs     turns tokens.json into CSS (don't edit the generated CSS)
 src/styles/                  tokens.css, base.css, fonts.css, and the Tailwind theme
-src/components/<Name>/       Name.tsx, name.css, Name.stories.tsx, index.ts
+src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
 docs/brand/                  the brand book, one Markdown file per topic
 src/foundations/             Storybook Foundations pages: the brand book plus token visuals
 .storybook/                  Storybook config, with a Light / Dark / Hot dog theme switch
@@ -49,6 +55,7 @@ src/foundations/             Storybook Foundations pages: the brand book plus to
 - **HSL only** for colors. **rem** for sizes; **px** only for borders, focus rings, and shadow offsets.
 - **Focus is an outline**, never only a shadow. Every control has a border (transparent if needed) so it survives Windows Contrast themes.
 - **Every story is checked for accessibility.** Violations fail the story (`a11y.test: "error"`).
+- **Every component has a test file.** `Name.test.tsx` covers behavior with Vitest and Testing Library. Stories also run as tests in Chromium, so accessibility checks run against the real CSS. See the Testing section of `CLAUDE.md`.
 
 ## Using it in another project
 
@@ -78,9 +85,10 @@ Set the theme with `data-theme="light" | "dark" | "hotdog"` on `<html>`. With no
 ## Adding a component
 
 1. If Base UI has a matching primitive (dialog, menu, tabs, popover…), build on it. shadcn's version of the component is a good starting point for structure; swap its Tailwind styling for a CSS file that follows the rules above.
-2. Create `src/components/<Name>/` with the component, its CSS, stories, and an `index.ts`.
+2. Create `src/components/<Name>/` with the component, its CSS, a test file, stories, and an `index.ts`.
 3. Import its CSS in `src/styles/index.css` and export it from `src/index.ts`.
 4. Add an `AllThemes` story so Chromatic snapshots it in every theme.
+5. Run `pnpm typecheck` and `pnpm test`. Copy the structure of `Button.test.tsx`.
 
 ## Publishing Storybook to Chromatic
 

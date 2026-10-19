@@ -17,7 +17,8 @@ The palette name may change, so never put "Sherbet" in file names, class names, 
 - React 19, TypeScript 6 (not 7: library tooling doesn't support it yet), Vite 8 in library mode
 - Base UI (`@base-ui/react`) for behavior and accessibility; shadcn/ui as a reference for structure
 - Tailwind CSS 4, for layout only (see below)
-- Storybook 10 with the docs, a11y, and themes addons; published to Chromatic by `.github/workflows/chromatic.yml`
+- Storybook 10 with the docs, a11y, themes, and Vitest addons; published to Chromatic by `.github/workflows/chromatic.yml`
+- Vitest 5 with Testing Library (jsdom) for unit tests, and Storybook's Vitest addon to run every story in Chromium (Playwright). `.github/workflows/test.yml` runs it all on every push and pull request.
 - pnpm 11, pinned in `package.json` (`packageManager`) and run through Corepack. pnpm 11 rejects packages published less than a day ago, and only packages listed under `allowBuilds` in `pnpm-workspace.yaml` may run install scripts.
 
 ## Commands
@@ -27,10 +28,15 @@ pnpm storybook        # dev server on http://localhost:6006
 pnpm typecheck
 pnpm build            # dist/: JS, types, and CSS
 pnpm build-storybook
+pnpm test             # unit tests (jsdom) and story tests (Chromium); first time: pnpm exec playwright install chromium
+pnpm test:unit        # unit tests only, fast
+pnpm test:watch       # unit tests in watch mode
+pnpm test:stories     # story tests only (play functions and axe)
+pnpm test:coverage
 pnpm tokens           # regenerate CSS from tokens/tokens.json (the other scripts do this first)
 ```
 
-Before saying any change is done, run `pnpm typecheck`, `pnpm build`, and `pnpm build-storybook`, and fix anything they report.
+Before saying any change is done, run `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`, and fix anything they report. `pnpm typecheck` also checks the type-level assertions (`expectTypeOf`) in test files.
 
 ## Layout
 
@@ -39,7 +45,9 @@ tokens/tokens.json           single source for colors, sizes, type, spacing, rad
 scripts/build-tokens.mjs     generates src/styles/tokens.css and src/styles/tailwind-theme.css
 scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
-src/components/<Name>/       Name.tsx, name.css, Name.stories.tsx, index.ts
+src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
+tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup)
+vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).
@@ -121,14 +129,36 @@ One convention per job. Never mix them.
 ## Adding a component
 
 1. If Base UI has a matching primitive, build on it. shadcn's version is a good reference for structure; replace its Tailwind styling with a CSS file that follows the rules above.
-2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.stories.tsx`, and `index.ts`.
-   A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx` and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
+2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.test.tsx`, `Name.stories.tsx`, and `index.ts`.
+   Write the test file for every component; it is not optional (see Testing).
+   A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx`, test file, and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
 3. Write JSDoc on the component and every prop. It becomes the Storybook docs.
 4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
 5. Stories: a `Playground` with controls, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
-6. Interaction tests use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
-7. Check contrast and focus in all three themes, then run typecheck, build, and build-storybook.
+6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
+7. Check contrast and focus in all three themes, then run typecheck, test, build, and build-storybook.
 8. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`.
+
+## Testing
+
+**Never delete, skip, weaken, or comment out a test to make a component pass. Only delete a test when the user explicitly tells you to, and never in any other circumstance.** If a test fails, the component is wrong or the test has a bug: fix the component, or tell the user why you think the test is wrong and let them decide. This also covers `it.skip`, `it.todo`, loosening an assertion until it passes, and removing a story's `play` function.
+
+Every component has a thorough `Name.test.tsx` next to it, and every story is also run as a test. Button's test file is the template; copy its structure.
+
+| Layer | Where | Covers |
+| --- | --- | --- |
+| Unit tests | `Name.test.tsx`, Vitest and Testing Library in jsdom | Behavior: props becoming attributes, ARIA state, keyboard use, callbacks, refs, `className` merging, disabled and loading, form behavior, and prop types |
+| Story tests | `Name.stories.tsx`, run in Chromium by Storybook's Vitest addon | Every story renders, `play` functions pass, and axe finds no violations (`a11y.test: "error"`), in the real CSS |
+| Visual tests | Chromatic, from the `AllThemes` story | Appearance in all three themes |
+
+- Query by role and accessible name (`getByRole("button", { name })`), the way a user or screen reader finds things. Use test ids only as a last resort.
+- Use `userEvent.setup()` for interactions. Test with the keyboard (Tab, Enter, Space, Escape, arrows) as well as the mouse.
+- For each component, cover: default rendering and defaults; every variant and size; each state (disabled, loading, invalid, checked, open, and so on) including that it blocks what it should; keyboard operation and focus order; accessible name and role; hidden decorative content; controlled and uncontrolled use; callbacks; ref forwarding; extra props passing through; and consumer `className` merging.
+- Test types with `expectTypeOf` in the test file, for example that an icon-only button requires `aria-label`. These run in `pnpm typecheck`, not in Vitest.
+- jsdom has no layout and no real CSS. Don't try to test focus rings, contrast, target size, or forced colors there: those belong to the story tests, Chromatic, and manual checks. If a Base UI popup needs a browser API that jsdom lacks (`ResizeObserver`, `matchMedia`, and similar), stub it in `tests/setup.ts`.
+- Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
+- When fixing a bug, add the test that would have caught it first.
+- Check that a new test can fail: break the code on purpose and confirm the test catches it.
 
 ## Foundations pages
 
@@ -152,5 +182,7 @@ Applies to docs, JSDoc, story descriptions, README text, and any copy in compone
 - Use hex colors, primitive tokens in components, or Tailwind for styling.
 - Add modifier classes or `cva`.
 - Remove a focus outline without replacing it.
+- Delete, skip, weaken, or comment out a test to get something passing. Tests are only removed when the user explicitly says so.
+- Ship a component without a test file.
 - Upgrade TypeScript to 7 or change the pnpm version without checking that every command still passes.
 - Commit secrets. The Chromatic token lives in the repo's GitHub secrets as `CHROMATIC_PROJECT_TOKEN`.

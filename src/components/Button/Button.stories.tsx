@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, Heart, Plus } from "lucide-react";
-import { expect, fn } from "storybook/test";
+import { fn } from "storybook/test";
 import { Button } from "./Button";
 
 const meta = {
@@ -75,12 +75,6 @@ export const IconOnly: Story = {
 /** Loading blocks clicks but stays focusable, so keyboard users don't lose their place. */
 export const Loading: Story = {
   args: { loading: true, children: "Sending message" },
-  play: async ({ args, canvas, userEvent }) => {
-    const button = canvas.getByRole("button", { name: "Sending message" });
-    await expect(button).toHaveAttribute("aria-busy", "true");
-    await userEvent.click(button);
-    await expect(args.onClick).not.toHaveBeenCalled();
-  },
 };
 
 export const Disabled: Story = {
@@ -91,15 +85,6 @@ export const Disabled: Story = {
       <Button {...args} disabled variant="ghost">Ghost</Button>
     </div>
   ),
-};
-
-/** Clicking calls `onClick` once. */
-export const ClickTest: Story = {
-  args: { children: "Send message" },
-  play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Send message" }));
-    await expect(args.onClick).toHaveBeenCalledOnce();
-  },
 };
 
 const variants = ["primary", "secondary", "ghost"] as const;
