@@ -164,6 +164,10 @@
       background: Canvas;
       color: HighlightText;
     }
+    /* The danger edge outranks the rule above, and forced colors would draw it in the page color, hiding the box */
+    .checkbox__box[aria-invalid="true"] {
+      border-color: ButtonText;
+    }
     .checkbox__box[aria-checked="true"],
     .checkbox__box[aria-checked="mixed"],
     .checkbox__row:hover .checkbox__box[aria-checked="true"]:not([data-disabled], [aria-readonly="true"]),
