@@ -32,6 +32,8 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 
 5. In the same throwaway test, record the keyboard behavior: focus the control and press Space, Enter, and any keys its pattern uses (arrows, Home, End, Escape), and log what changes. Similar Base UI primitives behave differently (Enter toggles a Switch but not a Checkbox), so don't assume it from the reference component.
 
+6. If the new component contains or wraps an existing one (a group of Checkboxes, a field around an Input), render them together in the throwaway test, not only the bare primitive. The existing component may bring its own Base UI wrappers that break the composition: Checkbox's own `Field.Root` hid a CheckboxGroup's `name`, so the form submitted nothing. Note any change the existing component needs; it goes in the proposal.
+
 ## Phase 2: Design proposal (stop for approval)
 
 Present this to the user and **stop**. Keep it to what they need to decide.
@@ -47,6 +49,8 @@ Present this to the user and **stop**. Keep it to what they need to decide.
 - **Motion:** what moves, with which tokens.
 - **Hot dog and forced-colors treatment.**
 - **Open questions:** decisions that are the user's, each with a recommendation.
+
+If the proposal changes an existing component, or its open questions would change the file set or the tests, offer to have the `junior-engineer` agent (Agent tool, `subagent_type: junior-engineer`) read it before the user's final pass. Give it the proposal text, the repo root, and the revision, and nothing about how you reached the design. Relay its blocking questions with your answer to each, and fold the answers into the proposal.
 
 Then ask for approval or changes. Continue only after the user approves. If they change the design, update the proposal and confirm again.
 
@@ -92,6 +96,10 @@ Screenshot the `AllThemes` story in all three themes with the recipe under "Look
 For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
 
 Then check what the theme screenshots can't show, with the second recipe there: a focused control, the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
+
+In forced colors, also check every state **at rest**: its edge or fill must differ from the page color. A state rule outranks the forced-colors base rule, and the browser can then draw it in the page color. An invalid, unticked Checkbox once disappeared entirely this way, with no hover involved. Look at the forced-colors screenshot for missing boxes, and log `borderTopColor` and `backgroundColor` for each state next to the page's `Canvas`.
+
+If the `AllThemes` matrix lays components out in columns, check that each one keeps its own height when its grid cell is stretched by a taller neighbor. A component whose root is a grid spreads its rows apart unless it sets `align-content: start`.
 
 If any part is dimmed with `opacity` (read-only, for example), check the contrast of everything inside it at that opacity, placeholders and icons included. `pnpm check:contrast` only knows undimmed pairs, so compute the composited colors by hand (blend each color with the page color at the opacity) and check 4.5:1 for text and 3:1 for edges and meaningful icons.
 
