@@ -134,6 +134,7 @@ One convention per job. Never mix them.
 ## Adding a component
 
 1. If Base UI has a matching primitive, build on it. shadcn's version is a good reference for structure; replace its Tailwind styling with a CSS file that follows the rules above.
+   Read Base UI's docs for it first: `node_modules/@base-ui/react/docs/react/components/<name>.md` ships with the package and is authoritative. Before writing CSS, render the primitive in a throwaway Vitest test and print the DOM, to see exactly which ARIA and `data-*` attributes it sets (Checkbox's `aria-checked="mixed"`, `aria-invalid`, and `data-disabled` came from this). Delete the throwaway test afterwards.
 2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.test.tsx`, `Name.stories.tsx`, and `index.ts`.
    Write the test file for every component; it is not optional (see Testing).
    A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx`, test file, and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
@@ -142,7 +143,28 @@ One convention per job. Never mix them.
 5. Stories: a `Playground` with controls, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
 7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
-8. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`.
+8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye.
+9. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`.
+
+### Looking at a component
+
+```sh
+pnpm build-storybook
+python3 -m http.server 6107 -d storybook-static &     # stop it afterwards: pkill -f "http.server 6107"
+node --input-type=module -e "
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 700, height: 900 } });
+for (const theme of ['light', 'dark', 'hotdog']) {
+  await page.goto('http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story');
+  await page.waitForSelector('[data-theme=' + theme + ']');
+  await page.locator('section[data-theme=' + theme + ']').screenshot({ path: '<scratchpad>/<name>-' + theme + '.png' });
+}
+await browser.close();
+"
+```
+
+Story ids are the title and story name in kebab case (`Components/Button link` and `AllThemes` become `components-button-link--all-themes`). Put the screenshots in a scratch folder, not the repo, and open them with the Read tool.
 
 ## Testing
 
@@ -183,6 +205,7 @@ Checkbox is the pattern for form controls (inputs, radios, switches, and so on).
 - Work on a branch and open a pull request into `main`. See `CONTRIBUTING.md` for the workflow, the required checks, and how to review.
 - Fill in `.github/pull_request_template.md` honestly. Never tick a checklist item that isn't true, and say what you did not check.
 - Chromatic posts the Storybook preview and the visual diff, so don't add screenshots. Add a recording only for motion or multi-step interactions.
+- Chromatic's check passes even when snapshots changed. New and changed stories wait as "must be accepted as baselines" in Chromatic's web app until someone accepts them, so check the build there after a push.
 - Keep a pull request to one thing, and call out breaking changes (renamed or removed props, tokens, or exports).
 
 ## Foundations pages

@@ -14,10 +14,10 @@ Keep pull requests small and about one thing. A new component, a token change, a
 
 ## Checks
 
-Two checks run on every pull request. Both must pass before merging.
+Two checks run on every pull request. The Test check must pass before merging. For Chromatic, a reviewer accepts or rejects the visual changes in its web app.
 
 - **Test** (`.github/workflows/test.yml`): typecheck, the contrast and rules checks, build, unit tests, and every story run as a test in Chromium, including the accessibility checks.
-- **Chromatic** (`.github/workflows/chromatic.yml`): publishes Storybook and compares every story to `main`.
+- **Chromatic** (`.github/workflows/chromatic.yml`): publishes Storybook and compares every story to `main`. Its check passes even when snapshots changed, because it runs with `--exit-zero-on-changes`; changes wait in Chromatic's web app until a reviewer accepts them as baselines.
 
 ## Reviewing a pull request
 
