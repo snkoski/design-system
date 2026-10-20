@@ -33,6 +33,9 @@ export default mergeConfig(
         {
           extends: true,
           plugins: [storybookTest({ configDir })],
+          // Pre-bundle every Base UI primitive up front. Otherwise the first story to use a new one
+          // makes Vite re-optimize and reload mid-run, and every story file fails once.
+          optimizeDeps: { include: ["@base-ui/react/*"] },
           test: {
             name: "storybook",
             browser: {
