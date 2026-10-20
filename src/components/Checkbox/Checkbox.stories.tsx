@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 import { Checkbox } from "./Checkbox";
 
 const meta = {
@@ -78,6 +78,11 @@ export const ReadOnly: Story = {
 /** With no visible label, such as a row in a table, an `aria-label` is required. The hit area is still 44px. */
 export const WithoutVisibleLabel: Story = {
   args: { children: undefined, "aria-label": "Select row 3" },
+  play: async ({ canvas }) => {
+    // Its own box is target-min tall, so its 44px hit area doesn't spill into the control above or below it
+    const control = canvas.getByRole("checkbox", { name: "Select row 3" });
+    await expect(control.closest(".checkbox")!.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  },
 };
 
 /** A "select all" box shows a dash when only some of the boxes below it are ticked. You decide the next state. */

@@ -77,6 +77,11 @@ export const ReadOnly: Story = {
 /** With no visible label, an `aria-label` is required. The hit area is still 44px. */
 export const WithoutVisibleLabel: Story = {
   args: { children: undefined, "aria-label": "Dark mode" },
+  play: async ({ canvas }) => {
+    // Its own box is target-min tall, so its 44px hit area doesn't spill into the control above or below it
+    const control = canvas.getByRole("switch", { name: "Dark mode" });
+    await expect(control.closest(".switch")!.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  },
 };
 
 /** `uncheckedValue` makes an off switch submit a value too, which suits on/off settings. */
