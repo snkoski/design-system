@@ -10,6 +10,8 @@ The brand book (principles, voice, color usage, type, layout, motion, iconograph
 
 When a rule or guideline changes, update the matching file in `docs/brand/`. If it's a rule about how code is written, update this file too.
 
+Decisions made for now that we may want to change, and open questions, go in `docs/revisit.md`: what we do today, why, and what would settle it. Check it before changing anything it mentions.
+
 The palette name may change, so never put "Sherbet" in file names, class names, CSS variables, or package names.
 
 ## Stack
@@ -57,6 +59,7 @@ scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 .claude/settings.json        a hook that warns when tests are removed, skipped, or weakened
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
+docs/revisit.md              decisions to come back to, and open questions
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).
                              Not part of the published package.
