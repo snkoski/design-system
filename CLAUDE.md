@@ -48,9 +48,10 @@ scripts/build-tokens.mjs     generates src/styles/tokens.css and src/styles/tail
 scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
-src/internal/                pieces several components share (cx, FieldError and field-error.css), with tests.
+src/internal/                pieces several components share (cx, FieldError and field-error.css, warn), with tests.
                              Not exported from the package.
-tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup)
+tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup, fail on unexpected warnings)
+tests/warnings.ts            takeWarnings(), for tests that expect a dev warning
 tokens/contrast.json         every foreground and background color pair the components use, with its minimum ratio
 scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 .claude/settings.json        a hook that warns when tests are removed, skipped, or weakened
@@ -236,6 +237,18 @@ Checkbox is the pattern for choice controls (checkboxes, switches, radios), and 
 - Disabled dims the control and its label to 50% opacity. Read-only dims only the control, to 75%, and keeps the label at full strength, because read-only content must stay readable. A read-only text field also hides its placeholder, which would fall below 4.5:1 at 75% and has nothing to suggest when you can't type. At 75% the control's edge and its mark still meet 3:1 in every theme. Forced colors resets both to full opacity.
 - Declare each Base UI prop you want in Storybook's docs table explicitly on the component's props type, with JSDoc. Storybook doesn't read props inherited from `node_modules`.
 - In tests, check names and descriptions with `toHaveAccessibleName` and `toHaveAccessibleDescription`, and check what the form submits with `FormData`.
+
+## Dev warnings
+
+`warn()` and `warnIfUnnamed()` in `src/internal/warn.ts` print a console warning in development, once per message, prefixed `[design-system] <Component>:`. A consumer's production build replaces `process.env.NODE_ENV` and drops them. Add one only when all three hold:
+
+1. TypeScript can't catch it. If a type can enforce it, use the type.
+2. The result is definitely broken: wrong form data, a control with no accessible name, or a prop that silently does nothing. Never for unusual but valid use, style, or preferences.
+3. Nothing else would show it: the page doesn't visibly break, and axe in Storybook doesn't catch it.
+
+The message says what's wrong and how to fix it. Warn about values that would have an effect (`invalid` on a group's option warns; `invalid={false}` doesn't). Call them during render, so they also show when a page is rendered on the server. Every form control and button calls `warnIfUnnamed()`, because an empty-string label passes the props type.
+
+`tests/setup.ts` fails any unit test that leaves a `console.warn` behind. A test that expects a warning takes it with `takeWarnings()` from `tests/warnings.ts` and asserts the exact message. Each warning has a test that it fires; correct usage everywhere else proves it stays quiet.
 
 ## Pull requests
 

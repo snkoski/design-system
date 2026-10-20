@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { ButtonLink } from "./ButtonLink";
 import type { ButtonLinkProps } from "./ButtonLink";
 
@@ -77,5 +78,23 @@ describe("ButtonLink", () => {
     expectTypeOf<ButtonLinkProps>().not.toHaveProperty("loading");
     expectTypeOf<ButtonLinkProps>().not.toHaveProperty("disabled");
     expectTypeOf<ButtonLinkProps>().toHaveProperty("href");
+  });
+
+  describe("dev warnings", () => {
+    it("warns when an icon-only button's aria-label is empty", () => {
+      render(
+        <ButtonLink href="/close" iconOnly aria-label="">
+          <svg />
+        </ButtonLink>,
+      );
+      expect(screen.getByRole("link")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] ButtonLink: has no accessible name, so screen readers announce it without one. Give an icon-only button an aria-label that says what it does."]);
+    });
+
+    it("warns when the label text is empty and there's no aria-label", () => {
+      render(<ButtonLink href="/close">{""}</ButtonLink>);
+      expect(screen.getByRole("link")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] ButtonLink: has no accessible name, so screen readers announce it without one. Give it label text (children) or an aria-label."]);
+    });
   });
 });

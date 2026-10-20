@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, Ref } from "react";
+import { warnIfUnnamed } from "../../internal/warn";
 import { Content, cx } from "./shared";
 import type { IconOnly, SharedProps } from "./shared";
 
@@ -23,6 +24,13 @@ export function ButtonLink({
   children,
   ...rest
 }: ButtonLinkProps) {
+  // An icon-only button's children are a hidden icon, so only an aria-label can name it
+  warnIfUnnamed(
+    "ButtonLink",
+    iconOnly ? undefined : children,
+    rest,
+    iconOnly ? "Give an icon-only button an aria-label that says what it does." : "Give it label text (children) or an aria-label.",
+  );
   return (
     <a
       {...rest}

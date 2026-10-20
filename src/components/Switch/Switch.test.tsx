@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { Switch } from "./Switch";
 import type { SwitchProps } from "./Switch";
 
@@ -520,6 +521,14 @@ describe("Switch", () => {
     it("takes string form values", () => {
       expectTypeOf<SwitchProps["value"]>().toEqualTypeOf<string | undefined>();
       expectTypeOf<SwitchProps["uncheckedValue"]>().toEqualTypeOf<string | undefined>();
+    });
+  });
+
+  describe("dev warnings", () => {
+    it("warns when the label text is empty and there's no aria-label", () => {
+      render(<Switch>{""}</Switch>);
+      expect(screen.getByRole("switch")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Switch: has no accessible name, so screen readers announce it without one. Give it label text (children) or an aria-label."]);
     });
   });
 });

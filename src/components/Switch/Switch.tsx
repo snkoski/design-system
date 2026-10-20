@@ -3,6 +3,7 @@ import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import type { ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { warnIfUnnamed } from "../../internal/warn";
 
 /** A switch needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =
@@ -80,6 +81,7 @@ export function Switch({
   name,
   ...rest
 }: SwitchProps) {
+  warnIfUnnamed("Switch", children, rest, "Give it label text (children) or an aria-label.");
   const control = (
     <BaseSwitch.Root {...rest} className="switch__track" disabled={disabled} name={name}>
       <BaseSwitch.Thumb className="switch__thumb" />

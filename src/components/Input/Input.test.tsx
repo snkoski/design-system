@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { Input } from "./Input";
 import type { InputProps, InputSize, InputType } from "./Input";
 
@@ -527,6 +528,14 @@ describe("Input", () => {
       expectTypeOf<InputProps["className"]>().toEqualTypeOf<string | undefined>();
       expectTypeOf<InputProps["ref"]>().toEqualTypeOf<Ref<HTMLInputElement> | undefined>();
       expectTypeOf<InputProps["iconStart"]>().toEqualTypeOf<ReactNode>();
+    });
+  });
+
+  describe("dev warnings", () => {
+    it("warns when the label is empty and there's no aria-label", () => {
+      render(<Input label="" />);
+      expect(screen.getByRole("textbox")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Input: has no accessible name, so screen readers announce it without one. Give it a label or an aria-label."]);
     });
   });
 });

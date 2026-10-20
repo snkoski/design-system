@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { Button } from "./Button";
 import type { ButtonProps } from "./Button";
 
@@ -291,6 +292,24 @@ describe("Button", () => {
     it("does not allow render or className-as-function overrides", () => {
       expectTypeOf<ButtonProps>().not.toHaveProperty("render");
       expectTypeOf<ButtonProps["className"]>().toEqualTypeOf<string | undefined>();
+    });
+  });
+
+  describe("dev warnings", () => {
+    it("warns when an icon-only button's aria-label is empty", () => {
+      render(
+        <Button iconOnly aria-label="">
+          <svg />
+        </Button>,
+      );
+      expect(screen.getByRole("button")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Button: has no accessible name, so screen readers announce it without one. Give an icon-only button an aria-label that says what it does."]);
+    });
+
+    it("warns when the label text is empty and there's no aria-label", () => {
+      render(<Button>{""}</Button>);
+      expect(screen.getByRole("button")).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Button: has no accessible name, so screen readers announce it without one. Give it label text (children) or an aria-label."]);
     });
   });
 });

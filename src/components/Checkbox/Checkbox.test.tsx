@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { CheckboxGroup } from "../CheckboxGroup";
 import { Checkbox } from "./Checkbox";
 import type { CheckboxProps } from "./Checkbox";
@@ -512,6 +513,8 @@ describe("Checkbox", () => {
   });
 
   describe("inside a CheckboxGroup", () => {
+    const warning = (message: string) => `[design-system] Checkbox: ${message}`;
+
     function submitted(form: HTMLFormElement, name: string) {
       return new FormData(form).getAll(name);
     }
@@ -527,6 +530,9 @@ describe("Checkbox", () => {
       const form = screen.getByTestId("form") as HTMLFormElement;
       expect(submitted(form, "services")).toEqual(["design"]);
       expect(submitted(form, "other")).toEqual([]);
+      expect(takeWarnings()).toEqual([
+        warning('the option "design" in a CheckboxGroup ignores name (set it on the CheckboxGroup).'),
+      ]);
     });
 
     it("is ticked by the group's value, not its own checked or defaultChecked", () => {
@@ -538,6 +544,10 @@ describe("Checkbox", () => {
       );
       expect(screen.getByRole("checkbox", { name: "Design" })).not.toBeChecked();
       expect(screen.getByRole("checkbox", { name: "Writing" })).toBeChecked();
+      expect(takeWarnings()).toEqual([
+        warning(`the option "design" in a CheckboxGroup ignores defaultChecked (use the CheckboxGroup's defaultValue).`),
+        warning(`the option "writing" in a CheckboxGroup ignores checked (use the CheckboxGroup's value).`),
+      ]);
     });
 
     it("ignores its own invalid and error, which belong to the group", () => {
@@ -549,6 +559,9 @@ describe("Checkbox", () => {
       expect(getBox()).toHaveAccessibleName("Design");
       expect(getBox()).not.toHaveAttribute("aria-invalid", "true");
       expect(screen.queryByText("Not this one.")).not.toBeInTheDocument();
+      expect(takeWarnings()).toEqual([
+        warning('the option "design" in a CheckboxGroup ignores invalid (set it on the CheckboxGroup), error (set it on the CheckboxGroup).'),
+      ]);
     });
 
     it("ignores its own required", () => {
@@ -560,6 +573,9 @@ describe("Checkbox", () => {
       expect(getInput(container)).toHaveAttribute("name", "services");
       expect(getInput(container)).not.toBeRequired();
       expect(getBox()).not.toHaveAttribute("aria-required", "true");
+      expect(takeWarnings()).toEqual([
+        warning('the option "design" in a CheckboxGroup ignores required (a group has none: use invalid and error on the CheckboxGroup).'),
+      ]);
     });
 
     it("ignores uncheckedValue, so an unticked option submits nothing", () => {
@@ -572,6 +588,9 @@ describe("Checkbox", () => {
       );
       expect(screen.getByTestId("form").querySelector("input[name=services]")).toBeInTheDocument();
       expect([...new FormData(screen.getByTestId("form") as HTMLFormElement).values()]).toEqual([]);
+      expect(takeWarnings()).toEqual([
+        warning('the option "design" in a CheckboxGroup ignores uncheckedValue (a group submits only ticked options).'),
+      ]);
     });
 
     it("needs a value: without one, it's listed under the group's name and submits `on`", async () => {
@@ -587,6 +606,9 @@ describe("Checkbox", () => {
       await user.click(getBox());
       expect(onValueChange).toHaveBeenCalledWith(["services"], expect.anything());
       expect(submitted(screen.getByTestId("form") as HTMLFormElement, "services")).toEqual(["on"]);
+      expect(takeWarnings()).toEqual([
+        warning(`an option in a CheckboxGroup has no value, so it submits "on" and is listed under the group's name. Give each option a value.`),
+      ]);
     });
 
     it("still calls its own onCheckedChange", async () => {
@@ -738,6 +760,62 @@ describe("Checkbox", () => {
     it("takes string form values", () => {
       expectTypeOf<CheckboxProps["value"]>().toEqualTypeOf<string | undefined>();
       expectTypeOf<CheckboxProps["uncheckedValue"]>().toEqualTypeOf<string | undefined>();
+    });
+  });
+
+  describe("dev warnings", () => {
+    it("warns when the label text is empty and there's no aria-label", () => {
+      render(<Checkbox aria-label=" ">{""}</Checkbox>);
+      expect(getBox()).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Checkbox: has no accessible name, so screen readers announce it without one. Give it label text (children) or an aria-label."]);
+    });
+
+    it("warns once, however often it renders", () => {
+      const { rerender } = render(<Checkbox>{"  "}</Checkbox>);
+      rerender(<Checkbox disabled>{"  "}</Checkbox>);
+      expect(takeWarnings()).toHaveLength(1);
+    });
+
+    it("stays quiet when aria-labelledby names it", () => {
+      render(
+        <>
+          <h2 id="terms-heading">Terms</h2>
+          <Checkbox aria-labelledby="terms-heading">{""}</Checkbox>
+        </>,
+      );
+      expect(getBox()).toHaveAccessibleName("Terms");
+      expect(takeWarnings()).toEqual([]);
+    });
+
+    it("warns when parent is used outside a CheckboxGroup", () => {
+      render(<Checkbox parent>All services</Checkbox>);
+      expect(getBox()).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] Checkbox: parent only works inside a CheckboxGroup that has allValues."]);
+    });
+
+    it("stays quiet about group props set to values that change nothing", () => {
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" invalid={false} required={false} defaultChecked={false} name="" error={null}>
+            Design
+          </Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(getBox()).toBeInTheDocument();
+      expect(takeWarnings()).toEqual([]);
+    });
+
+    it("names the parent box when it ignores a group prop", () => {
+      render(
+        <CheckboxGroup label="Services" allValues={["design"]}>
+          <Checkbox parent invalid>All services</Checkbox>
+          <Checkbox value="design">Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getByRole("checkbox", { name: "All services" })).toBeInTheDocument();
+      expect(takeWarnings()).toEqual([
+        "[design-system] Checkbox: the parent box in a CheckboxGroup ignores invalid (set it on the CheckboxGroup).",
+      ]);
     });
   });
 });

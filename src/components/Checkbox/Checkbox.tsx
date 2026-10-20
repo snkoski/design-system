@@ -5,6 +5,7 @@ import type { ReactNode, Ref } from "react";
 import { CheckboxGroupContext } from "../CheckboxGroup/context";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { hasContent, warn, warnIfUnnamed } from "../../internal/warn";
 
 /** A checkbox needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =
@@ -130,6 +131,31 @@ export function Checkbox({
   const group = useContext(CheckboxGroupContext);
   // Inside a group, the group's value ticks the box and its field gives the name and validity
   const { checked, defaultChecked, uncheckedValue, required, ...groupable } = rest;
+
+  warnIfUnnamed("Checkbox", children, rest, "Give it label text (children) or an aria-label.");
+  if (group) {
+    const option = parent ? "the parent box" : rest.value === undefined ? "an option" : `the option "${rest.value}"`;
+    if (parent && !group.hasAllValues) {
+      warn("Checkbox", "a parent box ticks only itself unless its CheckboxGroup has allValues. Pass every option's value as allValues.");
+    }
+    if (!parent && rest.value === undefined) {
+      warn("Checkbox", `an option in a CheckboxGroup has no value, so it submits "on" and is listed under the group's name. Give each option a value.`);
+    }
+    const ignored = [
+      name && "name (set it on the CheckboxGroup)",
+      invalid && "invalid (set it on the CheckboxGroup)",
+      hasContent(error) && "error (set it on the CheckboxGroup)",
+      required && "required (a group has none: use invalid and error on the CheckboxGroup)",
+      checked !== undefined && "checked (use the CheckboxGroup's value)",
+      defaultChecked && "defaultChecked (use the CheckboxGroup's defaultValue)",
+      uncheckedValue !== undefined && "uncheckedValue (a group submits only ticked options)",
+    ].filter(Boolean);
+    if (ignored.length > 0) {
+      warn("Checkbox", `${option} in a CheckboxGroup ignores ${ignored.join(", ")}.`);
+    }
+  } else if (parent) {
+    warn("Checkbox", "parent only works inside a CheckboxGroup that has allValues.");
+  }
 
   const box = (
     <BaseCheckbox.Root

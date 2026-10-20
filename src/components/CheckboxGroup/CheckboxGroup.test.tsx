@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { takeWarnings } from "../../../tests/warnings";
 import { Checkbox } from "../Checkbox";
 import { CheckboxGroup } from "./CheckboxGroup";
 import type { CheckboxGroupProps } from "./CheckboxGroup";
@@ -760,6 +761,9 @@ describe("CheckboxGroup", () => {
       );
       await user.click(getBox("All services"));
       expect(ticked()).toEqual(["All services", "Design"]);
+      expect(takeWarnings()).toEqual([
+        "[design-system] Checkbox: a parent box ticks only itself unless its CheckboxGroup has allValues. Pass every option's value as allValues.",
+      ]);
     });
 
     it("changes nothing when the group is read-only", async () => {
@@ -853,6 +857,27 @@ describe("CheckboxGroup", () => {
 
     it("takes a string name", () => {
       expectTypeOf<CheckboxGroupProps["name"]>().toEqualTypeOf<string | undefined>();
+    });
+  });
+
+  describe("dev warnings", () => {
+    it("warns when the label is empty and there's no aria-label", () => {
+      render(<CheckboxGroup label="">{options}</CheckboxGroup>);
+      expect(getGroup()).toBeInTheDocument();
+      expect(takeWarnings()).toEqual(["[design-system] CheckboxGroup: has no accessible name, so screen readers announce it without one. Give it a label or an aria-label."]);
+    });
+
+    it("stays quiet when aria-labelledby names it", () => {
+      render(
+        <>
+          <h2 id="services-heading">Services</h2>
+          <CheckboxGroup aria-label="" aria-labelledby="services-heading">
+            {options}
+          </CheckboxGroup>
+        </>,
+      );
+      expect(screen.getByRole("group", { name: "Services" })).toBeInTheDocument();
+      expect(takeWarnings()).toEqual([]);
     });
   });
 });

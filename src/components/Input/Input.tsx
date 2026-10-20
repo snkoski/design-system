@@ -3,6 +3,7 @@ import { Input as BaseInput } from "@base-ui/react/input";
 import type { InputHTMLAttributes, ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { warnIfUnnamed } from "../../internal/warn";
 
 export type InputType = "text" | "email" | "password" | "search" | "tel" | "url";
 export type InputSize = "md" | "lg";
@@ -95,6 +96,7 @@ export function Input({
   ref,
   ...rest
 }: InputProps) {
+  warnIfUnnamed("Input", label, rest, "Give it a label or an aria-label.");
   return (
     <Field.Root className={cx("input", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
       {label !== undefined && <Field.Label className="input__label">{label}</Field.Label>}

@@ -6,6 +6,7 @@ import type { ReactNode, Ref } from "react";
 import { CheckboxGroupContext } from "./context";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { warnIfUnnamed } from "../../internal/warn";
 
 /** A group needs a name a screen reader can announce: a visible label, or an `aria-label`. */
 type Labelled =
@@ -82,7 +83,9 @@ export function CheckboxGroup({
   children,
   ...rest
 }: CheckboxGroupProps) {
-  const context = useMemo(() => ({ readOnly }), [readOnly]);
+  const hasAllValues = rest.allValues !== undefined;
+  const context = useMemo(() => ({ readOnly, hasAllValues }), [readOnly, hasAllValues]);
+  warnIfUnnamed("CheckboxGroup", label, rest, "Give it a label or an aria-label.");
 
   return (
     <Field.Root className={cx("checkbox-group", className)} name={name} disabled={disabled} invalid={invalid}>
