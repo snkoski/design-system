@@ -33,6 +33,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 - Use real elements: `<button>` for actions, `<a href>` for navigation, `<label>` for every input. A link that looks like a button is still an `<a>`.
 - Build interactive components (dialog, menu, tabs, select, tooltip, popover) on Base UI through shadcn. Never hand-roll their keyboard or ARIA behavior.
 - Every interactive target is at least `target-min` (44px) in both directions.
+- For a checkbox, radio, or switch, the whole label is the click target. The checked state shows a mark (a tick or a dash) as well as a fill, and the box edge always meets 3:1 on its own, because the action fill does not.
 - Hover is never the only way to reach anything. Tooltips also open on focus and never hold essential content.
 - Icon-only buttons have an `aria-label`. Decorative images and icons get `alt=""` or `aria-hidden="true"`.
 - Form errors appear as text beside the field, are linked with `aria-describedby`, and are announced. The first invalid field receives focus on submit.

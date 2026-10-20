@@ -160,6 +160,18 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
 
+## Form controls
+
+Checkbox is the pattern for form controls (inputs, radios, switches, and so on). Follow it:
+
+- Wrap the control in Base UI's `Field.Root`, put the label in `Field.Label`, and render `description` and `error` props with `Field.Description` and `Field.Error`. Base UI then links them with `aria-labelledby`, `aria-describedby`, and `aria-invalid`, so don't set those by hand.
+- A control needs an accessible name. The props type requires visible label content (`children`) or an `aria-label`.
+- Take `invalid` and `error` as separate props. An error is always words plus an icon, never only a red border.
+- The label wraps the control, so clicking the text works. Keep the clickable row at least `--target-min` tall, and give a control with no visible label a pseudo-element hit area.
+- Style state from Base UI's ARIA attributes (`aria-checked`, `aria-invalid`, `aria-readonly`) and its `data-disabled`, as `checkbox.css` does.
+- Declare each Base UI prop you want in Storybook's docs table explicitly on the component's props type, with JSDoc. Storybook doesn't read props inherited from `node_modules`.
+- In tests, check names and descriptions with `toHaveAccessibleName` and `toHaveAccessibleDescription`, and check what the form submits with `FormData`.
+
 ## Pull requests
 
 - Work on a branch and open a pull request into `main`. See `CONTRIBUTING.md` for the workflow, the required checks, and how to review.

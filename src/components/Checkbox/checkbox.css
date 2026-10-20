@@ -1,0 +1,186 @@
+/* Checkbox: what it is (box, mark, colors, states, text). Where it sits (margin, width) is the layout's job. */
+@layer components {
+  .checkbox {
+    display: grid;
+    justify-items: start;
+    row-gap: var(--space-1);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    color: var(--ink);
+  }
+
+  /* The label is the click target. It's as tall as target-min, and the box sits on its first line. */
+  .checkbox__row {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-block: calc((var(--target-min) - var(--choice)) / 2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .checkbox__label {
+    line-height: var(--choice); /* the first line is as tall as the box, so they center */
+    min-width: 0;
+  }
+
+  .checkbox__box {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--choice);
+    height: var(--choice);
+    margin: 0;
+    padding: 0;
+    border: var(--border-thick) solid var(--border-strong); /* the 3:1 edge, whatever the fill is */
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--on-action);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* A box with no visible label still gets a target-min hit area */
+  .checkbox__box::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--choice) - var(--target-min)) / 2 - var(--border-thick));
+  }
+
+  .checkbox__row:hover .checkbox__box:not([data-disabled], [aria-readonly="true"]),
+  .checkbox__box:hover:not([data-disabled], [aria-readonly="true"]) {
+    background: var(--surface-tint);
+  }
+
+  .checkbox__box:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Ticked and mixed: filled, with a mark. The mark is what says "ticked", not the fill. */
+  .checkbox__box[aria-checked="true"],
+  .checkbox__box[aria-checked="mixed"] {
+    background: var(--action);
+  }
+  .checkbox__row:hover .checkbox__box[aria-checked="true"]:not([data-disabled], [aria-readonly="true"]),
+  .checkbox__row:hover .checkbox__box[aria-checked="mixed"]:not([data-disabled], [aria-readonly="true"]),
+  .checkbox__box[aria-checked="true"]:hover:not([data-disabled], [aria-readonly="true"]),
+  .checkbox__box[aria-checked="mixed"]:hover:not([data-disabled], [aria-readonly="true"]) {
+    background: var(--action-hover);
+  }
+
+  .checkbox__box[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+
+  .checkbox__box[aria-readonly="true"],
+  .checkbox__row:has(.checkbox__box[aria-readonly="true"]) {
+    cursor: default;
+  }
+
+  /* Disabled */
+  .checkbox__row[data-disabled],
+  .checkbox__box[data-disabled] {
+    cursor: not-allowed;
+  }
+  .checkbox__box[data-disabled],
+  .checkbox__row[data-disabled] .checkbox__label {
+    opacity: 0.5;
+  }
+
+  /* The mark */
+  .checkbox__indicator {
+    display: inline-flex;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-bounce);
+  }
+  .checkbox__indicator[data-starting-style],
+  .checkbox__indicator[data-ending-style] {
+    opacity: 0;
+    transform: scale(var(--motion-scale));
+  }
+  /* Leaving is quicker than arriving */
+  .checkbox__indicator[data-ending-style] {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-in);
+  }
+  .checkbox__mark {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Description and error line up with the label text, not the box */
+  .checkbox__description,
+  .checkbox__error {
+    margin: 0;
+    padding-inline-start: calc(var(--choice) + var(--space-3));
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+  }
+  .checkbox__description {
+    color: var(--ink-muted);
+  }
+  .checkbox__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    color: var(--danger);
+  }
+  .checkbox__error-icon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+  }
+
+  /* Hot dog mode: a hard shadow to press into */
+  [data-theme="hotdog"] .checkbox__box {
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .checkbox__row:active .checkbox__box:not([data-disabled], [aria-readonly="true"]),
+  [data-theme="hotdog"] .checkbox__box:active:not([data-disabled], [aria-readonly="true"]) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Windows Contrast themes: system colors, with the mark in a contrasting color */
+  @media (forced-colors: active) {
+    .checkbox__box {
+      border-color: ButtonText;
+      background: Canvas;
+      color: HighlightText;
+    }
+    .checkbox__box[aria-checked="true"],
+    .checkbox__box[aria-checked="mixed"] {
+      background: Highlight;
+      border-color: Highlight;
+    }
+    .checkbox__box[data-disabled],
+    .checkbox__row[data-disabled] .checkbox__label {
+      opacity: 1;
+    }
+    .checkbox__box[data-disabled] {
+      border-color: GrayText;
+    }
+    .checkbox__box[data-disabled][aria-checked="true"],
+    .checkbox__box[data-disabled][aria-checked="mixed"] {
+      background: GrayText;
+    }
+    .checkbox__row[data-disabled] .checkbox__label {
+      color: GrayText;
+    }
+    .checkbox__error {
+      color: CanvasText;
+    }
+  }
+}

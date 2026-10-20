@@ -10,5 +10,6 @@
 ## Shape and elevation
 
 - Soft and round. Buttons, chips, badges, and avatars use `radius-full` (pills). Inputs and menus use `radius-md`, cards and dialogs `radius-lg`, and hero panels `radius-xl`.
+- Checkboxes and other small choice controls use `radius-sm` and the `choice` size (24px). The label, or an invisible hit area, brings the target up to 44px.
 - Elevation: `shadow-sm` for raised controls, `shadow-md` for popovers and hovered cards, and `shadow-lg` for dialogs. Shadows are espresso-tinted, never gray.
 - A shadow never carries meaning alone. Pair it with a border so the element survives forced-colors mode.
