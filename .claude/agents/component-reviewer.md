@@ -30,7 +30,16 @@ pnpm test           # unit and story tests
 pnpm check:tests    # removed, skipped, or weakened tests compared with HEAD
 ```
 
-Report any failure as a Must fix. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
+Report any failure as a Must fix.
+
+To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, serve it read-only and inspect it with Playwright from the repo folder:
+
+```sh
+python3 -m http.server 6107 -d storybook-static &   # stop it afterwards: pkill -f "http.server 6107"
+node --input-type=module -e "import { chromium } from 'playwright'; /* open http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story */"
+```
+
+Check that it's current first: if any file in `src/components/<Name>/` is newer than `storybook-static/index.html`, say the build is stale and judge from the source instead. Use real hover (`locator.hover()`) and `page.emulateMedia({ forcedColors: 'active' })` to check states that screenshots can't show, and save screenshots to the scratchpad, not the repo. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
 
 ## What to check
 
@@ -45,6 +54,8 @@ Report any failure as a Must fix. The scripts cover hex and named colors, primit
 - Built on the Base UI primitive when one exists; no hand-rolled keyboard handling, focus management, or ARIA.
 - State is styled from ARIA attributes when one exists (`aria-checked`, `aria-invalid`, `aria-expanded`, and so on), and from Base UI's `data-*` only otherwise.
 - Focus is an outline with the focus tokens. Every control has a border (transparent if needed). A `@media (forced-colors: active)` block covers anything that would vanish, with checked and selected states still distinguishable.
+- No hover rule covers up a state (checked, selected, invalid): compare each state's edge and fill at rest and hovered, in normal mode and forced colors.
+- Anything dimmed with `opacity` still meets contrast for everything inside it, placeholders and icons included.
 - Every target is at least `--target-min` in both directions, with a pseudo-element hit area when the visible control is smaller.
 - Color never carries meaning alone. Every foreground and background pair the CSS uses is in `tokens/contrast.json`; list any that are missing.
 

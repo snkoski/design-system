@@ -54,6 +54,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 
 1. Write the props type (and a stub component that renders `null`) in `<Name>.tsx`, so the test file typechecks.
 2. Write `<Name>.test.tsx` from the approved API, covering the full list in the Testing section of `CLAUDE.md`. Include `expectTypeOf` checks for any rule enforced in types.
+   Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
 3. Run `pnpm test:unit` and `pnpm typecheck`. Every runtime test should fail, because the stub renders nothing; none should fail from import or type errors. Note the count.
 4. List the tests that pass against the stub (`pnpm exec vitest run --project unit src/components/<Name> --reporter=verbose`). Type-only tests (`expectTypeOf`) pass at runtime by design; `pnpm typecheck` checks them. **Any other test that passes is vacuous**: it only asserts that something is absent, so an empty render satisfies it. Make it stricter by asserting a positive precondition first (the control or hidden input exists), and rerun until only type tests pass.
 
@@ -67,7 +68,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 
 ## Phase 5: Stories
 
-Write `<Name>.stories.tsx`: a `Playground` with controls, one story per variant group or state, and `AllThemes` with every state in all three themes. Keep `play` functions to short demos.
+Write `<Name>.stories.tsx`: a `Playground` with controls; a `States` story showing every state side by side (Phase 7's focus check opens it, and the first Tab must land in it); one story per variant group or state; and `AllThemes` with every state in all three themes. Keep `play` functions to short demos, plus the CSS-dependent checks listed in Phase 3.
 
 ## Phase 6: Verify
 
@@ -88,7 +89,13 @@ Then prove the tests can fail: break the component three ways that matter (for e
 
 Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Check alignment, every state, focus, hot dog mode, and dark mode.
 
-Then check what the theme screenshots can't show, with the second recipe there: a focused control, the `AllThemes` story with forced colors emulated, and, in forced colors, the computed fill of each checked or selected state at rest and while hovered. The hovered fill must not fall back to the page color (a hovered "on" Switch once lost its fill and hid its thumb). Fix what looks wrong and check again.
+For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
+
+Then check what the theme screenshots can't show, with the second recipe there: a focused control, the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
+
+If any part is dimmed with `opacity` (read-only, for example), check the contrast of everything inside it at that opacity, placeholders and icons included. `pnpm check:contrast` only knows undimmed pairs, so compute the composited colors by hand (blend each color with the page color at the opacity) and check 4.5:1 for text and 3:1 for edges and meaningful icons.
+
+Fix what looks wrong and check again.
 
 ## Phase 8: Docs
 

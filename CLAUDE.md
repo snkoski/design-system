@@ -141,7 +141,7 @@ One convention per job. Never mix them.
    A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx`, test file, and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
 3. Write JSDoc on the component and every prop. It becomes the Storybook docs.
 4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
-5. Stories: a `Playground` with controls, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
+5. Stories: a `Playground` with controls, a `States` story with every state side by side, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
 7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
 8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye.
@@ -178,10 +178,11 @@ await page.locator('#storybook-root').screenshot({ path: '<scratchpad>/<name>-fo
 await page.emulateMedia({ forcedColors: 'active' });
 await page.goto('http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story');
 await page.locator('section[data-theme=light]').screenshot({ path: '<scratchpad>/<name>-forced.png' });
-const on = page.locator('[aria-checked=true]').first();   // or [aria-selected=true], [aria-pressed=true]
-const fill = () => on.evaluate((el) => getComputedStyle(el).backgroundColor);
-const rest = await fill(); await on.hover(); await page.waitForTimeout(300);
-console.log('forced colors fill at rest', rest, 'hovered', await fill());   // must not change to the page color
+// Repeat for every state that changes an edge or fill: [aria-checked=true], [aria-invalid=true], [aria-selected=true], ...
+const on = page.locator('[aria-checked=true]').first();
+const look = () => on.evaluate((el) => getComputedStyle(el).backgroundColor + ' ' + getComputedStyle(el).borderTopColor);
+const rest = await look(); await on.hover(); await page.waitForTimeout(300);
+console.log('at rest', rest, '| hovered', await look());   // hover must not cover up the state; check without forced colors too
 await browser.close();
 "
 ```
