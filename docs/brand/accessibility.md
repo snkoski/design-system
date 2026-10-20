@@ -37,6 +37,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 - Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%.
 - Hover is never the only way to reach anything. Tooltips also open on focus and never hold essential content.
 - Icon-only buttons have an `aria-label`. Decorative images and icons get `alt=""` or `aria-hidden="true"`.
+- A text field's help text sits between its label and the field, so it's read before typing. A text field is never shorter than 44px.
 - Form errors appear as text beside the field, are linked with `aria-describedby`, and are announced. The first invalid field receives focus on submit.
 - Toasts and status updates use a polite live region and never disappear in under 5 seconds or while hovered or focused.
 - One `<h1>` per page and no skipped heading levels. Pages have `<header>`, `<nav>`, `<main>`, and `<footer>` landmarks and a "Skip to content" link.

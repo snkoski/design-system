@@ -1,0 +1,197 @@
+/* Input: what it is (field, label, text, states). Where it sits and how wide it is is the layout's job:
+   the field fills the wrapper, so set the width with a class on the wrapper. */
+@layer components {
+  .input {
+    display: grid;
+    row-gap: var(--space-1);
+    font-family: var(--font-sans);
+    color: var(--ink);
+  }
+
+  .input__label {
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .input__description {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+    color: var(--ink-muted);
+  }
+
+  /* Positions the icons over the input */
+  .input__box {
+    position: relative;
+  }
+  /* A little more room between the text above and the field than between the label and its description */
+  .input__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  /* The input is the visible field, so a click anywhere in it focuses it */
+  .input__control {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--control-md);
+    margin: 0;
+    padding-inline: var(--space-3);
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: var(--text-body);
+    line-height: 1.5;
+    appearance: none;
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  /* The browser's clear button for type=search is unthemed and only about 12px wide. Escape still clears the field. */
+  .input__control::-webkit-search-cancel-button,
+  .input__control::-webkit-search-decoration {
+    appearance: none;
+  }
+
+  .input__control::placeholder {
+    color: var(--ink-muted);
+    opacity: 1; /* Firefox fades placeholders by default */
+  }
+
+  .input__control:hover:not(:disabled, [readonly], [aria-invalid="true"]) {
+    border-color: var(--ink);
+  }
+
+  .input__control:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Invalid: a danger edge, thickened with an inset shadow so the size doesn't jump */
+  .input__control[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: inset 0 0 0 calc(var(--border-thick) - var(--border-thin)) var(--danger);
+  }
+
+  /* Large */
+  .input[data-size="lg"] .input__control {
+    height: var(--control-lg);
+    padding-inline: var(--space-4);
+    font-size: var(--text-body-lg);
+  }
+
+  /* Icons sit over the input and let clicks through to it */
+  .input__icon {
+    position: absolute;
+    inset-block: 0;
+    display: flex;
+    align-items: center;
+    width: var(--icon-md);
+    color: var(--ink-muted);
+    pointer-events: none;
+  }
+  .input__icon > svg {
+    width: 100%;
+    height: var(--icon-md);
+  }
+  .input__icon:first-child {
+    inset-inline-start: calc(var(--space-3) + var(--border-thin));
+  }
+  .input__icon:last-child {
+    inset-inline-end: calc(var(--space-3) + var(--border-thin));
+  }
+  .input[data-size="lg"] .input__icon:first-child {
+    inset-inline-start: calc(var(--space-4) + var(--border-thin));
+  }
+  .input[data-size="lg"] .input__icon:last-child {
+    inset-inline-end: calc(var(--space-4) + var(--border-thin));
+  }
+  .input__box[data-icon-start] .input__control {
+    padding-inline-start: calc(var(--space-3) + var(--icon-md) + var(--space-2));
+  }
+  .input__box[data-icon-end] .input__control {
+    padding-inline-end: calc(var(--space-3) + var(--icon-md) + var(--space-2));
+  }
+  .input[data-size="lg"] .input__box[data-icon-start] .input__control {
+    padding-inline-start: calc(var(--space-4) + var(--icon-md) + var(--space-2));
+  }
+  .input[data-size="lg"] .input__box[data-icon-end] .input__control {
+    padding-inline-end: calc(var(--space-4) + var(--icon-md) + var(--space-2));
+  }
+
+  /* Disabled: the field and its label dim */
+  .input__control:disabled,
+  .input[data-disabled] .input__label {
+    opacity: 0.5;
+  }
+  .input__control:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Read-only: a lighter cue than disabled. Only the field dims; its text still meets 4.5:1. */
+  .input__control[readonly] {
+    opacity: 0.75;
+  }
+  /* A placeholder shows what to type, which doesn't apply when you can't type, and at 75% it would fall below 4.5:1 */
+  .input__control[readonly]::placeholder {
+    color: transparent;
+  }
+
+  .input__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+    color: var(--danger);
+  }
+  .input__error-icon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+  }
+
+  /* Hot dog mode: chunky ink edge and a hard shadow (nothing to press into) */
+  [data-theme="hotdog"] .input__control {
+    border-width: var(--border-thick);
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .input__control[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 var(--border-thin) var(--danger), var(--shadow-sm); /* thicker edge, as in other themes */
+  }
+
+  /* Windows Contrast themes: the system's field colors */
+  @media (forced-colors: active) {
+    .input__control {
+      border-color: FieldText;
+      background: Field;
+      color: FieldText;
+    }
+    .input__control:disabled,
+    .input__control[readonly],
+    .input[data-disabled] .input__label {
+      opacity: 1;
+    }
+    .input__control:disabled,
+    .input[data-disabled] .input__label {
+      border-color: GrayText;
+      color: GrayText;
+    }
+    .input__icon {
+      color: FieldText;
+    }
+    /* The inset shadow that thickens the invalid edge is removed here, so use a real thick border */
+    .input__control[aria-invalid="true"] {
+      border-width: var(--border-thick);
+    }
+    .input__error {
+      color: CanvasText;
+    }
+  }
+}

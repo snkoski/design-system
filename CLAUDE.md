@@ -130,7 +130,7 @@ One convention per job. Never mix them.
 ## Themes
 
 - Set with `data-theme="light" | "dark" | "hotdog"` on `<html>`. With no attribute, light or dark follows `prefers-color-scheme`.
-- Hot dog mode uses hard offset shadows and `border-thick` ink outlines; components press into their shadow on `:active`.
+- Hot dog mode uses hard offset shadows and `border-thick` ink outlines; components you click (buttons, checkboxes, switches) press into their shadow on `:active`. Text fields don't press: you type in them, so they keep their shadow.
 
 ## Adding a component
 
@@ -206,7 +206,8 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - Use `userEvent.setup()` for interactions. Test with the keyboard (Tab, Enter, Space, Escape, arrows) as well as the mouse.
 - For each component, cover: default rendering and defaults; every variant and size; each state (disabled, loading, invalid, checked, open, and so on) including that it blocks what it should; keyboard operation and focus order; accessible name and role; hidden decorative content; controlled and uncontrolled use; callbacks; ref forwarding; extra props passing through; and consumer `className` merging.
 - Test types with `expectTypeOf` in the test file, for example that an icon-only button requires `aria-label`. These run in `pnpm typecheck`, not in Vitest.
-- jsdom has no layout and no real CSS. Don't try to test focus rings, contrast, target size, or forced colors there: those belong to the story tests, Chromatic, and manual checks. If a Base UI popup needs a browser API that jsdom lacks (`ResizeObserver`, `matchMedia`, and similar), stub it in `tests/setup.ts`.
+- jsdom has no layout and no real CSS. Don't try to test focus rings, contrast, target size, forced colors, or anything that depends on CSS (such as `pointer-events`) there: those belong to the story tests, Chromatic, and manual checks. A story's `play` function can check CSS-dependent behavior in Chromium, for example with a real hit-test: `document.elementFromPoint(x, y)` at an icon's center must return the input (see Input's `WithIcons` story). If a Base UI popup needs a browser API that jsdom lacks (`ResizeObserver`, `matchMedia`, and similar), stub it in `tests/setup.ts`.
+- Define a story decorator that uses its context argument (`(Story, { parameters }) => …`) as a typed `const` outside `meta`, with the `Decorator` type. Written inline inside `meta`, it breaks Storybook's inference and every story's args become `never`.
 - Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
@@ -216,14 +217,19 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 
 ## Form controls
 
-Checkbox is the pattern for form controls (inputs, radios, switches, and so on). Follow it:
+Checkbox is the pattern for choice controls (checkboxes, switches, radios), and Input for text fields. Follow them:
 
 - Wrap the control in Base UI's `Field.Root`, put the label in `Field.Label`, and render `description` and `error` props with `Field.Description` and `Field.Error`. Base UI then links them with `aria-labelledby`, `aria-describedby`, and `aria-invalid`, so don't set those by hand.
-- A control needs an accessible name. The props type requires visible label content (`children`) or an `aria-label`. Type the label as `Exclude<ReactNode, undefined | null | boolean>`, because plain `ReactNode` accepts `undefined` and lets a nameless control compile.
+- The label: a choice control wraps its label, so the label is `children` (the whole row is the click target). A text field has its label above and can't have children, so the label is a `label` prop. Either way:
+- A control needs an accessible name. The props type requires visible label content or an `aria-label`. Type the label as `Exclude<ReactNode, undefined | null | boolean>`, because plain `ReactNode` accepts `undefined` and lets a nameless control compile.
 - Take `invalid` and `error` as separate props. An error is always words plus an icon, never only a red border.
-- The label wraps the control, so clicking the text works. Keep the clickable row at least `--target-min` tall, and give a control with no visible label a pseudo-element hit area.
-- Style state from Base UI's ARIA attributes (`aria-checked`, `aria-invalid`, `aria-readonly`) and its `data-disabled`, as `checkbox.css` does.
-- Disabled dims the control and its label to 50% opacity. Read-only dims only the control, to 75%, and keeps the label at full strength, because read-only content must stay readable. At 75% the control's edge and its mark still meet 3:1 in every theme. Forced colors resets both to full opacity.
+- The description goes under a choice control's label, but between a text field's label and the field, so it's read before typing and phone keyboards and autofill menus can't cover it. The error goes after the field.
+- An `<input>` can't have pseudo-elements, so a text field can't borrow the invisible hit area. Text fields come in sizes that are already at least `--target-min` tall (`md`, `lg`), never smaller.
+- A text field's visible box is the `<input>` itself. Decorative icons sit over it with `pointer-events: none`, so a click anywhere in the box focuses the field.
+- A choice control's label wraps it, so clicking the text works. Keep the clickable row at least `--target-min` tall, and give a choice control with no visible label a pseudo-element hit area. A text field's `<label for>` focuses it.
+- Style state from ARIA attributes where they exist (`aria-checked`, `aria-invalid`, `aria-readonly`). Otherwise, choice controls (a `<span>` with a role) use Base UI's `data-disabled`, as `checkbox.css` does, and text fields use the native `:disabled` and `[readonly]`, which a real `<input>` has.
+- A hover rule must not cover up a state. `:hover` adds specificity, so exclude the states it would override (`:hover:not(:disabled, [readonly], [aria-invalid="true"])`), or a hovered invalid field loses its red edge.
+- Disabled dims the control and its label to 50% opacity. Read-only dims only the control, to 75%, and keeps the label at full strength, because read-only content must stay readable. A read-only text field also hides its placeholder, which would fall below 4.5:1 at 75% and has nothing to suggest when you can't type. At 75% the control's edge and its mark still meet 3:1 in every theme. Forced colors resets both to full opacity.
 - Declare each Base UI prop you want in Storybook's docs table explicitly on the component's props type, with JSDoc. Storybook doesn't read props inherited from `node_modules`.
 - In tests, check names and descriptions with `toHaveAccessibleName` and `toHaveAccessibleDescription`, and check what the form submits with `FormData`.
 
