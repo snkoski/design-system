@@ -48,6 +48,8 @@ scripts/build-tokens.mjs     generates src/styles/tokens.css and src/styles/tail
 scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
+src/internal/                pieces several components share (cx, FieldError and field-error.css), with tests.
+                             Not exported from the package.
 tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup)
 tokens/contrast.json         every foreground and background color pair the components use, with its minimum ratio
 scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
@@ -220,9 +222,10 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 
 Checkbox is the pattern for choice controls (checkboxes, switches, radios), and Input for text fields. Follow them:
 
-- Wrap the control in Base UI's `Field.Root`, put the label in `Field.Label`, and render `description` and `error` props with `Field.Description` and `Field.Error`. Base UI then links them with `aria-labelledby`, `aria-describedby`, and `aria-invalid`, so don't set those by hand.
+- Wrap the control in Base UI's `Field.Root`, put the label in `Field.Label`, and render the `description` prop with `Field.Description` and the `error` prop with the shared `FieldError` (`src/internal/`), passing the part's own class (`className="checkbox__error"`). `FieldError` draws the icon and the words, so every control's error looks the same; the component's CSS only places it. Base UI then links them with `aria-labelledby`, `aria-describedby`, and `aria-invalid`, so don't set those by hand.
+- A group of choice controls (CheckboxGroup is the pattern) is one field: `Field.Root` around a `Fieldset.Root` rendered as Base UI's group, with its label in `Fieldset.Legend`. A control inside a group renders `Field.Item` instead of its own `Field.Root`, so the group owns `name`, `invalid`, and `error`. The control finds out it's in a group from a context in the group's folder (`context.ts`). Props the group owns are ignored on the controls inside it, and their JSDoc says so. A disabled or read-only group dims only its controls, never its legend or description: axe can tie a disabled control's own label to it and skip its contrast check, but not a group's legend, so a dimmed legend fails `a11y.test`.
 - The label: a choice control wraps its label, so the label is `children` (the whole row is the click target). A text field has its label above and can't have children, so the label is a `label` prop. Either way:
-- A control needs an accessible name. The props type requires visible label content or an `aria-label`. Type the label as `Exclude<ReactNode, undefined | null | boolean>`, because plain `ReactNode` accepts `undefined` and lets a nameless control compile.
+- A control needs an accessible name. The props type requires visible label content or an `aria-label`. Type the label as `Exclude<ReactNode, undefined | null | boolean>`, because plain `ReactNode` accepts `undefined` and lets a nameless control compile. Give the label and `aria-label` JSDoc in both branches of that union, so Storybook's docs table describes them.
 - Take `invalid` and `error` as separate props. An error is always words plus an icon, never only a red border.
 - The description goes under a choice control's label, but between a text field's label and the field, so it's read before typing and phone keyboards and autofill menus can't cover it. The error goes after the field.
 - An `<input>` can't have pseudo-elements, so a text field can't borrow the invisible hit area. Text fields come in sizes that are already at least `--target-min` tall (`md`, `lg`), never smaller.

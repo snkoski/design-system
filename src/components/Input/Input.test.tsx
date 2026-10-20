@@ -73,10 +73,11 @@ describe("Input", () => {
 
     it("puts the description between the label and the box, and the error after the box", () => {
       const { container } = render(<Input label="Email" description="We never share it." invalid error="Enter an email." />);
-      const order = [...container.querySelectorAll(".input__label, .input__description, .input__box, .input__error")].map(
-        (el) => el.className,
+      const parts = ["input__label", "input__description", "input__box", "input__error"];
+      const order = [...container.querySelectorAll(parts.map((part) => `.${part}`).join(", "))].map((el) =>
+        parts.find((part) => el.classList.contains(part)),
       );
-      expect(order).toEqual(["input__label", "input__description", "input__box", "input__error"]);
+      expect(order).toEqual(parts);
     });
 
     it("applies className to the outer wrapper, next to its own class", () => {

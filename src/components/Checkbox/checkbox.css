@@ -123,28 +123,17 @@
     height: 100%;
   }
 
-  /* Description and error line up with the label text, not the box */
-  .checkbox__description,
-  .checkbox__error {
+  .checkbox__description {
     margin: 0;
-    padding-inline-start: calc(var(--choice) + var(--space-3));
     font-size: var(--text-small);
     line-height: var(--icon-md);
-  }
-  .checkbox__description {
     color: var(--ink-muted);
   }
+
+  /* Description and error line up with the label text, not the box. The error's look is .field-error. */
+  .checkbox__description,
   .checkbox__error {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    color: var(--danger);
-  }
-  .checkbox__error-icon {
-    flex: none;
-    width: var(--icon-sm);
-    height: var(--icon-sm);
-    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+    padding-inline-start: calc(var(--choice) + var(--space-3));
   }
 
   /* Hot dog mode: a hard shadow to press into */
@@ -191,9 +180,6 @@
     }
     .checkbox__row[data-disabled] .checkbox__label {
       color: GrayText;
-    }
-    .checkbox__error {
-      color: CanvasText;
     }
   }
 }

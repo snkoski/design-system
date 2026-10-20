@@ -1,11 +1,23 @@
 import { Field } from "@base-ui/react/field";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import type { ReactNode, Ref } from "react";
+import { cx } from "../../internal/cx";
+import { FieldError } from "../../internal/FieldError";
 
 /** A switch needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =
-  | { children: Exclude<ReactNode, undefined | null | boolean>; "aria-label"?: string }
-  | { children?: undefined; "aria-label": string };
+  | {
+      /** The label text beside the switch. The whole row is the click target. Required unless `aria-label` is set. */
+      children: Exclude<ReactNode, undefined | null | boolean>;
+      /** Names the switch for screen readers. Usually not needed when there is label text, which names it already. */
+      "aria-label"?: string;
+    }
+  | {
+      /** The label text beside the switch. The whole row is the click target. Required unless `aria-label` is set. */
+      children?: undefined;
+      /** Names the switch for screen readers when there's no visible label, such as a row in a table. Required without `children`. */
+      "aria-label": string;
+    };
 
 interface OwnProps {
   /** Whether the switch is on. Use with `onCheckedChange` to control it. */
@@ -52,26 +64,6 @@ export type SwitchProps = Labelled &
   OwnProps &
   Omit<BaseSwitch.Root.Props, "className" | "render" | "nativeButton" | "children" | "aria-label" | keyof OwnProps>;
 
-const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
-
-function ErrorIcon() {
-  return (
-    <svg
-      className="switch__error-icon"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle cx="8" cy="8" r="6.25" />
-      <path d="M8 4.75V8.5M8 11h.01" />
-    </svg>
-  );
-}
-
 /**
  * An on/off control for a setting, with its label. Built on Base UI's Switch and Field, so the
  * label, description, and error are linked to the switch for screen readers, and it takes part in forms.
@@ -106,10 +98,9 @@ export function Switch({
       )}
       {description && <Field.Description className="switch__description">{description}</Field.Description>}
       {error && (
-        <Field.Error className="switch__error" match={invalid}>
-          <ErrorIcon />
-          <span>{error}</span>
-        </Field.Error>
+        <FieldError className="switch__error" match={invalid}>
+          {error}
+        </FieldError>
       )}
     </Field.Root>
   );

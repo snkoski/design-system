@@ -35,6 +35,8 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 - Every interactive target is at least `target-min` (44px) in both directions.
 - For a checkbox, radio, or switch, the whole label is the click target. The checked state shows a mark (a tick or a dash) or a position (a switch's thumb) as well as a fill, and the box edge always meets 3:1 on its own, because the action fill does not.
 - Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%.
+- A group of checkboxes or radios has a label that names the question, and its help text and error belong to the whole group. The error is linked to every option, so it's announced on each. When the group is disabled or read-only, only the options dim: the group's label and help text stay at full strength, because the help text often says why the choices can't be changed.
+- A group of checkboxes has no required state in ARIA. To ask for at least one choice, say "(required)" in the group's label, and show an error in words if nothing is ticked.
 - Hover is never the only way to reach anything. Tooltips also open on focus and never hold essential content.
 - Icon-only buttons have an `aria-label`. Decorative images and icons get `alt=""` or `aria-hidden="true"`.
 - A text field's help text sits between its label and the field, so it's read before typing. A text field is never shorter than 44px.

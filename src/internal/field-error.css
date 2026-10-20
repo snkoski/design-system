@@ -1,0 +1,27 @@
+/* The error message under a form control, shared by every form control: an icon and words in the danger color.
+   A component's own CSS adds only where it sits, such as lining up with its label text. */
+@layer components {
+  .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+    color: var(--danger);
+  }
+
+  .field-error__icon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+  }
+
+  /* Windows Contrast themes: the words and the icon carry the meaning, in the system text color */
+  @media (forced-colors: active) {
+    .field-error {
+      color: CanvasText;
+    }
+  }
+}

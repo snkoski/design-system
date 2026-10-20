@@ -113,28 +113,17 @@
     opacity: 0.5;
   }
 
-  /* Description and error line up with the label text, not the track */
-  .switch__description,
-  .switch__error {
+  .switch__description {
     margin: 0;
-    padding-inline-start: calc(var(--switch-track-width) + var(--space-3));
     font-size: var(--text-small);
     line-height: var(--icon-md);
-  }
-  .switch__description {
     color: var(--ink-muted);
   }
+
+  /* Description and error line up with the label text, not the track. The error's look is .field-error. */
+  .switch__description,
   .switch__error {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    color: var(--danger);
-  }
-  .switch__error-icon {
-    flex: none;
-    width: var(--icon-sm);
-    height: var(--icon-sm);
-    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+    padding-inline-start: calc(var(--switch-track-width) + var(--space-3));
   }
 
   /* Hot dog mode: a hard shadow to press into */
@@ -184,9 +173,6 @@
     }
     .switch__row[data-disabled] .switch__label {
       color: GrayText;
-    }
-    .switch__error {
-      color: CanvasText;
     }
   }
 }

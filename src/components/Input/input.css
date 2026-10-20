@@ -141,21 +141,6 @@
     color: transparent;
   }
 
-  .input__error {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--icon-md);
-    color: var(--danger);
-  }
-  .input__error-icon {
-    flex: none;
-    width: var(--icon-sm);
-    height: var(--icon-sm);
-    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
-  }
 
   /* Hot dog mode: chunky ink edge and a hard shadow (nothing to press into) */
   [data-theme="hotdog"] .input__control {
@@ -189,9 +174,6 @@
     /* The inset shadow that thickens the invalid edge is removed here, so use a real thick border */
     .input__control[aria-invalid="true"] {
       border-width: var(--border-thick);
-    }
-    .input__error {
-      color: CanvasText;
     }
   }
 }

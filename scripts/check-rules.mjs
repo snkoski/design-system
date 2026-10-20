@@ -50,7 +50,7 @@ if (existsSync(twTheme)) for (const match of read(twTheme).matchAll(/(--[\w-]+)\
 const tokens = JSON.parse(read(join(root, "tokens/tokens.json")));
 const primitives = tokens.color.tokens.filter((token) => /^Primitive\./.test(token.usage)).map((token) => token.name);
 
-const cssFiles = walk(join(root, "src/components")).filter((file) => file.endsWith(".css"));
+const cssFiles = [...walk(join(root, "src/components")), ...walk(join(root, "src/internal"))].filter((file) => file.endsWith(".css"));
 for (const file of cssFiles) {
   const raw = read(file);
   const css = stripComments(raw);

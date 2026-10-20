@@ -1,14 +1,26 @@
 import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import type { InputHTMLAttributes, ReactNode, Ref } from "react";
+import { cx } from "../../internal/cx";
+import { FieldError } from "../../internal/FieldError";
 
 export type InputType = "text" | "email" | "password" | "search" | "tel" | "url";
 export type InputSize = "md" | "lg";
 
 /** An input needs a name a screen reader can announce: a visible label, or an `aria-label`. */
 type Labelled =
-  | { label: Exclude<ReactNode, undefined | null | boolean>; "aria-label"?: string }
-  | { label?: undefined; "aria-label": string };
+  | {
+      /** The visible label above the field. Required unless `aria-label` is set. */
+      label: Exclude<ReactNode, undefined | null | boolean>;
+      /** Names the input for screen readers. Usually not needed when there is a `label`, which names it already. */
+      "aria-label"?: string;
+    }
+  | {
+      /** The visible label above the field. Required unless `aria-label` is set. */
+      label?: undefined;
+      /** Names the input for screen readers when there's no visible label, such as a search field in a toolbar. Required without `label`. */
+      "aria-label": string;
+    };
 
 interface OwnProps {
   /** The kind of text it takes. Text-like types only; use a number field for numbers. Default: `text`. */
@@ -62,26 +74,6 @@ export type InputProps = Labelled &
   OwnProps &
   Omit<BaseInput.Props, "className" | "render" | "children" | "aria-label" | keyof OwnProps>;
 
-const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
-
-function ErrorIcon() {
-  return (
-    <svg
-      className="input__error-icon"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle cx="8" cy="8" r="6.25" />
-      <path d="M8 4.75V8.5M8 11h.01" />
-    </svg>
-  );
-}
-
 /**
  * A single-line text field with its label, an optional description, and an error. Built on Base UI's
  * Input and Field, so the label, description, and error are linked to the input for screen readers,
@@ -117,10 +109,9 @@ export function Input({
         {iconEnd && <span className="input__icon" aria-hidden="true">{iconEnd}</span>}
       </div>
       {error && (
-        <Field.Error className="input__error" match={invalid}>
-          <ErrorIcon />
-          <span>{error}</span>
-        </Field.Error>
+        <FieldError className="input__error" match={invalid}>
+          {error}
+        </FieldError>
       )}
     </Field.Root>
   );

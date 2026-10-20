@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { CheckboxGroup } from "../CheckboxGroup";
 import { Checkbox } from "./Checkbox";
 import type { CheckboxProps } from "./Checkbox";
 
@@ -510,7 +511,203 @@ describe("Checkbox", () => {
     });
   });
 
+  describe("inside a CheckboxGroup", () => {
+    function submitted(form: HTMLFormElement, name: string) {
+      return new FormData(form).getAll(name);
+    }
+
+    it("takes its name from the group and ignores its own", () => {
+      render(
+        <form data-testid="form">
+          <CheckboxGroup label="Services" name="services" defaultValue={["design"]}>
+            <Checkbox name="other" value="design">Design</Checkbox>
+          </CheckboxGroup>
+        </form>,
+      );
+      const form = screen.getByTestId("form") as HTMLFormElement;
+      expect(submitted(form, "services")).toEqual(["design"]);
+      expect(submitted(form, "other")).toEqual([]);
+    });
+
+    it("is ticked by the group's value, not its own checked or defaultChecked", () => {
+      render(
+        <CheckboxGroup label="Services" defaultValue={["writing"]}>
+          <Checkbox value="design" defaultChecked>Design</Checkbox>
+          <Checkbox value="writing" checked={false}>Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getByRole("checkbox", { name: "Design" })).not.toBeChecked();
+      expect(screen.getByRole("checkbox", { name: "Writing" })).toBeChecked();
+    });
+
+    it("ignores its own invalid and error, which belong to the group", () => {
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" invalid error="Not this one.">Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(getBox()).toHaveAccessibleName("Design");
+      expect(getBox()).not.toHaveAttribute("aria-invalid", "true");
+      expect(screen.queryByText("Not this one.")).not.toBeInTheDocument();
+    });
+
+    it("ignores its own required", () => {
+      const { container } = render(
+        <CheckboxGroup label="Services" name="services">
+          <Checkbox value="design" required>Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(getInput(container)).toHaveAttribute("name", "services");
+      expect(getInput(container)).not.toBeRequired();
+      expect(getBox()).not.toHaveAttribute("aria-required", "true");
+    });
+
+    it("ignores uncheckedValue, so an unticked option submits nothing", () => {
+      render(
+        <form data-testid="form">
+          <CheckboxGroup label="Services" name="services">
+            <Checkbox value="design" uncheckedValue="no">Design</Checkbox>
+          </CheckboxGroup>
+        </form>,
+      );
+      expect(screen.getByTestId("form").querySelector("input[name=services]")).toBeInTheDocument();
+      expect([...new FormData(screen.getByTestId("form") as HTMLFormElement).values()]).toEqual([]);
+    });
+
+    it("needs a value: without one, it's listed under the group's name and submits `on`", async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <form data-testid="form">
+          <CheckboxGroup label="Services" name="services" onValueChange={onValueChange}>
+            <Checkbox>No value</Checkbox>
+          </CheckboxGroup>
+        </form>,
+      );
+      await user.click(getBox());
+      expect(onValueChange).toHaveBeenCalledWith(["services"], expect.anything());
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement, "services")).toEqual(["on"]);
+    });
+
+    it("still calls its own onCheckedChange", async () => {
+      const onCheckedChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" onCheckedChange={onCheckedChange}>Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      await user.click(getBox());
+      expect(onCheckedChange).toHaveBeenCalledOnce();
+      expect(onCheckedChange.mock.calls[0]?.[0]).toBe(true);
+    });
+
+    it("can be disabled on its own, dimming its label row too", async () => {
+      const user = userEvent.setup();
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" disabled>Design</Checkbox>
+          <Checkbox value="writing">Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      const design = screen.getByRole("checkbox", { name: "Design" });
+      expect(design).toHaveAttribute("aria-disabled", "true");
+      expect(screen.getByText("Design").closest(".checkbox__row")).toHaveAttribute("data-disabled");
+      expect(screen.getByText("Writing").closest(".checkbox__row")).not.toHaveAttribute("data-disabled");
+      await user.click(design);
+      await user.click(screen.getByRole("checkbox", { name: "Writing" }));
+      expect(design).not.toBeChecked();
+      expect(screen.getByRole("checkbox", { name: "Writing" })).toBeChecked();
+    });
+
+    it("can be read-only on its own while the others still change", async () => {
+      const user = userEvent.setup();
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" readOnly>Design</Checkbox>
+          <Checkbox value="writing">Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getByRole("checkbox", { name: "Design" })).toHaveAttribute("aria-readonly", "true");
+      await user.click(screen.getByRole("checkbox", { name: "Design" }));
+      await user.click(screen.getByRole("checkbox", { name: "Writing" }));
+      expect(screen.getByRole("checkbox", { name: "Design" })).not.toBeChecked();
+      expect(screen.getByRole("checkbox", { name: "Writing" })).toBeChecked();
+    });
+
+    it("is read-only when the group is, even if it says readOnly={false}", () => {
+      render(
+        <CheckboxGroup label="Services" readOnly>
+          <Checkbox value="design" readOnly={false}>Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(getBox()).toHaveAttribute("aria-readonly", "true");
+    });
+
+    it("keeps its description, id, and inputRef", () => {
+      const inputRef = createRef<HTMLInputElement>();
+      const { container } = render(
+        <CheckboxGroup aria-label="Services">
+          <Checkbox value="design" id="design-input" inputRef={inputRef} description="Logos and layouts">
+            Design
+          </Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(getBox()).toHaveAccessibleDescription("Logos and layouts");
+      expect(getInput(container)).toHaveAttribute("id", "design-input");
+      expect(inputRef.current).toBe(getInput(container));
+    });
+
+    it("applies className to its own wrapper", () => {
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" className="mt-4">Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getByText("Design").closest(".checkbox")).toHaveClass("checkbox", "mt-4");
+    });
+
+    it("marks a parent box's wrapper with data-parent, and no other", () => {
+      render(
+        <CheckboxGroup label="Services" allValues={["design"]}>
+          <Checkbox parent>All services</Checkbox>
+          <Checkbox value="design">Design</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getByText("All services").closest(".checkbox")).toHaveAttribute("data-parent");
+      expect(screen.getByText("Design").closest(".checkbox")).not.toHaveAttribute("data-parent");
+    });
+
+    it("shows the mark the group gives a parent box: a dash when mixed, a tick when all", async () => {
+      const user = userEvent.setup();
+      render(
+        <CheckboxGroup label="Services" allValues={["design", "writing"]} defaultValue={["design"]}>
+          <Checkbox parent>All services</Checkbox>
+          <Checkbox value="design">Design</Checkbox>
+          <Checkbox value="writing">Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      const parent = screen.getByRole("checkbox", { name: "All services" });
+      expect(parent.querySelector("svg path")).toHaveAttribute("d", "M3.5 8h9");
+      await user.click(screen.getByRole("checkbox", { name: "Writing" }));
+      expect(parent).toHaveAttribute("aria-checked", "true");
+      expect(parent.querySelector("svg path")).toHaveAttribute("d", expect.stringContaining("m3 8.5"));
+    });
+  });
+
+  describe("outside a group", () => {
+    it("has no data-parent on its wrapper", () => {
+      const { container } = render(<Checkbox>Accept terms</Checkbox>);
+      expect(container.firstElementChild).toHaveClass("checkbox");
+      expect(container.firstElementChild).not.toHaveAttribute("data-parent");
+    });
+  });
+
   describe("types", () => {
+    it("takes parent as a boolean", () => {
+      expectTypeOf<CheckboxProps["parent"]>().toEqualTypeOf<boolean | undefined>();
+    });
+
     it("requires visible label content or an aria-label", () => {
       expectTypeOf<{ children: string }>().toExtend<CheckboxProps>();
       expectTypeOf<{ "aria-label": string }>().toExtend<CheckboxProps>();

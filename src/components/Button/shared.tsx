@@ -19,10 +19,20 @@ export interface SharedProps {
 
 /** An icon-only button must have an accessible name. */
 export type IconOnly =
-  | { iconOnly?: false; "aria-label"?: string }
-  | { iconOnly: true; "aria-label": string };
+  | {
+      /** Shows only the icon, with no visible label. Requires an `aria-label`. Default: `false`. */
+      iconOnly?: false;
+      /** Names the button for screen readers. Usually not needed when the button has label text. */
+      "aria-label"?: string;
+    }
+  | {
+      /** Shows only the icon, with no visible label. Requires an `aria-label`. Default: `false`. */
+      iconOnly: true;
+      /** Names the icon-only button for screen readers, saying what it does ("Close dialog"). Required with `iconOnly`. */
+      "aria-label": string;
+    };
 
-export const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
+export { cx } from "../../internal/cx";
 
 function Spinner() {
   return (
