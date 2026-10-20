@@ -68,7 +68,7 @@ export type CheckboxGroupProps = Labelled &
  * field's value is the list of ticked options. Built on Base UI's CheckboxGroup, Fieldset, and Field, so
  * the label, description, and error are linked to the group and its options for screen readers.
  * Put a `Checkbox` with a `value` inside for each option, and add `<Checkbox parent>` with `allValues`
- * for a "select all" box. For exactly one choice, use a radio group; for a single yes or no, a Checkbox.
+ * for a "select all" box. For exactly one choice, use a RadioGroup; for a single yes or no, a Checkbox.
  */
 export function CheckboxGroup({
   label,

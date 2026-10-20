@@ -112,7 +112,7 @@ function Mark({ indeterminate }: { indeterminate: boolean }) {
  * A box that is ticked or unticked, with its label. Built on Base UI's Checkbox and Field, so the
  * label, description, and error are linked to the checkbox for screen readers, and it takes part in forms.
  * Clicking the label text ticks the box. Use it for options that can be chosen independently;
- * for exactly one choice from a list, use a radio group. Inside a CheckboxGroup it becomes one of the
+ * for exactly one choice from a list, use a RadioGroup. Inside a CheckboxGroup it becomes one of the
  * group's options: the group gives it its name, its ticked state, and its validity.
  */
 export function Checkbox({
