@@ -34,6 +34,8 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 
 6. If the new component contains or wraps an existing one (a group of Checkboxes, a field around an Input), render them together in the throwaway test, not only the bare primitive. The existing component may bring its own Base UI wrappers that break the composition: Checkbox's own `Field.Root` hid a CheckboxGroup's `name`, so the form submitted nothing. Note any change the existing component needs; it goes in the proposal.
 
+7. For a control with a single value (a radio group, a select), check how a controlled one says "nothing selected" (Base UI's RadioGroup takes `null`; `undefined` makes it uncontrolled), and type `value` so it can.
+
 ## Phase 2: Design proposal (stop for approval)
 
 Present this to the user and **stop**. Keep it to what they need to decide.
@@ -50,7 +52,7 @@ Present this to the user and **stop**. Keep it to what they need to decide.
 - **Hot dog and forced-colors treatment.**
 - **Open questions:** decisions that are the user's, each with a recommendation.
 
-If the proposal changes an existing component, or its open questions would change the file set or the tests, offer to have the `junior-engineer` agent (Agent tool, `subagent_type: junior-engineer`) read it before the user's final pass. Give it the proposal text, the repo root, and the revision, and nothing about how you reached the design. Relay its blocking questions with your answer to each, and fold the answers into the proposal.
+Offer to have the `junior-engineer` agent (Agent tool, `subagent_type: junior-engineer`) read it before the user's final pass. Give it the proposal text, the repo root, and the revision, and nothing about how you reached the design. Relay its blocking questions with your answer to each, and fold the answers into the proposal.
 
 Then ask for approval or changes. Continue only after the user approves. If they change the design, update the proposal and confirm again.
 
@@ -58,7 +60,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 
 1. Write the props type (and a stub component that renders `null`) in `<Name>.tsx`, so the test file typechecks.
 2. Write `<Name>.test.tsx` from the approved API, covering the full list in the Testing section of `CLAUDE.md`. Include `expectTypeOf` checks for any rule enforced in types.
-   Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
+   Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. For any control that can have no visible label, plan a story check that its wrapper is at least `--target-min` tall: its hit area hides the gap in a story with one control, but stacked unlabelled controls otherwise steal each other's clicks. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
 3. Run `pnpm test:unit` and `pnpm typecheck`. Every runtime test should fail, because the stub renders nothing; none should fail from import or type errors. Note the count.
 4. List the tests that pass against the stub (`pnpm exec vitest run --project unit src/components/<Name> --reporter=verbose`). Type-only tests (`expectTypeOf`) pass at runtime by design; `pnpm typecheck` checks them. **Any other test that passes is vacuous**: it only asserts that something is absent, so an empty render satisfies it. Make it stricter by asserting a positive precondition first (the control or hidden input exists), and rerun until only type tests pass.
 
@@ -95,13 +97,13 @@ Screenshot the `AllThemes` story in all three themes with the recipe under "Look
 
 For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
 
-Then check what the theme screenshots can't show, with the second recipe there: a focused control, the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
+Then check what the theme screenshots can't show, with the second recipe there: a focused control (if the story has a `play` function, it has already run when the page loads and may have moved focus, so don't press Tab again before screenshotting), the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
 
 In forced colors, also check every state **at rest**: its edge or fill must differ from the page color. A state rule outranks the forced-colors base rule, and the browser can then draw it in the page color. An invalid, unticked Checkbox once disappeared entirely this way, with no hover involved. Look at the forced-colors screenshot for missing boxes, and log `borderTopColor` and `backgroundColor` for each state next to the page's `Canvas`.
 
 If the `AllThemes` matrix lays components out in columns, check that each one keeps its own height when its grid cell is stretched by a taller neighbor. A component whose root is a grid spreads its rows apart unless it sets `align-content: start`.
 
-If any part is dimmed with `opacity` (read-only, for example), check the contrast of everything inside it at that opacity, placeholders and icons included. `pnpm check:contrast` only knows undimmed pairs, so compute the composited colors by hand (blend each color with the page color at the opacity) and check 4.5:1 for text and 3:1 for edges and meaningful icons.
+If any part is dimmed with `opacity` (read-only, for example), check the contrast of everything inside it at that opacity, placeholders and icons included. If a dimmed control can still receive focus (a disabled radio group's selected radio), its focus outline is dimmed too: check it still meets 3:1, or restore full opacity on `:focus-visible`. `pnpm check:contrast` only knows undimmed pairs, so compute the composited colors by hand (blend each color with the page color at the opacity) and check 4.5:1 for text and 3:1 for edges and meaningful icons.
 
 Fix what looks wrong and check again.
 
