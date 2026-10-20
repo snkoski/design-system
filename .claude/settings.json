@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/check-tests-kept.mjs\" --hook",
+            "statusMessage": "Checking that no tests were removed"
+          }
+        ]
+      }
+    ]
+  }
+}

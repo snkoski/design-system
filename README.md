@@ -27,6 +27,8 @@ pnpm 11 refuses packages published less than a day ago, as protection against hi
 | `pnpm build` | Builds the package into `dist/` (JavaScript, types, and CSS) |
 | `pnpm build-storybook` | Builds a static Storybook into `storybook-static/` |
 | `pnpm typecheck` | Checks TypeScript, including the type assertions in test files |
+| `pnpm check` | Checks the contrast of every color pair in all three themes, and the CSS and structure rules in `CLAUDE.md` |
+| `pnpm check:tests` | Fails if tests were deleted, skipped, or weakened compared with the last commit (`--base main` to compare with a branch) |
 | `pnpm test` | Runs the unit tests (jsdom) and the story tests (Chromium, including accessibility checks) |
 | `pnpm test:unit` | Runs only the unit tests; fast |
 | `pnpm test:watch` | Runs the unit tests and reruns them as files change |

@@ -33,10 +33,12 @@ pnpm test:unit        # unit tests only, fast
 pnpm test:watch       # unit tests in watch mode
 pnpm test:stories     # story tests only (play functions and axe)
 pnpm test:coverage
+pnpm check            # contrast of every color pair in all themes, and the rules in this file (CSS, structure)
+pnpm check:tests      # fails if tests were deleted, skipped, or weakened compared with HEAD (or --base <ref>)
 pnpm tokens           # regenerate CSS from tokens/tokens.json (the other scripts do this first)
 ```
 
-Before saying any change is done, run `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`, and fix anything they report. `pnpm typecheck` also checks the type-level assertions (`expectTypeOf`) in test files.
+Before saying any change is done, run `pnpm typecheck`, `pnpm check`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`, and fix anything they report. `pnpm typecheck` also checks the type-level assertions (`expectTypeOf`) in test files.
 
 ## Layout
 
@@ -47,6 +49,9 @@ scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
 tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup)
+tokens/contrast.json         every foreground and background color pair the components use, with its minimum ratio
+scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
+.claude/settings.json        a hook that warns when tests are removed, skipped, or weakened
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
@@ -136,7 +141,7 @@ One convention per job. Never mix them.
 4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
 5. Stories: a `Playground` with controls, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
-7. Check contrast and focus in all three themes, then run typecheck, test, build, and build-storybook.
+7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
 8. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`.
 
 ## Testing
@@ -159,6 +164,7 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
+- A hook in `.claude/settings.json` runs `scripts/check-tests-kept.mjs` after edits to test and story files, and after shell commands that remove them. If it reports removed, skipped, or weakened tests, put them back unless the user explicitly asked for the removal. `pnpm check:tests` runs the same check by hand.
 
 ## Form controls
 

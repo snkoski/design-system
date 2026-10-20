@@ -24,6 +24,9 @@ jobs:
 
       - run: pnpm typecheck
 
+      - name: Check contrast and rules
+        run: pnpm check
+
       - run: pnpm build
 
       - name: Install Chromium for the story tests

@@ -4,10 +4,10 @@
 
 ## Checklist
 
-- [ ] `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm build-storybook` pass
-- [ ] Components have a `Name.test.tsx`, and no test was deleted, skipped, or weakened to get a pass
+- [ ] `pnpm typecheck`, `pnpm check`, `pnpm test`, `pnpm build`, and `pnpm build-storybook` pass
+- [ ] Components have a `Name.test.tsx`, and no test was deleted, skipped, or weakened to get a pass (`pnpm check:tests --base main`)
 - [ ] New or changed components have a `Playground` story and an `AllThemes` story
-- [ ] Contrast and focus checked in light, dark, and hot dog
+- [ ] New color pairs are in `tokens/contrast.json`, and focus is checked in light, dark, and hot dog
 - [ ] Components use semantic tokens only, and any new token has a `usage` note
 - [ ] `docs/brand/` and `CLAUDE.md` are updated if a rule or pattern changed
 - [ ] Breaking changes (renamed or removed props, tokens, or exports) are called out below

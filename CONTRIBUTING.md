@@ -6,7 +6,7 @@ Read `CLAUDE.md` first. It has the rules for tokens, CSS, accessibility, motion,
 
 1. Branch from `main`, for example `add-input` or `fix-button-focus`.
 2. Make the change. Follow the "Adding a component" steps in `CLAUDE.md` for a new component.
-3. Run `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`. All four must pass.
+3. Run `pnpm typecheck`, `pnpm check`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`. All five must pass. Run `pnpm check:tests --base main` too, and explain any removed test in the pull request.
 4. Open a pull request. The template pre-fills a checklist; fill it in honestly.
 5. Wait for the checks, address review comments, and merge once approved.
 
@@ -16,7 +16,7 @@ Keep pull requests small and about one thing. A new component, a token change, a
 
 Two checks run on every pull request. Both must pass before merging.
 
-- **Test** (`.github/workflows/test.yml`): typecheck, build, unit tests, and every story run as a test in Chromium, including the accessibility checks.
+- **Test** (`.github/workflows/test.yml`): typecheck, the contrast and rules checks, build, unit tests, and every story run as a test in Chromium, including the accessibility checks.
 - **Chromatic** (`.github/workflows/chromatic.yml`): publishes Storybook and compares every story to `main`.
 
 ## Reviewing a pull request
