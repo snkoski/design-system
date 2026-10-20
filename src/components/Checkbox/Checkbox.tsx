@@ -4,7 +4,7 @@ import type { ReactNode, Ref } from "react";
 
 /** A checkbox needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =
-  | { children: ReactNode; "aria-label"?: string }
+  | { children: Exclude<ReactNode, undefined | null | boolean>; "aria-label"?: string }
   | { children?: undefined; "aria-label": string };
 
 interface OwnProps {
@@ -29,8 +29,18 @@ interface OwnProps {
   invalid?: boolean;
   /** Identifies the field when the form is submitted. */
   name?: string;
+  /**
+   * The id of the hidden `<input>`, not of the visible checkbox. A `<label htmlFor>` pointing at it
+   * toggles the checkbox but doesn't give it a name screen readers announce, so label it with
+   * `children` or `aria-label` instead.
+   */
+  id?: string;
+  /** The id of a `<form>` to submit with, when the checkbox sits outside that form. */
+  form?: string;
   /** What a ticked checkbox submits with the form. Without it, the browser's default `on` is submitted. */
   value?: string;
+  /** What the checkbox submits when it's unticked. Without it, an unticked checkbox submits nothing, like a native one. */
+  uncheckedValue?: string;
   /** Secondary text under the label. Linked to the checkbox so screen readers read it too. */
   description?: ReactNode;
   /** The message shown when `invalid` is true, with an icon. Linked to the checkbox. */

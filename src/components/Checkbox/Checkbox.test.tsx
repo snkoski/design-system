@@ -53,6 +53,7 @@ describe("Checkbox", () => {
       const { container } = render(
         <Checkbox invalid indeterminate disabled error="Required" description="More">Accept terms</Checkbox>,
       );
+      expect(container.querySelector(".checkbox__box")).toBeInTheDocument();
       expect(container.innerHTML).not.toMatch(/checkbox--/);
     });
   });
@@ -403,7 +404,26 @@ describe("Checkbox", () => {
           <Checkbox name="terms">Accept terms</Checkbox>
         </form>,
       );
+      expect(screen.getByTestId("form").querySelector("input[name=terms]")).toBeInTheDocument();
       expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual({});
+    });
+
+    it("submits uncheckedValue when unticked", () => {
+      render(
+        <form data-testid="form">
+          <Checkbox name="newsletter" value="yes" uncheckedValue="no">Newsletter</Checkbox>
+        </form>,
+      );
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual({ newsletter: "no" });
+    });
+
+    it("submits its value, not uncheckedValue, when ticked", () => {
+      render(
+        <form data-testid="form">
+          <Checkbox name="newsletter" value="yes" uncheckedValue="no" defaultChecked>Newsletter</Checkbox>
+        </form>,
+      );
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual({ newsletter: "yes" });
     });
 
     it("starts submitting after the user ticks it", async () => {
@@ -423,6 +443,9 @@ describe("Checkbox", () => {
           <Checkbox name="terms" defaultChecked disabled>Accept terms</Checkbox>
         </form>,
       );
+      const input = screen.getByTestId("form").querySelector<HTMLInputElement>("input[name=terms]");
+      expect(input).toBeChecked();
+      expect(input).toBeDisabled();
       expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual({});
     });
 
@@ -440,6 +463,38 @@ describe("Checkbox", () => {
     });
   });
 
+  describe("id and form", () => {
+    it("puts id on the hidden input, not on the visible checkbox", () => {
+      const { container } = render(<Checkbox id="terms-input">Accept terms</Checkbox>);
+      expect(getInput(container)).toHaveAttribute("id", "terms-input");
+      expect(getBox()).not.toHaveAttribute("id", "terms-input");
+    });
+
+    it("can be toggled, but not named, by an outside label pointing at that id", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <label htmlFor="terms-input">Outside label</label>
+          <Checkbox id="terms-input" aria-label="Inner name" />
+        </>,
+      );
+      await user.click(screen.getByText("Outside label"));
+      expect(getBox()).toBeChecked();
+      expect(getBox()).toHaveAccessibleName("Inner name");
+    });
+
+    it("submits with a form it sits outside of, through form", () => {
+      render(
+        <>
+          <form id="settings" data-testid="outside-form" />
+          <Checkbox name="terms" form="settings" defaultChecked>Accept terms</Checkbox>
+        </>,
+      );
+      const form = screen.getByTestId("outside-form") as HTMLFormElement;
+      expect(Object.fromEntries(new FormData(form).entries())).toEqual({ terms: "on" });
+    });
+  });
+
   describe("refs", () => {
     it("forwards ref to the checkbox element", () => {
       const ref = createRef<HTMLElement>();
@@ -450,6 +505,7 @@ describe("Checkbox", () => {
     it("forwards inputRef to the hidden input", () => {
       const inputRef = createRef<HTMLInputElement>();
       const { container } = render(<Checkbox inputRef={inputRef}>Accept terms</Checkbox>);
+      expect(inputRef.current).toBeInstanceOf(HTMLInputElement);
       expect(inputRef.current).toBe(getInput(container));
     });
   });
@@ -460,6 +516,11 @@ describe("Checkbox", () => {
       expectTypeOf<{ "aria-label": string }>().toExtend<CheckboxProps>();
       expectTypeOf<object>().not.toExtend<CheckboxProps>();
       expectTypeOf<{ description: string }>().not.toExtend<CheckboxProps>();
+      // Empty label content isn't a name, so it still needs an aria-label
+      expectTypeOf<{ children: undefined }>().not.toExtend<CheckboxProps>();
+      expectTypeOf<{ children: null }>().not.toExtend<CheckboxProps>();
+      expectTypeOf<{ children: false }>().not.toExtend<CheckboxProps>();
+      expectTypeOf<{ children: string | undefined }>().not.toExtend<CheckboxProps>();
     });
 
     it("keeps Base UI's render and nativeButton out of the public props", () => {
@@ -470,6 +531,16 @@ describe("Checkbox", () => {
 
     it("reports the new value as a boolean", () => {
       expectTypeOf<CheckboxProps["onCheckedChange"]>().parameter(0).toEqualTypeOf<boolean>();
+    });
+
+    it("takes string ids", () => {
+      expectTypeOf<CheckboxProps["id"]>().toEqualTypeOf<string | undefined>();
+      expectTypeOf<CheckboxProps["form"]>().toEqualTypeOf<string | undefined>();
+    });
+
+    it("takes string form values", () => {
+      expectTypeOf<CheckboxProps["value"]>().toEqualTypeOf<string | undefined>();
+      expectTypeOf<CheckboxProps["uncheckedValue"]>().toEqualTypeOf<string | undefined>();
     });
   });
 });
