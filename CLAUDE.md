@@ -110,7 +110,7 @@ One convention per job. Never mix them.
 - Text meets 4.5:1 contrast in every theme (3:1 for 24px+ or bold 19px+). Control borders, focus rings, and meaningful icons meet 3:1. Check all three themes, including hot dog.
 - Color never carries meaning alone: add an icon, a word, or a shape.
 - Focus is an **outline**, never only a box-shadow: `outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset);`.
-- Every control has a border, `transparent` if the design doesn't want one visible, so it shows in Windows forced-colors mode. Selected and checked states never rely on background color alone. Icons use `currentColor`. Add a `@media (forced-colors: active)` block when something would disappear.
+- Every control has a border, `transparent` if the design doesn't want one visible, so it shows in Windows forced-colors mode. Selected and checked states never rely on background color alone. Icons use `currentColor`. Add a `@media (forced-colors: active)` block when something would disappear. Hover rules are usually more specific than the forced-colors overrides and win, so repeat the hover selectors for checked or selected states inside that block (a hovered "on" switch otherwise loses its fill and hides the thumb).
 - Use real elements: `<button>` for actions, `<a href>` for navigation, `<label>` for inputs. A link that looks like a button is still an `<a>` (see `ButtonLink`). Don't pass `<a>` to a Base UI component's `render` prop.
 - Interactive components (dialog, menu, tabs, select, tooltip, popover, and so on) are built on Base UI. Never hand-roll their keyboard handling, focus management, or ARIA.
 - Every interactive target is at least `--target-min` (44px) in both directions, using a pseudo-element hit area when the visible control is smaller.
@@ -122,6 +122,7 @@ One convention per job. Never mix them.
 - Durations 100–320ms using the motion tokens. Exits are faster than entrances and use `--ease-in`.
 - Animate only `transform` and `opacity`.
 - Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Looping animations (spinner, skeleton) use `--duration-loop`, which gets slower under reduced motion. Under `prefers-reduced-motion` slides and pops become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
+- Movement that shows state (a switch thumb sliding to "on") is not decoration: give it a fixed distance, not `--motion-distance`, so it still moves under reduced motion. `--ease-bounce` turns into a plain ease-out there; `--duration-fast` stays the same, and is already short.
 - `data-motion="full"` or `data-motion="reduced"` on any element overrides the system setting for that subtree (generated in `tokens.css`).
 - `--ease-bounce` only for chips, toggles, and success states.
 - Base UI marks entering and leaving elements with `data-starting-style` and `data-ending-style`. Use them for enter and exit transitions in plain CSS.
@@ -164,6 +165,29 @@ await browser.close();
 "
 ```
 
+Then check what the theme screenshots can't show: focus, forced colors, and hover in forced colors. Same server, a second script:
+
+```sh
+node --input-type=module -e "
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 700, height: 900 } });
+await page.goto('http://localhost:6107/iframe.html?id=components-<name>--states&viewMode=story');
+await page.keyboard.press('Tab');
+await page.locator('#storybook-root').screenshot({ path: '<scratchpad>/<name>-focus.png' });
+await page.emulateMedia({ forcedColors: 'active' });
+await page.goto('http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story');
+await page.locator('section[data-theme=light]').screenshot({ path: '<scratchpad>/<name>-forced.png' });
+const on = page.locator('[aria-checked=true]').first();   // or [aria-selected=true], [aria-pressed=true]
+const fill = () => on.evaluate((el) => getComputedStyle(el).backgroundColor);
+const rest = await fill(); await on.hover(); await page.waitForTimeout(300);
+console.log('forced colors fill at rest', rest, 'hovered', await fill());   // must not change to the page color
+await browser.close();
+"
+```
+
+Run scripts from the repo folder with `node --input-type=module` (piping a file in with `<` works too). A script file saved elsewhere can't find `playwright`.
+
 Story ids are the title and story name in kebab case (`Components/Button link` and `AllThemes` become `components-button-link--all-themes`). Put the screenshots in a scratch folder, not the repo, and open them with the Read tool.
 
 ## Testing
@@ -186,6 +210,8 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
+- A test that only asserts something is absent (`not.toBeInTheDocument`, an empty `FormData`, `not.toMatch`) also passes when nothing renders at all. Assert a positive precondition first, such as the control or hidden input existing. Writing tests against a stub that renders `null` exposes these: every runtime test should fail there.
+- jest-dom's `toBeRequired` only understands some roles, not `switch`. For those, check `aria-required` and the hidden input's `required` directly, and check that a negative assertion can actually fail.
 - A hook in `.claude/settings.json` runs `scripts/check-tests-kept.mjs` after edits to test and story files, and after shell commands that remove them. If it reports removed, skipped, or weakened tests, put them back unless the user explicitly asked for the removal. `pnpm check:tests` runs the same check by hand.
 
 ## Form controls
@@ -193,10 +219,11 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 Checkbox is the pattern for form controls (inputs, radios, switches, and so on). Follow it:
 
 - Wrap the control in Base UI's `Field.Root`, put the label in `Field.Label`, and render `description` and `error` props with `Field.Description` and `Field.Error`. Base UI then links them with `aria-labelledby`, `aria-describedby`, and `aria-invalid`, so don't set those by hand.
-- A control needs an accessible name. The props type requires visible label content (`children`) or an `aria-label`.
+- A control needs an accessible name. The props type requires visible label content (`children`) or an `aria-label`. Type the label as `Exclude<ReactNode, undefined | null | boolean>`, because plain `ReactNode` accepts `undefined` and lets a nameless control compile.
 - Take `invalid` and `error` as separate props. An error is always words plus an icon, never only a red border.
 - The label wraps the control, so clicking the text works. Keep the clickable row at least `--target-min` tall, and give a control with no visible label a pseudo-element hit area.
 - Style state from Base UI's ARIA attributes (`aria-checked`, `aria-invalid`, `aria-readonly`) and its `data-disabled`, as `checkbox.css` does.
+- Disabled dims the control and its label to 50% opacity. Read-only dims only the control, to 75%, and keeps the label at full strength, because read-only content must stay readable. At 75% the control's edge and its mark still meet 3:1 in every theme. Forced colors resets both to full opacity.
 - Declare each Base UI prop you want in Storybook's docs table explicitly on the component's props type, with JSDoc. Storybook doesn't read props inherited from `node_modules`.
 - In tests, check names and descriptions with `toHaveAccessibleName` and `toHaveAccessibleDescription`, and check what the form submits with `FormData`.
 

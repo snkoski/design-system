@@ -1,0 +1,192 @@
+/* Switch: what it is (track, thumb, colors, states, text). Where it sits (margin, width) is the layout's job. */
+@layer components {
+  .switch {
+    /* The track's width; the thumb's travel and the text indent are derived from it */
+    --switch-track-width: calc(var(--choice) * 1.75);
+    display: grid;
+    justify-items: start;
+    row-gap: var(--space-1);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    color: var(--ink);
+  }
+
+  /* The label is the click target. It's as tall as target-min, and the track sits on its first line. */
+  .switch__row {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-block: calc((var(--target-min) - var(--choice)) / 2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .switch__label {
+    line-height: var(--choice); /* the first line is as tall as the track, so they center */
+    min-width: 0;
+  }
+
+  .switch__track {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    box-sizing: border-box;
+    width: var(--switch-track-width);
+    height: var(--choice);
+    margin: 0;
+    padding: calc(var(--space-1) / 2);
+    border: var(--border-thick) solid var(--border-strong); /* the 3:1 edge, whatever the fill is */
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* A switch with no visible label still gets a target-min hit area */
+  .switch__track::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--choice) - var(--target-min)) / 2 - var(--border-thick));
+  }
+
+  .switch__row:hover .switch__track:not([data-disabled], [aria-readonly="true"]),
+  .switch__track:hover:not([data-disabled], [aria-readonly="true"]) {
+    background: var(--surface-tint);
+  }
+
+  .switch__track:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* The thumb. Its position says on or off, so the state never relies on color alone. */
+  .switch__thumb {
+    display: block;
+    width: calc(var(--choice) - var(--border-thick) * 2 - var(--space-1));
+    height: calc(var(--choice) - var(--border-thick) * 2 - var(--space-1));
+    border-radius: var(--radius-full);
+    background: var(--border-strong);
+    /* The slide carries meaning, so it doesn't use --motion-distance: it must still move under reduced motion */
+    transition:
+      transform var(--duration-fast) var(--ease-bounce),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  /* On: filled track, thumb slides to the end */
+  .switch__track[aria-checked="true"] {
+    background: var(--action);
+  }
+  .switch__track[aria-checked="true"] .switch__thumb {
+    background: var(--on-action);
+    transform: translateX(calc(var(--switch-track-width) - var(--choice))); /* track width minus thumb, padding, and border */
+  }
+  .switch__row:hover .switch__track[aria-checked="true"]:not([data-disabled], [aria-readonly="true"]),
+  .switch__track[aria-checked="true"]:hover:not([data-disabled], [aria-readonly="true"]) {
+    background: var(--action-hover);
+  }
+
+  .switch__track[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+
+  .switch__track[aria-readonly="true"],
+  .switch__row:has(.switch__track[aria-readonly="true"]) {
+    cursor: default;
+  }
+  /* Read-only: a lighter cue than disabled. Only the control dims; the label stays readable. */
+  .switch__track[aria-readonly="true"] {
+    opacity: 0.75;
+  }
+
+  /* Disabled */
+  .switch__row[data-disabled],
+  .switch__track[data-disabled] {
+    cursor: not-allowed;
+  }
+  .switch__track[data-disabled],
+  .switch__row[data-disabled] .switch__label {
+    opacity: 0.5;
+  }
+
+  /* Description and error line up with the label text, not the track */
+  .switch__description,
+  .switch__error {
+    margin: 0;
+    padding-inline-start: calc(var(--switch-track-width) + var(--space-3));
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+  }
+  .switch__description {
+    color: var(--ink-muted);
+  }
+  .switch__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    color: var(--danger);
+  }
+  .switch__error-icon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
+  }
+
+  /* Hot dog mode: a hard shadow to press into */
+  [data-theme="hotdog"] .switch__track {
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .switch__row:active .switch__track:not([data-disabled], [aria-readonly="true"]),
+  [data-theme="hotdog"] .switch__track:active:not([data-disabled], [aria-readonly="true"]) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Windows Contrast themes: system colors, with the thumb in a contrasting color when on */
+  @media (forced-colors: active) {
+    .switch__track {
+      border-color: ButtonText;
+      background: Canvas;
+    }
+    .switch__thumb {
+      background: ButtonText;
+    }
+    .switch__track[aria-checked="true"],
+    .switch__row:hover .switch__track[aria-checked="true"]:not([data-disabled], [aria-readonly="true"]),
+    .switch__track[aria-checked="true"]:hover:not([data-disabled], [aria-readonly="true"]) {
+      background: Highlight; /* the hover fill would otherwise become Canvas and hide the thumb */
+      border-color: Highlight;
+    }
+    .switch__track[aria-checked="true"] .switch__thumb {
+      background: HighlightText;
+    }
+    .switch__track[data-disabled],
+    .switch__track[aria-readonly="true"],
+    .switch__row[data-disabled] .switch__label {
+      opacity: 1;
+    }
+    .switch__track[data-disabled] {
+      border-color: GrayText;
+    }
+    .switch__track[data-disabled] .switch__thumb {
+      background: GrayText;
+    }
+    .switch__track[data-disabled][aria-checked="true"] {
+      background: GrayText;
+    }
+    .switch__track[data-disabled][aria-checked="true"] .switch__thumb {
+      background: Canvas;
+    }
+    .switch__row[data-disabled] .switch__label {
+      color: GrayText;
+    }
+    .switch__error {
+      color: CanvasText;
+    }
+  }
+}

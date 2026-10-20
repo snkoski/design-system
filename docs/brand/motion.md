@@ -42,6 +42,7 @@ To override the visitor's system setting for part of a page, for example a site'
 - Looping animations (spinners, skeleton shimmer) use `--duration-loop` for one cycle. Reduced motion slows them down rather than stopping them, so a loading indicator stays visible.
 - Animate only `transform` and `opacity`. Never animate width, height, top, or left.
 - Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
+- Movement that carries meaning is the exception. A switch's thumb moving to the other end is how it shows on and off, so it moves the full distance even with reduced motion, quickly and without bounce (the bounce token turns into a plain ease-out). Don't build it from `--motion-distance`, which becomes 0.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.
 - Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels.
 
