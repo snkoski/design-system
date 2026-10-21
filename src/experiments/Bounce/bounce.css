@@ -1,6 +1,6 @@
 /* Bounce: something that travels around its box (or the screen) and bounces off the edges. Bounce.tsx and
-   mover.ts move it with a transform each frame. Decorative: hidden from screen readers, clicks pass through it,
-   and with reduced motion (--experiment-decoration 0, from ../decoration.css) it holds still. Experiment. */
+   mover.ts move it with a transform each frame. Decorative: hidden from screen readers, clicks pass through it
+   (unless it's grabbable), and with reduced motion (--experiment-decoration 0, from ../decoration.css) it holds still. Experiment. */
 @layer components {
   .bounce {
     position: absolute;
@@ -15,8 +15,32 @@
     position: fixed;
   }
 
+  /* Grabbable: it catches the pointer instead of letting it through, and doesn't scroll the page on touch */
+  .bounce[data-grabbable] {
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .bounce[data-dragging] {
+    cursor: grabbing;
+  }
+  /* Something small still gets a target-min area to grab */
+  .bounce[data-grabbable]::before {
+    content: "";
+    position: absolute;
+    inset-block: min(0px, calc((100% - var(--target-min)) / 2));
+    inset-inline: min(0px, calc((100% - var(--target-min)) / 2));
+  }
+
   .bounce__content {
     display: inline-flex;
+    transition: scale var(--duration-fast) var(--ease-out);
+  }
+  /* Picked up: a little bigger while it's held */
+  .bounce[data-dragging] .bounce__content {
+    scale: calc(1 + 0.15 * var(--experiment-decoration));
   }
 
   .bounce__dot {

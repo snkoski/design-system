@@ -17,6 +17,8 @@ export interface Physics {
   gravity: number;
   /** How much speed is kept at each bounce: 1 keeps it all, 0 stops dead. */
   bounciness: number;
+  /** How quickly it slows down by itself, per second: 0 never does, 1 loses about two thirds of its speed a second. */
+  friction?: number;
 }
 
 export type Edge = "top" | "right" | "bottom" | "left";
@@ -31,11 +33,13 @@ export function velocity(speed: number, angle: number) {
 }
 
 /** Moves `body` on by `seconds`, bouncing it off the room's edges, and says which edges it hit */
-export function step(body: Body, room: Room, seconds: number, { gravity, bounciness }: Physics) {
+export function step(body: Body, room: Room, seconds: number, { gravity, bounciness, friction = 0 }: Physics) {
   const keep = Math.min(Math.max(bounciness, 0), 1);
   const maxX = Math.max(room.width, 0);
   const maxY = Math.max(room.height, 0);
-  let { vx, vy } = body;
+  const slow = Math.exp(-Math.max(friction, 0) * seconds);
+  let vx = body.vx * slow;
+  let vy = body.vy * slow;
   vy += gravity * seconds;
   let x = body.x + vx * seconds;
   let y = body.y + vy * seconds;

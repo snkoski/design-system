@@ -22,7 +22,20 @@ const meta = {
   component: Bounce,
   // It's somewhere different every time, so a snapshot would never match
   parameters: { layout: "fullscreen", chromatic: { disableSnapshot: true } },
-  args: { speed: 240, angle: 45, gravity: 0, bounciness: 1, startX: 0, startY: 0, bounds: "parent", squash: true, paused: false },
+  args: {
+    speed: 240,
+    angle: 45,
+    gravity: 0,
+    bounciness: 1,
+    friction: 0,
+    startX: 0,
+    startY: 0,
+    bounds: "parent",
+    squash: true,
+    paused: false,
+    grabbable: false,
+    throwable: true,
+  },
   argTypes: {
     children: { control: false },
     ref: { control: false },
@@ -31,6 +44,7 @@ const meta = {
     angle: { control: { type: "range", min: 0, max: 360, step: 5 } },
     gravity: { control: { type: "range", min: 0, max: 4000, step: 50 } },
     bounciness: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+    friction: { control: { type: "range", min: 0, max: 5, step: 0.1 } },
     startX: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
     startY: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
   },
@@ -147,6 +161,55 @@ function WholePageDemo(args: Story["args"]) {
     </div>
   );
 }
+
+/** Grab a ball and throw it. Let go while you're still moving and it flies off at that speed; hold still and let go to drop it. */
+export const Throw: Story = {
+  args: { gravity: 2000, bounciness: 0.75, speed: 0, grabbable: true },
+  render: (args) => (
+    <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
+      {colors.slice(0, 5).map((color, index) => (
+        <Bounce key={color} {...args} startX={0.2 + index * 0.15} startY={0.3}>
+          <Ball color={color} size="3rem" />
+        </Bounce>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * Drag things around and drop them anywhere: no speed, no gravity, and no throwing. The story checks that the
+ * small dot can be grabbed from a little outside its edge, and that dragging moves it.
+ */
+export const DragAround: Story = {
+  args: { speed: 0, grabbable: true, throwable: false },
+  render: ({ children: _children, startX: _startX, startY: _startY, ...args }) => (
+    <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
+      <Bounce {...args} startX={0.1} startY={0.1} data-testid="dot" />
+      {emoji.slice(0, 8).map((choice, index) => (
+        <Bounce key={choice} {...args} startX={0.15 + (index % 4) * 0.2} startY={index < 4 ? 0.4 : 0.7}>
+          <span style={{ fontSize: "3rem", lineHeight: 1 }}>{choice}</span>
+        </Bounce>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const dot = canvas.getByTestId("dot");
+    const from = dot.getBoundingClientRect();
+    // The dot is smaller than target-min, but grabbing just outside it still catches it
+    await expect(document.elementFromPoint(from.right + 6, from.top + from.height / 2)?.closest(".bounce")).toBe(dot);
+    const x = from.left + from.width / 2;
+    const y = from.top + from.height / 2;
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: dot, coords: { clientX: x, clientY: y } },
+      { target: dot, coords: { clientX: x + 60, clientY: y + 30 } },
+      { target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
+      { keys: "[/MouseLeft]", target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
+    ]);
+    const to = dot.getBoundingClientRect();
+    await expect(Math.round(to.left - from.left)).toBe(120);
+    await expect(Math.round(to.top - from.top)).toBe(60);
+  },
+};
 
 /** Fast, in a small box. The story checks that it moves, bounces back, and never leaves the box. */
 export const StaysInside: Story = {

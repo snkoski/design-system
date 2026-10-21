@@ -1,8 +1,10 @@
-import { act, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { Bounce } from "./Bounce";
 import type { BounceProps } from "./Bounce";
+import { interact } from "./mover";
+import type { Member } from "./mover";
 import { step, velocity } from "./physics";
 
 const float = { gravity: 0, bounciness: 1 };
@@ -73,6 +75,18 @@ describe("step", () => {
     const { body, edges } = step({ x: 0, y: 20, vx: 20, vy: 0 }, { width: 0, height: 50 }, 0.5, float);
     expect(body.x).toBe(0);
     expect(edges).toEqual([]);
+  });
+});
+
+describe("step with friction", () => {
+  it("slows down by itself", () => {
+    const { body } = step({ x: 50, y: 20, vx: 20, vy: -10 }, room, 1, { gravity: 0, bounciness: 1, friction: Math.LN2 });
+    expect(body.vx).toBeCloseTo(10); // friction ln 2 halves the speed each second
+    expect(body.vy).toBeCloseTo(-5);
+  });
+
+  it("keeps its speed with no friction", () => {
+    expect(step({ x: 50, y: 20, vx: 20, vy: 0 }, room, 1, { gravity: 0, bounciness: 1, friction: 0 }).body.vx).toBe(20);
   });
 });
 
@@ -171,6 +185,173 @@ describe("Bounce", () => {
       expect(getComputedStyle(getBounce(container)).getPropertyValue("--experiment-decoration")).toBe("0");
       act(() => vi.advanceTimersByTime(500));
       expect(position(getBounce(container))).toEqual([0, 0]);
+    });
+
+    describe("grabbing", () => {
+      const point = (x: number, y: number) => ({ pointerId: 1, button: 0, clientX: x, clientY: y });
+
+      it("isn't grabbable by default: the pointer doesn't move it", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} />);
+        const ball = getBounce(container);
+        expect(ball).not.toHaveAttribute("data-grabbable");
+        fireEvent.pointerDown(ball, point(10, 10));
+        fireEvent.pointerMove(ball, point(60, 40));
+        expect(position(ball)).toEqual([0, 0]);
+        expect(ball).not.toHaveAttribute("data-dragging");
+      });
+
+      it("follows the pointer while it's held, staying inside its box", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable />);
+        const ball = getBounce(container);
+        expect(ball).toHaveAttribute("data-grabbable");
+        fireEvent.pointerDown(ball, point(10, 10));
+        expect(ball).toHaveAttribute("data-dragging");
+        fireEvent.pointerMove(ball, point(60, 40));
+        expect(position(ball)).toEqual([50, 30]);
+        fireEvent.pointerMove(ball, point(500, -50));
+        expect(position(ball)).toEqual([200, 0]);
+      });
+
+      it("only drags with the main button, and only with the pointer that grabbed it", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, { ...point(10, 10), button: 2 });
+        fireEvent.pointerMove(ball, point(60, 40));
+        expect(position(ball)).toEqual([0, 0]);
+        fireEvent.pointerDown(ball, point(10, 10));
+        fireEvent.pointerMove(ball, { ...point(60, 40), pointerId: 2 });
+        expect(position(ball)).toEqual([0, 0]);
+      });
+
+      it("isn't moved by the loop while it's held", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={100} angle={0} grabbable />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(10, 10));
+        act(() => vi.advanceTimersByTime(500));
+        expect(position(ball)).toEqual([0, 0]);
+      });
+
+      it("flies off at the speed it was thrown", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(0, 0));
+        act(() => vi.advanceTimersByTime(50));
+        fireEvent.pointerMove(ball, point(10, 0)); // 10px in 50ms: 200px per second, to the right
+        fireEvent.pointerUp(ball, point(10, 0));
+        expect(ball).not.toHaveAttribute("data-dragging");
+        act(() => vi.advanceTimersByTime(250));
+        const [x, y] = position(ball);
+        expect(x).toBeGreaterThan(50);
+        expect(x).toBeLessThan(70);
+        expect(y).toBe(0);
+      });
+
+      it("drops where it's let go after holding still", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(0, 0));
+        fireEvent.pointerMove(ball, point(40, 20));
+        act(() => vi.advanceTimersByTime(300));
+        fireEvent.pointerUp(ball, point(40, 20));
+        act(() => vi.advanceTimersByTime(300));
+        expect(position(ball)).toEqual([40, 20]);
+      });
+
+      it("drops where it's let go when it isn't throwable, however fast it was moving", () => {
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable throwable={false} />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(0, 0));
+        act(() => vi.advanceTimersByTime(20));
+        fireEvent.pointerMove(ball, point(40, 20));
+        fireEvent.pointerUp(ball, point(40, 20));
+        act(() => vi.advanceTimersByTime(300));
+        expect(position(ball)).toEqual([40, 20]);
+      });
+
+      it("calls onClick when it's pressed and let go without dragging", () => {
+        const onClick = vi.fn();
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable onClick={onClick} />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(10, 10));
+        fireEvent.pointerMove(ball, point(13, 11)); // a little wobble is still a click
+        fireEvent.pointerUp(ball, point(13, 11));
+        fireEvent.click(ball);
+        expect(onClick).toHaveBeenCalledOnce();
+      });
+
+      it("doesn't count letting go after a drag as a click, but counts the next click", () => {
+        const onClick = vi.fn();
+        const { container } = render(<Bounce bounds="viewport" speed={0} grabbable onClick={onClick} />);
+        const ball = getBounce(container);
+        fireEvent.pointerDown(ball, point(10, 10));
+        fireEvent.pointerMove(ball, point(60, 40));
+        fireEvent.pointerUp(ball, point(60, 40));
+        fireEvent.click(ball);
+        expect(position(ball)).toEqual([50, 30]);
+        expect(onClick).not.toHaveBeenCalled();
+        fireEvent.pointerDown(ball, point(60, 40));
+        fireEvent.pointerUp(ball, point(60, 40));
+        fireEvent.click(ball);
+        expect(onClick).toHaveBeenCalledOnce();
+      });
+
+      it("still calls pointer handlers passed in", () => {
+        const onPointerDown = vi.fn();
+        const { container } = render(<Bounce bounds="viewport" grabbable onPointerDown={onPointerDown} />);
+        fireEvent.pointerDown(getBounce(container), point(0, 0));
+        expect(onPointerDown).toHaveBeenCalledOnce();
+      });
+    });
+
+    describe("interactions", () => {
+      // What Magnets uses to act between movers; Bounce on its own adds none
+      let leave = () => {};
+      afterEach(() => leave());
+
+      it("lets an interaction push movers, until it's removed", () => {
+        leave = interact({ push: (members) => members.map(() => ({ ax: 400, ay: 0 })) });
+        const { container } = render(<Bounce bounds="viewport" speed={0} />);
+        act(() => vi.advanceTimersByTime(250));
+        const pushedTo = position(getBounce(container))[0]!;
+        expect(pushedTo).toBeGreaterThan(5);
+        leave();
+        act(() => vi.advanceTimersByTime(250));
+        expect(position(getBounce(container))[0]).toBeGreaterThan(pushedTo); // still moving at the speed it reached
+        const { container: later } = render(<Bounce bounds="viewport" speed={0} />);
+        act(() => vi.advanceTimersByTime(250));
+        expect(position(getBounce(later))).toEqual([0, 0]);
+      });
+
+      it("gives it the movers in each box, saying which are fixed", () => {
+        const seen: Member[][] = [];
+        leave = interact({ push: (members) => (seen.push(members), members.map(() => ({ ax: 0, ay: 0 }))) });
+        const { container } = render(
+          <>
+            <Bounce bounds="viewport" speed={0} startX={0.5} />
+            <Bounce bounds="viewport" speed={0} paused />
+          </>,
+        );
+        act(() => vi.advanceTimersByTime(20));
+        const [moving, paused] = container.querySelectorAll<HTMLElement>(".bounce");
+        expect(seen.at(-1)!.map(({ element, x, fixed }) => ({ element, x, fixed }))).toEqual([
+          { element: moving, x: 100, fixed: false },
+          { element: paused, x: 0, fixed: true },
+        ]);
+      });
+
+      it("lets an interaction settle where movers end up, inside their box, without moving fixed ones", () => {
+        leave = interact({ settle: (members) => members.map(({ vx, vy }) => ({ x: 1000, y: 30, vx, vy })) });
+        const { container } = render(
+          <>
+            <Bounce bounds="viewport" speed={0} />
+            <Bounce bounds="viewport" speed={0} paused />
+          </>,
+        );
+        act(() => vi.advanceTimersByTime(20));
+        const [moving, paused] = container.querySelectorAll<HTMLElement>(".bounce");
+        expect(position(moving!)).toEqual([200, 30]);
+        expect(position(paused!)).toEqual([0, 0]);
+      });
     });
 
     it("stops the animation loop when the last one goes", () => {
