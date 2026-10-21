@@ -43,9 +43,9 @@ Raised while building TextArea (2026-10-21).
 
 **Why it's in question:** a counter ("120 of 500") helps people stay under a limit. It has to tell screen readers how much room is left without announcing every keystroke, which needs its own design: when to announce, how politely, and how it looks over the limit.
 
-**To decide:** whether TextArea gets a counter, how it announces itself (for example, only near the limit), and whether going over the limit is blocked or shown as an error.
+**To decide:** whether TextArea gets a counter, how it announces itself (for example, only near the limit), and whether going over the limit is blocked or shown as an error. The RichText experiment needs the same answer, counting the text people see rather than its markdown.
 
-Raised while building TextArea (2026-10-21).
+Raised while building TextArea (2026-10-21). RichText added (2026-10-21).
 
 ## Invalid text fields in hot dog mode with forced colors
 
@@ -86,3 +86,63 @@ Raised while building SegmentedControl (2026-10-21).
 **To decide:** look at it in use. If the bold isn't clear enough, try a different fill (such as `ink`, which is strong in every theme) or a check mark in the chosen option, as Material's segmented buttons do.
 
 Raised while building SegmentedControl (2026-10-21).
+
+## Enter to send in RichText
+
+**Today:** in the RichText experiment, Enter starts a new paragraph (or a new list item), Shift+Enter adds a line break inside the paragraph, and Mod+Enter also adds a line break (Tiptap's default). Nothing sends.
+
+**Why it's in question:** it's planned. Chat-style message fields usually send on Enter. People who write longer messages want Enter for new lines and Mod+Enter to send. The field needs a setting for which way round it works.
+
+**To decide:** the prop (for example `submitOn="enter" | "mod-enter"`), what "send" calls (a callback, or submitting the field's form), what Shift+Enter does in each mode, what happens inside a list or code block (where Enter usually adds an item or a line), and how the field tells people which key sends, in words, for screen readers too. RichText keeps its keyboard shortcuts in one place (`markdown.ts` and the toolbar tools in `RichText.tsx`), so this goes there.
+
+Raised while building RichText (2026-10-21).
+
+## Choosing which RichText buttons appear
+
+**Today:** the RichText toolbar always has all ten buttons: bold, italic, underline, strikethrough, inline code, link, quote, bulleted list, numbered list, and code block. Their markdown shortcuts and keyboard shortcuts always work.
+
+**Why it's in question:** some fields need less, such as a comment box with no code blocks. Hiding a button while its shortcut still works would be confusing, so turning a format off has to remove the button, the shortcut, the typed markdown rule, and the format on paste.
+
+**To decide:** whether to add a prop such as `formats={["bold", "italic", "link"]}`, what pasted or loaded markdown does with a format that's off (keep its text), and whether the toolbar can be hidden entirely for a field that only takes shortcuts.
+
+Raised while building RichText (2026-10-21).
+
+## Syntax colors in RichText code blocks
+
+**Today:** code blocks in the RichText experiment are plain monospace text on `surface-tint`. A language after the fence (```` ```js ````) is kept in the markdown but not shown.
+
+**Why it's in question:** colored code is easier to read. It needs a highlighting library (Tiptap's CodeBlockLowlight with lowlight), which adds noticeably to the size, and a set of syntax colors that meet 4.5:1 in all three themes, hot dog included.
+
+**To decide:** whether messages carry enough code to be worth the size, and which colors, as tokens.
+
+Raised while building RichText (2026-10-21).
+
+## Nested lists in RichText
+
+**Today:** Tab always moves on to the next control, as in any field, so a list item can't be indented from the keyboard, and the toolbar has no indent button. Nested lists in loaded or pasted markdown still show, nested.
+
+**Why it's in question:** word processors indent list items with Tab. Doing that makes Tab do two things depending on where the caret is, which is surprising for keyboard users, and a field mustn't trap Tab.
+
+**To decide:** whether nested lists are needed in messages at all. If so, indent and outdent toolbar buttons with their own shortcuts (Mod+] and Mod+[ are common) keep Tab predictable.
+
+Raised while building RichText (2026-10-21).
+
+## A taller RichText
+
+**Today:** RichText starts one line tall and grows to four lines, then scrolls (`rows` 1, `maxRows` 4), like a chat message field. Both can be changed, so a taller field already works by setting them.
+
+**Why it's in question:** a field for long writing, such as a post or a document, might want a different look: more room from the start, the toolbar somewhere else, or no scrolling at all.
+
+**To decide:** whether `rows` and `maxRows` are enough, or a separate multi-line variant is worth having, once there's a real use for one.
+
+Raised while building RichText (2026-10-21).
+
+## How read-only fields look
+
+**Today:** each control does its own thing. Input and TextArea dim the field to 75% and hide the placeholder, keeping the label at full strength. Checkbox, Switch, and Radio dim the control to 75%. SegmentedControl dims only the options that aren't chosen, because the chosen option's label sits on its fill. The RichText experiment hides its toolbar and doesn't dim at all, because links and inline code would fall below 4.5:1 at 75%.
+
+**Why it's in question:** the rule is that people should be able to tell a field can't be changed before they try (`docs/brand/accessibility.md`). A 75% dim is a quiet cue, and it can't be used wherever colored text would lose contrast. There's no one pattern yet for what read-only should mean visually.
+
+**To decide:** what read-only is for in the sites and apps that use the system (showing a saved value, a locked setting, a sent message), and then one cue for all of it. Options: the dim; dropping the field's edge and background so it reads as plain text; or a "Read only" note or lock icon beside the label, in words. Whatever is chosen has to meet contrast in every theme and work in forced colors.
+
+Raised while building RichText (2026-10-21).
