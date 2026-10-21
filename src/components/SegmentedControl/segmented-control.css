@@ -124,9 +124,12 @@
   }
 
   /* The label and a hidden bold copy share one cell, so the copy sets the width whether or not it's chosen */
+  /* Options can get narrower than their longest word, so the page never scrolls sideways. A word that doesn't fit
+     then breaks, rather than spill into the next option. */
   .segment__label {
     display: inline-grid;
     min-width: 0;
+    overflow-wrap: anywhere;
   }
   .segment__text,
   .segment__sizer {

@@ -228,8 +228,9 @@ export const WithoutVisibleLabel: Story = {
 };
 
 /**
- * In a narrow space, labels wrap and every option grows to the same height, so the page never scrolls sideways.
- * The story checks the control stays inside its container.
+ * In a narrow space, labels wrap and every option grows to the same height, so the page never scrolls sideways. A
+ * word too long for its option breaks rather than spill into the next one. The story checks the control stays
+ * inside its container, and every label inside its option.
  */
 export const Narrow: Story = {
   args: { label: "Delivery", name: "delivery", defaultValue: "standard" },
@@ -248,6 +249,16 @@ export const Narrow: Story = {
     await expect(track.right).toBeLessThanOrEqual(container.right + 0.5);
     const heights = canvas.getAllByRole("radio").map((option) => option.getBoundingClientRect().height);
     await expect(new Set(heights).size).toBe(1);
+    // The text itself, not its box: a word too long for the box sticks out of it
+    for (const option of canvas.getAllByRole("radio")) {
+      const label = option.querySelector(".segment__label")!.getBoundingClientRect();
+      for (const part of option.querySelectorAll(".segment__text, .segment__sizer")) {
+        const text = document.createRange();
+        text.selectNodeContents(part);
+        await expect(text.getBoundingClientRect().right).toBeLessThanOrEqual(label.right + 0.5);
+        await expect(text.getBoundingClientRect().left).toBeGreaterThanOrEqual(label.left - 0.5);
+      }
+    }
   },
 };
 

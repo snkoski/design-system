@@ -59,7 +59,10 @@ interface OwnProps {
   className?: string;
   /** Reaches the element with the radiogroup role. */
   ref?: Ref<HTMLDivElement>;
-  /** The options: a `Segment` with a `value` for each. Two to about five. */
+  /**
+   * The options: a `Segment` with a `value` for each. Two to about five, with short labels of a word or two: in a
+   * narrow space, a word too long for its option breaks across lines.
+   */
   children?: ReactNode;
 }
 
