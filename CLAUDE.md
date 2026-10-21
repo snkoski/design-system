@@ -264,7 +264,7 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 
 ## Experiments
 
-`src/experiments/` holds ideas being tried out (the focus sheen, LookAt, a custom cursor, Spin), one folder each, shown under Experiments in Storybook.
+`src/experiments/` holds ideas being tried out (the focus sheen, LookAt, a custom cursor, Spin, Bounce), one folder each, shown under Experiments in Storybook.
 
 - Experiments don't have to follow this file's rules or the established patterns: tokens only, tests, stories per state, JSDoc, and so on are all optional there, until an experiment moves out.
 - Two rules still hold. An experiment never changes a component, `src/styles/`, or the tokens: it imports its own CSS, and reaches components from outside (FocusSheen styles the components inside its wrapper by their classes). And nothing outside `src/experiments/` imports from it, so it's never exported from `src/index.ts` or published (`tsconfig.build.json` excludes the folder).

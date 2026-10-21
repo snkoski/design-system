@@ -1,0 +1,38 @@
+/* Bounce: something that travels around its box (or the screen) and bounces off the edges. Bounce.tsx and
+   mover.ts move it with a transform each frame. Decorative: hidden from screen readers, clicks pass through it,
+   and with reduced motion (--experiment-decoration 0, from ../decoration.css) it holds still. Experiment. */
+@layer components {
+  .bounce {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-flex;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .bounce[data-bounds="viewport"] {
+    position: fixed;
+  }
+
+  .bounce__content {
+    display: inline-flex;
+  }
+
+  .bounce__dot {
+    display: block;
+    box-sizing: border-box;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: var(--border-thin) solid transparent; /* shows in forced colors */
+    border-radius: var(--radius-full);
+    background: var(--action);
+  }
+
+  @media (forced-colors: active) {
+    .bounce__dot {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+}
