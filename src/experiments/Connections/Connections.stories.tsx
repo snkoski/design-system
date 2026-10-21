@@ -110,6 +110,20 @@ export const Constellation: Story = {
   ),
 };
 
+/** Constellation, but with hot dogs, joined by lines of ketchup. */
+export const Ketchup: Story = {
+  args: { distance: "10vmin", lineWidth: 2.5, color: "hsl(2 85% 42%)" },
+  render: (args) => (
+    <Connections {...args} className="h-screen overflow-hidden" style={page}>
+      {Array.from({ length: 60 }, (_, index) => (
+        <Bounce key={index} {...spread(index)} speed={20 + ((index * 13) % 40)} squash={false}>
+          <span style={{ fontSize: "1.125rem", lineHeight: 1 }}>🌭</span>
+        </Bounce>
+      ))}
+    </Connections>
+  ),
+};
+
 /** Measured against the window: at "15vw", things connect from further apart in a wider window. Resize it to see. */
 export const WindowRelative: Story = {
   args: { distance: "15vw" },
