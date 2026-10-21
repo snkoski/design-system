@@ -15,7 +15,11 @@ If `$0` is empty, ask which component to build and stop.
 
 Work through the phases in order. **Phase 2 ends in a hard stop for the user's approval.** Don't write component files before it.
 
+**An experiment built to these rules.** When the user asks for an experiment in `src/experiments/<Name>/` to follow this skill anyway, every phase applies, with these differences, because an experiment never changes components, styles, or tokens and is never published: no `index.ts`, no export from `src/index.ts`, and no import in `src/styles/index.css` (the component imports its own CSS); no new tokens and no `tokens/contrast.json` pairs, so any color it needs is written in its CSS with a comment saying it becomes a token if the experiment graduates, and its contrast is checked by a `play` function on the `AllThemes` story (`pnpm check` doesn't look at experiments); new dependencies go in `devDependencies`; the story title is `Experiments/<Name>`, so screenshot ids start `experiments-<name>--`; and Phase 9 points the reviewer at `src/experiments/<Name>/`, naming the reference component.
+
 ## Phase 1: Research
+
+Before anything else, check the starting point: the branch is based on the latest `main` (`git log -1 main` against the branch's base), and any dependency you've added is still in `node_modules`. Another session can share this folder and switch branches or reinstall packages under you. If one does, suggest a git worktree for one of them.
 
 1. Read `CLAUDE.md` in full, plus `docs/brand/accessibility.md`, `docs/brand/building.md`, and `docs/brand/motion.md`.
 2. Pick the reference component: `src/components/Checkbox/` for choice controls (checkboxes, switches, radios), `src/components/Input/` for text fields, and `src/components/Button/` for actions. Read all its files. New components match its structure, prop names, JSDoc style, and test layout unless there is a reason not to.
@@ -66,6 +70,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 2. Write `<Name>.test.tsx` from the approved API, covering the full list in the Testing section of `CLAUDE.md`. Include `expectTypeOf` checks for any rule enforced in types.
    Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. For any control that can have no visible label, plan a story check that its wrapper is at least `--target-min` tall: its hit area hides the gap in a story with one control, but stacked unlabelled controls otherwise steal each other's clicks. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
    For a form control, test that a consumer's `aria-describedby` is added to the description and error, not put in their place: the control's accessible description must still include both. The usual "passes other props through" test only checks plain attributes, so it can't catch this.
+   Base UI popups (Popover, Dialog, Menu, Select, Tooltip) move focus a frame after they open or close, so check focus after opening or closing one with `await waitFor(() => expect(...).toHaveFocus())`, not straight away.
 3. Run `pnpm test:unit` and `pnpm typecheck`. Every runtime test should fail, because the stub renders nothing; none should fail from import or type errors. Note the count.
 4. List the tests that pass against the stub (`pnpm exec vitest run --project unit src/components/<Name> --reporter=verbose`). Type-only tests (`expectTypeOf`) pass at runtime by design; `pnpm typecheck` checks them. **Any other test that passes is vacuous**: it only asserts that something is absent, so an empty render satisfies it. Make it stricter by asserting a positive precondition first (the control or hidden input exists), and rerun until only type tests pass.
 
@@ -101,6 +106,8 @@ Then prove the tests can fail: break the component three ways that matter (for e
 Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Check alignment, every state, focus, hot dog mode, and dark mode.
 
 For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
+
+If the component renders lists (`ul`, `ol`), check their bullets and numbers show: the base styles remove them. For any story that isn't `fullscreen`, Storybook centers the component on the page, so screenshot the `#storybook-root` element or the whole page, not a fixed area.
 
 Then check what the theme screenshots can't show, with the second recipe there: a focused control (if the story has a `play` function, it has already run when the page loads and may have moved focus, so don't press Tab again before screenshotting), the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
 
