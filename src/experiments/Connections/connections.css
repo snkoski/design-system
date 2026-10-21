@@ -1,0 +1,16 @@
+/* Connections: a box that draws a line between things inside it that come close together. Connections.tsx
+   draws the lines on a canvas behind them each frame. The canvas's color is the line color. Experiment. */
+@layer components {
+  .connections {
+    position: relative; /* the box Bounce bounces in, and the canvas covers */
+  }
+
+  .connections__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    color: var(--connections-color, var(--border-strong));
+  }
+}
