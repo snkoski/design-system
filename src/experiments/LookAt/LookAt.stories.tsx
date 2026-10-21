@@ -67,10 +67,13 @@ export const Playground: Story = {
   ),
 };
 
-/** Two arrows. Put the mouse between them and they face each other, because each aims from its own center. */
+/**
+ * Two arrows. Put the mouse between them and they face each other, because each aims from its own center. Forced
+ * to full motion with data-motion="full", so they turn even where the system asks for reduced motion.
+ */
 export const Pair: Story = {
   render: () => (
-    <div className="flex items-center justify-center gap-40" style={page}>
+    <div data-motion="full" className="flex items-center justify-center gap-40" style={page}>
       <LookAt data-testid="left" className="size-16">
         <Arrow />
       </LookAt>

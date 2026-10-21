@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import "../decoration.css";
@@ -41,7 +41,9 @@ export function LookAt({ direction = "toward", turnDuration, turnEasing, classNa
   const element = useRef<HTMLSpanElement | null>(null);
   const watcher = useRef<Watcher | null>(null);
 
-  useEffect(() => {
+  // A layout effect, so it's listening as soon as it's on the page: a pointer move in the same moment
+  // (a story's play function, say) isn't lost before a passive effect would have run
+  useLayoutEffect(() => {
     watcher.current = { element: element.current!, away: direction === "away", angle: 0 };
     const stop = watch(watcher.current);
     return () => {
