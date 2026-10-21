@@ -12,6 +12,13 @@ interface OwnProps {
   /** Whether the content faces toward the mouse or away from it. Default: `toward`. */
   direction?: LookAtDirection;
   /**
+   * How long each turn takes, in milliseconds. 0 snaps straight to the mouse; longer ones trail behind it
+   * lazily. Default: 120 (`--duration-fast`).
+   */
+  turnDuration?: number;
+  /** The easing of each turn, as a CSS timing function, such as `var(--ease-in-out)` or `linear`. Default: `var(--ease-out)`. */
+  turnEasing?: string;
+  /**
    * What turns to face the mouse, drawn pointing up: an up arrow, a vertical bar, and so on. It's hidden from
    * screen readers, because the turning is decoration.
    */
@@ -30,7 +37,7 @@ export type LookAtProps = OwnProps & Omit<HTMLAttributes<HTMLSpanElement>, keyof
  * hidden from screen readers; with reduced motion the content stays pointing up. An experiment: not exported
  * from the package (see CLAUDE.md, Experiments).
  */
-export function LookAt({ direction = "toward", className, ref, children, ...rest }: LookAtProps) {
+export function LookAt({ direction = "toward", turnDuration, turnEasing, className, style, ref, children, ...rest }: LookAtProps) {
   const element = useRef<HTMLSpanElement | null>(null);
   const watcher = useRef<Watcher | null>(null);
 
@@ -57,7 +64,18 @@ export function LookAt({ direction = "toward", className, ref, children, ...rest
   };
 
   return (
-    <span {...rest} ref={setRef} className={cx("look-at", className)} data-direction={direction} aria-hidden="true">
+    <span
+      {...rest}
+      ref={setRef}
+      className={cx("look-at", className)}
+      data-direction={direction}
+      aria-hidden="true"
+      style={{
+        ...style,
+        ...(turnDuration !== undefined && { "--look-at-duration": `${Math.max(turnDuration, 0)}ms` }),
+        ...(turnEasing && { "--look-at-ease": turnEasing }),
+      }}
+    >
       <span className="look-at__pointer">{children}</span>
     </span>
   );

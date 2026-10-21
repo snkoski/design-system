@@ -36,14 +36,29 @@ const meta = {
   title: "Experiments/Look at",
   component: LookAt,
   parameters: { layout: "fullscreen" },
-  args: { direction: "toward", children: <Arrow /> },
-  argTypes: { children: { control: false }, ref: { control: false } },
+  args: { direction: "toward", turnDuration: 120, turnEasing: "ease-out (now)", children: <Arrow /> },
+  argTypes: {
+    children: { control: false },
+    ref: { control: false },
+    turnDuration: { control: { type: "range", min: 0, max: 2000, step: 20 } },
+    turnEasing: {
+      control: "select",
+      options: ["ease-out (now)", "ease-in-out", "ease-in", "ease-bounce", "linear"],
+      mapping: {
+        "ease-out (now)": "var(--ease-out)",
+        "ease-in-out": "var(--ease-in-out)",
+        "ease-in": "var(--ease-in)",
+        "ease-bounce": "var(--ease-bounce)",
+        linear: "linear",
+      },
+    },
+  },
 } satisfies Meta<typeof LookAt>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Move the mouse around the page. Switch direction in the Controls panel. */
+/** Move the mouse around the page. Change the direction, turn speed, and easing in the Controls panel. */
 export const Playground: Story = {
   render: (args) => (
     <div className="grid place-items-center" style={page}>
@@ -84,14 +99,14 @@ function Grid({ columns, rows, item }: { columns: number; rows: number; item: (i
   );
 }
 
-/** A grid of arrows. Each one points at the mouse from where it is. */
+/** A grid of arrows. Each one points at the mouse from where it is. Try a slow turn speed in the Controls panel. */
 export const ArrowGrid: Story = {
-  render: () => (
+  render: (args) => (
     <Grid
       columns={10}
       rows={6}
       item={(index) => (
-        <LookAt key={index} className="size-12">
+        <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
           <Arrow />
         </LookAt>
       )}
@@ -101,12 +116,12 @@ export const ArrowGrid: Story = {
 
 /** The same grid of arrows, facing away from the mouse. */
 export const AwayGrid: Story = {
-  render: () => (
+  render: (args) => (
     <Grid
       columns={10}
       rows={6}
       item={(index) => (
-        <LookAt key={index} direction="away" className="size-12">
+        <LookAt key={index} direction="away" turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
           <Arrow />
         </LookAt>
       )}
@@ -116,12 +131,12 @@ export const AwayGrid: Story = {
 
 /** A grid of bars that stand on end toward the mouse. */
 export const BarGrid: Story = {
-  render: () => (
+  render: (args) => (
     <Grid
       columns={14}
       rows={9}
       item={(index) => (
-        <LookAt key={index} className="size-12">
+        <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
           <Bar />
         </LookAt>
       )}
@@ -131,17 +146,38 @@ export const BarGrid: Story = {
 
 /** A checkerboard of toward and away. */
 export const Mixed: Story = {
-  render: () => (
+  render: (args) => (
     <Grid
       columns={10}
       rows={6}
       item={(index) => (
-        <LookAt key={index} direction={(index + Math.floor(index / 10)) % 2 ? "away" : "toward"} className="size-12">
+        <LookAt key={index} direction={(index + Math.floor(index / 10)) % 2 ? "away" : "toward"} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
           <Arrow />
         </LookAt>
       )}
     />
   ),
+};
+
+/** A slow, linear turn: the arrows trail behind the mouse. */
+export const SlowTurn: Story = {
+  args: { turnDuration: 800, turnEasing: "linear" },
+  render: (args) => (
+    <Grid
+      columns={10}
+      rows={6}
+      item={(index) => (
+        <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} data-testid={index ? undefined : "first"} className="size-12">
+          <Arrow />
+        </LookAt>
+      )}
+    />
+  ),
+  play: async ({ canvas }) => {
+    const pointer = canvas.getByTestId("first").querySelector(".look-at__pointer")!;
+    await expect(getComputedStyle(pointer).transitionDuration).toBe("0.8s");
+    await expect(getComputedStyle(pointer).transitionTimingFunction).toBe("linear");
+  },
 };
 
 /** With reduced motion (here forced with data-motion="reduced"), nothing turns: everything keeps pointing up. */

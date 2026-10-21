@@ -176,6 +176,50 @@ describe("LookAt", () => {
     });
   });
 
+  describe("turn speed", () => {
+    it("turns at the default speed unless told otherwise", () => {
+      const { element } = renderAt(100, 100);
+      expect(element).toHaveClass("look-at");
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("");
+      expect(element.style.getPropertyValue("--look-at-ease")).toBe("");
+    });
+
+    it("sets how long a turn takes, and its easing", () => {
+      const { element } = renderAt(100, 100, { turnDuration: 600, turnEasing: "linear" });
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("600ms");
+      expect(element.style.getPropertyValue("--look-at-ease")).toBe("linear");
+    });
+
+    it("snaps straight to the mouse with 0, and treats a negative duration as 0", () => {
+      const { element, rerender } = renderAt(100, 100, { turnDuration: 0 });
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("0ms");
+      rerender(
+        <LookAt data-testid="look" turnDuration={-50}>
+          <svg />
+        </LookAt>,
+      );
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("0ms");
+    });
+
+    it("keeps its angle when the speed changes", () => {
+      const { element, rerender } = renderAt(100, 100, { turnDuration: 120 });
+      movePointer(200, 100);
+      rerender(
+        <LookAt data-testid="look" turnDuration={900}>
+          <svg />
+        </LookAt>,
+      );
+      expect(angleOf(element)).toBe("90deg");
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("900ms");
+    });
+
+    it("keeps the consumer's own style", () => {
+      const { element } = renderAt(100, 100, { turnDuration: 300, style: { opacity: 0.5 } });
+      expect(element.style.opacity).toBe("0.5");
+      expect(element.style.getPropertyValue("--look-at-duration")).toBe("300ms");
+    });
+  });
+
   describe("in a grid", () => {
     it("points each one its own way: with the mouse between two, they face each other", () => {
       render(
@@ -267,6 +311,11 @@ describe("LookAt", () => {
     it("requires content to turn", () => {
       expectTypeOf<object>().not.toExtend<LookAtProps>();
       expectTypeOf<{ children: string }>().toExtend<LookAtProps>();
+    });
+
+    it("takes the turn duration as a number and the easing as a string", () => {
+      expectTypeOf<LookAtProps["turnDuration"]>().toEqualTypeOf<number | undefined>();
+      expectTypeOf<LookAtProps["turnEasing"]>().toEqualTypeOf<string | undefined>();
     });
 
     it("takes className as a string", () => {

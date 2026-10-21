@@ -11,6 +11,7 @@
   .look-at__pointer {
     display: inline-flex;
     transform: rotate(calc(var(--look-angle, 0deg) * var(--experiment-decoration)));
-    transition: transform var(--duration-fast) var(--ease-out);
+    /* How fast it turns: the turnDuration and turnEasing props set these */
+    transition: transform var(--look-at-duration, var(--duration-fast)) var(--look-at-ease, var(--ease-out));
   }
 }
