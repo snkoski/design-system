@@ -2,7 +2,7 @@
   "note": "Every foreground and background pair the components use, checked in all three themes by `pnpm check:contrast`. Text needs 4.5:1 (3:1 only for 24px+ or bold 19px+ text). Control edges, focus outlines, and meaningful icons need 3:1. When a component puts a color on a new background, add the pair here.",
   "pairs": [
     { "fg": "ink", "bg": "bg", "min": 4.5, "use": "Body text on the page" },
-    { "fg": "ink", "bg": "surface", "min": 4.5, "use": "Text on cards, menus, dialogs, and inputs" },
+    { "fg": "ink", "bg": "surface", "min": 4.5, "use": "Text on cards, menus, dialogs, inputs, and text areas" },
     { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels and hovered controls" },
     { "fg": "ink", "bg": "success-soft", "min": 4.5, "use": "Message text on a success background" },
     { "fg": "ink", "bg": "warning-soft", "min": 4.5, "use": "Message text on a warning background" },

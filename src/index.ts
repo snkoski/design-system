@@ -4,3 +4,4 @@ export * from "./components/CheckboxGroup";
 export * from "./components/RadioGroup";
 export * from "./components/Switch";
 export * from "./components/Input";
+export * from "./components/TextArea";

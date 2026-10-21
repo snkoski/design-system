@@ -78,8 +78,8 @@ export type InputProps = Labelled &
 /**
  * A single-line text field with its label, an optional description, and an error. Built on Base UI's
  * Input and Field, so the label, description, and error are linked to the input for screen readers,
- * and it takes part in forms. For numbers, longer text, or picking from options, use a number field,
- * a textarea, or a select instead.
+ * and it takes part in forms. For longer text, use TextArea. For numbers or picking from options, use a
+ * number field or a select instead.
  */
 export function Input({
   label,

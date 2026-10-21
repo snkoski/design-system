@@ -32,7 +32,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 
 - Use real elements: `<button>` for actions, `<a href>` for navigation, `<label>` for every input. A link that looks like a button is still an `<a>`.
 - Build interactive components (dialog, menu, tabs, select, tooltip, popover) on Base UI through shadcn. Never hand-roll their keyboard or ARIA behavior.
-- Every interactive target is at least `target-min` (44px) in both directions.
+- Every interactive target is at least `target-min` (44px) in both directions. One exception: a text area's resize handle, which the browser draws at about 12px. Nothing depends on it, because long text scrolls and keyboard users can't use the handle in any browser, and WCAG's target-size rule exempts controls the browser draws. Keep it visible in every theme, and keep the text area itself at least `target-min` tall.
 - For a checkbox, radio, or switch, the whole label is the click target. The checked state shows a mark (a tick, a dash, or a radio's dot) or a position (a switch's thumb) as well as a fill, and the box edge always meets 3:1 on its own, because the action fill does not.
 - Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%.
 - A radio group is one Tab stop, and the arrow keys move between its radios and select them. A group of checkboxes is one Tab stop per box.
