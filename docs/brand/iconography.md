@@ -3,6 +3,7 @@
 - **Lucide** (shadcn's default set): outline icons, 2px stroke, round caps.
 - Icons inherit color with `currentColor`. Never hard-code an icon fill.
 - Sizes: `icon-sm` in chips and small text, `icon-md` everywhere else.
+- Lines are `icon-stroke` (2). A chosen segment thickens its icons' lines to `icon-stroke-bold` (2.75), the icon version of its bold label, so the choice doesn't rely on color. Filled icons don't change, so pair them with label text.
 - An icon-only button always has an accessible name (`aria-label`). Decorative icons get `aria-hidden="true"`.
 - No emoji in UI.
 

@@ -19,10 +19,10 @@ These are requirements. A component that breaks one is not done.
 
 The operating system replaces all colors with a small fixed palette and removes shadows and background images. Build every component so it still works:
 
-- Buttons, inputs, chips, cards, and toggles always have a border. Use `border-color: transparent` when the design doesn't want one visible; it becomes a real border in forced colors.
+- Buttons, inputs, chips, cards, and toggles always have a border. Use `border-color: transparent` when the design doesn't want one visible; it becomes a real border in forced colors. Connected options, such as a segmented control's, share one border instead: the track's edge and the lines between options outline every option, so each option has none of its own.
 - Selected, checked, and current states never rely on background color alone. Add a border, an underline, a check icon, or a weight change.
 - Icons and SVGs use `currentColor`, never a fixed fill.
-- Test in forced colors with `@media (forced-colors: active)` and adjust with system colors (`Highlight`, `ButtonText`, `CanvasText`) when something disappears.
+- Test in forced colors with `@media (forced-colors: active)` and adjust with system colors (`Highlight`, `ButtonText`, `CanvasText`) when something disappears. Text on a `Highlight` fill also needs `forced-color-adjust: none`: otherwise the browser draws a page-colored backplate behind the text, and `HighlightText` vanishes on it.
 
 ## More contrast
 
@@ -34,8 +34,8 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 - Build interactive components (dialog, menu, tabs, select, tooltip, popover) on Base UI through shadcn. Never hand-roll their keyboard or ARIA behavior.
 - Every interactive target is at least `target-min` (44px) in both directions. One exception: a text area's resize handle, which the browser draws at about 12px. Nothing depends on it, because long text scrolls and keyboard users can't use the handle in any browser, and WCAG's target-size rule exempts controls the browser draws. Keep it visible in every theme, and keep the text area itself at least `target-min` tall.
 - For a checkbox, radio, or switch, the whole label is the click target. The checked state shows a mark (a tick, a dash, or a radio's dot) or a position (a switch's thumb) as well as a fill, and the box edge always meets 3:1 on its own, because the action fill does not.
-- Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%.
-- A radio group is one Tab stop, and the arrow keys move between its radios and select them. A group of checkboxes is one Tab stop per box.
+- Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%. A segmented control's labels sit inside its options, so read-only dims only the options that aren't chosen: dimmed, the chosen option's label would fall below 4.5:1 on its fill.
+- A radio group is one Tab stop, and the arrow keys move between its radios and select them. A segmented control works the same way, because it is a radio group drawn as connected buttons; its chosen option is filled and bold, and an icon's lines get thicker. A group of checkboxes is one Tab stop per box.
 - A group of checkboxes or radios has a label that names the question, and its help text and error belong to the whole group. The error is linked to every option, so it's announced on each. When the group is disabled or read-only, only the options dim: the group's label and help text stay at full strength, because the help text often says why the choices can't be changed.
 - A group of checkboxes has no required state in ARIA. To ask for at least one choice, say "(required)" in the group's label, and show an error in words if nothing is ticked.
 - Hover is never the only way to reach anything. Tooltips also open on focus and never hold essential content.

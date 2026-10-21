@@ -37,7 +37,7 @@ function themeBlock(theme) {
   return lines.join("\n");
 }
 
-const staticFamilies = ["spacing", "radius", "size", "borderWidth"];
+const staticFamilies = ["spacing", "radius", "size", "iconStroke", "borderWidth"];
 const staticLines = staticFamilies.flatMap((f) => (tokens[f]?.tokens ?? []).map((t) => `  --${t.name}: ${t.value};`));
 for (const [k, v] of Object.entries(tokens.type.families)) staticLines.push(`  --font-${k}: ${v};`);
 for (const t of tokens.type.leading?.tokens ?? []) staticLines.push(`  --${t.name}: ${t.value};`);

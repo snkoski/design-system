@@ -3,7 +3,7 @@
   "pairs": [
     { "fg": "ink", "bg": "bg", "min": 4.5, "use": "Body text on the page" },
     { "fg": "ink", "bg": "surface", "min": 4.5, "use": "Text on cards, menus, dialogs, inputs, and text areas" },
-    { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels and hovered controls" },
+    { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels and hovered controls, such as a segment" },
     { "fg": "ink", "bg": "success-soft", "min": 4.5, "use": "Message text on a success background" },
     { "fg": "ink", "bg": "warning-soft", "min": 4.5, "use": "Message text on a warning background" },
     { "fg": "ink", "bg": "danger-soft", "min": 4.5, "use": "Message text on an error background" },
@@ -16,8 +16,8 @@
     { "fg": "link", "bg": "surface", "min": 4.5, "use": "Links on cards" },
     { "fg": "link", "bg": "surface-tint", "min": 4.5, "use": "Links on tinted panels" },
 
-    { "fg": "on-action", "bg": "action", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, and the switch thumb when on, on the fill" },
-    { "fg": "on-action", "bg": "action-hover", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, and the switch thumb when on, on hover" },
+    { "fg": "on-action", "bg": "action", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, the switch thumb when on, and a chosen segment's label and icons, on the fill" },
+    { "fg": "on-action", "bg": "action-hover", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, the switch thumb when on, and a chosen segment's label and icons, on hover" },
     { "fg": "on-highlight", "bg": "highlight", "min": 4.5, "use": "Chip and badge text" },
 
     { "fg": "success", "bg": "bg", "min": 4.5, "use": "Success text and icons on the page" },
@@ -29,7 +29,7 @@
     { "fg": "danger", "bg": "surface-tint", "min": 4.5, "use": "Error text on tinted panels" },
 
     { "fg": "border-strong", "bg": "bg", "min": 3, "use": "Control edges on the page" },
-    { "fg": "border-strong", "bg": "surface", "min": 3, "use": "Control edges on cards, the unticked checkbox box, the unselected radio circle, and the switch thumb when off" },
+    { "fg": "border-strong", "bg": "surface", "min": 3, "use": "Control edges on cards, the segmented control's track and dividers, the unticked checkbox box, the unselected radio circle, and the switch thumb when off" },
     { "fg": "border-strong", "bg": "surface-tint", "min": 3, "use": "Control edges on tinted panels and hovered controls (checkbox box, radio circle), and the switch thumb when off and hovered" },
     { "fg": "focus", "bg": "bg", "min": 3, "use": "Focus outline on the page" },
     { "fg": "focus", "bg": "surface", "min": 3, "use": "Focus outline on cards" },

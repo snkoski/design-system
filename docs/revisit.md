@@ -13,6 +13,8 @@ Decisions we made for now but may want to change, and questions we haven't answe
 - Is it deliberate in Base UI, or a bug that will change in a later version?
 - If we want it skipped, can that be done through Base UI's own props rather than by overriding focus ourselves?
 
+SegmentedControl is built on the same RadioGroup and behaves the same way, so whatever is decided applies to both. Rendering the radios as native buttons isn't the answer: Base UI makes the chosen radio the Tab stop, so a chosen, disabled button would hide the whole group from Tab, even with other options enabled.
+
 Raised while building RadioGroup (2026-10-20).
 
 ## Shared CSS for form controls
@@ -64,3 +66,23 @@ Raised while building TextArea (2026-10-21).
 **To decide:** which is right. If `surface` is, fix the example. If `transparent` is, change `button.css`, which Chromatic would show as a change wherever a secondary button sits on a tinted or colored background. Either way, the contrast pairs for secondary buttons should match the background chosen.
 
 Raised while planning SegmentedControl (2026-10-21).
+
+## A full-width segmented control
+
+**Today:** a SegmentedControl is as wide as its options need, with every option as wide as the widest. There's no way to stretch it across its container, and a layout class on its wrapper doesn't stretch the track.
+
+**Why it's in question:** on phones and in narrow side panels, a control that fills the width often looks more settled, and gives each option a bigger target.
+
+**To decide:** whether we hit a layout where it looks wrong. If so, add it as a design choice (for example, a `width="fill"` prop rendered as `data-width`), or let a consumer's width class reach the track.
+
+Raised while building SegmentedControl (2026-10-21).
+
+## How a chosen segment stands out
+
+**Today:** the chosen option in a SegmentedControl is filled with `action`, and its label turns semibold (600, from 400). An icon's lines get thicker (`icon-stroke-bold`, 2.75, from `icon-stroke`, 2). The bold is the cue that doesn't rely on color, because `action` is only 2.89:1 against `surface` in light mode, under the 3:1 a non-text cue needs.
+
+**Why it's in question:** a weight change is quieter than the marks other choice controls use (a tick, a dot, a thumb's position). Icons that aren't drawn with lines, such as filled icons, don't get thicker at all.
+
+**To decide:** look at it in use. If the bold isn't clear enough, try a different fill (such as `ink`, which is strong in every theme) or a check mark in the chosen option, as Material's segmented buttons do.
+
+Raised while building SegmentedControl (2026-10-21).
