@@ -19,7 +19,8 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 
 1. Read `CLAUDE.md` in full, plus `docs/brand/accessibility.md`, `docs/brand/building.md`, and `docs/brand/motion.md`.
 2. Pick the reference component: `src/components/Checkbox/` for choice controls (checkboxes, switches, radios), `src/components/Input/` for text fields, and `src/components/Button/` for actions. Read all its files. New components match its structure, prop names, JSDoc style, and test layout unless there is a reason not to.
-3. If Base UI has a matching primitive, read its docs at `node_modules/@base-ui/react/docs/react/components/<name>.md`. They ship with the installed version and are authoritative.
+3. Look for the component in Base UI (the files in `node_modules/@base-ui/react/docs/react/components/`) and in shadcn/ui (the component list at https://ui.shadcn.com/docs/components). If Base UI has a matching primitive, read its docs at `node_modules/@base-ui/react/docs/react/components/<name>.md`. They ship with the installed version and are authoritative. shadcn's version is a reference for structure only.
+   If neither has a component by that name (a segmented control, for example), don't pick the closest one quietly. Find the Base UI primitives it could be built on, and for each one note what it's for, what a screen reader announces, its keyboard behavior, and what it gives up (no form `name`, letting nothing be selected, and so on). The choice usually depends on what the component is for, so it goes to the user in Phase 2. Research each candidate in the steps below.
 4. Render the primitive in a throwaway test to see the exact DOM, ARIA, and `data-*` attributes it emits, with every state you'll style turned on (inside `Field.Root` for form controls):
 
    ```sh
@@ -43,7 +44,7 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 Present this to the user and **stop**. Keep it to what they need to decide.
 
 - **What it is and when to use it**, in one or two sentences, and what it should not be used for.
-- **Built on:** the Base UI primitive and parts, and the reference component it follows.
+- **Built on:** the Base UI primitive and parts, and the reference component it follows. If Base UI and shadcn have no component by that name, say so first. Then list the candidates from Phase 1 in a table (what each is for, what a screen reader announces, what it gives up), recommend one, and make the choice the first open question.
 - **Props table:** name, type, default, what it maps to (`data-*` attribute, ARIA attribute, or Base UI prop). Mark anything that differs from the reference component and why.
 - **Anatomy:** the elements and their classes (`.name`, `.name__part`).
 - **States and how each is styled:** which ARIA or `data-*` attribute drives it.
