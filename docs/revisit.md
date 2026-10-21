@@ -54,3 +54,13 @@ Raised while building TextArea (2026-10-21).
 **To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), and fixing Input and TextArea together, ideally as part of sharing text-field CSS (see "Shared CSS for form controls").
 
 Raised while building TextArea (2026-10-21).
+
+## The secondary button's background in the Building page
+
+**Today:** the CSS example on the Building page (`docs/brand/building.md`) gives a secondary button `background: transparent`. The real Button uses `var(--surface)` (`button.css`), so a secondary button is white, or the dark surface, rather than showing the page through it.
+
+**Why it's in question:** the brand book is the source of truth, and here it disagrees with the code. Someone copying the example, or rebuilding Button from the docs, would get a different button.
+
+**To decide:** which is right. If `surface` is, fix the example. If `transparent` is, change `button.css`, which Chromatic would show as a change wherever a secondary button sits on a tinted or colored background. Either way, the contrast pairs for secondary buttons should match the background chosen.
+
+Raised while planning SegmentedControl (2026-10-21).
