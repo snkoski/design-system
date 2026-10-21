@@ -33,9 +33,24 @@ export default mergeConfig(
         {
           extends: true,
           plugins: [storybookTest({ configDir })],
-          // Pre-bundle every Base UI primitive up front. Otherwise the first story to use a new one
-          // makes Vite re-optimize and reload mid-run, and every story file fails once.
-          optimizeDeps: { include: ["@base-ui/react/*"] },
+          // Pre-bundle every Base UI primitive, and the Tiptap packages the RichText experiment uses, up front.
+          // Otherwise the first story to use a new one makes Vite re-optimize and reload mid-run, and every story
+          // file fails once.
+          optimizeDeps: {
+            include: [
+              "@base-ui/react/*",
+              "@tiptap/react",
+              "@tiptap/starter-kit",
+              "@tiptap/markdown",
+              "@tiptap/extensions",
+              "@tiptap/extension-link",
+              "@tiptap/extension-list",
+              "@tiptap/extension-underline",
+              "@tiptap/pm/model",
+              "@tiptap/pm/state",
+              "@tiptap/pm/view",
+            ],
+          },
           test: {
             name: "storybook",
             browser: {

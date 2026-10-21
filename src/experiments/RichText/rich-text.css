@@ -1,0 +1,435 @@
+/* RichText: what it is (label, box, toolbar, editable area, formatting, states). Where it sits and how wide it is
+   is the layout's job: the box fills the wrapper, so set the width with a class on the wrapper. The label,
+   description, edge, and states follow TextArea's. */
+
+/* Inline code colors, set per theme like the tokens are, so a section with its own data-theme gets its own.
+   Hard-coded here because this is an experiment: if RichText graduates to a component, these become semantic
+   tokens in tokens/tokens.json (such as `code` and `code-soft`), with their pairs in tokens/contrast.json.
+   Ratios, checked by hand and by the AllThemes story: ink on its background, and ink on surface. */
+@layer components {
+  :root,
+  [data-theme="light"] {
+    --rich-text-code-ink: hsl(335 70% 38%); /* 6.2:1 on the background, 7.2:1 on surface */
+    --rich-text-code-bg: hsl(335 85% 95%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --rich-text-code-ink: hsl(335 85% 80%);
+      --rich-text-code-bg: hsl(335 30% 20%);
+    }
+  }
+  [data-theme="dark"] {
+    --rich-text-code-ink: hsl(335 85% 80%); /* 7.1:1 on the background, 8.3:1 on surface */
+    --rich-text-code-bg: hsl(335 30% 20%);
+  }
+  [data-theme="hotdog"] {
+    --rich-text-code-ink: hsl(335 85% 30%); /* 7.6:1 on the background, 9.3:1 on surface */
+    --rich-text-code-bg: hsl(335 90% 94%);
+  }
+
+  /* align-content: start keeps it at its own height when a grid or flex layout stretches it */
+  .rich-text {
+    display: grid;
+    align-content: start;
+    row-gap: var(--space-1);
+    font-family: var(--font-sans);
+    color: var(--ink);
+  }
+
+  .rich-text__label {
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: var(--leading-control);
+  }
+
+  .rich-text__description {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+    color: var(--ink-muted);
+  }
+
+  /* The box is the visible field: its edge goes round the toolbar and the editable area together */
+  .rich-text__box {
+    --rich-text-edge: var(--border-thin);
+    min-width: 0;
+    border: var(--rich-text-edge) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+  /* A little more room between the text above and the field than between the label and its description */
+  .rich-text__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  .rich-text__box:hover:not(:has([aria-disabled="true"], [aria-readonly="true"], [aria-invalid="true"])) {
+    border-color: var(--ink);
+  }
+
+  /* Focus in the editable area rings the whole box, toolbar included; toolbar buttons ring themselves */
+  .rich-text__box:has(.rich-text__editor:focus-visible) {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Invalid: a danger edge, thickened with an inset shadow so nothing inside moves */
+  .rich-text__box:has([aria-invalid="true"]) {
+    border-color: var(--danger);
+    box-shadow: inset 0 0 0 calc(var(--border-thick) - var(--border-thin)) var(--danger);
+  }
+
+  /* Toolbar: one row of buttons that wraps when the field is narrow, with a hairline under it */
+  .rich-text__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: var(--space-1);
+    border-block-end: var(--border-thin) solid var(--border);
+  }
+
+  .rich-text__group {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .rich-text__separator {
+    align-self: center;
+    width: 0;
+    height: var(--icon-md);
+    margin-inline: var(--space-1);
+    border-inline-start: var(--border-thin) solid var(--border);
+  }
+
+  /* Each button is a full target in itself, so neighbors' hit areas never overlap */
+  .rich-text__tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--target-min);
+    height: var(--target-min);
+    margin: 0;
+    padding: 0;
+    border: var(--border-thin) solid transparent; /* visible in forced-colors mode */
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .rich-text__icon {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    stroke-width: var(--icon-stroke);
+  }
+
+  .rich-text__tool:hover:not([data-disabled], [aria-pressed="true"]) {
+    background: var(--surface-tint);
+  }
+
+  /* On: a fill, an ink edge, and thicker icon lines, so "on" never relies on the fill's color */
+  .rich-text__tool[aria-pressed="true"] {
+    border-color: var(--ink);
+    background: var(--highlight);
+    color: var(--on-highlight);
+  }
+  .rich-text__tool[aria-pressed="true"] .rich-text__icon {
+    stroke-width: var(--icon-stroke-bold);
+  }
+
+  .rich-text__tool:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  .rich-text__tool[data-disabled] {
+    cursor: not-allowed;
+  }
+
+  /* The editable area: one line is exactly the control height, like Input, and it grows a line at a time up to
+     --rich-text-max-rows, then scrolls. Its focus ring is drawn on the box. */
+  .rich-text__content,
+  .rich-text__editor {
+    --rich-text-pad: calc((var(--control-md) - 1lh) / 2);
+    box-sizing: border-box;
+    min-height: calc(var(--rich-text-rows, 1) * 1lh + 2 * var(--rich-text-pad));
+    font-size: var(--text-body);
+    line-height: var(--leading-control);
+  }
+  /* The wrapper holds the field's height until the editor mounts (and on the server), so the page doesn't jump */
+  .rich-text__editor {
+    max-height: calc(var(--rich-text-max-rows, 4) * 1lh + 2 * var(--rich-text-pad));
+    overflow-y: auto;
+    padding-block: var(--rich-text-pad);
+    padding-inline: var(--space-3);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+    outline: none; /* replaced by the box's outline above */
+  }
+
+  .rich-text[data-size="lg"] .rich-text__content,
+  .rich-text[data-size="lg"] .rich-text__editor {
+    --rich-text-pad: calc((var(--control-lg) - 1lh) / 2);
+    font-size: var(--text-body-lg);
+  }
+  .rich-text[data-size="lg"] .rich-text__editor {
+    padding-inline: var(--space-4);
+  }
+
+  /* Formatting inside the field */
+  .rich-text__editor p {
+    margin: 0;
+  }
+
+  .rich-text__editor strong {
+    font-weight: 600;
+  }
+
+  .rich-text__editor a {
+    color: var(--link);
+    text-decoration: underline;
+    cursor: text; /* links aren't followed while editing */
+  }
+  .rich-text__editor[aria-readonly="true"] a {
+    cursor: pointer;
+  }
+  .rich-text__editor[aria-disabled="true"] a {
+    pointer-events: none;
+  }
+
+  .rich-text__editor code {
+    padding-inline: var(--space-1);
+    border: var(--border-thin) solid transparent; /* outlines it in forced-colors mode, where the fill is gone */
+    border-radius: var(--radius-xs);
+    background: var(--rich-text-code-bg);
+    color: var(--rich-text-code-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+
+  .rich-text__editor blockquote {
+    margin: 0;
+    padding-inline-start: var(--space-3);
+    border-inline-start: var(--border-thick) solid var(--border-strong);
+  }
+
+  /* Markers back on: the base styles take them off every list */
+  .rich-text__editor ul,
+  .rich-text__editor ol {
+    margin: 0;
+    padding-inline-start: var(--space-6);
+  }
+  .rich-text__editor ul {
+    list-style: disc;
+  }
+  .rich-text__editor ul ul {
+    list-style: circle;
+  }
+  .rich-text__editor ol {
+    list-style: decimal;
+  }
+
+  .rich-text__editor pre {
+    margin-block: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-thin) solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-tint);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    white-space: pre;
+    overflow-x: auto; /* long lines scroll inside the block, not the page */
+  }
+  .rich-text__editor pre code {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* The text a link will go on, kept looking selected while the link editor has focus */
+  .rich-text__selection {
+    background: var(--highlight);
+    color: var(--on-highlight);
+  }
+
+  /* The placeholder, drawn by Tiptap's Placeholder on the empty first line */
+  .rich-text__editor p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: inline-start;
+    height: 0;
+    color: var(--ink-muted);
+    pointer-events: none;
+  }
+
+  /* Disabled: the box and the label dim */
+  .rich-text[data-disabled] .rich-text__box,
+  .rich-text[data-disabled] .rich-text__label {
+    opacity: 0.5;
+  }
+  .rich-text[data-disabled] .rich-text__editor {
+    cursor: not-allowed;
+  }
+
+  /* Read-only: the toolbar is gone, which is the cue. The text isn't dimmed as TextArea's is: links and inline code
+     would fall below 4.5:1 at 75%. See "Read-only fields" in docs/revisit.md. */
+  /* A placeholder shows what to type, which doesn't apply when you can't type, and at 75% it would fall below 4.5:1 */
+  .rich-text__editor[aria-readonly="true"] p.is-editor-empty:first-child::before {
+    content: none;
+  }
+
+  /* The link editor, in a popover under the link button */
+  .rich-text__link-popup {
+    box-sizing: border-box;
+    width: min(20rem, calc(100vw - 2 * var(--space-4))); /* a size token, if RichText graduates */
+    padding: var(--space-4);
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-md);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+  }
+  /* Popups slide out of their button: down when below it, up when above */
+  .rich-text__link-popup[data-starting-style],
+  .rich-text__link-popup[data-ending-style],
+  .rich-text__tooltip[data-starting-style],
+  .rich-text__tooltip[data-ending-style] {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--motion-distance)));
+  }
+  .rich-text__link-popup[data-side="top"]:is([data-starting-style], [data-ending-style]),
+  .rich-text__tooltip[data-side="top"]:is([data-starting-style], [data-ending-style]) {
+    transform: translateY(var(--motion-distance));
+  }
+  .rich-text__link-popup[data-ending-style] {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-in);
+  }
+
+  .rich-text__link-form {
+    display: grid;
+    row-gap: var(--space-3);
+  }
+
+  .rich-text__link-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* The tooltip: a toolbar button's name and its shortcut */
+  .rich-text__tooltip {
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--leading-control);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+  }
+  /* Exits are faster than entrances */
+  .rich-text__tooltip[data-ending-style] {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-in);
+  }
+
+  .rich-text__shortcut {
+    margin-inline-start: var(--space-1);
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
+    font-size: inherit;
+  }
+
+  /* Hot dog mode: chunky ink edges and hard shadows. The box is a text field, so it doesn't press; the toolbar
+     buttons sit inside it and don't either, like Button's ghost variant. */
+  [data-theme="hotdog"] .rich-text__box {
+    --rich-text-edge: var(--border-thick);
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .rich-text__box:has([aria-invalid="true"]) {
+    box-shadow: inset 0 0 0 var(--border-thin) var(--danger), var(--shadow-sm); /* thicker edge, as in other themes */
+  }
+  [data-theme="hotdog"] .rich-text__toolbar {
+    border-block-end-width: var(--border-thick);
+  }
+  [data-theme="hotdog"] .rich-text__link-popup,
+  [data-theme="hotdog"] .rich-text__tooltip {
+    border-width: var(--border-thick);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Windows Contrast themes: the system's field and button colors */
+  @media (forced-colors: active) {
+    .rich-text__box {
+      border-color: FieldText;
+      background: Field;
+    }
+    .rich-text__editor {
+      color: FieldText;
+    }
+    .rich-text__tool {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+    /* On: the system highlight, which the browser would hide behind its text backplate without forced-color-adjust.
+       Repeated for hover, so hover never covers it. */
+    .rich-text__tool[aria-pressed="true"],
+    .rich-text__tool[aria-pressed="true"]:hover {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .rich-text__tool[data-disabled],
+    .rich-text__tool[data-disabled][aria-pressed="true"] {
+      forced-color-adjust: auto;
+      border-color: GrayText;
+      background: Field;
+      color: GrayText;
+    }
+    .rich-text__editor code {
+      border-color: CanvasText;
+    }
+    .rich-text__selection {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* Drawn by CSS, not a native placeholder, so it needs the system's dimmed text color to not look typed */
+    .rich-text__editor p.is-editor-empty:first-child::before {
+      color: GrayText;
+    }
+    .rich-text[data-disabled] .rich-text__box,
+    .rich-text[data-disabled] .rich-text__label {
+      opacity: 1;
+    }
+    .rich-text[data-disabled] .rich-text__box,
+    .rich-text[data-disabled] .rich-text__label,
+    .rich-text[data-disabled] .rich-text__editor {
+      border-color: GrayText;
+      color: GrayText;
+    }
+    /* The inset shadow that thickens the invalid edge is removed here, so use a real thick edge */
+    .rich-text__box:has([aria-invalid="true"]) {
+      --rich-text-edge: var(--border-thick);
+    }
+  }
+}
