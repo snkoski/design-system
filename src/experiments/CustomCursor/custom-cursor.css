@@ -1,0 +1,23 @@
+/* CustomCursor: the cursor value comes from CustomCursor.tsx in --custom-cursor. Experiment. */
+@layer components {
+  [data-custom-cursor] {
+    cursor: var(--custom-cursor);
+  }
+
+  /* Replace: everything inside shows this cursor, even where a control sets its own (the hand, not-allowed) */
+  [data-custom-cursor="replace"] *,
+  [data-custom-cursor="replace"] *::before,
+  [data-custom-cursor="replace"] *::after {
+    cursor: inherit !important;
+  }
+
+  /* The icon is rendered only so CustomCursor.tsx can copy its SVG into the cursor image */
+  .custom-cursor__icon {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
