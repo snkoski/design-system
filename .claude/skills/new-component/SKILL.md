@@ -18,7 +18,7 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 ## Phase 1: Research
 
 1. Read `CLAUDE.md` in full, plus `docs/brand/accessibility.md`, `docs/brand/building.md`, and `docs/brand/motion.md`.
-2. Pick the reference component: `src/components/Checkbox/` for form controls, `src/components/Button/` for actions. Read all its files. New components match its structure, prop names, JSDoc style, and test layout unless there is a reason not to.
+2. Pick the reference component: `src/components/Checkbox/` for choice controls (checkboxes, switches, radios), `src/components/Input/` for text fields, and `src/components/Button/` for actions. Read all its files. New components match its structure, prop names, JSDoc style, and test layout unless there is a reason not to.
 3. If Base UI has a matching primitive, read its docs at `node_modules/@base-ui/react/docs/react/components/<name>.md`. They ship with the installed version and are authoritative.
 4. Render the primitive in a throwaway test to see the exact DOM, ARIA, and `data-*` attributes it emits, with every state you'll style turned on (inside `Field.Root` for form controls):
 
@@ -35,6 +35,8 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 6. If the new component contains or wraps an existing one (a group of Checkboxes, a field around an Input), render them together in the throwaway test, not only the bare primitive. The existing component may bring its own Base UI wrappers that break the composition: Checkbox's own `Field.Root` hid a CheckboxGroup's `name`, so the form submitted nothing. Note any change the existing component needs; it goes in the proposal.
 
 7. For a control with a single value (a radio group, a select), check how a controlled one says "nothing selected" (Base UI's RadioGroup takes `null`; `undefined` makes it uncontrolled), and type `value` so it can.
+
+8. If Base UI has no matching primitive and the component renders a Base UI part as a different element through `render` (TextArea renders `Field.Control` as a `<textarea>`), pass every prop through the Base UI part, not the `render` element. Props on the `render` element override Base UI's own, so a consumer's `aria-describedby` there replaced the field's links to its description and error. Put only attributes the Base UI part can't take (such as `rows`) on the `render` element.
 
 ## Phase 2: Design proposal (stop for approval)
 
@@ -61,6 +63,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 1. Write the props type (and a stub component that renders `null`) in `<Name>.tsx`, so the test file typechecks.
 2. Write `<Name>.test.tsx` from the approved API, covering the full list in the Testing section of `CLAUDE.md`. Include `expectTypeOf` checks for any rule enforced in types.
    Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. For any control that can have no visible label, plan a story check that its wrapper is at least `--target-min` tall: its hit area hides the gap in a story with one control, but stacked unlabelled controls otherwise steal each other's clicks. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
+   For a form control, test that a consumer's `aria-describedby` is added to the description and error, not put in their place: the control's accessible description must still include both. The usual "passes other props through" test only checks plain attributes, so it can't catch this.
 3. Run `pnpm test:unit` and `pnpm typecheck`. Every runtime test should fail, because the stub renders nothing; none should fail from import or type errors. Note the count.
 4. List the tests that pass against the stub (`pnpm exec vitest run --project unit src/components/<Name> --reporter=verbose`). Type-only tests (`expectTypeOf`) pass at runtime by design; `pnpm typecheck` checks them. **Any other test that passes is vacuous**: it only asserts that something is absent, so an empty render satisfies it. Make it stricter by asserting a positive precondition first (the control or hidden input exists), and rerun until only type tests pass.
 
