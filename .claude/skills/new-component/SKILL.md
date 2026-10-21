@@ -32,6 +32,7 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
    Style from what it actually emits, not from memory.
 
 5. In the same throwaway test, record the keyboard behavior: focus the control and press Space, Enter, and any keys its pattern uses (arrows, Home, End, Escape), and log what changes. Similar Base UI primitives behave differently (Enter toggles a Switch but not a Checkbox), so don't assume it from the reference component.
+   For a control that is one Tab stop (a radio group, a segmented control, tabs), also press Tab with the chosen item disabled, and with the whole control disabled. Base UI makes the chosen item the Tab stop, so if that item can't take focus (a disabled native `<button>`), Tab skips the whole control.
 
 6. If the new component contains or wraps an existing one (a group of Checkboxes, a field around an Input), render them together in the throwaway test, not only the bare primitive. The existing component may bring its own Base UI wrappers that break the composition: Checkbox's own `Field.Root` hid a CheckboxGroup's `name`, so the form submitted nothing. Note any change the existing component needs; it goes in the proposal.
 
@@ -103,7 +104,9 @@ For a text field, type a value into the fields before screenshotting, so browser
 
 Then check what the theme screenshots can't show, with the second recipe there: a focused control (if the story has a `play` function, it has already run when the page loads and may have moved focus, so don't press Tab again before screenshotting), the `AllThemes` story with forced colors emulated, and hover. **For every state that changes an edge or a fill (checked, selected, invalid, and so on), compare the computed style at rest and while hovered, in normal mode and in forced colors.** Hover must never cover up a state: a hovered "on" Switch once lost its fill and hid its thumb in forced colors, and a hovered invalid Input once lost its red edge. Use real hover through Playwright (`locator.hover()`); a story's `userEvent.hover` doesn't trigger CSS `:hover`.
 
-In forced colors, also check every state **at rest**: its edge or fill must differ from the page color. A state rule outranks the forced-colors base rule, and the browser can then draw it in the page color. An invalid, unticked Checkbox once disappeared entirely this way, with no hover involved. Look at the forced-colors screenshot for missing boxes, and log `borderTopColor` and `backgroundColor` for each state next to the page's `Canvas`.
+In forced colors, also check every state **at rest**: its edge or fill must differ from the page color. A state rule outranks the forced-colors base rule, and the browser can then draw it in the page color. An invalid, unticked Checkbox once disappeared entirely this way, with no hover involved. Look at the forced-colors screenshot for missing boxes, and log `borderTopColor` and `backgroundColor` for each state next to the page's `Canvas`. Read every label in that screenshot too: the browser draws a Canvas backplate behind text, which hides `HighlightText` on a `Highlight` fill even when the logged colors look right (a chosen segment's label vanished this way; `forced-color-adjust: none` fixes it).
+
+When a rule that dims or colors a state gains extra conditions (`:not(:focus-visible)`, `:has(...)`), copy the same selector into the forced-colors reset. Otherwise the reset is less specific and loses: disabled segments stayed faded in forced colors this way.
 
 If the `AllThemes` matrix lays components out in columns, check that each one keeps its own height when its grid cell is stretched by a taller neighbor. A component whose root is a grid spreads its rows apart unless it sets `align-content: start`.
 
