@@ -99,6 +99,8 @@ export const Choosing: Story = {
     </SegmentedControl>
   ),
   play: async ({ canvas, userEvent }) => {
+    // Measure in Geist, not the fallback font shown until it loads (font-display: swap)
+    await document.fonts.ready;
     const track = canvas.getByRole("radiogroup").querySelector(".segmented-control__track")!;
     const width = track.getBoundingClientRect().width;
     for (const name of ["Professional", "Team", "Free"]) {
