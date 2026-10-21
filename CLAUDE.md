@@ -60,6 +60,7 @@ scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 docs/revisit.md              decisions to come back to, and open questions
+src/experiments/             ideas being tried out; relaxed rules, never published (see Experiments)
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).
                              Not part of the published package.
@@ -260,6 +261,15 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 - Chromatic posts the Storybook preview and the visual diff, so don't add screenshots. Add a recording only for motion or multi-step interactions.
 - Chromatic's check passes even when snapshots changed. New and changed stories wait as "must be accepted as baselines" in Chromatic's web app until someone accepts them, so check the build there after a push.
 - Keep a pull request to one thing, and call out breaking changes (renamed or removed props, tokens, or exports).
+
+## Experiments
+
+`src/experiments/` holds ideas being tried out (the focus sheen, LookAt), one folder each, shown under Experiments in Storybook.
+
+- Experiments don't have to follow this file's rules or the established patterns: tokens only, tests, stories per state, JSDoc, and so on are all optional there, until an experiment moves out.
+- Two rules still hold. An experiment never changes a component, `src/styles/`, or the tokens: it imports its own CSS, and reaches components from outside (FocusSheen styles the components inside its wrapper by their classes). And nothing outside `src/experiments/` imports from it, so it's never exported from `src/index.ts` or published (`tsconfig.build.json` excludes the folder).
+- The checks still run on it: `pnpm typecheck` and `pnpm test` include it, so keep it compiling and its tests passing. `pnpm check` doesn't look at it.
+- To graduate, an experiment leaves the folder and is rebuilt to follow every rule here, like a new component (`/new-component`).
 
 ## Foundations pages
 

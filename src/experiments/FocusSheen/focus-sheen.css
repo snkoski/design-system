@@ -1,0 +1,60 @@
+/* Focus sheen: when a control inside <FocusSheen> gets keyboard focus, a band of light sweeps across it once,
+   like light catching a surface. Decorative: the focus outline still shows focus.
+
+   An experiment, so it doesn't touch the components: it reaches the focusable part of each one inside the
+   wrapper by its class (Input's box, because an <input> can't have pseudo-elements). It uses each part's
+   ::before, which those parts leave free, and their position: relative.
+
+   The band moves with background-position, not transform: a sliding band has to be clipped to the control's
+   shape, which needs a still container with the band inside it, and a pseudo-element can't contain anything.
+   Under reduced motion --experiment-decoration (../decoration.css) is 0, and the band's opacity is multiplied
+   by it, so it doesn't show at all. --sheen-duration and --sheen-ease override the speed and easing. */
+@layer components {
+  .focus-sheen {
+    --focus-sheen-color: var(--white);
+  }
+
+  .focus-sheen :is(.button, .checkbox__box, .switch__track, .radio__circle, .input__box)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1; /* over the control's own content, such as a checkbox's tick or a switch's thumb */
+    border-radius: inherit;
+    background: linear-gradient(110deg, transparent 40%, var(--focus-sheen-color) 50%, transparent 60%) no-repeat;
+    background-size: 250% 100%;
+    background-position: 50% 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .focus-sheen :is(.button, .checkbox__box, .switch__track, .radio__circle):focus-visible::before,
+  .focus-sheen .input__box:has(> .input__control:focus-visible)::before {
+    animation: sheen var(--sheen-duration, var(--duration-slow)) var(--sheen-ease, var(--ease-in-out));
+  }
+
+  /* From 100% to 0% carries the band from the left edge to the right */
+  @keyframes sheen {
+    from {
+      background-position: 100% 0;
+      opacity: 0;
+    }
+    50% {
+      opacity: calc(0.6 * var(--experiment-decoration));
+    }
+    to {
+      background-position: 0% 0;
+      opacity: 0;
+    }
+  }
+
+  /* Windows Contrast themes replace colors with a fixed palette: a band of light means nothing there */
+  @media (forced-colors: active) {
+    .focus-sheen {
+    --focus-sheen-color: var(--white);
+  }
+
+  .focus-sheen :is(.button, .checkbox__box, .switch__track, .radio__circle, .input__box)::before {
+      display: none;
+    }
+  }
+}

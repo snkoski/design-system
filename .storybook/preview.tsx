@@ -23,6 +23,8 @@ const preview: Preview = {
           "Foundations",
           ["Introduction", "Voice and copy", "Color", "Typography", "Spacing, layout, and shape", "Motion", "Iconography", "Accessibility", "Building"],
           "Components",
+          "Experiments",
+          ["About"],
         ],
       },
     },

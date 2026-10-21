@@ -1,0 +1,15 @@
+/* Experiments only. --experiment-decoration is 1 normally and 0 under reduced motion, so purely decorative
+   motion can switch itself off. It follows data-motion="full" or "reduced" the same way the motion tokens do.
+   If an experiment graduates, this becomes a real motion token in scripts/build-tokens.mjs. */
+:root,
+[data-motion="full"] {
+  --experiment-decoration: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) {
+    --experiment-decoration: 0;
+  }
+}
+[data-motion="reduced"] {
+  --experiment-decoration: 0;
+}

@@ -1,0 +1,16 @@
+/* LookAt: turns its content to face the mouse. Each one aims from its own center. Where it sits, and how big its
+   cell is, are the layout's job. */
+@layer components {
+  .look-at {
+    display: inline-grid;
+    place-items: center;
+  }
+
+  /* The content is drawn pointing up; LookAt.tsx sets --look-angle to turn it. It's decoration, so with reduced
+     motion (--experiment-decoration 0, from ../decoration.css) it stays pointing up. */
+  .look-at__pointer {
+    display: inline-flex;
+    transform: rotate(calc(var(--look-angle, 0deg) * var(--experiment-decoration)));
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+}
