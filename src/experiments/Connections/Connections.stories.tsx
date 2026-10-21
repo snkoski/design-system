@@ -6,6 +6,46 @@ import { Connections } from "./Connections";
 const page = { background: "var(--bg)", color: "var(--ink)" };
 const emoji = ["🌭", "🦄", "👀", "✨", "🍕", "🐱", "🍩", "⭐"];
 
+/** Black, white, and the painter's primary and secondary colors. The blue and green are paint's, a little muted. */
+const paints = {
+  black: "hsl(0 0% 0%)",
+  white: "hsl(0 0% 100%)",
+  red: "hsl(0 100% 50%)",
+  yellow: "hsl(60 100% 50%)",
+  blue: "hsl(211 57% 38%)",
+  orange: "hsl(30 100% 50%)",
+  green: "hsl(138 100% 33%)",
+  purple: "hsl(300 100% 25%)",
+};
+
+/** A ball in its own color, which it also gives its lines. The edge keeps white and black visible in every theme. */
+function PaintBall({ color }: { color: string }) {
+  return (
+    <span
+      style={{
+        display: "block",
+        width: "3rem",
+        height: "3rem",
+        boxSizing: "border-box",
+        borderRadius: "var(--radius-full)",
+        border: "var(--border-thin) solid var(--border-strong)",
+        background: color,
+      }}
+    />
+  );
+}
+
+/** The hue of a pixel on `canvas` at a point in the page, in degrees */
+function hueAt(canvas: HTMLCanvasElement, x: number, y: number) {
+  const area = canvas.getBoundingClientRect();
+  const density = canvas.width / area.width;
+  const [r, g, b] = [...canvas.getContext("2d")!.getImageData(Math.round((x - area.left) * density), Math.round((y - area.top) * density), 1, 1).data].map((value) => value / 255);
+  const [most, least] = [Math.max(r!, g!, b!), Math.min(r!, g!, b!)];
+  if (most === least) return null;
+  const hue = most === r ? (g! - b!) / (most - least) : most === g ? 2 + (b! - r!) / (most - least) : 4 + (r! - g!) / (most - least);
+  return (hue * 60 + 360) % 360;
+}
+
 /** Spread out, but the same every time: the nth of a set's speed, direction, and start */
 const spread = (index: number) => ({
   speed: 60 + ((index * 37) % 100),
@@ -34,7 +74,8 @@ const meta = {
     ref: { control: false },
     distance: { control: "text", description: 'A number of px, or a length such as "15vw", "10vh", "12vmin", or "8rem".' },
     color: { control: "color" },
-    lineWidth: { control: { type: "range", min: 0.5, max: 6, step: 0.5 } },
+    lineWidth: { control: { type: "range", min: 0.5, max: 12, step: 0.5 } },
+    blend: { control: "select", options: [undefined, "paint", "light"] },
   },
 } satisfies Meta<typeof Connections>;
 
@@ -110,5 +151,61 @@ export const DragToConnect: Story = {
     // Halfway between the two close ones there's a line; halfway to the far one there isn't
     await expect(drawnAt(lines, (first!.x + second!.x) / 2, (first!.y + second!.y) / 2)).toBe(true);
     await expect(drawnAt(lines, (first!.x + far!.x) / 2, (first!.y + far!.y) / 2)).toBe(false);
+  },
+};
+
+/**
+ * Eight balls: black, white, and the painter's primary and secondary colors. When two connect, the line between
+ * them mixes their colors like paint: red and blue are purple in the middle, and redder towards the red end. Drag
+ * them together to mix any two. Switch blend to light to see the difference: light mixes blue and yellow to gray.
+ */
+export const ColorMixing: Story = {
+  args: { blend: "paint", distance: 180, lineWidth: 6, fade: true },
+  render: (args) => (
+    <Connections {...args} className="h-screen overflow-hidden" style={page}>
+      {Object.values(paints).map((color, index) => (
+        <Bounce key={color} {...spread(index)} speed={30 + ((index * 23) % 40)} grabbable squash={false} style={{ "--connection-color": color } as object}>
+          <PaintBall color={color} />
+        </Bounce>
+      ))}
+    </Connections>
+  ),
+};
+
+/**
+ * Three pairs that stay put: red and blue, red and yellow, and blue and yellow. The story checks the middle of each
+ * line is purple, orange, and green.
+ */
+export const MixedPairs: Story = {
+  args: { blend: "paint", distance: 70, lineWidth: 8, fade: false },
+  render: (args) => (
+    <div className="grid place-items-center p-4" style={{ ...page, minHeight: "100vh" }}>
+      <Connections {...args} className="h-96 w-[36rem] shrink-0" style={{ ...page, border: "var(--border-thin) solid var(--border-strong)" }}>
+        {[
+          [paints.red, paints.blue],
+          [paints.red, paints.yellow],
+          [paints.blue, paints.yellow],
+        ].flatMap((colors, row) =>
+          colors.map((color, side) => (
+            <Bounce key={`${row}-${side}`} speed={0} startX={side === 0 ? 0.3 : 0.5} startY={0.1 + row * 0.4} data-testid={`pair-${row}-${side}`} style={{ "--connection-color": color } as object}>
+              <PaintBall color={color} />
+            </Bounce>
+          )),
+        )}
+      </Connections>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await nextFrame();
+    await nextFrame();
+    const lines = canvasElement.querySelector("canvas")!;
+    const middle = (row: number) => {
+      const [left, right] = [0, 1].map((side) => canvas.getByTestId(`pair-${row}-${side}`).getBoundingClientRect());
+      return [(left!.left + left!.right + right!.left + right!.right) / 4, (left!.top + left!.bottom) / 2] as const;
+    };
+    const near = (hue: number | null, expected: number) => hue !== null && Math.abs(((hue - expected + 540) % 360) - 180) < 25;
+    await expect(near(hueAt(lines, ...middle(0)), 300)).toBe(true); // purple
+    await expect(near(hueAt(lines, ...middle(1)), 30)).toBe(true); // orange
+    await expect(near(hueAt(lines, ...middle(2)), 138)).toBe(true); // green
   },
 };

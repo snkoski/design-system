@@ -40,6 +40,8 @@ export interface Line {
   to: { x: number; y: number };
   /** 1 when the boxes touch, fading towards 0 as the gap reaches the distance */
   strength: number;
+  /** Which two boxes it joins, by their place in the list */
+  between: [number, number];
 }
 
 /** The gap between two boxes' nearest edges: 0 when they touch or overlap */
@@ -54,13 +56,14 @@ export function lines(boxes: Box[], distance: number) {
   const found: Line[] = [];
   if (distance <= 0) return found;
   boxes.forEach((a, index) => {
-    boxes.slice(index + 1).forEach((b) => {
+    boxes.slice(index + 1).forEach((b, offset) => {
       const between = gap(a, b);
       if (between >= distance) return;
       found.push({
         from: { x: a.left + a.width / 2, y: a.top + a.height / 2 },
         to: { x: b.left + b.width / 2, y: b.top + b.height / 2 },
         strength: 1 - between / distance,
+        between: [index, index + 1 + offset],
       });
     });
   });

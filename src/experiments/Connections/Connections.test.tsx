@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "v
 import { Connections } from "./Connections";
 import type { ConnectionsProps } from "./Connections";
 import { gap, lines, toPixels } from "./lines";
+import { mixPaint, parseRgb, rgbFromRyb, rybFromRgb, toCss } from "./paint";
+import type { Rgb } from "./paint";
 
 const scale = { width: 1000, height: 500, rem: 16 };
 const box = (left: number, top: number, size = 10) => ({ left, top, width: size, height: size });
@@ -46,11 +48,15 @@ describe("gap", () => {
 describe("lines", () => {
   it("joins the centers of boxes closer than the distance, and not ones further away", () => {
     const found = lines([box(0, 0), box(30, 0), box(300, 0)], 50);
-    expect(found).toEqual([{ from: { x: 5, y: 5 }, to: { x: 35, y: 5 }, strength: 0.6 }]);
+    expect(found).toEqual([{ from: { x: 5, y: 5 }, to: { x: 35, y: 5 }, strength: 0.6, between: [0, 1] }]);
   });
 
   it("joins every close pair", () => {
-    expect(lines([box(0, 0), box(20, 0), box(0, 20)], 50)).toHaveLength(3);
+    expect(lines([box(0, 0), box(20, 0), box(0, 20)], 50).map(({ between }) => between)).toEqual([
+      [0, 1],
+      [0, 2],
+      [1, 2],
+    ]);
   });
 
   it("is strongest when they touch, and draws nothing at exactly the distance", () => {
@@ -63,31 +69,87 @@ describe("lines", () => {
   });
 });
 
+describe("paint", () => {
+  const red: Rgb = [1, 0, 0];
+  const yellow: Rgb = [1, 1, 0];
+  const blue: Rgb = [0.163, 0.373, 0.6]; // the paint cube's blue
+  const white: Rgb = [1, 1, 1];
+  const black: Rgb = [0, 0, 0];
+  const mix = (a: Rgb, b: Rgb, t = 0.5) => toCss(mixPaint(a, b, t));
+
+  it("turns paint amounts into colors at the cube's corners", () => {
+    expect(toCss(rgbFromRyb([0, 0, 0]))).toBe("rgb(255 255 255)");
+    expect(toCss(rgbFromRyb([1, 0, 0]))).toBe("rgb(255 0 0)");
+    expect(toCss(rgbFromRyb([1, 0, 1]))).toBe("rgb(128 0 128)");
+  });
+
+  it("finds the paint amounts for a color", () => {
+    rybFromRgb(red).forEach((amount, channel) => expect(amount).toBeCloseTo([1, 0, 0][channel]!, 3));
+    rybFromRgb(blue).forEach((amount, channel) => expect(amount).toBeCloseTo([0, 0, 1][channel]!, 3));
+  });
+
+  it.each([
+    ["red and blue make purple", red, blue, "rgb(128 0 128)"],
+    ["red and yellow make orange", red, yellow, "rgb(255 128 0)"],
+    ["blue and yellow make green", blue, yellow, "rgb(0 168 51)"],
+    ["white lightens red to pink", red, white, "rgb(255 128 128)"],
+    ["black and white make gray", black, white, "rgb(128 128 128)"],
+  ] as const)("mixes like paint: %s", (_, a, b, middle) => {
+    expect(mix(a, b)).toBe(middle);
+  });
+
+  it("is each color at its own end", () => {
+    expect(mix(red, blue, 0)).toBe("rgb(255 0 0)");
+    expect(mix(red, blue, 1)).toBe("rgb(42 95 153)");
+  });
+
+  it("is more red than blue towards the red end", () => {
+    const [r, , b] = mixPaint(red, blue, 0.25);
+    expect(r).toBeGreaterThan(b);
+  });
+
+  it("reads the color forms a canvas gives back", () => {
+    expect(parseRgb("#ff8000")).toEqual([1, 128 / 255, 0]);
+    expect(parseRgb("rgb(255, 0, 51)")).toEqual([1, 0, 0.2]);
+    expect(parseRgb("rgba(0, 255, 0, 0.5)")).toEqual([0, 1, 0]);
+    expect(parseRgb("hsl(0 100% 50%)")).toBeNull();
+  });
+});
+
 describe("Connections", () => {
-  /** A canvas context that records the lines drawn on it */
+  /** A canvas context that records the lines drawn on it, and the gradients they're drawn with */
   function fakeContext() {
     const drawn: { from: number[]; to: number[]; alpha: number }[] = [];
+    const styles: unknown[] = [];
     let from: number[] = [];
     let to: number[] = [];
     const context = {
       globalAlpha: 1,
+      fillStyle: "" as unknown, // a real canvas normalizes colors set here; tests use colors already in its form
+      strokeStyle: "" as unknown,
       setTransform: vi.fn(),
-      clearRect: vi.fn(() => drawn.splice(0)),
+      clearRect: vi.fn(() => (drawn.splice(0), styles.splice(0))),
       beginPath: vi.fn(),
       moveTo: vi.fn((x: number, y: number) => (from = [x, y])),
       lineTo: vi.fn((x: number, y: number) => (to = [x, y])),
-      stroke: vi.fn(() => drawn.push({ from, to, alpha: context.globalAlpha })),
+      stroke: vi.fn(() => (drawn.push({ from, to, alpha: context.globalAlpha }), styles.push(context.strokeStyle))),
+      createLinearGradient: vi.fn(() => {
+        const stops: [number, string][] = [];
+        return { stops, addColorStop: (at: number, color: string) => stops.push([at, color]) };
+      }),
     };
-    return { context, drawn };
+    return { context, drawn, styles };
   }
 
   let drawn: ReturnType<typeof fakeContext>["drawn"];
+  let styles: ReturnType<typeof fakeContext>["styles"];
   const spies: { mockRestore: () => void }[] = [];
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame"] });
     const fake = fakeContext();
     drawn = fake.drawn;
+    styles = fake.styles;
     // jsdom has no canvas drawing and no layout
     spies.push(vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(fake.context as never));
   });
@@ -167,6 +229,55 @@ describe("Connections", () => {
     place(container, [0, 30, 40]);
     act(() => vi.advanceTimersByTime(20));
     expect(drawn).toEqual([{ from: [5, 5], to: [35, 5], alpha: 0.6 }]);
+  });
+
+  describe("blend", () => {
+    const pair = (blend?: "paint" | "light", second = "#ffff00") => (
+      <Connections distance={50} blend={blend}>
+        <span className="bounce" style={{ "--connection-color": "#ff0000" } as object} />
+        <span className="bounce" style={{ "--connection-color": second } as object} />
+      </Connections>
+    );
+    const stopsOf = (style: unknown) => (style as { stops: [number, string][] }).stops;
+
+    it("draws a gradient that mixes like paint between the two colors", () => {
+      const { container } = render(pair("paint"));
+      place(container, [0, 30]);
+      act(() => vi.advanceTimersByTime(20));
+      expect(drawn).toHaveLength(1);
+      const stops = stopsOf(styles[0]);
+      expect(stops).toHaveLength(13);
+      expect(stops[0]).toEqual([0, "rgb(255 0 0)"]);
+      expect(stops[6]).toEqual([0.5, "rgb(255 128 0)"]); // red and yellow make orange in the middle
+      expect(stops[12]).toEqual([1, "rgb(255 255 0)"]);
+    });
+
+    it("draws a plain gradient between the two colors when mixing like light", () => {
+      const { container } = render(pair("light"));
+      place(container, [0, 30]);
+      act(() => vi.advanceTimersByTime(20));
+      expect(stopsOf(styles[0])).toEqual([
+        [0, "rgb(255 0 0)"],
+        [1, "rgb(255 255 0)"],
+      ]);
+    });
+
+    it("uses the line color for a thing without its own", () => {
+      const { container } = render(pair("light", ""));
+      place(container, [0, 30]);
+      act(() => vi.advanceTimersByTime(20));
+      const line = parseRgb(getComputedStyle(container.querySelector("canvas")!).color);
+      expect(line).not.toBeNull();
+      expect(stopsOf(styles[0])[1]).toEqual([1, toCss(line!)]);
+    });
+
+    it("draws plain lines in the line color without blend", () => {
+      const { container } = render(pair());
+      place(container, [0, 30]);
+      act(() => vi.advanceTimersByTime(20));
+      expect(drawn).toHaveLength(1);
+      expect(typeof styles[0]).toBe("string");
+    });
   });
 
   it("sets the line color", () => {
