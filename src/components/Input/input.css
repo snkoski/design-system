@@ -24,6 +24,7 @@
   /* Positions the icons over the input */
   .input__box {
     position: relative;
+    border-radius: var(--radius-md); /* the field's corners, so the focus sheen on the box keeps them */
   }
   /* A little more room between the text above and the field than between the label and its description */
   .input__box:not(:first-child) {

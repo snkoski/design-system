@@ -160,7 +160,7 @@ export function Checkbox({
   const box = (
     <BaseCheckbox.Root
       {...(group ? groupable : rest)}
-      className="checkbox__box"
+      className="checkbox__box sheen"
       disabled={disabled}
       name={group ? undefined : name}
       readOnly={readOnly || group?.readOnly}

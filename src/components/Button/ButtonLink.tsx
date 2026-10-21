@@ -34,7 +34,7 @@ export function ButtonLink({
   return (
     <a
       {...rest}
-      className={cx("button", className)}
+      className={cx("button", "sheen", className)}
       data-variant={variant}
       data-size={size}
       data-icon-only={iconOnly || undefined}

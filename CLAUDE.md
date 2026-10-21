@@ -126,7 +126,8 @@ One convention per job. Never mix them.
 ## Motion
 
 - Durations 100–320ms using the motion tokens. Exits are faster than entrances and use `--ease-in`.
-- Animate only `transform` and `opacity`.
+- Animate only `transform` and `opacity`. The one exception is the focus sheen (`src/internal/sheen.css`), which moves a clipped band of light with `background-position`, because a pseudo-element can't contain a moving child to clip.
+- Every focusable part gets the shared `sheen` class (on the element that takes focus, or on a wrapper whose child does, as Input's box), so a band of light sweeps across it on keyboard focus. It uses the part's `::before`, so keep that free.
 - Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Looping animations (spinner, skeleton) use `--duration-loop`, which gets slower under reduced motion. Under `prefers-reduced-motion` slides and pops become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
 - Movement that shows state (a switch thumb sliding to "on") is not decoration: give it a fixed distance, not `--motion-distance`, so it still moves under reduced motion. `--ease-bounce` turns into a plain ease-out there; `--duration-fast` stays the same, and is already short.
 - `data-motion="full"` or `data-motion="reduced"` on any element overrides the system setting for that subtree (generated in `tokens.css`).

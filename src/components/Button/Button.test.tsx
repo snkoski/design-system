@@ -34,7 +34,8 @@ describe("Button", () => {
 
     it("never uses modifier classes", () => {
       render(<Button variant="secondary" size="sm">Save</Button>);
-      expect(screen.getByRole("button").className).toBe("button");
+      // "sheen" is the shared focus effect, not a variant; the variant and size are data attributes
+      expect(screen.getByRole("button").className).toBe("button sheen");
     });
 
     it("merges a consumer className with its own", () => {

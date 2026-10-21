@@ -55,7 +55,7 @@ export function Radio({ children, description, disabled, className, ...rest }: R
   warnIfUnnamed("Radio", children, rest, "Give it label text (children) or an aria-label.");
 
   const circle = (
-    <BaseRadio.Root {...rest} className="radio__circle">
+    <BaseRadio.Root {...rest} className="radio__circle sheen">
       <BaseRadio.Indicator className="radio__indicator">
         <svg className="radio__dot" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <circle cx="8" cy="8" r="4" fill="currentColor" />

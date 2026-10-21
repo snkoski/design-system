@@ -83,7 +83,7 @@ export function Switch({
 }: SwitchProps) {
   warnIfUnnamed("Switch", children, rest, "Give it label text (children) or an aria-label.");
   const control = (
-    <BaseSwitch.Root {...rest} className="switch__track" disabled={disabled} name={name}>
+    <BaseSwitch.Root {...rest} className="switch__track sheen" disabled={disabled} name={name}>
       <BaseSwitch.Thumb className="switch__thumb" />
     </BaseSwitch.Root>
   );

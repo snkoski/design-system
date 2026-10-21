@@ -52,11 +52,13 @@ const motionFull = `
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --motion-distance: 0.5rem;
-  --motion-scale: 0.85;`;
+  --motion-scale: 0.85;
+  --motion-decoration: 1; /* purely decorative motion, such as the focus sheen: 0 turns it off */`;
 // Reduced motion: no slides, no bounce, no scale, shorter durations
 const motionReduced = `
   --motion-distance: 0rem;
   --motion-scale: 1;
+  --motion-decoration: 0;
   --duration-base: 120ms;
   --duration-slow: 120ms;
   --duration-loop: 1600ms;

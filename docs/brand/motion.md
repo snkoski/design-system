@@ -20,12 +20,14 @@ Motion explains something: where an element came from, what changed, or what can
 
   --motion-distance: 0.5rem; /* how far things slide when entering */
   --motion-scale: 0.85;      /* where things pop in from */
+  --motion-decoration: 1;    /* purely decorative motion (the focus sheen): 0 turns it off */
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-distance: 0rem;
     --motion-scale: 1;
+    --motion-decoration: 0;
     --duration-base: 120ms;
     --duration-slow: 120ms;
     --duration-loop: 1600ms;
@@ -44,6 +46,7 @@ To override the visitor's system setting for part of a page, for example a site'
 - Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
 - Movement that carries meaning is the exception. A switch's thumb moving to the other end is how it shows on and off, so it moves the full distance even with reduced motion, quickly and without bounce (the bounce token turns into a plain ease-out). Don't build it from `--motion-distance`, which becomes 0.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.
+- Purely decorative motion, which explains nothing, multiplies its opacity by `--motion-decoration`, so it disappears under reduced motion instead of turning into a fade.
 - Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels.
 
 ## In components
@@ -64,6 +67,10 @@ To override the visitor's system setting for part of a page, for example a site'
 ```
 
 - Primary buttons lift slightly on hover (`translateY(-1px)`) and settle on press. In hot dog mode they push into their hard shadow instead.
+
+## Focus sheen
+
+When a control gets keyboard focus, a band of light sweeps across it once, as if light caught its surface. It's decoration on top of the focus outline, never a replacement for it. It runs for `--duration-slow` with `--ease-in-out` in the `sheen` color. It's pure decoration, so it doesn't appear at all under reduced motion (`--motion-decoration` is 0) or in Windows Contrast themes.
 
 ## Page level
 

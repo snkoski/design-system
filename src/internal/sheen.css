@@ -1,0 +1,55 @@
+/* Focus sheen: when a control gets keyboard focus, a band of light sweeps across it once, like light catching
+   a surface. Decorative: the focus outline is still what shows focus. Shared by every component.
+
+   To use it, add the class `sheen` to the element that takes focus, or to a wrapper whose child does (Input puts
+   it on its box, because an <input> can't have pseudo-elements). The element must be position: relative, and
+   its ::before must be free.
+
+   The band moves with background-position, not transform: a sliding band has to be clipped to the control's
+   shape, which needs a still container with the band inside it, and a pseudo-element can't contain anything.
+   It's paint-only, on one small element, once per focus.
+
+   It's pure decoration (the focus outline shows focus), so under reduced motion it doesn't show at all:
+   --motion-decoration is 0 there, and the band's opacity is multiplied by it.
+
+   --sheen-duration and --sheen-ease override the speed and easing; the Focus sheen stories use them to compare. */
+@layer components {
+  .sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1; /* over the control's own content, such as a checkbox's tick or a switch's thumb */
+    border-radius: inherit;
+    background: linear-gradient(110deg, transparent 40%, var(--sheen) 50%, transparent 60%) no-repeat;
+    background-size: 250% 100%;
+    background-position: 50% 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sheen:is(:focus-visible, :has(:focus-visible))::before {
+    animation: sheen var(--sheen-duration, var(--duration-slow)) var(--sheen-ease, var(--ease-in-out));
+  }
+
+  /* From 100% to 0% carries the band from the left edge to the right */
+  @keyframes sheen {
+    from {
+      background-position: 100% 0;
+      opacity: 0;
+    }
+    50% {
+      opacity: calc(0.6 * var(--motion-decoration));
+    }
+    to {
+      background-position: 0% 0;
+      opacity: 0;
+    }
+  }
+
+  /* Windows Contrast themes replace colors with a fixed palette: a band of light means nothing there */
+  @media (forced-colors: active) {
+    .sheen::before {
+      display: none;
+    }
+  }
+}

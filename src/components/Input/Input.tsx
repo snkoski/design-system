@@ -102,7 +102,7 @@ export function Input({
       {label !== undefined && <Field.Label className="input__label">{label}</Field.Label>}
       {description && <Field.Description className="input__description">{description}</Field.Description>}
       <div
-        className="input__box"
+        className="input__box sheen"
         data-icon-start={iconStart ? true : undefined}
         data-icon-end={iconEnd ? true : undefined}
       >
