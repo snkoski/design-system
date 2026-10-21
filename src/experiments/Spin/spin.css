@@ -1,0 +1,30 @@
+/* Spin: a button whose content spins when clicked. Spin.tsx sets --spin-angle (where it's spinning to) and
+   --spin-duration; a transition turns it there from wherever it is, so a second click mid-spin adds more spin.
+   Decorative, so with reduced motion (--experiment-decoration 0, from ../decoration.css) it doesn't turn.
+   Experiment. */
+@layer components {
+  .spin {
+    display: inline-grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border: var(--border-thin) solid transparent; /* shows in forced colors */
+    border-radius: var(--radius-md);
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .spin:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  .spin__content {
+    display: inline-flex;
+    transform: rotate(calc(var(--spin-angle, 0deg) * var(--experiment-decoration)));
+    transition: transform var(--spin-duration) var(--spin-ease, var(--ease-out));
+  }
+}
