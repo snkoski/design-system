@@ -4,6 +4,7 @@ import { useState } from "react";
 import { expect } from "storybook/test";
 import { Bounce } from "../Bounce/Bounce";
 import { Magnet } from "./Magnet";
+import type { MagnetProps } from "./Magnet";
 
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to move around in: positioned, so the magnets measure it, with an edge you can see */
@@ -23,13 +24,20 @@ function Charge({ charge, size = "2.5rem" }: { charge: number; size?: string }) 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
+/** The stories take the magnets' props, plus how many to show (a story setting, not a Magnet prop) */
+type StoryArgs = MagnetProps & {
+  /** How many magnets are on the page. */
+  count?: number;
+};
+
 const meta = {
   title: "Experiments/Magnets",
   component: Magnet,
   // They're somewhere different every time, so a snapshot would never match
   parameters: { layout: "fullscreen", chromatic: { disableSnapshot: true } },
-  args: { charge: 1, friction: 0.6, speed: 120, gravity: 0, bounciness: 1, grabbable: true, throwable: true, squash: false, paused: false },
+  args: { count: 12, charge: 1, friction: 0.6, speed: 120, gravity: 0, bounciness: 1, grabbable: true, throwable: true, squash: false, paused: false },
   argTypes: {
+    count: { control: { type: "range", min: 1, max: 150, step: 1 } },
     children: { control: false },
     ref: { control: false },
     onBounce: { control: false },
@@ -40,11 +48,10 @@ const meta = {
     gravity: { control: { type: "range", min: 0, max: 4000, step: 50 } },
     bounciness: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
   },
-} satisfies Meta<typeof Magnet>;
+} satisfies Meta<StoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
+type Story = StoryObj<StoryArgs>;
 
 /**
  * Orange + magnets attract teal − ones and push other + ones away, and the other way round. A little friction
@@ -52,10 +59,10 @@ type Story = StoryObj<typeof meta>;
  * friction controls apply to every magnet; each keeps its own sign.
  */
 export const Playground: Story = {
-  args: { charge: 1, friction: 0.6, speed: 120, grabbable: true, squash: false },
-  render: ({ charge, ...args }) => (
+  args: { count: 12, charge: 1, friction: 0.6, speed: 120, grabbable: true, squash: false },
+  render: ({ count = 12, charge, ...args }) => (
     <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
-      {Array.from({ length: 12 }, (_, index) => {
+      {Array.from({ length: count }, (_, index) => {
         const sign = index % 2 === 0 ? 1 : -1;
         return (
           <Magnet key={index} {...args} charge={sign * Math.abs(charge ?? 1)} angle={(index * 67) % 360} startX={((index * 41) % 100) / 100} startY={((index * 59) % 100) / 100}>
@@ -70,18 +77,22 @@ export const Playground: Story = {
 /**
  * Every ball has the same charge, so they all push each other away. They end up spread out along the walls, the
  * way charge spreads over the outside of a piece of metal. Drag one into the middle and watch it get pushed out.
+ * Change how many there are with the count control. The story checks the count is what's on the page.
  */
 export const PersonalSpace: Story = {
-  args: { charge: 2, friction: 1, speed: 60, grabbable: true, squash: false },
-  render: (args) => (
+  args: { count: 16, charge: 2, friction: 1, speed: 60, grabbable: true, squash: false },
+  render: ({ count = 16, ...args }) => (
     <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
-      {Array.from({ length: 16 }, (_, index) => (
+      {Array.from({ length: count }, (_, index) => (
         <Magnet key={index} {...args} angle={(index * 67) % 360} startX={0.4 + ((index * 41) % 20) / 100} startY={0.4 + ((index * 59) % 20) / 100}>
           <Charge charge={1} size="2rem" />
         </Magnet>
       ))}
     </div>
   ),
+  play: async ({ canvasElement, args }) => {
+    await expect(canvasElement.querySelectorAll(".bounce")).toHaveLength(args.count!);
+  },
 };
 
 /**
@@ -90,7 +101,7 @@ export const PersonalSpace: Story = {
  * click flips one.
  */
 export const FlipCharge: Story = {
-  args: { charge: 2, friction: 1, speed: 60, grabbable: true, squash: false },
+  args: { count: 16, charge: 2, friction: 1, speed: 60, grabbable: true, squash: false },
   render: (args) => <FlipChargeDemo {...args} />,
   play: async ({ canvas, userEvent }) => {
     const ball = canvas.getByTestId("ball-0");
@@ -102,12 +113,18 @@ export const FlipCharge: Story = {
   },
 };
 
-function FlipChargeDemo({ charge, ...args }: NonNullable<Story["args"]>) {
-  const [signs, setSigns] = useState(() => Array.from({ length: 16 }, () => 1));
-  const flip = (index: number) => setSigns((now) => now.map((sign, at) => (at === index ? -sign : sign)));
+function FlipChargeDemo({ count = 16, charge, ...args }: StoryArgs) {
+  // Which ones have been flipped to −, so changing the count keeps them
+  const [flipped, setFlipped] = useState<ReadonlySet<number>>(new Set());
+  const flip = (index: number) =>
+    setFlipped((now) => {
+      const next = new Set(now);
+      if (!next.delete(index)) next.add(index);
+      return next;
+    });
   return (
     <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
-      {signs.map((sign, index) => (
+      {Array.from({ length: count }, (_, index) => flipped.has(index) ? -1 : 1).map((sign, index) => (
         <Magnet
           key={index}
           {...args}
@@ -126,17 +143,17 @@ function FlipChargeDemo({ charge, ...args }: NonNullable<Story["args"]>) {
 }
 
 /**
- * A big paused − magnet in the middle pulls every + magnet in. The gray balls are plain Bounce elements, not
- * magnets, so they ignore it. Drag the big one around, and the others follow.
+ * A big paused − magnet in the middle pulls every + magnet in. Every fifth ball is gray: a plain Bounce, not a
+ * magnet, so it ignores the magnet. Drag the big one around, and the others follow. The count is the small balls.
  */
 export const FixedMagnet: Story = {
-  args: { friction: 0.3, speed: 200, squash: false },
-  render: ({ charge: _charge, paused: _paused, ...args }) => (
+  args: { count: 10, friction: 0.3, speed: 200, squash: false },
+  render: ({ count = 10, charge: _charge, paused: _paused, ...args }) => (
     <div className="relative" style={{ ...page, height: "100vh", overflow: "hidden" }}>
       <Magnet speed={0} charge={-12} paused grabbable startX={0.5} startY={0.5}>
         <Charge charge={-1} size="5rem" />
       </Magnet>
-      {Array.from({ length: 10 }, (_, index) => {
+      {Array.from({ length: count }, (_, index) => {
         const place = { angle: (index * 67) % 360, startX: ((index * 41) % 100) / 100, startY: ((index * 59) % 100) / 100 };
         return index % 5 === 0 ? (
           <Bounce key={index} {...args} {...place}>
@@ -155,7 +172,8 @@ export const FixedMagnet: Story = {
 /** A + and − pair on the left, and a + and + pair on the right. The story checks the first pair closes in and the second spreads out. */
 export const AttractAndRepel: Story = {
   args: { speed: 0, squash: false },
-  render: ({ charge: _charge, ...args }) => (
+  argTypes: { count: { table: { disable: true } } }, // always two pairs
+  render: ({ count: _count, charge: _charge, ...args }) => (
     <div className="grid grid-cols-2 gap-4 p-4" style={{ ...page, height: "100vh" }}>
       {[
         [1, -1],
