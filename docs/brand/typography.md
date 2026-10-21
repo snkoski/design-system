@@ -5,3 +5,4 @@
 - Use `display` once per page at most. Headings get `text-wrap: balance`.
 - Running text is `body` (1rem) with `body-lg` for intros, kept within `measure`. Meta and helper text is `small`. `label` is for short uppercase eyebrows only.
 - Numbers that line up in columns use `font-variant-numeric: tabular-nums`.
+- Text in text fields, and the labels of form controls and groups, use the `leading-control` line height (1.5), so one line centers in a field.

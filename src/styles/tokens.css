@@ -173,6 +173,7 @@
   --focus-offset: 2px;
   --font-sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --leading-control: 1.5;
   --text-display: clamp(2.441rem, 1.749rem + 3.075vw, 4.209rem);
   --text-heading-xl: clamp(1.953rem, 1.482rem + 2.094vw, 3.157rem);
   --text-heading-lg: clamp(1.563rem, 1.248rem + 1.402vw, 2.369rem);

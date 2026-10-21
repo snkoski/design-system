@@ -125,6 +125,18 @@ export function TypeScale() {
             ))}
           </section>
         ))}
+        <section className="fd-stack">
+          <h3 className="fd-group">Line heights</h3>
+          {tokens.type.leading.tokens.map((t) => (
+            <div key={t.name} className="fd-type-row">
+              <div className="fd-meta">
+                <b>{t.name}</b>
+                <code>{t.value}</code>
+              </div>
+              <p className="fd-note">{t.usage}</p>
+            </div>
+          ))}
+        </section>
       </div>
     </ThemeFrame>
   );

@@ -11,7 +11,7 @@
   .input__label {
     font-size: var(--text-body);
     font-weight: 600;
-    line-height: 1.5;
+    line-height: var(--leading-control);
   }
 
   .input__description {
@@ -44,7 +44,7 @@
     color: var(--ink);
     font-family: inherit;
     font-size: var(--text-body);
-    line-height: 1.5;
+    line-height: var(--leading-control);
     appearance: none;
     transition:
       border-color var(--duration-fast) var(--ease-out),

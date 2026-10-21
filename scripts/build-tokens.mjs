@@ -40,6 +40,7 @@ function themeBlock(theme) {
 const staticFamilies = ["spacing", "radius", "size", "borderWidth"];
 const staticLines = staticFamilies.flatMap((f) => (tokens[f]?.tokens ?? []).map((t) => `  --${t.name}: ${t.value};`));
 for (const [k, v] of Object.entries(tokens.type.families)) staticLines.push(`  --font-${k}: ${v};`);
+for (const t of tokens.type.leading?.tokens ?? []) staticLines.push(`  --${t.name}: ${t.value};`);
 
 // Motion tokens live here because tokens.json has no motion family
 const motionFull = `

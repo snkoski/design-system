@@ -21,7 +21,7 @@
   .radio-group__label {
     font-size: var(--text-body);
     font-weight: 600;
-    line-height: 1.5;
+    line-height: var(--leading-control);
   }
 
   .radio-group__description {
