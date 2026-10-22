@@ -255,6 +255,64 @@ export const FullOrbits: Story = {
   },
 };
 
+/**
+ * How far out each hot dog starts, in rem, its mass, and how big it's drawn, in rem: a mix of snack size and
+ * footlong. The rings are further apart than any two hot dogs are wide, so they pass without bumping, and the
+ * masses are tiny next to the burger's: packed this close, any heavier and they tug each other out of orbit
+ * within half a minute, and one that strays into the wall bounces off and plunges into the burger.
+ */
+const HOT_DOGS = [
+  { radius: 6, mass: 0.01, size: 1.75 },
+  { radius: 9, mass: 0.03, size: 2.5 },
+  { radius: 12, mass: 0.015, size: 2 },
+  { radius: 15, mass: 0.04, size: 2.75 },
+  { radius: 18, mass: 0.008, size: 1.5 },
+];
+
+function Emoji({ children, size }: { children: string; size: number }) {
+  return <span style={{ display: "block", fontSize: `${size}rem`, lineHeight: 1 }}>{children}</span>;
+}
+
+/**
+ * A big hamburger at the center of its own little system, with hot dogs of every size going round it, trailing
+ * ketchup and mustard. The heavier hot dogs are drawn bigger. Drag the burger and they follow. The story checks
+ * the burger and every hot dog are there.
+ */
+export const BurgerSystem: Story = {
+  args: { trail: 4 },
+  argTypes: { count: { table: { disable: true } }, mass: { table: { disable: true } } }, // a fixed set of hot dogs
+  render: ({ count: _count, starMass, mass: _mass, speed: _speed, angle: _angle, startX: _startX, startY: _startY, ...args }) => (
+    <div className="grid place-items-center p-4" style={{ ...page, minHeight: "100vh" }}>
+      <div className="relative" style={{ ...box, width: `${MOONS_BOX}rem`, height: `${MOONS_BOX}rem` }}>
+        <Star mass={starMass} {...from(MOONS_BOX, 5, 0, 0)} data-testid="burger">
+          <Emoji size={5}>🍔</Emoji>
+        </Star>
+        {HOT_DOGS.map(({ radius, mass, size }, index) => {
+          const turn = (index * 137.5 * Math.PI) / 180;
+          return (
+            <Planet
+              key={index}
+              {...args}
+              mass={mass}
+              {...from(MOONS_BOX, size, radius * Math.cos(turn), radius * Math.sin(turn))}
+              trailColor={index % 2 === 0 ? "var(--danger)" : "var(--warning)"}
+              data-testid="hot-dog"
+            >
+              <Emoji size={size}>🌭</Emoji>
+            </Planet>
+          );
+        })}
+      </div>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("burger")).toHaveTextContent("🍔");
+    const hotDogs = canvas.getAllByTestId("hot-dog");
+    await expect(hotDogs).toHaveLength(HOT_DOGS.length);
+    for (const hotDog of hotDogs) await expect(hotDog).toHaveTextContent("🌭");
+  },
+};
+
 const ORBIT_BOX = 30; // rem
 
 /**
