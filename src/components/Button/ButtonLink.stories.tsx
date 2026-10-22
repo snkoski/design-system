@@ -1,6 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, ExternalLink, Heart } from "lucide-react";
+import { expect } from "storybook/test";
 import { ButtonLink } from "./ButtonLink";
+
+/** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
+function measure(token: string, parent: HTMLElement = document.body) {
+  const probe = document.createElement("div");
+  probe.style.height = `var(${token})`;
+  parent.append(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  return height;
+}
+
+/** Whether a click just inside `size` from an element's center, above, below, left, and right of it, reaches the element */
+function hitAreaReaches(element: Element, size: number) {
+  const box = element.getBoundingClientRect();
+  const [x, y, reach] = [box.left + box.width / 2, box.top + box.height / 2, size / 2 - 1];
+  const points: [number, number][] = [[x, y - reach], [x, y + reach], [x - reach, y], [x + reach, y]];
+  return points.every(([px, py]) => element.contains(document.elementFromPoint(px, py)));
+}
 
 const meta = {
   title: "Components/Button link",
@@ -40,7 +59,10 @@ export const Variants: Story = {
   ),
 };
 
-/** Small links are 32px tall but keep a 44px hit area. */
+/**
+ * Small links are 32px tall, but their hit area is never smaller than `target-min`: 24px with a mouse, 44px on
+ * touch. The story checks both.
+ */
 export const Sizes: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-4">
@@ -49,6 +71,23 @@ export const Sizes: Story = {
       <ButtonLink {...args} size="lg">Large</ButtonLink>
     </div>
   ),
+  play: async ({ canvas, canvasElement }) => {
+    const links = ["Small", "Medium", "Large"].map((name) => canvas.getByRole("link", { name }));
+    // With a mouse, every link's visible box is already at least target-min tall
+    const mouse = measure("--target-min", canvasElement);
+    await expect(mouse).toBeGreaterThanOrEqual(24);
+    for (const link of links) await expect(link.getBoundingClientRect().height).toBeGreaterThanOrEqual(mouse);
+    // On touch, a small link stays shorter than target-min, and its hit area reaches above and below it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      const touch = measure("--target-min", canvasElement);
+      await expect(touch).toBeGreaterThanOrEqual(44);
+      await expect(links[0]!.getBoundingClientRect().height).toBeLessThan(touch);
+      for (const link of links) await expect(hitAreaReaches(link, touch)).toBe(true);
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
+  },
 };
 
 /** Icons are decorative and hidden from screen readers; the label does the talking. */

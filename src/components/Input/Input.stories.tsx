@@ -5,6 +5,16 @@ import { expect, fn } from "storybook/test";
 import { Button } from "../Button";
 import { Input } from "./Input";
 
+/** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
+function measure(token: string, parent: HTMLElement = document.body) {
+  const probe = document.createElement("div");
+  probe.style.height = `var(${token})`;
+  parent.append(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  return height;
+}
+
 // Fields fill their container, so give single stories a realistic width. (Defined outside meta: written
 // inline, its context argument breaks Storybook's inference of the story args.)
 const realisticWidth: Decorator = (Story, { parameters }) =>
@@ -61,7 +71,10 @@ export const States: Story = {
   ),
 };
 
-/** Medium is the default. Large matches a large button, so the two line up side by side. */
+/**
+ * Medium is the default. Large matches a large button, so the two line up side by side. Both are at least
+ * `target-min` tall: 24px with a mouse, 44px on touch. The story checks both.
+ */
 export const Sizes: Story = {
   render: (args) => (
     <div className="grid gap-4">
@@ -69,6 +82,23 @@ export const Sizes: Story = {
       <Input {...args} size="lg" label="Large" />
     </div>
   ),
+  play: async ({ canvas, canvasElement }) => {
+    const fields = ["Medium", "Large"].map((name) => canvas.getByRole("textbox", { name }));
+    const check = async (floor: number) => {
+      const target = measure("--target-min", canvasElement);
+      await expect(target).toBeGreaterThanOrEqual(floor);
+      for (const field of fields) await expect(field.getBoundingClientRect().height).toBeGreaterThanOrEqual(target);
+    };
+    // With a mouse, target-min is 24px
+    await check(24);
+    // On touch, target-min is 44px, and both sizes grow to meet it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await check(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
+  },
 };
 
 /** The description sits between the label and the field, so people read it before they type. */

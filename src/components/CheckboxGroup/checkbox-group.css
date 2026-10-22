@@ -30,7 +30,7 @@
     color: var(--ink-muted);
   }
 
-  /* Each option's row is already target-min tall, so they stack with no gap */
+  /* Each option's row is already choice-row tall, so they stack with no gap */
   .checkbox-group__options {
     display: grid;
     justify-items: start;

@@ -2,7 +2,7 @@
 
 Tokens, styles, and React components for a playful, accessible design system. The current palette is called Sherbet (tangerine, peach, and mint with espresso ink) and ships with three themes: light, dark, and hot dog.
 
-The brand book (principles, voice, color, type, layout, motion, iconography, accessibility, and how to build with it) lives in `docs/brand/`, and Storybook shows it under **Foundations**, next to visual pages for every token. This repo is the source of truth for both the code and the guidelines.
+The brand book (principles, voice, color, type, layout, mouse and touch sizing, motion, iconography, forms, accessibility, how to build with it, and a comparison with major industry design systems) lives in `docs/brand/`, and Storybook shows it under **Foundations**, next to visual pages for every token. This repo is the source of truth for both the code and the guidelines.
 
 ## Getting started
 

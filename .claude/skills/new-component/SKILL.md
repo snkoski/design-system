@@ -21,7 +21,7 @@ Work through the phases in order. **Phase 2 ends in a hard stop for the user's a
 
 Before anything else, check the starting point: the branch is based on the latest `main` (`git log -1 main` against the branch's base), and any dependency you've added is still in `node_modules`. Another session can share this folder and switch branches or reinstall packages under you. If one does, suggest a git worktree for one of them.
 
-1. Read `CLAUDE.md` in full, plus `docs/brand/accessibility.md`, `docs/brand/building.md`, and `docs/brand/motion.md`.
+1. Read `CLAUDE.md` in full, plus `docs/brand/accessibility.md`, `docs/brand/building.md`, `docs/brand/motion.md`, `docs/brand/platforms.md` (sizes with a mouse, on touch, and in compact density), `docs/brand/iconography.md`, and `docs/brand/voice.md`. For a form control, also `docs/brand/forms.md`. Check `docs/brand/industry.md` for a section on this kind of component, and see how the major systems it compares (Primer, Carbon, Atlassian, Material, Fluent, Polaris, GOV.UK, and others) name it, which variants they offer, and where they disagree.
 2. Pick the reference component: `src/components/Checkbox/` for choice controls (checkboxes, switches, radios), `src/components/Input/` for text fields, and `src/components/Button/` for actions. Read all its files. New components match its structure, prop names, JSDoc style, and test layout unless there is a reason not to.
 3. Look for the component in Base UI (the files in `node_modules/@base-ui/react/docs/react/components/`) and in shadcn/ui (the component list at https://ui.shadcn.com/docs/components). If Base UI has a matching primitive, read its docs at `node_modules/@base-ui/react/docs/react/components/<name>.md`. They ship with the installed version and are authoritative. shadcn's version is a reference for structure only.
    If neither has a component by that name (a segmented control, for example), don't pick the closest one quietly. Find the Base UI primitives it could be built on, and for each one note what it's for, what a screen reader announces, its keyboard behavior, and what it gives up (no form `name`, letting nothing be selected, and so on). The choice usually depends on what the component is for, so it goes to the user in Phase 2. Research each candidate in the steps below.
@@ -54,6 +54,9 @@ Present this to the user and **stop**. Keep it to what they need to decide.
 - **Anatomy:** the elements and their classes (`.name`, `.name__part`).
 - **States and how each is styled:** which ARIA or `data-*` attribute drives it.
 - **Keyboard behavior** as recorded in Phase 1, and any place it differs from the reference component.
+- **Sizes:** its height and hit area with a mouse, on touch, and under compact density, from the size tokens. Anything smaller than `--target-min` in any mode needs a pseudo-element hit area; a text field can't have one, so it must never be shorter.
+- **How other systems do it:** a short table of what the major systems call it, the variants they offer, and where they differ, with what we chose. It becomes a section or row in `docs/brand/industry.md` in Phase 8.
+- **When to use each variant**, if it has variants or could be confused with another component (a segmented control or tabs, a switch or a checkbox). It becomes a guidance page in Phase 8.
 - **Tokens:** existing tokens it uses, and any new token it needs (name, value, usage note).
 - **Color pairs** it introduces, to add to `tokens/contrast.json`.
 - **Motion:** what moves, with which tokens.
@@ -68,7 +71,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 
 1. Write the props type (and a stub component that renders `null`) in `<Name>.tsx`, so the test file typechecks.
 2. Write `<Name>.test.tsx` from the approved API, covering the full list in the Testing section of `CLAUDE.md`. Include `expectTypeOf` checks for any rule enforced in types.
-   Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. For any control that can have no visible label, plan a story check that its wrapper is at least `--target-min` tall: its hit area hides the gap in a story with one control, but stacked unlabelled controls otherwise steal each other's clicks. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
+   Behavior that depends on CSS or layout (clicks passing through an icon, hit areas, anything relying on `pointer-events`, sizes, or position) can't be tested in jsdom. Plan every size and hit-area check to run with a mouse and again on touch (`data-pointer="coarse"`), as CLAUDE.md's Testing section describes: with a mouse `--target-min` is only 24px, so a check that only runs there misses a broken touch hit area. For any control that can have no visible label, plan a story check that its wrapper is at least `--target-min` tall: its hit area hides the gap in a story with one control, but stacked unlabelled controls otherwise steal each other's clicks. Don't put it in the unit tests; list it now and write it as a story `play` function in Phase 5, for example a real hit-test with `document.elementFromPoint`.
    For a form control, test that a consumer's `aria-describedby` is added to the description and error, not put in their place: the control's accessible description must still include both. The usual "passes other props through" test only checks plain attributes, so it can't catch this.
    Base UI popups (Popover, Dialog, Menu, Select, Tooltip) move focus a frame after they open or close, so check focus after opening or closing one with `await waitFor(() => expect(...).toHaveFocus())`, not straight away.
 3. Run `pnpm test:unit` and `pnpm typecheck`. Every runtime test should fail, because the stub renders nothing; none should fail from import or type errors. Note the count.
@@ -84,7 +87,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 
 ## Phase 5: Stories
 
-Write `<Name>.stories.tsx`: a `Playground` with controls; a `States` story showing every state side by side (Phase 7's focus check opens it, and the first Tab must land in it); one story per variant group or state; and `AllThemes` with every state in all three themes. Keep `play` functions to short demos, plus the CSS-dependent checks listed in Phase 3.
+Write `<Name>.stories.tsx`: a `Playground` with controls; a `States` story showing every state side by side (Phase 7's focus check opens it, and the first Tab must land in it); one story per variant group or state; and `AllThemes` with every state in all three themes. Keep `play` functions to short demos, plus the CSS-dependent checks listed in Phase 3, each run with a mouse and on touch. Labels, descriptions, and errors in stories are real copy: follow `docs/brand/voice.md` (no periods in labels and buttons; errors say what went wrong and how to fix it).
 
 ## Phase 6: Verify
 
@@ -103,7 +106,9 @@ Then prove the tests can fail: break the component three ways that matter (for e
 
 ## Phase 7: Look at it
 
-Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Check alignment, every state, focus, hot dog mode, and dark mode.
+Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Check alignment, every state, focus, hot dog mode, and dark mode. In a worktree, use a port other than 6107, so another session's screenshots don't collide with yours.
+
+Then screenshot the light theme again with `data-pointer="coarse"` and with `data-density="compact"` set on the section (`page.locator('section[data-theme=light]').evaluate((el) => el.dataset.pointer = 'coarse')`). Check that it grows or shrinks with the tokens, that icons and labels stay centered, and that nothing overlaps.
 
 For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
 
@@ -124,6 +129,8 @@ Fix what looks wrong and check again.
 ## Phase 8: Docs
 
 If the component introduces a new pattern or rule, add it to `CLAUDE.md` (code rules) or the right `docs/brand/` page (design rules). Don't restate what's already there.
+
+If the proposal had a "When to use each variant" section, write it as a guidance page, `docs/brand/<topic>.md`, and render it with `src/components/<Name>/<Name>.mdx` beside the stories (`buttons.md` and `Button.mdx` are the pattern). Add the "How other systems do it" table to `docs/brand/industry.md`, with sources.
 
 ## Phase 9: Independent review
 

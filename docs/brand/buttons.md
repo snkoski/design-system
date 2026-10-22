@@ -1,0 +1,56 @@
+# Choosing a button
+
+Pick a variant by how much attention the action deserves, not by how it looks. Most design systems settle on the same three or four levels of emphasis; Sherbet has three. See **Industry standards** for how they line up.
+
+| Variant | Emphasis | Use it for | Examples |
+| --- | --- | --- | --- |
+| `primary` | Highest | The one action the view exists for | "Send message," "Save changes," "Create account" |
+| `secondary` | Medium | Every other action, including the alternative to the primary one | "Cancel," "Back," "Download résumé" |
+| `ghost` | Lowest | Supporting actions that shouldn't compete: toolbars, table rows, menus, and a third action beside a pair | "Add tag," "Edit," "Show more" |
+
+## One primary per view
+
+- **A view has at most one primary button.** A dialog or side panel opened from the view may have its own, because it's a separate task.
+- **Pages for reading, such as a portfolio piece or an article, may have no primary button at all.** Use secondary and ghost buttons there.
+- If two actions both feel primary, the view is doing two jobs. Split it, or decide which one matters more.
+- "Cancel" is never primary. It's secondary beside a primary button, or ghost when there are already two other buttons.
+
+## Pairs and groups
+
+- **Two actions:** primary and secondary ("Save changes" and "Cancel").
+- **Three actions:** primary, secondary, and ghost. More than three is a sign some belong in a menu.
+- Where they sit (left-aligned under a form, bottom right in a dialog with the primary button last) is in **Forms**.
+- Keep a group the same size. Don't mix `sm` and `md` in one row.
+
+## Size
+
+- `md` is the default and the right choice almost everywhere.
+- `sm` is for dense places: toolbars, table rows, and tags. It still gets a full `target-min` hit area.
+- `lg` is for a hero call to action, once per page at most.
+
+## Button or link
+
+- **A button does something:** sends, saves, opens a dialog, or changes what's on screen. Use `Button`.
+- **A link goes somewhere:** another page, or a file to download. Use `ButtonLink` when a link needs to look like a button. It's still an `<a>`, so it opens in a new tab, can be copied, and is announced as a link.
+- Never use a button to navigate or a link to submit.
+
+## Labels and icons
+
+- Labels follow **Voice and copy**: start with a verb, say exactly what happens, and name the thing ("Delete project," not "Delete").
+- Icons are decoration: the label does the talking. Put the icon before the label for an action ("Download résumé") and after it for moving forward ("Next project").
+- Icon-only buttons are for actions people already recognize from the icon alone, such as close, favorite, or more. They need an `aria-label`, and are usually `ghost` or `secondary`.
+
+## States
+
+- Show `loading` while an action runs, instead of disabling the button, so it stays focusable and can't be clicked twice.
+- Avoid disabled buttons when you can: a disabled button can't say why it's disabled. Let people press it and explain what's missing.
+
+## Destructive actions
+
+There is no danger style yet (see `docs/revisit.md`). Until there is:
+
+- A destructive action is a `secondary` button whose label names what will be lost: "Delete project."
+- Unless it can be undone, it opens a confirmation dialog that says what will happen. The dialog's final button is `primary`, with the same label, and "Cancel" is `secondary`.
+- Prefer undo over confirmation when you can offer it: "Project deleted," with an "Undo" button in the toast.
+
+When a danger style is added, it's planned as a `tone="danger"` prop on `primary`, `secondary`, and `ghost`, following Carbon and Uber's Base. It will never go on the "Cancel" button, never on an icon-only button, and never be the only sign that something is destructive: the label always says so too.

@@ -146,3 +146,33 @@ Raised while building RichText (2026-10-21).
 **To decide:** what read-only is for in the sites and apps that use the system (showing a saved value, a locked setting, a sent message), and then one cue for all of it. Options: the dim; dropping the field's edge and background so it reads as plain text; or a "Read only" note or lock icon beside the label, in words. Whatever is chosen has to meet contrast in every theme and work in forced colors.
 
 Raised while building RichText (2026-10-21).
+
+## A danger style for buttons
+
+**Today:** Button has no danger style. A destructive action is a `secondary` button whose label names what's lost, behind a confirmation dialog (`docs/brand/buttons.md`).
+
+**Why it's in question:** most systems give destructive actions their own look (Carbon, Primer, Atlassian, and Uber's Base), so they stand out in a confirmation dialog or a settings page.
+
+**To decide:** a `tone="danger"` prop (`data-tone="danger"`) on `primary`, `secondary`, and `ghost`, never on icon-only buttons. It needs `danger-hover` and `on-danger` tokens that pass contrast in all three themes, and its own look in hot dog mode, where `action` is already ketchup red and a danger fill would match the primary button.
+
+Raised while comparing button systems (2026-10-22).
+
+## Where a field's error goes
+
+**Today:** every form control shows its error after the field (below the control, or below a group's options), through the shared `FieldError`, with an icon and the message. There's no visually hidden "Error:" before the message. `docs/brand/forms.md` asks for the GOV.UK pattern instead: the error between the label and hint and the field, with a hidden "Error:".
+
+**Why it's in question:** the error above the field is read before the field, like the description, and a phone keyboard or autofill menu can't cover it, the same reason the description sits there. Below the field is closer to what most React libraries and shadcn do, and it's what's built.
+
+**To decide:** look at both side by side in Storybook (a comparison story for Input, TextArea, Checkbox, CheckboxGroup, RadioGroup, and SegmentedControl, in all three themes), then pick one. Moving it changes every form control and `FieldError`, and the "Error:" prefix changes what screen readers announce, so it's its own branch.
+
+Raised while reviewing the forms guidance (2026-10-22).
+
+## Icon size in large buttons and segments
+
+**Today:** Button's and SegmentedControl's `lg` sizes use `icon-md` (20px), the same as `md`. `docs/brand/iconography.md` says large buttons use `icon-lg` (24px).
+
+**Why it's in question:** a 24px icon next to `body-lg` text may look better balanced, as in Material's touch sizes, or it may look heavy beside the label.
+
+**To decide:** look at `lg` buttons and segments with each icon size side by side in Storybook, with icons before and after the label and icon-only, then update the components or the doc.
+
+Raised while reviewing the iconography guidance (2026-10-22).

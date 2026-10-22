@@ -1,6 +1,6 @@
 // Visual blocks for the Foundations docs pages. Everything is drawn from tokens/tokens.json,
 // so a token change updates these pages automatically. Not part of the published package.
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import tokens from "../../tokens/tokens.json";
 import { Button } from "../components/Button";
 import "./foundations.css";
@@ -188,12 +188,110 @@ export function Shadows() {
   );
 }
 
+type PointerMode = "auto" | "fine" | "coarse";
+type Density = "comfortable" | "compact";
+const SIZE_TOKENS = ["target-min", "target-gap", "control-sm", "control-md", "control-lg"] as const;
+
+type SizeToken = { name: string; value: string; touch?: string; compact?: string };
+const sizeTokens = tokens.size.tokens as SizeToken[];
+const sizeToken = (name: string) => sizeTokens.find((t) => t.name === name)!;
+/** A rem value from tokens.json in px, at the browser's default 16px */
+const px = (rem: string) => `${parseFloat(rem) * 16}px`;
+
+/** Reads live size tokens from an element, as "2.75rem · 44px". Measured, because compact sizes are a max(). */
+function useSizeReadout(ref: RefObject<HTMLElement | null>, deps: unknown[]) {
+  const [values, setValues] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const probe = document.createElement("div");
+    el.append(probe);
+    setValues(Object.fromEntries(SIZE_TOKENS.map((t) => {
+      probe.style.height = `var(--${t})`;
+      const height = probe.getBoundingClientRect().height;
+      return [t, `${height / rootPx}rem · ${Math.round(height)}px`];
+    })));
+    probe.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return values;
+}
+
 export function Sizing() {
+  const [pointer, setPointer] = useState<PointerMode>("auto");
+  const [density, setDensity] = useState<Density>("comfortable");
+  const [hasTouch] = useState(() => matchMedia("(any-pointer: coarse)").matches);
+  const box = useRef<HTMLDivElement>(null);
+  const v = useSizeReadout(box, [pointer, density]);
+  const touch = pointer === "coarse" || (pointer === "auto" && hasTouch);
+
   return (
     <ThemeFrame label="Sizing">
-      <div className="fd-stack">
+      <div
+        ref={box}
+        className="fd-stack"
+        data-pointer={pointer === "auto" ? undefined : pointer}
+        data-density={density === "compact" ? "compact" : undefined}
+      >
+        <div className="fd-stack sm">
+          <div className="fd-row">
+            <span className="fd-group">Pointer</span>
+            <div className="fd-switch" role="group" aria-label="Pointer preview">
+              {(["auto", "fine", "coarse"] as const).map((m) => (
+                <button key={m} type="button" aria-pressed={pointer === m} onClick={() => setPointer(m)}>
+                  {m === "auto" ? `Auto (${hasTouch ? "touch" : "mouse"})` : m === "fine" ? "Mouse" : "Touch"}
+                </button>
+              ))}
+            </div>
+            <span className="fd-group">Density</span>
+            <div className="fd-switch" role="group" aria-label="Density preview">
+              {(["comfortable", "compact"] as const).map((d) => (
+                <button key={d} type="button" aria-pressed={density === d} onClick={() => setDensity(d)}>
+                  {d === "comfortable" ? "Comfortable" : "Compact"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="fd-note" role="status">
+            {touch
+              ? `Touch sizes: ${px(sizeToken("target-min").touch!)} minimum hit area, ${px(sizeToken("control-md").touch!)} default controls, and ${px(sizeToken("control-lg").touch!)} large controls.`
+              : `Mouse and trackpad sizes: ${px(sizeToken("target-min").value)} minimum hit area, ${px(sizeToken("control-md").value)} default controls, and ${px(sizeToken("control-lg").value)} large controls.`}
+            {density === "compact" ? " Compact density shrinks default and large controls one step, but never below the minimum hit area." : ""}
+          </p>
+        </div>
+
         <section className="fd-panel">
-          <h3 className="fd-group">Border widths</h3>
+          <h3 className="fd-group">Targets and controls</h3>
+          <div className="fd-grid">
+            <div className="fd-item">
+              <b>Minimum hit area</b>
+              <div className="fd-row"><span className="fd-target"><Button size="sm">Small</Button></span></div>
+              <code>target-min · {v["target-min"]}</code>
+              <p className="fd-note">The dashed outline is the clickable area. With a mouse, the {px(sizeToken("control-sm").value)} button already exceeds the {px(sizeToken("target-min").value)} minimum. On touch, an invisible area pads it out to {px(sizeToken("target-min").touch!)}.</p>
+            </div>
+            <div className="fd-item">
+              <b>Space between small targets</b>
+              <div className="fd-row" style={{ gap: "var(--target-gap)" }}>
+                <Button size="sm" variant="secondary" iconOnly aria-label="Bold"><svg viewBox="0 0 24 24" className="fd-ico" aria-hidden="true"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7z" /><path d="M7 12h7a3.5 3.5 0 0 1 0 7H7z" /></svg></Button>
+                <Button size="sm" variant="secondary" iconOnly aria-label="Italic"><svg viewBox="0 0 24 24" className="fd-ico" aria-hidden="true"><path d="M14 5h-4" /><path d="M14 19h-4" /><path d="M14 5 10 19" /></svg></Button>
+                <Button size="sm" variant="secondary" iconOnly aria-label="Underline"><svg viewBox="0 0 24 24" className="fd-ico" aria-hidden="true"><path d="M7 4v7a5 5 0 0 0 10 0V4" /><path d="M5 20h14" /></svg></Button>
+              </div>
+              <code>target-gap · {v["target-gap"]}</code>
+            </div>
+            <div className="fd-item">
+              <b>Control heights</b>
+              <div className="fd-row end">
+                <span className="fd-col"><Button size="sm">Small</Button><code>{v["control-sm"]}</code></span>
+                <span className="fd-col"><Button>Default</Button><code>{v["control-md"]}</code></span>
+                <span className="fd-col"><Button size="lg">Large</Button><code>{v["control-lg"]}</code></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="fd-panel">
+          <h3 className="fd-group">Border widths and focus</h3>
           <div className="fd-grid">
             <div className="fd-item">
               <b>Thin and thick</b>
@@ -212,37 +310,22 @@ export function Sizing() {
             </div>
           </div>
         </section>
+
         <section className="fd-panel">
-          <h3 className="fd-group">Touch targets and controls</h3>
-          <div className="fd-grid">
-            <div className="fd-item">
-              <b>Minimum touch target</b>
-              <div className="fd-row"><span className="fd-target"><Button size="sm">Small</Button></span></div>
-              <p className="fd-note">The dashed outline is <code>target-min</code> (2.75rem, 44px). A small button is 2rem tall, so its clickable area is padded out to 44px.</p>
-            </div>
-            <div className="fd-item">
-              <b>Control heights</b>
-              <div className="fd-row end">
-                <span className="fd-col"><Button size="sm">Small</Button><code>control-sm · 2rem</code></span>
-                <span className="fd-col"><Button>Default</Button><code>control-md · 2.75rem</code></span>
-                <span className="fd-col"><Button size="lg">Large</Button><code>control-lg · 3.25rem</code></span>
-              </div>
-            </div>
-            <div className="fd-item">
-              <b>Icon sizes</b>
-              <div className="fd-row">
-                <span className="fd-icon-text sm"><svg className="fd-ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Saved</span>
-                <span className="fd-icon-text"><svg className="fd-ico md" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>See my work</span>
-              </div>
-              <code>icon-sm · 1rem · icon-md · 1.25rem</code>
-            </div>
+          <h3 className="fd-group">Icon sizes</h3>
+          <div className="fd-row">
+            <span className="fd-icon-text sm"><svg className="fd-ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Saved</span>
+            <span className="fd-icon-text"><svg className="fd-ico md" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>See my work</span>
+            <span className="fd-icon-text lg"><svg className="fd-ico lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>Home</span>
           </div>
+          <code>{["icon-sm", "icon-md", "icon-lg"].map((n) => `${n} · ${sizeToken(n).value} (${px(sizeToken(n).value)})`).join(" · ")}</code>
         </section>
+
         <section className="fd-panel">
           <h3 className="fd-group">Layout widths, drawn to scale</h3>
-          <div className="fd-bar content">content-max · 72rem · page content</div>
-          <div className="fd-bar measure">measure · 40rem · running text</div>
-          <p className="fd-prose">This paragraph is capped at <code>measure</code>. Lines of about 65 characters are the easiest to read, so running text stops here even when the page is wider.</p>
+          <div className="fd-bar content">content-max · {sizeToken("content-max").value} · page content</div>
+          <div className="fd-bar measure" style={{ width: `${(parseFloat(sizeToken("measure").value) / parseFloat(sizeToken("content-max").value)) * 100}%` }}>measure · {sizeToken("measure").value} · running text</div>
+          <p className="fd-prose">This paragraph is capped at <code>measure</code>. Lines of about 65–75 characters are the easiest to read, so running text stops here even when the page is wider.</p>
         </section>
       </div>
     </ThemeFrame>

@@ -26,7 +26,7 @@ type Labelled =
 interface OwnProps {
   /** The kind of text it takes. Text-like types only; use a number field for numbers. Default: `text`. */
   type?: InputType;
-  /** Height and type size. Both meet the 44px target. Default: `md`. */
+  /** Height and type size. Both meet target-min: 40px or 48px with a mouse, 44px or 52px on touch. Default: `md`. */
   size?: InputSize;
   /** The text in the field. Use with `onValueChange` to control it. */
   value?: string;

@@ -75,12 +75,13 @@
     gap: var(--space-1);
     font-size: var(--text-small);
   }
-  /* Small buttons are 32px tall but keep a 44px hit area */
-  .button[data-size="sm"]::after {
+  /* Any button smaller than target-min (small, compact, or on touch) gets an invisible
+     hit area padded out to target-min. Larger buttons get nothing extra. */
+  .button::after {
     content: "";
     position: absolute;
-    inset-block: calc((var(--control-sm) - var(--target-min)) / 2);
-    inset-inline: min(0px, calc((var(--control-sm) - var(--target-min)) / 2));
+    inset-block: min(0px, calc((100% - var(--target-min)) / 2));
+    inset-inline: min(0px, calc((100% - var(--target-min)) / 2));
   }
 
   .button[data-size="lg"] {

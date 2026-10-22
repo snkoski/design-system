@@ -63,6 +63,19 @@ const motionReduced = `
   --duration-loop: 1600ms;
   --ease-bounce: var(--ease-out);`;
 
+// Pointer and density sizing. A size token's value is for a mouse or trackpad; "touch" replaces it when a touch
+// screen is present, and "compact" under compact density, but never below target-min, so a text field (which
+// can't have an invisible hit area) stays a full target on a touchscreen laptop.
+const sizeValue = (name) => tokens.size.tokens.find((t) => t.name === name).value;
+const declarations = (list, pick) => list.map((t) => `\n  --${t.name}: ${pick(t)};`).join("");
+const touchSized = tokens.size.tokens.filter((t) => t.touch);
+const pointerCoarse = declarations(touchSized, (t) => t.touch);
+const pointerFine = declarations(touchSized, (t) => t.value);
+const densityCompact = declarations(
+  tokens.size.tokens.filter((t) => t.compact),
+  (t) => `max(${t.compact}, var(--target-min))`,
+);
+
 // Fluid heading sizes (the token file stores the widest-screen size)
 const fluid = {
   display: "clamp(2.441rem, 1.749rem + 3.075vw, 4.209rem)",
@@ -127,6 +140,23 @@ ${typeLines.join("\n")}
   [data-motion="reduced"] {${motionReduced}
   }
 
+  /* Touch: bigger targets and controls whenever any touch input exists (any-pointer, so a
+     touchscreen laptop counts). data-pointer="coarse" or "fine" overrides it for a subtree. */
+  @media (any-pointer: coarse) {
+    :root:not([data-pointer="fine"]) {${pointerCoarse.replace(/\n/g, "\n  ")}
+    }
+  }
+
+  [data-pointer="coarse"] {${pointerCoarse}
+  }
+
+  [data-pointer="fine"] {${pointerFine}
+  }
+
+  /* Opt-in compact density for data-heavy screens. Controls never get shorter than target-min. */
+  [data-density="compact"] {${densityCompact}
+  }
+
   @media (prefers-contrast: more) {
     :root,
     [data-theme] {
@@ -162,13 +192,9 @@ const tw = `${header}
   --animate-*: initial;
 
   --spacing: 0.25rem;
-  --container-measure: ${tokens.size.tokens.find((t) => t.name === "measure").value};
-  --container-content: ${tokens.size.tokens.find((t) => t.name === "content-max").value};
-  --breakpoint-sm: 40em;
-  --breakpoint-md: 48em;
-  --breakpoint-lg: 64em;
-  --breakpoint-xl: 80em;
-  --breakpoint-2xl: 96em;
+  --container-measure: ${sizeValue("measure")};
+  --container-content: ${sizeValue("content-max")};
+${tokens.breakpoint.tokens.map((t) => `  --${t.name}: ${t.value};`).join("\n")}
 }
 `;
 writeFileSync(join(outDir, "tailwind-theme.css"), tw);

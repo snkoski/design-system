@@ -75,13 +75,21 @@ export const ReadOnly: Story = {
   args: { children: "Joined in 2024", readOnly: true, defaultChecked: true },
 };
 
-/** With no visible label, such as a row in a table, an `aria-label` is required. The hit area is still 44px. */
+/** With no visible label, such as a row in a table, an `aria-label` is required. The hit area is still `target-min`: 24px with a mouse, 44px on touch. */
 export const WithoutVisibleLabel: Story = {
   args: { children: undefined, "aria-label": "Select row 3" },
-  play: async ({ canvas }) => {
-    // Its own box is target-min tall, so its 44px hit area doesn't spill into the control above or below it
+  play: async ({ canvas, canvasElement }) => {
     const control = canvas.getByRole("checkbox", { name: "Select row 3" });
-    await expect(control.closest(".checkbox")!.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    const height = () => control.closest(".checkbox")!.getBoundingClientRect().height;
+    // With a mouse, its own box is choice-row tall (32px), more than its 24px hit area
+    await expect(height()).toBeGreaterThanOrEqual(32);
+    // On touch, its box is target-min tall, so its 44px hit area doesn't spill into the control above or below it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await expect(height()).toBeGreaterThanOrEqual(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
   },
 };
 
