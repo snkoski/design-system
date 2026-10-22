@@ -1,0 +1,26 @@
+/* Proximity: tracker.ts sets --proximity, from 0 (the mouse is out of reach) to 1 (it's over it), and
+   --proximity-color when it has colors. These rules turn them into see-through and color. Where it sits, and its
+   size, are the layout's job. Experiment. */
+@layer components {
+  .proximity {
+    display: inline-block;
+    /* Eases between the pointer's updates, so a quick move doesn't jump */
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  /* Fully there far away, down to the faintest up close */
+  .proximity[data-fade="out"] {
+    opacity: calc(1 - var(--proximity, 0) * (1 - var(--proximity-faintest, 0)));
+  }
+
+  /* The faintest far away, fully there up close */
+  .proximity[data-fade="in"] {
+    opacity: calc(var(--proximity-faintest, 0) + var(--proximity, 0) * (1 - var(--proximity-faintest, 0)));
+  }
+
+  .proximity[data-colored] {
+    color: var(--proximity-color);
+  }
+}
