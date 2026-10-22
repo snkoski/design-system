@@ -20,3 +20,22 @@ Two tiers. **Primitives** (`tangerine-500`, `espresso-950`, `mint-200`…) are t
 
 - Light or dark follows the visitor's system setting until they choose. Hot dog mode is only ever an explicit choice.
 - Hot dog mode is a joke that is built properly: it passes the same contrast checks, and it swaps soft shadows for hard offset shadows and `border-thick` outlines.
+
+## Dark mode
+
+- Dark mode is its own design, not an inverted light mode. Colors are re-chosen so every pair still meets contrast.
+- **Higher surfaces are lighter.** `surface` and `surface-tint` sit above `bg` by being lighter, because shadows barely show on dark backgrounds (the same approach as Apple, Atlassian, and Material).
+- Accent colors get lighter in dark mode (`tangerine-400` instead of `tangerine-500`, mint links instead of tangerine), with dark text on them through the `on-…` tokens.
+- Avoid pure black backgrounds; `espresso-900` keeps some warmth and reduces glare.
+
+## Contrast at a glance
+
+| What | Minimum | Sherbet's check |
+| --- | --- | --- |
+| Body and UI text | 4.5:1 | `ink` and `ink-muted` on `bg`, `surface`, and `surface-tint` |
+| Large text (24px+, or 19px+ bold) | 3:1 | Headings use `ink`, so they exceed this |
+| Control borders, focus outlines, and meaningful icons | 3:1 | `border-strong` and `focus` |
+| High-contrast theme (future) | 7:1 | Not built yet |
+
+Every system studied (Apple, Material, Primer, Atlassian, Carbon, Fluent, Polaris, GOV.UK, and USWDS) uses these same WCAG AA numbers.
+

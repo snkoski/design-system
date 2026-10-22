@@ -178,7 +178,7 @@ export const Throw: Story = {
 
 /**
  * Drag things around and drop them anywhere: no speed, no gravity, and no throwing. The story checks that the
- * small dot can be grabbed from a little outside its edge, and that dragging moves it.
+ * small dot can be grabbed at its edge with a mouse and from a little outside its edge on touch, and that dragging moves it.
  */
 export const DragAround: Story = {
   args: { speed: 0, grabbable: true, throwable: false },
@@ -192,22 +192,30 @@ export const DragAround: Story = {
       ))}
     </div>
   ),
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const dot = canvas.getByTestId("dot");
     const from = dot.getBoundingClientRect();
-    // The dot is smaller than target-min, but grabbing just outside it still catches it
-    await expect(document.elementFromPoint(from.right + 6, from.top + from.height / 2)?.closest(".bounce")).toBe(dot);
-    const x = from.left + from.width / 2;
-    const y = from.top + from.height / 2;
-    await userEvent.pointer([
-      { keys: "[MouseLeft>]", target: dot, coords: { clientX: x, clientY: y } },
-      { target: dot, coords: { clientX: x + 60, clientY: y + 30 } },
-      { target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
-      { keys: "[/MouseLeft]", target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
-    ]);
-    const to = dot.getBoundingClientRect();
-    await expect(Math.round(to.left - from.left)).toBe(120);
-    await expect(Math.round(to.top - from.top)).toBe(60);
+    // With a mouse, the 24px dot already meets target-min, so its own edge is the grab area
+    await expect(from.width).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(from.right - 1, from.top + from.height / 2)?.closest(".bounce")).toBe(dot);
+    // On touch, the dot is smaller than target-min, but grabbing just outside it still catches it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await expect(document.elementFromPoint(from.right + 6, from.top + from.height / 2)?.closest(".bounce")).toBe(dot);
+      const x = from.left + from.width / 2;
+      const y = from.top + from.height / 2;
+      await userEvent.pointer([
+        { keys: "[MouseLeft>]", target: dot, coords: { clientX: x, clientY: y } },
+        { target: dot, coords: { clientX: x + 60, clientY: y + 30 } },
+        { target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
+        { keys: "[/MouseLeft]", target: dot, coords: { clientX: x + 120, clientY: y + 60 } },
+      ]);
+      const to = dot.getBoundingClientRect();
+      await expect(Math.round(to.left - from.left)).toBe(120);
+      await expect(Math.round(to.top - from.top)).toBe(60);
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
   },
 };
 

@@ -8,7 +8,7 @@ export type ButtonSize = "sm" | "md" | "lg";
 export interface SharedProps {
   /** Visual weight. Use `primary` for the one main action in a view. Default: `primary`. */
   variant?: ButtonVariant;
-  /** Height and type size. Small buttons still get a 44px hit area. Default: `md`. */
+  /** Height and type size. Small buttons still get a target-min hit area (44px on touch). Default: `md`. */
   size?: ButtonSize;
   /** Icon shown before the label. Decorative: it is hidden from screen readers. */
   iconStart?: ReactNode;

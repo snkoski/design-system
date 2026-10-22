@@ -5,3 +5,6 @@ storybook-static/
 .DS_Store
 build-storybook.log
 coverage/
+
+# Claude Code worktrees, one folder per parallel session
+.claude/worktrees/

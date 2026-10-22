@@ -1,0 +1,6 @@
+/* "icon-lg": large buttons and segments get 24px icons instead of 20px. Medium sizes are unchanged. */
+.icon-lg .button[data-size="lg"] .button__icon,
+.icon-lg .segmented-control[data-size="lg"] .segment__icon {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}

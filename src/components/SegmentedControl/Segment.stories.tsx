@@ -14,11 +14,11 @@ const inControl: Decorator = (Story, { parameters }) =>
     </SegmentedControl>
   );
 
-/** The px value of a length token, measured in the browser */
-function measure(token: string) {
+/** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
+function measure(token: string, parent: HTMLElement = document.body) {
   const probe = document.createElement("div");
   probe.style.height = `var(${token})`;
-  document.body.append(probe);
+  parent.append(probe);
   const height = probe.getBoundingClientRect().height;
   probe.remove();
   return height;
@@ -78,7 +78,10 @@ export const WithIcons: Story = {
   ),
 };
 
-/** An icon-only option needs an `aria-label`. It's still 44px wide and tall, which the story checks. */
+/**
+ * An icon-only option needs an `aria-label`. It's still at least `target-min` wide and tall: 24px with a mouse,
+ * 44px on touch. The story checks both.
+ */
 export const IconOnly: Story = {
   parameters: { controlValue: "grid" },
   render: () => (
@@ -91,19 +94,30 @@ export const IconOnly: Story = {
       </Segment>
     </>
   ),
-  play: async ({ canvas }) => {
-    const target = measure("--target-min");
-    await expect(target).toBeGreaterThan(0);
-    const track = canvas.getByRole("radiogroup").querySelector(".segmented-control__track")!.getBoundingClientRect();
-    await expect(track.height).toBeGreaterThanOrEqual(target);
-    for (const name of ["List", "Grid"]) {
-      const option = canvas.getByRole("radio", { name });
-      const box = option.getBoundingClientRect();
-      await expect(box.width).toBeGreaterThanOrEqual(target);
-      // The hit area reaches over the track's edge, so the option is a target from the track's top to its bottom
-      const x = box.left + box.width / 2;
-      await expect(option.contains(document.elementFromPoint(x, track.top + 0.5))).toBe(true);
-      await expect(option.contains(document.elementFromPoint(x, track.bottom - 0.5))).toBe(true);
+  play: async ({ canvas, canvasElement }) => {
+    const check = async (floor: number) => {
+      const target = measure("--target-min", canvasElement);
+      await expect(target).toBeGreaterThanOrEqual(floor);
+      const track = canvas.getByRole("radiogroup").querySelector(".segmented-control__track")!.getBoundingClientRect();
+      await expect(track.height).toBeGreaterThanOrEqual(target);
+      for (const name of ["List", "Grid"]) {
+        const option = canvas.getByRole("radio", { name });
+        const box = option.getBoundingClientRect();
+        await expect(box.width).toBeGreaterThanOrEqual(target);
+        // The hit area reaches over the track's edge, so the option is a target from the track's top to its bottom
+        const x = box.left + box.width / 2;
+        await expect(option.contains(document.elementFromPoint(x, track.top + 0.5))).toBe(true);
+        await expect(option.contains(document.elementFromPoint(x, track.bottom - 0.5))).toBe(true);
+      }
+    };
+    // With a mouse, target-min is 24px
+    await check(24);
+    // On touch, target-min is 44px, and the track grows to meet it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await check(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
     }
   },
 };

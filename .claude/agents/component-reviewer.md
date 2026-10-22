@@ -16,7 +16,7 @@ You review one component in this design system. You did not write it, and you ha
 ## Read first
 
 1. `CLAUDE.md`, all of it. It is the rulebook.
-2. `docs/brand/accessibility.md`, `docs/brand/building.md`, and `docs/brand/motion.md`.
+2. `docs/brand/accessibility.md`, `docs/brand/building.md`, `docs/brand/motion.md`, `docs/brand/platforms.md`, `docs/brand/iconography.md`, and `docs/brand/voice.md`; for a form control, also `docs/brand/forms.md`. Any guidance page for the component (a `<Name>.mdx` in its folder renders one).
 3. Every file in `src/components/<Name>/`.
 4. The closest existing component as the reference for consistency: `src/components/Checkbox/` for form controls, `src/components/Button/` for actions. Compare prop names, defaults, JSDoc style, CSS structure, and test structure.
 5. `git status` and `git diff` to see what is new or changed, including `src/index.ts`, `src/styles/index.css`, `tokens/tokens.json`, and `tokens/contrast.json`.
@@ -35,7 +35,7 @@ Report any failure as a Must fix.
 To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, serve it read-only and inspect it with Playwright from the repo folder:
 
 ```sh
-python3 -m http.server 6107 -d storybook-static &   # stop it afterwards: pkill -f "http.server 6107"
+python3 -m http.server 6107 -d storybook-static &   # stop it afterwards: pkill -f "http.server 6107"; in a worktree, use another port
 node --input-type=module -e "import { chromium } from 'playwright'; /* open http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story */"
 ```
 
@@ -56,7 +56,8 @@ Check that it's current first: if any file in `src/components/<Name>/` is newer 
 - Focus is an outline with the focus tokens. Every control has a border (transparent if needed). A `@media (forced-colors: active)` block covers anything that would vanish, with checked and selected states still distinguishable.
 - No hover rule covers up a state (checked, selected, invalid): compare each state's edge and fill at rest and hovered, in normal mode and forced colors.
 - Anything dimmed with `opacity` still meets contrast for everything inside it, placeholders and icons included.
-- Every target is at least `--target-min` in both directions, with a pseudo-element hit area when the visible control is smaller.
+- Every target is at least `--target-min` in both directions, with a pseudo-element hit area when the visible control is smaller, with a mouse (24px), on touch (44px), and under `data-density="compact"`. A text field can't have a pseudo-element, so it must never be shorter than `--target-min` in any mode.
+- Sizes come only from the size tokens, never from the component's own pointer or density media queries.
 - Color never carries meaning alone. Every foreground and background pair the CSS uses is in `tokens/contrast.json`; list any that are missing.
 
 **CSS**
@@ -73,9 +74,13 @@ Check that it's current first: if any file in `src/components/<Name>/` is newer 
 **Stories** (`Name.stories.tsx`)
 - A `Playground` with controls, one story per variant group or state, and an `AllThemes` story with every state in all three themes.
 - `play` functions are short demos; exhaustive cases live in the test file.
+- Size and hit-area checks run with a mouse and again with `data-pointer="coarse"`, measure tokens rather than hard-coding px, and assert the `--target-min` floor. A check that only runs with a mouse, where `--target-min` is 24px, can pass with a broken touch hit area: flag it.
+- Story copy (labels, descriptions, and errors) follows `docs/brand/voice.md`: no periods in labels and buttons, and errors say what went wrong and how to fix it, without "invalid" or "oops".
 
 **Docs**
 - If the component introduces a new pattern or rule, it is in `CLAUDE.md` or the right `docs/brand/` page.
+- If it has variants people must choose between, or could be confused with another component, a guidance page explains when to use which (`docs/brand/<topic>.md`, rendered by `<Name>.mdx`), and `docs/brand/industry.md` covers how the major systems differ.
+- Nothing in `docs/brand/` contradicts what the component does. Where the docs and the component disagree and `docs/revisit.md` doesn't already list it, flag it.
 
 ## Report
 

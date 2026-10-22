@@ -15,11 +15,11 @@ const options = (
   </>
 );
 
-/** The px value of a length token, measured in the browser */
-function measure(token: string) {
+/** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
+function measure(token: string, parent: HTMLElement = document.body) {
   const probe = document.createElement("div");
   probe.style.height = `var(${token})`;
-  document.body.append(probe);
+  parent.append(probe);
   const height = probe.getBoundingClientRect().height;
   probe.remove();
   return height;
@@ -114,7 +114,8 @@ export const Choosing: Story = {
 
 /**
  * Medium is the default. Each size is as tall as an Input and a Button of the same size, so they line up in a row.
- * The story checks the heights, and that a click anywhere from the top to the bottom edge reaches an option.
+ * The story checks the heights with a mouse and on touch, and that a click anywhere from the top to the bottom
+ * edge reaches an option.
  */
 export const Sizes: Story = {
   render: (args) => (
@@ -130,17 +131,28 @@ export const Sizes: Story = {
       ))}
     </div>
   ),
-  play: async ({ canvas }) => {
-    const target = measure("--target-min");
-    await expect(target).toBeGreaterThan(0);
-    for (const size of ["md", "lg"]) {
-      const row = canvas.getByTestId(size);
-      const track = row.querySelector(".segmented-control__track")!;
-      const height = track.getBoundingClientRect().height;
-      await expect(height).toBeGreaterThanOrEqual(target);
-      await expect(Math.abs(row.querySelector(".input__control")!.getBoundingClientRect().height - height)).toBeLessThan(0.5);
-      await expect(Math.abs(row.querySelector("button.button")!.getBoundingClientRect().height - height)).toBeLessThan(0.5);
-      await expect(edgesReachOptions(track)).toBe(true);
+  play: async ({ canvas, canvasElement }) => {
+    const check = async (floor: number) => {
+      const target = measure("--target-min", canvasElement);
+      await expect(target).toBeGreaterThanOrEqual(floor);
+      for (const size of ["md", "lg"]) {
+        const row = canvas.getByTestId(size);
+        const track = row.querySelector(".segmented-control__track")!;
+        const height = track.getBoundingClientRect().height;
+        await expect(height).toBeGreaterThanOrEqual(target);
+        await expect(Math.abs(row.querySelector(".input__control")!.getBoundingClientRect().height - height)).toBeLessThan(0.5);
+        await expect(Math.abs(row.querySelector("button.button")!.getBoundingClientRect().height - height)).toBeLessThan(0.5);
+        await expect(edgesReachOptions(track)).toBe(true);
+      }
+    };
+    // With a mouse, target-min is 24px
+    await check(24);
+    // On touch, target-min is 44px, and the control, Input, and Button all grow together
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await check(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
     }
   },
 };
@@ -176,7 +188,8 @@ export const WithIcons: Story = {
 
 /**
  * Icon-only options need an `aria-label`. Use icons whose meaning is obvious, since sighted people see no words.
- * Each option is still at least 44px wide, which the story checks, along with its thicker lines when chosen.
+ * Each option is still at least `target-min` wide: 24px with a mouse, 44px on touch. The story checks both, and
+ * the thicker lines of the chosen option.
  */
 export const IconOnly: Story = {
   args: { label: undefined, "aria-label": "View", name: "view" },
@@ -190,11 +203,22 @@ export const IconOnly: Story = {
       </Segment>
     </SegmentedControl>
   ),
-  play: async ({ canvas, userEvent }) => {
-    const target = measure("--target-min");
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const stroke = (name: string) => getComputedStyle(canvas.getByRole("radio", { name }).querySelector("svg")!).strokeWidth;
-    for (const name of ["List", "Grid"]) {
-      await expect(canvas.getByRole("radio", { name }).getBoundingClientRect().width).toBeGreaterThanOrEqual(target);
+    const widths = async (floor: number) => {
+      const target = measure("--target-min", canvasElement);
+      await expect(target).toBeGreaterThanOrEqual(floor);
+      for (const name of ["List", "Grid"]) {
+        await expect(canvas.getByRole("radio", { name }).getBoundingClientRect().width).toBeGreaterThanOrEqual(target);
+      }
+    };
+    // With a mouse, target-min is 24px; on touch, it's 44px
+    await widths(24);
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await widths(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
     }
     await expect(parseFloat(stroke("List"))).toBeGreaterThan(parseFloat(stroke("Grid")));
     await userEvent.click(canvas.getByRole("radio", { name: "Grid" }));

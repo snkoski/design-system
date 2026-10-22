@@ -21,8 +21,22 @@ const preview: Preview = {
       storySort: {
         order: [
           "Foundations",
-          ["Introduction", "Voice and copy", "Color", "Typography", "Spacing, layout, and shape", "Motion", "Iconography", "Accessibility", "Building"],
+          [
+            "Introduction",
+            "Voice and copy",
+            "Color",
+            "Typography",
+            "Spacing, layout, and shape",
+            "Mouse, touch, and screen size",
+            "Motion",
+            "Iconography",
+            "Forms",
+            "Accessibility",
+            "Building",
+            "Industry standards",
+          ],
           "Components",
+          "Revisit",
           "Experiments",
           ["About"],
         ],
