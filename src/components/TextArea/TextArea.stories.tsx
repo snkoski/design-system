@@ -13,11 +13,11 @@ const realisticWidth: Decorator = (Story, { parameters }) =>
 const longText =
   "Thanks for the quick reply. I'd love to talk about the new site: we need a portfolio, a contact form, and somewhere to post the occasional article. Hot dog mode is non-negotiable. Could we meet next week? Tuesday or Thursday afternoon works best for me, and I can bring the old brand files.";
 
-/** The px value of a length token, measured in the browser */
-function measure(token: string) {
+/** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
+function measure(token: string, parent: HTMLElement = document.body) {
   const probe = document.createElement("div");
   probe.style.height = `var(${token})`;
-  document.body.append(probe);
+  parent.append(probe);
   const height = probe.getBoundingClientRect().height;
   probe.remove();
   return height;
@@ -82,8 +82,8 @@ export const Sizes: Story = {
 };
 
 /**
- * `rows` sets how tall it starts. One row is as tall as an Input: the story checks it still meets the 44px
- * target size at both sizes.
+ * `rows` sets how tall it starts. One row is as tall as an Input, and the story checks it still meets `target-min`
+ * at both sizes: 24px with a mouse, 44px on touch.
  */
 export const Rows: Story = {
   render: (args) => (
@@ -94,11 +94,22 @@ export const Rows: Story = {
       <TextArea {...args} rows={8} label="Eight rows" />
     </div>
   ),
-  play: async ({ canvas }) => {
-    const target = measure("--target-min");
-    await expect(target).toBeGreaterThan(0);
-    for (const name of ["One row", "One row, large"]) {
-      await expect(canvas.getByRole("textbox", { name }).getBoundingClientRect().height).toBeGreaterThanOrEqual(target);
+  play: async ({ canvas, canvasElement }) => {
+    const check = async (floor: number) => {
+      const target = measure("--target-min", canvasElement);
+      await expect(target).toBeGreaterThanOrEqual(floor);
+      for (const name of ["One row", "One row, large"]) {
+        await expect(canvas.getByRole("textbox", { name }).getBoundingClientRect().height).toBeGreaterThanOrEqual(target);
+      }
+    };
+    // With a mouse, target-min is 24px
+    await check(24);
+    // On touch, target-min is 44px, and a one-row text area grows to meet it
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await check(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
     }
   },
 };
