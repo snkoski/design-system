@@ -5,7 +5,7 @@ Forms are where accessibility and clear writing matter most. These rules follow 
 ## Labels and hints
 
 - Every field has a visible label **above** it, left-aligned, in sentence case, with no colon. Keep labels short (1–3 words where possible).
-- Hint text sits between the label and the field, in `small` and `ink-muted`: one short sentence, no period, no links. Link it to the field with `aria-describedby`.
+- Hint text sits between the label and the field, in `small` and `ink-muted`: one short sentence, no links. Link it to the field with `aria-describedby`.
 - **Never use placeholder text as a label or for essential information.** It disappears on typing and often fails contrast.
 - Group related fields (an address, a set of radios) in a `<fieldset>` with a `<legend>`.
 - One column. Field order matches visual order.
@@ -30,7 +30,7 @@ The big systems disagree here: GOV.UK marks optional fields and bans asterisks, 
 
 ## Errors
 
-- **Inline error:** below the label and hint, directly above the field, in `danger` with an icon and the word "Error:" for screen readers (hidden visually). The field gets a `danger` border and `aria-invalid="true"`, and the message is linked with `aria-describedby`.
+- **Inline error:** below the label and hint, directly above the field, in `danger` with an icon and the word "Error:" for screen readers (hidden visually). The field gets a `danger` border and `aria-invalid="true"`, and the message is linked with `aria-describedby`. Today's components still put the error after the field, with no "Error:"; which placement wins is open (see `docs/revisit.md`).
 - **Error summary:** when a submit fails with **two or more errors**, show a summary at the top of the form, before the first heading inside it, titled "There is a problem." Each item links to its field. Move focus to the summary. For a single error, move focus to that field.
 - Add "Error: " to the start of the page `<title>` while errors are showing.
 - Write messages using the rules in **Voice and copy**: what went wrong and how to fix it, specific, no blame. The inline message and the summary use the same words.
@@ -45,6 +45,6 @@ The big systems disagree here: GOV.UK marks optional fields and bans asterisks, 
 
 ## Phones
 
-- Inputs and buttons are full width below `breakpoint-sm`.
+- Make inputs and buttons full width below `breakpoint-sm`. That's the page layout's job, not the component's: components never set their own width, so use Tailwind in the markup (`w-full`, then a width that fits the expected input from `sm:`).
 - Inputs are at least 16px text (`body`), which also stops iPhones from zooming in on focus.
 - Put the primary action at the bottom of long forms, where thumbs can reach.

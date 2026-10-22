@@ -76,6 +76,7 @@ src/foundations/             Storybook docs pages (MDX) that render docs/brand, 
 - Every token has a `usage` note saying where it's used. Text colors name the backgrounds they're checked on.
 - No raw values in component CSS. If a value is missing, add a token first.
 - Motion tokens (`--duration-*`, `--ease-*`, `--motion-distance`) and the fluid heading sizes are written by `build-tokens.mjs`, because `tokens.json` has no motion family.
+- A size token can also have a `touch` value, used whenever a touch screen is present or under `data-pointer="coarse"`, and a `compact` value, used under `data-density="compact"` but never below `--target-min`. `build-tokens.mjs` writes the rules for both from `tokens.json`; don't hard-code them in the script.
 
 ## CSS architecture
 
@@ -137,9 +138,9 @@ One convention per job. Never mix them.
 
 ## Sizing: mouse, touch, and density
 
-- `tokens.json` holds mouse and trackpad sizes. `build-tokens.mjs` raises `--target-min`, `--choice-row`, `--control-md`, and `--control-lg` under `@media (any-pointer: coarse)` (any touch input, so touchscreen laptops count). Don't switch on the *primary* pointer.
-- `data-pointer="coarse"` or `"fine"` on an element forces one mode for that subtree. `data-density="compact"` shrinks `--control-md` and `--control-lg` one step for desktop tables and toolbars; comfortable is the default.
-- Components size themselves only with these tokens, never with their own pointer or density media queries, so every mode works automatically. Check new components with Storybook's Foundations → Mouse, touch, and screen size switches, or by wrapping a story in `data-pointer="coarse"`.
+- A size token's `value` is for a mouse or trackpad. `--target-min`, `--choice-row`, `--control-md`, and `--control-lg` also have a `touch` value, which `build-tokens.mjs` applies under `@media (any-pointer: coarse)` (any touch input, so touchscreen laptops count). Don't switch on the *primary* pointer.
+- `data-pointer="coarse"` or `"fine"` on an element forces one mode for that subtree. `data-density="compact"` shrinks `--control-md` and `--control-lg` one step (their `compact` values) for desktop tables and toolbars, but never below `--target-min`, so on touch they stay 44px and text fields stay full targets; comfortable is the default.
+- Components size themselves only with these tokens, never with their own pointer or density media queries, so every mode works automatically. Check new components with Storybook's Foundations → Mouse, touch, and screen size switches, or by wrapping a story in `data-pointer="coarse"`. Story checks of sizes and hit areas run in both modes (see Testing).
 - Text never changes size with pointer or density. Body text is the same size on every screen; only headings and page-level spacing scale with width.
 - Breakpoints are the `breakpoint` tokens (40em, 48em, 64em, 80em, and 96em), used as Tailwind's `sm:` to `2xl:`. Design for 320px wide first.
 - `docs/brand/platforms.md` explains the reasoning and what each major platform does.
@@ -168,11 +169,11 @@ Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
    A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx`, test file, and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
 3. Write JSDoc on the component and every prop. It becomes the Storybook docs.
 4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
-5. Stories: a `Playground` with controls, a `States` story with every state side by side, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it).
+5. Stories: a `Playground` with controls, a `States` story with every state side by side, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it). Checks of sizes and hit areas run with a mouse and on touch (see Testing). Labels, descriptions, and errors in stories follow `docs/brand/voice.md`, like real copy.
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
 7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
-8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye.
-9. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`.
+8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye. Also look at it with `data-pointer="coarse"` and inside `data-density="compact"`.
+9. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, write a guidance page, `docs/brand/<topic>.md`, rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, add a section or row to `docs/brand/industry.md` with what Sherbet chose.
 
 ### Looking at a component
 
@@ -214,7 +215,7 @@ await browser.close();
 "
 ```
 
-Run scripts from the repo folder with `node --input-type=module` (piping a file in with `<` works too). A script file saved elsewhere can't find `playwright`.
+Run scripts from the repo folder with `node --input-type=module` (piping a file in with `<` works too). A script file saved elsewhere can't find `playwright`. Port 6107 is for this folder: in a worktree, use another port for the server and the URLs, so two sessions' screenshots don't collide.
 
 Story ids are the title and story name in kebab case (`Components/Button link` and `AllThemes` become `components-button-link--all-themes`). Put the screenshots in a scratch folder, not the repo, and open them with the Read tool.
 
@@ -235,6 +236,7 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - For each component, cover: default rendering and defaults; every variant and size; each state (disabled, loading, invalid, checked, open, and so on) including that it blocks what it should; keyboard operation and focus order; accessible name and role; hidden decorative content; controlled and uncontrolled use; callbacks; ref forwarding; extra props passing through; and consumer `className` merging.
 - Test types with `expectTypeOf` in the test file, for example that an icon-only button requires `aria-label`. These run in `pnpm typecheck`, not in Vitest.
 - jsdom has no layout and no real CSS. Don't try to test focus rings, contrast, target size, forced colors, or anything that depends on CSS (such as `pointer-events`) there: those belong to the story tests, Chromatic, and manual checks. A story's `play` function can check CSS-dependent behavior in Chromium, for example with a real hit-test: `document.elementFromPoint(x, y)` at an icon's center must return the input (see Input's `WithIcons` story). If a Base UI popup needs a browser API that jsdom lacks (`ResizeObserver`, `matchMedia`, and similar), stub it in `tests/setup.ts`.
+- Sizes depend on the pointer, and story tests run with a mouse. There `--target-min` is 24px, smaller than most controls, so a size or hit-area check that only runs with a mouse passes even when the touch hit area is broken. Check both: mouse first, then set `canvasElement.dataset.pointer = "coarse"`, check again inside `try`, and delete it in `finally` (see Radio's `WithoutVisibleLabel`). Measure tokens with a probe element inside `canvasElement`, so `data-pointer` reaches it, rather than hard-coding px, and also assert the floor (`--target-min` at least 24px with a mouse and 44px on touch), so a token mistake can't make the check pass by default.
 - Define a story decorator that uses its context argument (`(Story, { parameters }) => …`) as a typed `const` outside `meta`, with the `Decorator` type. Written inline inside `meta`, it breaks Storybook's inference and every story's args become `never`.
 - Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
 - When fixing a bug, add the test that would have caught it first.
@@ -283,6 +285,7 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 - Chromatic posts the Storybook preview and the visual diff, so don't add screenshots. Add a recording only for motion or multi-step interactions.
 - Chromatic's check passes even when snapshots changed. New and changed stories wait as "must be accepted as baselines" in Chromatic's web app until someone accepts them, so check the build there after a push.
 - Keep a pull request to one thing, and call out breaking changes (renamed or removed props, tokens, or exports).
+- One session per folder. Run parallel Claude sessions in their own worktrees (`claude -w <name>`, which creates `.claude/worktrees/<name>/`; git ignores the folder). Switch branches only in a folder no other session is using. Each worktree needs its own `pnpm install`.
 
 ## Experiments
 
@@ -310,6 +313,7 @@ Applies to docs, JSDoc, story descriptions, README text, and any copy in compone
 - Always use the Oxford comma.
 - Sentence case for headings, buttons, and labels.
 - Short, plain sentences. Buttons say exactly what happens ("Send message").
+- No periods in buttons, labels, and headings. Descriptions, hints, errors, and other text that reads as a sentence end with one.
 - No emoji in UI or docs.
 
 ## Don't

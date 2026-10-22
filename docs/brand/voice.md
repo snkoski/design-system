@@ -15,7 +15,7 @@ Sherbet sounds like a person who is good at their job and fun to work with: plai
 
 - **Sentence case everywhere**: headings, buttons, labels, menu items, and tabs. Only the first word and proper nouns are capitalized. Uppercase only in `label` eyebrows. (Sentence case is the standard in Primer, Atlassian, Carbon, Polaris, and GOV.UK.)
 - **Always use the Oxford comma**: "tangerine, peach, and mint." (Atlassian and Polaris do too.)
-- **No periods** in buttons, labels, headings, or single-sentence UI text. Use them when there are two or more sentences.
+- **No periods** in buttons, labels, and headings. Descriptions, hints, errors, and other text that reads as a sentence end with one, even when there's only one sentence, so they stay consistent when a second sentence is added.
 - **At most one exclamation mark per page**, and only for genuinely good news. Never in errors.
 - **Numbers as numerals**: "3 projects," not "three projects." Use commas from 4 digits ("1,200"), an en dash for ranges ("5–10"), and avoid abbreviations like "12k" unless space forces it.
 - **Dates and times**: "Oct 21, 2026" and "3:45 pm." Spell out the month when there is room ("October 21, 2026"). Use relative dates ("2 days ago") only for recent activity, with the full date available on hover and focus.

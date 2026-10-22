@@ -34,7 +34,7 @@ See **Mouse, touch, and screen size** for the full reasoning. In short:
 ## Density
 
 - **Comfortable is the default.** Material, Primer, and Atlassian all keep dense layouts opt-in.
-- `data-density="compact"` on a container shrinks `control-md` to 32px and `control-lg` to 40px. Use it for data tables, toolbars, and admin screens on desktop. Hit areas still meet `target-min`.
+- `data-density="compact"` on a container shrinks `control-md` to 32px and `control-lg` to 40px. Use it for data tables, toolbars, and admin screens on desktop. Controls never get shorter than `target-min`, so on a device with a touch screen both stay 44px, and text fields (which can't have an invisible hit area) remain full targets.
 - Don't use compact density on touch-first screens, in menus or dialogs, or for forms that people fill in once. Don't mix densities within one view.
 - Density changes spacing and control height, never text size.
 
