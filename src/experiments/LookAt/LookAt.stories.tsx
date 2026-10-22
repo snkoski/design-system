@@ -147,6 +147,29 @@ export const BarGrid: Story = {
   ),
 };
 
+/**
+ * A hot dog emoji, turned to stand on end like the bar. The emoji lies on a diagonal, top left to bottom right,
+ * so turning it 45 degrees stands it upright for LookAt to aim. (That's Apple's emoji; others may lie differently.)
+ */
+function HotDog() {
+  return <span style={{ display: "block", fontSize: "2rem", lineHeight: 1, rotate: "45deg" }}>🌭</span>;
+}
+
+/** The bar grid, with hot dogs. Each stands on end toward the mouse. */
+export const HotDogGrid: Story = {
+  render: (args) => (
+    <Grid
+      columns={14}
+      rows={9}
+      item={(index) => (
+        <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
+          <HotDog />
+        </LookAt>
+      )}
+    />
+  ),
+};
+
 /** A checkerboard of toward and away. */
 export const Mixed: Story = {
   render: (args) => (
