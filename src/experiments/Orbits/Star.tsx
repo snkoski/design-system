@@ -4,7 +4,7 @@ import type { PlanetProps } from "./Planet";
 /** A star never moves by itself, so the props for moving don't apply */
 export type StarProps = Omit<
   PlanetProps,
-  "orbit" | "speed" | "angle" | "gravity" | "bounciness" | "friction" | "paused" | "throwable" | "squash" | "onBounce"
+  "orbit" | "trail" | "trailColor" | "speed" | "angle" | "gravity" | "bounciness" | "friction" | "paused" | "throwable" | "squash" | "onBounce"
 > & {
   /** How heavy it is: how hard it pulls the planets around it. Default: 100. */
   mass?: number;

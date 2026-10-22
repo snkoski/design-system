@@ -273,12 +273,85 @@ describe("Planet and Star", () => {
     });
   });
 
+  describe("trails", () => {
+    const bands = (container: HTMLElement) =>
+      [...container.querySelectorAll("polyline")].map((line) =>
+        (line.getAttribute("points") ?? "")
+          .split(" ")
+          .filter(Boolean)
+          .map((point) => point.split(",").map(Number) as [number, number]),
+      );
+
+    it("draws no trail by default", () => {
+      const { container } = render(system({ orbit: "counterclockwise" }));
+      expect(parts(container)[1]).toHaveClass("bounce"); // the planet is there
+      expect(container.querySelector(".orbit-trail")).not.toBeInTheDocument();
+    });
+
+    it("draws the trail in lines that fade from oldest to newest, hidden from screen readers, in its color", () => {
+      const { container } = render(system({ trail: 2, trailColor: "var(--action)" }));
+      const trail = container.querySelector<SVGElement>(".orbit-trail");
+      expect(trail).toHaveAttribute("aria-hidden", "true");
+      expect(trail!.style.getPropertyValue("--orbit-trail-color")).toBe("var(--action)");
+      const opacities = [...trail!.querySelectorAll("polyline")].map((line) => Number(line.getAttribute("stroke-opacity")));
+      expect(opacities).toHaveLength(20);
+      expect(opacities.at(-1)).toBe(1);
+      expect(opacities).toEqual([...opacities].sort((a, b) => a - b));
+    });
+
+    it("follows where it's been, up to where it is now", () => {
+      const { container } = render(system({ orbit: "counterclockwise", trail: 10 }));
+      act(() => vi.advanceTimersByTime(1000));
+      const points = bands(container).flat();
+      expect(points.length).toBeGreaterThan(20);
+      // Every point is on the orbit, 140px out from the star
+      points.forEach(([x, y]) => expect(Math.abs(Math.hypot(x - 300, y - 300) - 140)).toBeLessThan(5));
+      // From where it started, to where it is now
+      expect(points[0]![0]).toBeCloseTo(440, 0);
+      const now = centerOf(parts(container)[1]);
+      expect(points.at(-1)![0]).toBeCloseTo(now.x, 0);
+      expect(points.at(-1)![1]).toBeCloseTo(now.y, 0);
+    });
+
+    it("forgets where it was longer ago than the trail lasts", () => {
+      const { container, rerender } = render(system({ orbit: "counterclockwise", trail: 0.5 }));
+      act(() => vi.advanceTimersByTime(1000));
+      expect(new Set(bands(container).flat().map(String)).size).toBeGreaterThan(5);
+      rerender(system({ orbit: "counterclockwise", trail: 0.5, paused: true }));
+      act(() => vi.advanceTimersByTime(1000));
+      // Held still for longer than the trail lasts: nothing left but where it is
+      const drawn = bands(container);
+      expect(drawn.slice(0, -1).flat()).toEqual([]);
+      expect(new Set(drawn.at(-1)!.map(String)).size).toBe(1);
+    });
+
+    it("starts a fresh trail when it's placed somewhere new, rather than drawing a line from where it was", () => {
+      const { container, rerender } = render(system({ orbit: "counterclockwise", trail: 10 }));
+      act(() => vi.advanceTimersByTime(500));
+      rerender(system({ orbit: "counterclockwise", trail: 10, startX: 0.1 }));
+      act(() => vi.advanceTimersByTime(100));
+      bands(container)
+        .flat()
+        .forEach(([x]) => expect(x).toBeLessThan(150)); // near its new start, at 76
+    });
+
+    it("removes the trail when it's turned off", () => {
+      const { container, rerender } = render(system({ trail: 2 }));
+      expect(container.querySelector(".orbit-trail")).toBeInTheDocument();
+      rerender(system({ trail: 0 }));
+      expect(container.querySelector(".orbit-trail")).not.toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(100)); // and nothing breaks drawing it
+    });
+  });
+
   it("types: a planet takes every Bounce prop, a mass, and an orbit; a star takes no props for moving", () => {
     expectTypeOf<PlanetProps["mass"]>().toEqualTypeOf<number | undefined>();
     expectTypeOf<PlanetProps["orbit"]>().toEqualTypeOf<"clockwise" | "counterclockwise" | undefined>();
     expectTypeOf<PlanetProps["gravity"]>().toEqualTypeOf<number | undefined>();
     expectTypeOf<StarProps>().not.toHaveProperty("speed");
     expectTypeOf<StarProps>().not.toHaveProperty("orbit");
+    expectTypeOf<PlanetProps["trail"]>().toEqualTypeOf<number | undefined>();
+    expectTypeOf<StarProps>().not.toHaveProperty("trail");
     expectTypeOf<StarProps>().not.toHaveProperty("paused");
     expectTypeOf<StarProps["mass"]>().toEqualTypeOf<number | undefined>();
   });

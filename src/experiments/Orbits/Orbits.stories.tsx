@@ -62,12 +62,14 @@ const meta = {
   subcomponents: { Star },
   // They're somewhere different every time, so a snapshot would never match
   parameters: { layout: "fullscreen", chromatic: { disableSnapshot: true } },
-  args: { count: 8, starMass: 100, mass: 1, orbit: "counterclockwise", bounciness: 1, friction: 0, grabbable: true, throwable: true, squash: false, paused: false },
+  args: { count: 8, starMass: 100, mass: 1, orbit: "counterclockwise", trail: 3, bounciness: 1, friction: 0, grabbable: true, throwable: true, squash: false, paused: false },
   argTypes: {
     count: { control: { type: "range", min: 1, max: 40, step: 1 } },
     starMass: { control: { type: "range", min: 10, max: 400, step: 10 } },
     mass: { control: { type: "range", min: 0, max: 5, step: 0.1 } },
     orbit: { control: "inline-radio", options: ["clockwise", "counterclockwise"] },
+    trail: { control: { type: "range", min: 0, max: 20, step: 0.5 } },
+    trailColor: { control: false }, // each planet's trail matches its color
     children: { control: false },
     ref: { control: false },
     onBounce: { control: false },
@@ -98,7 +100,7 @@ export const Playground: Story = {
         const radius = 0.15 + (0.3 * (index + 1)) / count;
         const turn = (index * 137.5 * Math.PI) / 180;
         return (
-          <Planet key={index} {...args} mass={heft * mass} startX={0.5 + radius * Math.cos(turn)} startY={0.5 + radius * Math.sin(turn)}>
+          <Planet key={index} {...args} mass={heft * mass} startX={0.5 + radius * Math.cos(turn)} startY={0.5 + radius * Math.sin(turn)} trailColor={colors[index % colors.length]}>
             <Ball mass={heft} color={colors[index % colors.length]!} />
           </Planet>
         );
@@ -125,19 +127,19 @@ export const Moons: Story = {
           <Star mass={starMass} {...from(MOONS_BOX, STAR, 0, 0)}>
             <Sunny />
           </Star>
-          <Planet {...args} mass={heavy} {...from(MOONS_BOX, width(heavy), 15, 0)} data-testid="heavy">
+          <Planet {...args} mass={heavy} {...from(MOONS_BOX, width(heavy), 15, 0)} data-testid="heavy" trailColor="var(--action)">
             <Ball mass={heavy} color="var(--action)" />
           </Planet>
-          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), 18, 0)} data-testid="moon">
+          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), 18, 0)} data-testid="moon" trailColor="var(--ink-muted)">
             <Ball mass={moon} color="var(--ink-muted)" />
           </Planet>
-          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), 12, 0)}>
+          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), 12, 0)} trailColor="var(--ink-muted)">
             <Ball mass={moon} color="var(--ink-muted)" />
           </Planet>
-          <Planet {...args} mass={light} {...from(MOONS_BOX, width(light), -15, 0)}>
+          <Planet {...args} mass={light} {...from(MOONS_BOX, width(light), -15, 0)} trailColor="var(--success)">
             <Ball mass={light} color="var(--success)" />
           </Planet>
-          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), -18, 0)}>
+          <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), -18, 0)} trailColor="var(--ink-muted)">
             <Ball mass={moon} color="var(--ink-muted)" />
           </Planet>
         </div>
@@ -172,7 +174,7 @@ export const BinaryStars: Story = {
         const turn = (index * 137.5 * Math.PI) / 180;
         const radius = 0.08 + (0.1 * (index % 3)) / 2;
         return (
-          <Planet key={index} {...args} mass={heft * mass} startX={(index % 2 === 0 ? 0.3 : 0.7) + radius * Math.cos(turn)} startY={0.5 + radius * 2 * Math.sin(turn)}>
+          <Planet key={index} {...args} mass={heft * mass} startX={(index % 2 === 0 ? 0.3 : 0.7) + radius * Math.cos(turn)} startY={0.5 + radius * 2 * Math.sin(turn)} trailColor={colors[index % colors.length]}>
             <Ball mass={heft} color={colors[index % colors.length]!} />
           </Planet>
         );
@@ -197,13 +199,60 @@ export const ThrowIntoOrbit: Story = {
       {Array.from({ length: count }, (_, index) => {
         const heft = MASSES[index % MASSES.length]!;
         return (
-          <Planet key={index} {...args} mass={heft * mass} startX={(index + 0.5) / count} startY={0.1}>
+          <Planet key={index} {...args} mass={heft * mass} startX={(index + 0.5) / count} startY={0.1} trailColor={colors[index % colors.length]}>
             <Ball mass={heft} color={colors[index % colors.length]!} />
           </Planet>
         );
       })}
     </div>
   ),
+};
+
+/** How far out each planet in FullOrbits starts, in rem, and its mass: light, so they hardly disturb each other */
+const RINGS = [
+  { radius: 5, mass: 0.3 },
+  { radius: 8, mass: 0.8 },
+  { radius: 11, mass: 0.5 },
+  { radius: 14, mass: 1 },
+  { radius: 17, mass: 0.4 },
+];
+
+/**
+ * Long trails, so each planet draws its whole orbit before the oldest part fades. The planets are light and
+ * spread out, so they keep to clean circles. The ones close in go round fastest; the outermost takes about 13
+ * seconds to close its loop. Set the trail control to a couple of seconds to see only where each one is heading.
+ * The story checks the trails are drawn.
+ */
+export const FullOrbits: Story = {
+  args: { trail: 15 },
+  argTypes: { count: { table: { disable: true } }, mass: { table: { disable: true } } }, // a fixed set of light planets
+  render: ({ count: _count, starMass, mass: _mass, speed: _speed, angle: _angle, startX: _startX, startY: _startY, ...args }) => (
+    <div className="grid place-items-center p-4" style={{ ...page, minHeight: "100vh" }}>
+      <div className="relative" style={{ ...box, width: `${MOONS_BOX}rem`, height: `${MOONS_BOX}rem` }}>
+        <Star mass={starMass} {...from(MOONS_BOX, STAR, 0, 0)}>
+          <Sunny />
+        </Star>
+        {RINGS.map(({ radius, mass }, index) => {
+          const turn = (index * 137.5 * Math.PI) / 180;
+          const color = colors[index % colors.length]!;
+          return (
+            <Planet key={index} {...args} mass={mass} {...from(MOONS_BOX, width(mass), radius * Math.cos(turn), radius * Math.sin(turn))} trailColor={color}>
+              <Ball mass={mass} color={color} />
+            </Planet>
+          );
+        })}
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await wait(500);
+    const trails = [...canvasElement.querySelectorAll(".orbit-trail")];
+    await expect(trails).toHaveLength(RINGS.length);
+    for (const trail of trails) {
+      // Half a second in, the newest band holds the whole trail so far
+      await expect(trail.querySelector("polyline:last-child")!.getAttribute("points")!.split(" ").length).toBeGreaterThan(5);
+    }
+  },
 };
 
 const ORBIT_BOX = 30; // rem
@@ -221,7 +270,7 @@ export const Orbiting: Story = {
         <Star mass={starMass} {...from(ORBIT_BOX, STAR, 0, 0)} data-testid="star">
           <Sunny />
         </Star>
-        <Planet {...args} {...from(ORBIT_BOX, width(1), 10, 0)} data-testid="planet">
+        <Planet {...args} {...from(ORBIT_BOX, width(1), 10, 0)} data-testid="planet" trailColor="var(--action)">
           <Ball mass={1} color="var(--action)" />
         </Planet>
       </div>
