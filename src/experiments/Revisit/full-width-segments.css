@@ -1,0 +1,32 @@
+/* Two containers to set the controls in: a 320px phone screen with its 16px page gutter, and a 24rem side panel.
+   Each is outlined so its width shows. */
+.segments-frame {
+  display: grid;
+  gap: var(--space-6);
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: var(--space-4);
+  color: var(--ink);
+}
+.segments-frame[data-frame="phone"] {
+  width: 20rem;
+  outline: var(--border-thin) dashed var(--border-strong);
+  background: var(--bg);
+}
+.segments-frame[data-frame="panel"] {
+  width: 24rem;
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.segments-frame__name {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+/* "Fills its container": the group stretches the track instead of letting it hug its options. The options already
+   share the width equally (grid-auto-columns: 1fr), and the track's max-width: 100% still stops it at the edge. */
+.segments-fill .segmented-control__group {
+  justify-items: stretch;
+}

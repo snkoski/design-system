@@ -1,0 +1,49 @@
+/* Layout for the Revisit comparison stories. Each story's own CSS file draws its options. */
+.compare-theme {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-8);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.compare-theme__name {
+  margin: 0;
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.compare-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.compare-option {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.compare-option__title {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.compare-option__note {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+.compare-option__body {
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+  justify-items: start;
+}
