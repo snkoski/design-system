@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>;
 /** Change any prop in the Controls panel. */
 export const Playground: Story = {};
 
-/** Primary for the one main action in a view, secondary for everything else, ghost for low-emphasis actions in toolbars and menus. */
+/** Primary for the one main action in a view, secondary for everything else, ghost for low-emphasis actions in toolbars and menus. See **Choosing a button** for the full guidance. */
 export const Variants: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-4">

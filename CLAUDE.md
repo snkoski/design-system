@@ -120,7 +120,8 @@ One convention per job. Never mix them.
 - Every control has a border, `transparent` if the design doesn't want one visible, so it shows in Windows forced-colors mode. Connected options (a segmented control's) share one: the track's edge and the lines between options. Selected and checked states never rely on background color alone. Icons use `currentColor`. Add a `@media (forced-colors: active)` block when something would disappear. Text on a `Highlight` fill (a chosen segment) needs `forced-color-adjust: none` there, or the browser's Canvas backplate behind the text hides it. Hover rules are usually more specific than the forced-colors overrides and win, so repeat the hover selectors for checked or selected states inside that block (a hovered "on" switch otherwise loses its fill and hides the thumb).
 - Use real elements: `<button>` for actions, `<a href>` for navigation, `<label>` for inputs. A link that looks like a button is still an `<a>` (see `ButtonLink`). Don't pass `<a>` to a Base UI component's `render` prop.
 - Interactive components (dialog, menu, tabs, select, tooltip, popover, and so on) are built on Base UI. Never hand-roll their keyboard handling, focus management, or ARIA.
-- Every interactive target is at least `--target-min` (44px) in both directions, using a pseudo-element hit area when the visible control is smaller. The one exception is the resize handle the browser draws on a text area (see `docs/brand/accessibility.md`).
+- Every interactive target's hit area is at least `--target-min` in both directions: 24px with a mouse (WCAG 2.2 AA) and 44px when a touch screen is present. When the visible control is smaller, extend it with an invisible pseudo-element (see `.button::after`). The one exception is the resize handle the browser draws on a text area (see `docs/brand/accessibility.md`). Separate small targets are at least `--target-gap` (8px) apart.
+- Focus must never be hidden behind sticky headers or footers (use `scroll-padding`). Anything done by dragging also works with a tap or click.
 - Icon-only controls require an accessible name; enforce it in the props type.
 - Storybook runs axe on every story with `a11y.test: "error"`. A violation is a bug, not something to suppress.
 
@@ -133,6 +134,25 @@ One convention per job. Never mix them.
 - `data-motion="full"` or `data-motion="reduced"` on any element overrides the system setting for that subtree (generated in `tokens.css`).
 - `--ease-bounce` only for chips, toggles, and success states.
 - Base UI marks entering and leaving elements with `data-starting-style` and `data-ending-style`. Use them for enter and exit transitions in plain CSS.
+
+## Sizing: mouse, touch, and density
+
+- `tokens.json` holds mouse and trackpad sizes. `build-tokens.mjs` raises `--target-min`, `--choice-row`, `--control-md`, and `--control-lg` under `@media (any-pointer: coarse)` (any touch input, so touchscreen laptops count). Don't switch on the *primary* pointer.
+- `data-pointer="coarse"` or `"fine"` on an element forces one mode for that subtree. `data-density="compact"` shrinks `--control-md` and `--control-lg` one step for desktop tables and toolbars; comfortable is the default.
+- Components size themselves only with these tokens, never with their own pointer or density media queries, so every mode works automatically. Check new components with Storybook's Foundations → Mouse, touch, and screen size switches, or by wrapping a story in `data-pointer="coarse"`.
+- Text never changes size with pointer or density. Body text is the same size on every screen; only headings and page-level spacing scale with width.
+- Breakpoints are the `breakpoint` tokens (40em, 48em, 64em, 80em, and 96em), used as Tailwind's `sm:` to `2xl:`. Design for 320px wide first.
+- `docs/brand/platforms.md` explains the reasoning and what each major platform does.
+
+## Forms and copy
+
+Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
+
+- Visible label above every field, no colon, never a placeholder as the label. Help text between label and field.
+- Mark optional fields with "(optional)"; no asterisks. A checkbox group that needs at least one choice says "(required)" in its label.
+- Validate on submit, then on leaving a field. Never disable the submit button to signal an incomplete form.
+- Errors in words next to the field, with `aria-invalid` and `aria-describedby`. An error summary at the top for two or more errors, focused on submit.
+- Buttons start with a verb, have no punctuation, and say exactly what happens. Error messages say what went wrong and how to fix it, with no blame, jokes, "invalid," or "oops."
 
 ## Themes
 
@@ -235,9 +255,9 @@ Checkbox is the pattern for choice controls (checkboxes, switches, radios), and 
 - The description goes under a choice control's label, but between a text field's label and the field, so it's read before typing and phone keyboards and autofill menus can't cover it. The error goes after the field.
 - Base UI has no textarea, so TextArea renders `Field.Control` as one (`render={<textarea rows={rows} />}`). `Field.Control`'s props are typed for an `<input>`, so a component like this builds its props type from its own element's attributes (`TextareaHTMLAttributes`), so input-only attributes such as `type` don't compile, and still spreads every prop onto `Field.Control` (with a cast), which passes them on to the element. Only attributes `Field.Control` can't take, such as `rows`, go on the `render` element. Props on the `render` element override Base UI's own, so a consumer's `aria-describedby` there would cut the field's description and error out of it.
 - SegmentedControl keeps each Base UI Radio a `<span>`, as Radio does, and draws it as a button. Don't render it as a native `<button>` (`nativeButton`): Base UI always makes the chosen option the Tab stop, and a disabled button can't take focus, so a chosen, disabled option would hide the whole control from Tab. Wrap each option in `Field.Item`: without it, every option inside the `Field.Root` gets the same id. Its label is inside the fill, so read-only dims only the options that aren't chosen: dimming the chosen one would take its text below 4.5:1.
-- An `<input>` can't have pseudo-elements, so a text field can't borrow the invisible hit area. Text fields come in sizes that are already at least `--target-min` tall (`md`, `lg`), never smaller.
+- An `<input>` can't have pseudo-elements, so a text field can't borrow the invisible hit area. Text fields come in sizes that are already at least `--target-min` tall (`md`, `lg`, which follow `--control-md` and `--control-lg`), never smaller.
 - A text field's visible box is the `<input>` itself. Decorative icons sit over it with `pointer-events: none`, so a click anywhere in the box focuses the field.
-- A choice control's label wraps it, so clicking the text works. Keep the clickable row at least `--target-min` tall, and give a choice control with no visible label a pseudo-element hit area. A text field's `<label for>` focuses it.
+- A choice control's label wraps it, so clicking the text works. Each row is `--choice-row` tall (32px with a mouse, 44px on touch, never less than `--target-min`), and a choice control with no visible label gets a pseudo-element hit area of `--target-min`. A text field's `<label for>` focuses it.
 - Style state from ARIA attributes where they exist (`aria-checked`, `aria-invalid`, `aria-readonly`). ARIA has no read-only state for a radio (only its group has `aria-readonly`), so a radio styles read-only from Base UI's `data-readonly`. Otherwise, choice controls (a `<span>` with a role) use Base UI's `data-disabled`, as `checkbox.css` does, and text fields use the native `:disabled` and `[readonly]`, which a real `<input>` has.
 - A hover rule must not cover up a state. `:hover` adds specificity, so exclude the states it would override (`:hover:not(:disabled, [readonly], [aria-invalid="true"])`), or a hovered invalid field loses its red edge.
 - Disabled dims the control and its label to 50% opacity. Read-only dims only the control, to 75%, and keeps the label at full strength, because read-only content must stay readable. A read-only text field also hides its placeholder, which would fall below 4.5:1 at 75% and has nothing to suggest when you can't type. At 75% the control's edge and its mark still meet 3:1 in every theme. Forced colors resets both to full opacity.
@@ -280,6 +300,8 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 - Blocks read `tokens/tokens.json` directly, so new tokens appear automatically. Don't hard-code token values in them.
 - Wrap blocks in `<Unstyled>` so Storybook's docs styles don't override them. Each block has its own Light / Dark / Hot dog switch.
 - To add a page: write `docs/brand/<topic>.md`, add `src/foundations/NN-<topic>.mdx`, and add its title to `storySort` in `.storybook/preview.tsx`.
+- Guidance for one component goes in `docs/brand/<topic>.md` too, rendered by an MDX page attached to the component (`src/components/Button/Button.mdx` renders `buttons.md` as Button's "Choosing a button" page).
+- `docs/brand/industry.md` compares the system with Apple, Material, Primer, Atlassian, Carbon, Fluent, Polaris, GOV.UK, USWDS, and WCAG. When a choice on a compared topic changes, update its row there.
 
 ## Writing style
 
