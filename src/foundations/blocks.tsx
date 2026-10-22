@@ -192,19 +192,27 @@ type PointerMode = "auto" | "fine" | "coarse";
 type Density = "comfortable" | "compact";
 const SIZE_TOKENS = ["target-min", "target-gap", "control-sm", "control-md", "control-lg"] as const;
 
-/** Reads live size tokens from an element, as "2.75rem · 44px". */
+type SizeToken = { name: string; value: string; touch?: string; compact?: string };
+const sizeTokens = tokens.size.tokens as SizeToken[];
+const sizeToken = (name: string) => sizeTokens.find((t) => t.name === name)!;
+/** A rem value from tokens.json in px, at the browser's default 16px */
+const px = (rem: string) => `${parseFloat(rem) * 16}px`;
+
+/** Reads live size tokens from an element, as "2.75rem · 44px". Measured, because compact sizes are a max(). */
 function useSizeReadout(ref: RefObject<HTMLElement | null>, deps: unknown[]) {
   const [values, setValues] = useState<Record<string, string>>({});
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const cs = getComputedStyle(el);
     const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const probe = document.createElement("div");
+    el.append(probe);
     setValues(Object.fromEntries(SIZE_TOKENS.map((t) => {
-      const v = cs.getPropertyValue(`--${t}`).trim();
-      const px = v.endsWith("rem") ? Math.round(parseFloat(v) * rootPx) : parseFloat(v);
-      return [t, `${v} · ${px}px`];
+      probe.style.height = `var(--${t})`;
+      const height = probe.getBoundingClientRect().height;
+      return [t, `${height / rootPx}rem · ${Math.round(height)}px`];
     })));
+    probe.remove();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return values;
@@ -247,9 +255,9 @@ export function Sizing() {
           </div>
           <p className="fd-note" role="status">
             {touch
-              ? "Touch sizes: 44px minimum hit area, 44px default controls, and 52px large controls."
-              : "Mouse and trackpad sizes: 24px minimum hit area, 40px default controls, and 48px large controls."}
-            {density === "compact" ? " Compact density shrinks default and large controls one step; hit areas still meet the minimum." : ""}
+              ? `Touch sizes: ${px(sizeToken("target-min").touch!)} minimum hit area, ${px(sizeToken("control-md").touch!)} default controls, and ${px(sizeToken("control-lg").touch!)} large controls.`
+              : `Mouse and trackpad sizes: ${px(sizeToken("target-min").value)} minimum hit area, ${px(sizeToken("control-md").value)} default controls, and ${px(sizeToken("control-lg").value)} large controls.`}
+            {density === "compact" ? " Compact density shrinks default and large controls one step, but never below the minimum hit area." : ""}
           </p>
         </div>
 
@@ -260,7 +268,7 @@ export function Sizing() {
               <b>Minimum hit area</b>
               <div className="fd-row"><span className="fd-target"><Button size="sm">Small</Button></span></div>
               <code>target-min · {v["target-min"]}</code>
-              <p className="fd-note">The dashed outline is the clickable area. With a mouse, the 32px button already exceeds the 24px minimum. On touch, an invisible area pads it out to 44px.</p>
+              <p className="fd-note">The dashed outline is the clickable area. With a mouse, the {px(sizeToken("control-sm").value)} button already exceeds the {px(sizeToken("target-min").value)} minimum. On touch, an invisible area pads it out to {px(sizeToken("target-min").touch!)}.</p>
             </div>
             <div className="fd-item">
               <b>Space between small targets</b>
@@ -310,13 +318,13 @@ export function Sizing() {
             <span className="fd-icon-text"><svg className="fd-ico md" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>See my work</span>
             <span className="fd-icon-text lg"><svg className="fd-ico lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>Home</span>
           </div>
-          <code>icon-sm · 1rem (16px) · icon-md · 1.25rem (20px) · icon-lg · 1.5rem (24px)</code>
+          <code>{["icon-sm", "icon-md", "icon-lg"].map((n) => `${n} · ${sizeToken(n).value} (${px(sizeToken(n).value)})`).join(" · ")}</code>
         </section>
 
         <section className="fd-panel">
           <h3 className="fd-group">Layout widths, drawn to scale</h3>
-          <div className="fd-bar content">content-max · 72rem · page content</div>
-          <div className="fd-bar measure">measure · 40rem · running text</div>
+          <div className="fd-bar content">content-max · {sizeToken("content-max").value} · page content</div>
+          <div className="fd-bar measure" style={{ width: `${(parseFloat(sizeToken("measure").value) / parseFloat(sizeToken("content-max").value)) * 100}%` }}>measure · {sizeToken("measure").value} · running text</div>
           <p className="fd-prose">This paragraph is capped at <code>measure</code>. Lines of about 65–75 characters are the easiest to read, so running text stops here even when the page is wider.</p>
         </section>
       </div>

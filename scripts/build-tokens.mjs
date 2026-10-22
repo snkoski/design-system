@@ -63,12 +63,18 @@ const motionReduced = `
   --duration-loop: 1600ms;
   --ease-bounce: var(--ease-out);`;
 
-// Pointer-based sizing: values for touch, and the mouse/trackpad defaults from tokens.json
+// Pointer and density sizing. A size token's value is for a mouse or trackpad; "touch" replaces it when a touch
+// screen is present, and "compact" under compact density, but never below target-min, so a text field (which
+// can't have an invisible hit area) stays a full target on a touchscreen laptop.
 const sizeValue = (name) => tokens.size.tokens.find((t) => t.name === name).value;
-const pointerSized = ["target-min", "choice-row", "control-md", "control-lg"];
-const coarseValues = { "target-min": "2.75rem", "choice-row": "2.75rem", "control-md": "2.75rem", "control-lg": "3.25rem" };
-const pointerCoarse = pointerSized.map((n) => `\n  --${n}: ${coarseValues[n]};`).join("");
-const pointerFine = pointerSized.map((n) => `\n  --${n}: ${sizeValue(n)};`).join("");
+const declarations = (list, pick) => list.map((t) => `\n  --${t.name}: ${pick(t)};`).join("");
+const touchSized = tokens.size.tokens.filter((t) => t.touch);
+const pointerCoarse = declarations(touchSized, (t) => t.touch);
+const pointerFine = declarations(touchSized, (t) => t.value);
+const densityCompact = declarations(
+  tokens.size.tokens.filter((t) => t.compact),
+  (t) => `max(${t.compact}, var(--target-min))`,
+);
 
 // Fluid heading sizes (the token file stores the widest-screen size)
 const fluid = {
@@ -147,10 +153,8 @@ ${typeLines.join("\n")}
   [data-pointer="fine"] {${pointerFine}
   }
 
-  /* Opt-in compact density for data-heavy screens. Hit areas still meet target-min. */
-  [data-density="compact"] {
-    --control-md: 2rem;
-    --control-lg: 2.5rem;
+  /* Opt-in compact density for data-heavy screens. Controls never get shorter than target-min. */
+  [data-density="compact"] {${densityCompact}
   }
 
   @media (prefers-contrast: more) {

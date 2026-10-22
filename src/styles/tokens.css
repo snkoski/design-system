@@ -233,30 +233,30 @@
   @media (any-pointer: coarse) {
     :root:not([data-pointer="fine"]) {
     --target-min: 2.75rem;
-    --choice-row: 2.75rem;
     --control-md: 2.75rem;
     --control-lg: 3.25rem;
+    --choice-row: 2.75rem;
     }
   }
 
   [data-pointer="coarse"] {
   --target-min: 2.75rem;
-  --choice-row: 2.75rem;
   --control-md: 2.75rem;
   --control-lg: 3.25rem;
+  --choice-row: 2.75rem;
   }
 
   [data-pointer="fine"] {
   --target-min: 1.5rem;
-  --choice-row: 2rem;
   --control-md: 2.5rem;
   --control-lg: 3rem;
+  --choice-row: 2rem;
   }
 
-  /* Opt-in compact density for data-heavy screens. Hit areas still meet target-min. */
+  /* Opt-in compact density for data-heavy screens. Controls never get shorter than target-min. */
   [data-density="compact"] {
-    --control-md: 2rem;
-    --control-lg: 2.5rem;
+  --control-md: max(2rem, var(--target-min));
+  --control-lg: max(2.5rem, var(--target-min));
   }
 
   @media (prefers-contrast: more) {
