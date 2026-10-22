@@ -1,0 +1,35 @@
+/* The grounds a secondary button sits on: the page, a card, and a tinted panel */
+.secondary-ground {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding: var(--space-4);
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+}
+.secondary-ground[data-ground="bg"] {
+  background: var(--bg);
+}
+.secondary-ground[data-ground="surface"] {
+  background: var(--surface);
+}
+.secondary-ground[data-ground="surface-tint"] {
+  background: var(--surface-tint);
+}
+.secondary-ground__name {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+/* "transparent": the Building page's example. The hover fill stays surface-tint, as today. */
+.secondary-transparent .button[data-variant="secondary"] {
+  background: transparent;
+}
+.secondary-transparent .button[data-variant="secondary"]:hover {
+  background: var(--surface-tint);
+}
+.secondary-transparent .button[data-disabled][data-variant="secondary"]:not([data-loading]):hover {
+  background: transparent;
+}

@@ -296,6 +296,7 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 - The checks still run on it: `pnpm typecheck` and `pnpm test` include it, so keep it compiling and its tests passing. `pnpm check` doesn't look at it.
 - Work that stays inside `src/experiments/` can go straight to `main`, including experiments that use or affect each other. Anything that would change code outside the folder (a component, `src/internal/`, the styles, or the tokens) goes on its own branch.
 - To graduate, an experiment leaves the folder and is rebuilt to follow every rule here, like a new component (`/new-component`).
+- `src/experiments/Revisit/` holds comparison stories for open questions in `docs/revisit.md`, shown under Revisit in Storybook: the options side by side in all three themes, drawn by restyling the real components from outside (`Compare.tsx` lays them out). They must still pass axe. When the question is decided, delete its story with its entry.
 
 ## Foundations pages
 

@@ -1,0 +1,21 @@
+/* "ink fill": the chosen option is filled with ink, its label and icons in the page color, still in bold. Hovering it
+   lightens the fill a little, as action-hover does today. Icons draw in currentColor, so they follow the label. */
+.chosen-ink .segment__button[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.chosen-ink .segment__button[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
+  background: color-mix(in hsl, var(--ink) 85%, var(--bg));
+}
+.chosen-ink .segment__button[aria-checked="true"] .segment__icon {
+  color: inherit;
+}
+
+/* Windows Contrast themes: the chosen option goes back to Highlight, as today */
+@media (forced-colors: active) {
+  .chosen-ink .segment__button[aria-checked="true"],
+  .chosen-ink .segment__button[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
+    background: Highlight;
+    color: HighlightText;
+  }
+}

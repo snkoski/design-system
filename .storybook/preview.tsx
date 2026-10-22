@@ -36,6 +36,7 @@ const preview: Preview = {
             "Industry standards",
           ],
           "Components",
+          "Revisit",
           "Experiments",
           ["About"],
         ],

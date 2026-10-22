@@ -2,6 +2,8 @@
 
 Decisions we made for now but may want to change, and questions we haven't answered yet. Each entry says what we do today, why, and what would settle it. When one is decided, move the outcome into `CLAUDE.md` or `docs/brand/` and delete the entry.
 
+Where an answer comes from looking, Storybook's **Revisit** section shows the options side by side, in all three themes (`src/experiments/Revisit/`). Delete an entry's comparison story along with the entry.
+
 ## A disabled radio group can still be reached with Tab
 
 **Today:** in a disabled RadioGroup, Base UI keeps the selected radio (or the first one) in the tab order with `tabindex="0"` and `aria-disabled="true"`. Tab lands on it and nothing else happens. We keep Base UI's behavior, because CLAUDE.md says never to hand-roll focus handling. Because the dim would also dim the focus outline below 3:1, a focused disabled radio shows its circle at full strength (`radio-group.css`); its label stays dimmed.
@@ -65,6 +67,8 @@ Raised while building TextArea (2026-10-21).
 
 **To decide:** which is right. If `surface` is, fix the example. If `transparent` is, change `button.css`, which Chromatic would show as a change wherever a secondary button sits on a tinted or colored background. Either way, the contrast pairs for secondary buttons should match the background chosen.
 
+**Compare in Storybook:** Revisit → Secondary button background.
+
 Raised while planning SegmentedControl (2026-10-21).
 
 ## A full-width segmented control
@@ -75,6 +79,8 @@ Raised while planning SegmentedControl (2026-10-21).
 
 **To decide:** whether we hit a layout where it looks wrong. If so, add it as a design choice (for example, a `width="fill"` prop rendered as `data-width`), or let a consumer's width class reach the track.
 
+**Compare in Storybook:** Revisit → Full-width segmented control.
+
 Raised while building SegmentedControl (2026-10-21).
 
 ## How a chosen segment stands out
@@ -84,6 +90,8 @@ Raised while building SegmentedControl (2026-10-21).
 **Why it's in question:** a weight change is quieter than the marks other choice controls use (a tick, a dot, a thumb's position). Icons that aren't drawn with lines, such as filled icons, don't get thicker at all.
 
 **To decide:** look at it in use. If the bold isn't clear enough, try a different fill (such as `ink`, which is strong in every theme) or a check mark in the chosen option, as Material's segmented buttons do.
+
+**Compare in Storybook:** Revisit → How a chosen segment stands out.
 
 Raised while building SegmentedControl (2026-10-21).
 
@@ -145,6 +153,8 @@ Raised while building RichText (2026-10-21).
 
 **To decide:** what read-only is for in the sites and apps that use the system (showing a saved value, a locked setting, a sent message), and then one cue for all of it. Options: the dim; dropping the field's edge and background so it reads as plain text; or a "Read only" note or lock icon beside the label, in words. Whatever is chosen has to meet contrast in every theme and work in forced colors.
 
+**Compare in Storybook:** Revisit → How read-only fields look.
+
 Raised while building RichText (2026-10-21).
 
 ## A danger style for buttons
@@ -165,6 +175,8 @@ Raised while comparing button systems (2026-10-22).
 
 **To decide:** look at both side by side in Storybook (a comparison story for Input, TextArea, Checkbox, CheckboxGroup, RadioGroup, and SegmentedControl, in all three themes), then pick one. Moving it changes every form control and `FieldError`, and the "Error:" prefix changes what screen readers announce, so it's its own branch.
 
+**Compare in Storybook:** Revisit → Where a field's error goes.
+
 Raised while reviewing the forms guidance (2026-10-22).
 
 ## Icon size in large buttons and segments
@@ -174,5 +186,7 @@ Raised while reviewing the forms guidance (2026-10-22).
 **Why it's in question:** a 24px icon next to `body-lg` text may look better balanced, as in Material's touch sizes, or it may look heavy beside the label.
 
 **To decide:** look at `lg` buttons and segments with each icon size side by side in Storybook, with icons before and after the label and icon-only, then update the components or the doc.
+
+**Compare in Storybook:** Revisit → Icon size in large controls.
 
 Raised while reviewing the iconography guidance (2026-10-22).
