@@ -47,11 +47,16 @@ export const States: Story = {
       </Radio>
     </>
   ),
-  play: async ({ canvas }) => {
-    // Every row is at least target-min (44px) tall, so each label is a full-size click target
-    for (const name of ["Unselected", "Selected", "Disabled"]) {
-      const row = canvas.getByText(name).closest("label")!;
-      await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  play: async ({ canvas, canvasElement }) => {
+    const rows = ["Unselected", "Selected", "Disabled"].map((name) => canvas.getByText(name).closest("label")!);
+    // With a mouse, every row is choice-row tall (32px), more than the 24px target-min
+    for (const row of rows) await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(32);
+    // On touch, every row is at least target-min (44px) tall, so each label is a full-size click target
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      for (const row of rows) await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    } finally {
+      delete canvasElement.dataset.pointer;
     }
   },
 };
@@ -66,23 +71,30 @@ export const Disabled: Story = {
   args: { disabled: true },
 };
 
-/** With no visible label, an `aria-label` is required. The hit area is still 44px. */
+/** With no visible label, an `aria-label` is required. The hit area is still `target-min`: 24px with a mouse, 44px on touch. */
 export const WithoutVisibleLabel: Story = {
   args: { children: undefined, "aria-label": "Team plan" },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const radio = canvas.getByRole("radio", { name: "Team plan" });
     const box = radio.getBoundingClientRect();
-    // 18px right of the center is outside the 24px circle but inside the 44px hit area
-    const x = box.left + box.width / 2 + 18;
     const y = box.top + box.height / 2;
-    const hit = document.elementFromPoint(x, y)!;
-    await expect(radio.contains(hit)).toBe(true);
-    await userEvent.click(hit);
-    await expect(radio).toBeChecked();
+    // With a mouse, the hit area is a 24px square, so its corner, outside the round circle, still counts
+    await expect(radio.contains(document.elementFromPoint(box.left + box.width / 2 + 11, y + 11)!)).toBe(true);
+    // On touch, 18px right of the center is outside the 24px circle but inside the 44px hit area
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      const x = box.left + box.width / 2 + 18;
+      const hit = document.elementFromPoint(x, y)!;
+      await expect(radio.contains(hit)).toBe(true);
+      await userEvent.click(hit);
+      await expect(radio).toBeChecked();
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
   },
 };
 
-/** Radios with no visible label, one under another, as in a table. Each keeps a 44px target of its own. */
+/** Radios with no visible label, one under another, as in a table. Each keeps a target of its own: 24px with a mouse, 44px on touch. */
 export const StackedWithoutVisibleLabels: Story = {
   render: () => (
     <>
@@ -90,16 +102,30 @@ export const StackedWithoutVisibleLabels: Story = {
       <Radio value="second" aria-label="Second row" />
     </>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     const first = canvas.getByRole("radio", { name: "First row" });
     const second = canvas.getByRole("radio", { name: "Second row" });
-    for (const radio of [first, second]) {
-      await expect(radio.closest(".radio")!.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
-    }
-    // Just above the line between them still belongs to the first radio, not the second
-    const line = first.closest(".radio")!.getBoundingClientRect().bottom;
+    const heights = async (minHeight: number) => {
+      for (const radio of [first, second]) {
+        await expect(radio.closest(".radio")!.getBoundingClientRect().height).toBeGreaterThanOrEqual(minHeight);
+      }
+    };
+    const line = () => first.closest(".radio")!.getBoundingClientRect().bottom;
     const box = first.getBoundingClientRect();
-    await expect(first.contains(document.elementFromPoint(box.left + box.width / 2, line - 3))).toBe(true);
+    const x = box.left + box.width / 2;
+    // With a mouse, each row is choice-row tall (32px), with a little space between the two 24px hit areas
+    await heights(32);
+    await expect(first.contains(document.elementFromPoint(x, box.bottom - 1))).toBe(true);
+    await expect(second.contains(document.elementFromPoint(x, line() - 3))).toBe(false);
+    // On touch, each row is target-min tall (44px)
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await heights(44);
+      // Just above the line between them still belongs to the first radio, not the second
+      await expect(first.contains(document.elementFromPoint(x, line() - 3))).toBe(true);
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
   },
 };
 

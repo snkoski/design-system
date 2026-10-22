@@ -63,6 +63,13 @@ const motionReduced = `
   --duration-loop: 1600ms;
   --ease-bounce: var(--ease-out);`;
 
+// Pointer-based sizing: values for touch, and the mouse/trackpad defaults from tokens.json
+const sizeValue = (name) => tokens.size.tokens.find((t) => t.name === name).value;
+const pointerSized = ["target-min", "choice-row", "control-md", "control-lg"];
+const coarseValues = { "target-min": "2.75rem", "choice-row": "2.75rem", "control-md": "2.75rem", "control-lg": "3.25rem" };
+const pointerCoarse = pointerSized.map((n) => `\n  --${n}: ${coarseValues[n]};`).join("");
+const pointerFine = pointerSized.map((n) => `\n  --${n}: ${sizeValue(n)};`).join("");
+
 // Fluid heading sizes (the token file stores the widest-screen size)
 const fluid = {
   display: "clamp(2.441rem, 1.749rem + 3.075vw, 4.209rem)",
@@ -127,6 +134,25 @@ ${typeLines.join("\n")}
   [data-motion="reduced"] {${motionReduced}
   }
 
+  /* Touch: bigger targets and controls whenever any touch input exists (any-pointer, so a
+     touchscreen laptop counts). data-pointer="coarse" or "fine" overrides it for a subtree. */
+  @media (any-pointer: coarse) {
+    :root:not([data-pointer="fine"]) {${pointerCoarse.replace(/\n/g, "\n  ")}
+    }
+  }
+
+  [data-pointer="coarse"] {${pointerCoarse}
+  }
+
+  [data-pointer="fine"] {${pointerFine}
+  }
+
+  /* Opt-in compact density for data-heavy screens. Hit areas still meet target-min. */
+  [data-density="compact"] {
+    --control-md: 2rem;
+    --control-lg: 2.5rem;
+  }
+
   @media (prefers-contrast: more) {
     :root,
     [data-theme] {
@@ -162,13 +188,9 @@ const tw = `${header}
   --animate-*: initial;
 
   --spacing: 0.25rem;
-  --container-measure: ${tokens.size.tokens.find((t) => t.name === "measure").value};
-  --container-content: ${tokens.size.tokens.find((t) => t.name === "content-max").value};
-  --breakpoint-sm: 40em;
-  --breakpoint-md: 48em;
-  --breakpoint-lg: 64em;
-  --breakpoint-xl: 80em;
-  --breakpoint-2xl: 96em;
+  --container-measure: ${sizeValue("measure")};
+  --container-content: ${sizeValue("content-max")};
+${tokens.breakpoint.tokens.map((t) => `  --${t.name}: ${t.value};`).join("\n")}
 }
 `;
 writeFileSync(join(outDir, "tailwind-theme.css"), tw);

@@ -82,13 +82,15 @@
   border: var(--border-thick) solid transparent;
   outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset);
 }
-.fd-target { position: relative; display: inline-grid; place-items: center; min-width: var(--target-min); min-height: var(--target-min); padding-inline: calc((var(--target-min) - var(--control-sm)) / 2); }
+.fd-target { position: relative; display: inline-grid; place-items: center; min-width: var(--target-min); min-height: var(--target-min); padding: max(0px, calc((var(--target-min) - var(--control-sm)) / 2)); }
 .fd-target::before { content: ""; position: absolute; inset: 0; border: var(--border-thin) dashed var(--link); border-radius: var(--radius-full); }
 .fd-icon-text { display: inline-flex; align-items: center; gap: var(--space-2); }
 .fd-icon-text.sm { gap: var(--space-1); font-size: 0.875rem; }
 .fd-ico { flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .fd-ico.sm { width: var(--icon-sm); height: var(--icon-sm); }
 .fd-ico.md { width: var(--icon-md); height: var(--icon-md); }
+.fd-ico.lg { width: var(--icon-lg); height: var(--icon-lg); }
+.fd-icon-text.lg { gap: var(--space-2); font-size: 1.125rem; }
 .fd-bar { height: 2.25rem; border-radius: var(--radius-sm); display: flex; align-items: center; padding-inline: var(--space-3); font-size: 0.8125rem; font-weight: 600; white-space: nowrap; overflow: hidden; }
 .fd-bar.content { width: 100%; background: var(--surface-tint); color: var(--ink); border: var(--border-thin) solid var(--border-strong); }
 .fd-bar.measure { width: calc(40 / 72 * 100%); background: var(--highlight); color: var(--on-highlight); border: var(--border-thin) solid transparent; }

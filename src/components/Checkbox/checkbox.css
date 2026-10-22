@@ -9,18 +9,18 @@
     color: var(--ink);
   }
 
-  /* The label is the click target. It's as tall as target-min, and the box sits on its first line. */
-  /* With no visible label there's no row, so the wrapper itself is target-min tall. Otherwise the hit area
+  /* The label is the click target. It's as tall as choice-row, and the box sits on its first line. */
+  /* With no visible label there's no row, so the wrapper itself is choice-row tall. Otherwise the hit area
      spills into the control above or below, and stacked boxes without labels would steal each other's clicks. */
   .checkbox:not(:has(> .checkbox__row)) {
-    padding-block: calc((var(--target-min) - var(--choice)) / 2);
+    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
   }
 
   .checkbox__row {
     display: inline-flex;
     align-items: flex-start;
     gap: var(--space-3);
-    padding-block: calc((var(--target-min) - var(--choice)) / 2);
+    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
