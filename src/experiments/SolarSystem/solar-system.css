@@ -32,6 +32,17 @@
     stroke-dasharray: 4 4;
   }
 
+  /* A moon going round too fast to follow: its hot dog gives way to a blur all round its orbit */
+  .solar-system__moon-blur {
+    fill: none;
+    stroke: hsl(32 80% 55% / 0.35); /* a hot dog bun, faint */
+  }
+
+  .solar-system__moon:not([data-fast]) .solar-system__moon-blur,
+  .solar-system__moon[data-fast] > g {
+    display: none;
+  }
+
   .solar-system__body,
   .solar-system__label {
     text-anchor: middle;
@@ -136,6 +147,10 @@
 
     .solar-system__label {
       fill: CanvasText;
+    }
+
+    .solar-system__moon-blur {
+      stroke: CanvasText;
     }
   }
 }

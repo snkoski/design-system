@@ -192,6 +192,81 @@ describe("SolarSystem", () => {
     });
   });
 
+  describe("moons", () => {
+    const moonPlace = (container: HTMLElement, name: string) => {
+      const [x, y] = container.querySelector(`[data-moon=${name}] > g`)!.getAttribute("transform")!.match(/-?[\d.]+/g)!.map(Number);
+      return { x: x!, y: y! };
+    };
+
+    it("puts smaller hot dogs round their planets, each named", () => {
+      const { container } = render(<SolarSystem paused />);
+      expect(container.querySelectorAll("[data-moon]")).toHaveLength(21);
+      expect(planet(container, "Earth").querySelector("[data-moon=Moon]")).toHaveTextContent("Moon🌭");
+      expect(planet(container, "Jupiter").querySelectorAll("[data-moon]")).toHaveLength(4);
+      expect(planet(container, "Pluto").querySelector("[data-moon=Charon] title")).toHaveTextContent("Charon");
+      expect(screen.getByRole("img")).toHaveAccessibleName(/Smaller hot dogs go round them as moons/);
+      const size = (selector: string) => Number(container.querySelector(selector)!.getAttribute("font-size"));
+      expect(size("[data-moon=Ganymede] text")).toBeLessThan(size("g[data-planet=Jupiter] > .solar-system__body"));
+    });
+
+    it("has every round moon, Saturn's seven and Uranus's five among them", () => {
+      const { container } = render(<SolarSystem paused />);
+      const names = (name: string) => [...planet(container, name).querySelectorAll<SVGGElement>("[data-moon]")].map((moon) => moon.dataset.moon);
+      expect(names("Saturn")).toEqual(["Mimas", "Enceladus", "Tethys", "Dione", "Rhea", "Titan", "Iapetus"]);
+      expect(names("Uranus")).toEqual(["Miranda", "Ariel", "Umbriel", "Titania", "Oberon"]);
+    });
+
+    it("keeps each planet's moons in order outwards, the furthest within twice the nearest's distance", () => {
+      const { container } = render(<SolarSystem paused />);
+      for (const name of ["Mars", "Jupiter", "Saturn", "Uranus"]) {
+        const radii = [...planet(container, name).querySelectorAll(".solar-system__moon-blur")].map((ring) => Number(ring.getAttribute("r")));
+        radii.slice(1).forEach((radius, index) => expect(radius, name).toBeGreaterThan(radii[index]!));
+        expect(radii.at(-1)! / radii[0]!, name).toBeLessThanOrEqual(2 + 1e-9);
+      }
+      // Jupiter's are close enough together to keep the cube root of their real distances
+      const jupiter = [...planet(container, "Jupiter").querySelectorAll(".solar-system__moon-blur")].map((ring) => Number(ring.getAttribute("r")));
+      expect(jupiter.at(-1)! / jupiter[0]!).toBeCloseTo(Math.cbrt(1_882_700 / 421_800));
+    });
+
+    it("leaves them out with moons={false}", () => {
+      const { container } = render(<SolarSystem paused moons={false} />);
+      expect(planet(container, "Earth")).toBeInTheDocument();
+      expect(container.querySelector("[data-moon]")).not.toBeInTheDocument();
+      expect(screen.getByRole("img")).not.toHaveAccessibleName(/moons/);
+    });
+
+    it("puts the Moon between Earth and the Sun at the eclipse of 8 April 2024", () => {
+      const { container } = render(<SolarSystem paused date={Date.UTC(2024, 3, 8, 18, 18)} />);
+      const earth = placeOf(container, "Earth");
+      const moon = moonPlace(container, "Moon");
+      const toSun = Math.atan2(-earth.y, -earth.x);
+      const toMoon = Math.atan2(moon.y, moon.x); // the Moon's place is from Earth's middle
+      expect(Math.abs((((toMoon - toSun) * 180) / Math.PI + 540) % 360 - 180)).toBeLessThan(2);
+    });
+
+    it("keeps each moon the same distance from its planet as they go round", () => {
+      const { container } = render(<SolarSystem date={Date.UTC(2026, 0, 1)} />);
+      const reach = () => Math.hypot(moonPlace(container, "Titan").x, moonPlace(container, "Titan").y);
+      const [before, place] = [reach(), moonPlace(container, "Titan")];
+      wait(500);
+      expect(moonPlace(container, "Titan")).not.toEqual(place);
+      expect(reach()).toBeCloseTo(before);
+    });
+
+    it("blurs moons too fast to follow, only while they're going round", async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const { container, rerender } = render(<SolarSystem date={Date.UTC(2026, 0, 1)} speed={30} />);
+      const fast = () => container.querySelectorAll("[data-moon][data-fast]").length;
+      expect(container.querySelectorAll("[data-moon]")).toHaveLength(21);
+      expect(fast()).toBe(0); // a month a second: every moon is slow enough to watch
+      rerender(<SolarSystem date={Date.UTC(2026, 0, 1)} speed={3650} />);
+      wait(100);
+      expect(fast()).toBe(21);
+      await user.click(screen.getByRole("button", { name: "Pause" }));
+      expect(fast()).toBe(0);
+    });
+  });
+
   describe("ruler", () => {
     const marksOf = (container: HTMLElement) =>
       [...container.querySelectorAll<HTMLElement>(".solar-system__ruler-mark")].map((mark) => ({

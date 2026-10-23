@@ -66,3 +66,43 @@ export const PLANETS: Planet[] = [
     orbit: orbit([39.48211675, 0.2488273, 17.14001206, 238.92903833, 224.06891629, 110.30393684], [-0.00031596, 0.0000517, 0.00004818, 145.20780515, -0.04062942, -0.01183482]),
   },
 ];
+
+export interface Moon extends Body {
+  /** The name of the planet it goes round */
+  planet: string;
+  /** Its average distance from the planet's middle, in km */
+  distance: number;
+  /** How long it takes to go round once, in days */
+  period: number;
+  /** Goes round the other way from the planets, as Triton does */
+  retrograde?: boolean;
+}
+
+/**
+ * Every round moon (the 19 big enough for their own gravity to pull them round), and both of Mars's. Distances and
+ * periods are from JPL's planetary satellite mean elements (https://ssd.jpl.nasa.gov/sats/elem/), radii in km from
+ * its physical parameters.
+ */
+export const MOONS: Moon[] = [
+  { name: "Moon", emoji: "🌭", radius: 1_737, planet: "Earth", distance: 384_400, period: 27.322 },
+  { name: "Phobos", emoji: "🌭", radius: 11, planet: "Mars", distance: 9_375, period: 0.3187 },
+  { name: "Deimos", emoji: "🌭", radius: 6, planet: "Mars", distance: 23_457, period: 1.2625 },
+  { name: "Io", emoji: "🌭", radius: 1_822, planet: "Jupiter", distance: 421_800, period: 1.762732 },
+  { name: "Europa", emoji: "🌭", radius: 1_561, planet: "Jupiter", distance: 671_100, period: 3.525463 },
+  { name: "Ganymede", emoji: "🌭", radius: 2_634, planet: "Jupiter", distance: 1_070_400, period: 7.155588 },
+  { name: "Callisto", emoji: "🌭", radius: 2_410, planet: "Jupiter", distance: 1_882_700, period: 16.69044 },
+  { name: "Mimas", emoji: "🌭", radius: 198, planet: "Saturn", distance: 186_000, period: 0.942422 },
+  { name: "Enceladus", emoji: "🌭", radius: 252, planet: "Saturn", distance: 238_400, period: 1.370218 },
+  { name: "Tethys", emoji: "🌭", radius: 531, planet: "Saturn", distance: 295_000, period: 1.887802 },
+  { name: "Dione", emoji: "🌭", radius: 561, planet: "Saturn", distance: 377_700, period: 2.736916 },
+  { name: "Rhea", emoji: "🌭", radius: 764, planet: "Saturn", distance: 527_200, period: 4.517503 },
+  { name: "Titan", emoji: "🌭", radius: 2_575, planet: "Saturn", distance: 1_221_900, period: 15.945448 },
+  { name: "Iapetus", emoji: "🌭", radius: 735, planet: "Saturn", distance: 3_561_700, period: 79.331002 },
+  { name: "Miranda", emoji: "🌭", radius: 236, planet: "Uranus", distance: 129_846, period: 1.413479 },
+  { name: "Ariel", emoji: "🌭", radius: 579, planet: "Uranus", distance: 190_929, period: 2.520379 },
+  { name: "Umbriel", emoji: "🌭", radius: 585, planet: "Uranus", distance: 265_986, period: 4.144177 },
+  { name: "Titania", emoji: "🌭", radius: 788, planet: "Uranus", distance: 436_298, period: 8.705869 },
+  { name: "Oberon", emoji: "🌭", radius: 761, planet: "Uranus", distance: 583_511, period: 13.463237 },
+  { name: "Triton", emoji: "🌭", radius: 1_353, planet: "Neptune", distance: 354_800, period: 5.8792, retrograde: true },
+  { name: "Charon", emoji: "🌭", radius: 606, planet: "Pluto", distance: 19_600, period: 6.387222 },
+];
