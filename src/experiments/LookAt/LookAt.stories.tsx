@@ -5,12 +5,8 @@ import { expect } from "storybook/test";
 import { LookAt } from "./LookAt";
 
 /** A rounded bar, drawn pointing up, so LookAt stands it on end toward the mouse */
-function Bar() {
-  return (
-    <span
-      style={{ display: "block", width: "0.375rem", height: "2rem", borderRadius: "var(--radius-full)", background: "var(--action)" }}
-    />
-  );
+function Bar({ width = "0.375rem", height = "2rem" }: { width?: string; height?: string }) {
+  return <span style={{ display: "block", width, height, borderRadius: "var(--radius-full)", background: "var(--action)" }} />;
 }
 
 function Arrow() {
@@ -92,10 +88,20 @@ export const Pair: Story = {
   },
 };
 
-function Grid({ columns, rows, item }: { columns: number; rows: number; item: (index: number) => ReactNode }) {
+interface GridProps {
+  columns: number;
+  rows: number;
+  item: (index: number) => ReactNode;
+  /** The width of each column. Default: 3rem. */
+  cell?: string;
+  /** The space between cells, as a Tailwind gap class. Default: gap-2. */
+  gap?: string;
+}
+
+function Grid({ columns, rows, item, cell = "3rem", gap = "gap-2" }: GridProps) {
   return (
     <div className="grid place-items-center p-8" style={page}>
-      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${columns}, 3rem)` }}>
+      <div className={`grid ${gap}`} style={{ gridTemplateColumns: `repeat(${columns}, ${cell})` }}>
         {Array.from({ length: columns * rows }, (_, index) => item(index))}
       </div>
     </div>
@@ -141,6 +147,23 @@ export const BarGrid: Story = {
       item={(index) => (
         <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-12">
           <Bar />
+        </LookAt>
+      )}
+    />
+  ),
+};
+
+/** Smaller bars, packed tightly: they read as a field of grass or iron filings combing toward the mouse. */
+export const DenseBarGrid: Story = {
+  render: (args) => (
+    <Grid
+      columns={36}
+      rows={22}
+      cell="1.25rem"
+      gap="gap-0.5"
+      item={(index) => (
+        <LookAt key={index} turnDuration={args.turnDuration} turnEasing={args.turnEasing} className="size-5">
+          <Bar width="0.1875rem" height="1rem" />
         </LookAt>
       )}
     />
