@@ -4,12 +4,15 @@ import type { ReactNode } from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonShape = "rectangle" | "pill";
 
 export interface SharedProps {
   /** Visual weight. Use `primary` for the one main action in a view. Default: `primary`. */
   variant?: ButtonVariant;
   /** Height and type size. Small buttons still get a target-min hit area (44px on touch). Default: `md`. */
   size?: ButtonSize;
+  /** Corners. `rectangle` has four straight edges and slightly rounded corners; `pill` is fully rounded. Default: `rectangle`. */
+  shape?: ButtonShape;
   /** Icon shown before the label. Decorative: it is hidden from screen readers. */
   iconStart?: ReactNode;
   /** Icon shown after the label. Decorative: it is hidden from screen readers. */

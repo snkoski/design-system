@@ -124,6 +124,8 @@ Primer ships nine themes, including high-contrast and colorblind variants. Carbo
 
 Every system limits primary buttons: Carbon to one per page (dialogs and side panels aside), Primer to one per group and rarely more than one per page. Sherbet allows one per view.
 
+Some systems offer more than one button shape. Material 3's expressive update has round and square buttons, Uber's Base has a `shape` prop (pill, round, square, and others), and SwiftUI buttons take a capsule or rounded-rectangle border. Carbon and GOV.UK use square corners only. Sherbet has a rectangle with small rounded corners by default, and a pill.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -143,6 +145,9 @@ Every system limits primary buttons: Carbon to one per page (dialogs and side pa
 - [IBM Carbon](https://carbondesignsystem.com/components/button/style/) and [Carbon buttons](https://carbondesignsystem.com/components/button/usage)
 - [Primer buttons](https://primer.style/components/button)
 - [Atlassian buttons](https://developer.atlassian.com/platform/forge/ui-kit/components/button)
+- [Material 3 buttons](https://m3.material.io/components/buttons/overview)
+- [Uber Base buttons](https://baseweb.design/components/button/)
+- [SwiftUI button border shapes](https://developer.apple.com/documentation/swiftui/buttonbordershape)
 - [Microsoft Fluent 2](https://fluent2.microsoft.design/layout)
 - [Shopify Polaris](https://polaris-react.shopify.com/content/grammar-and-mechanics)
 - [GOV.UK Design System](https://design-system.service.gov.uk/patterns/question-pages)

@@ -17,6 +17,7 @@ export type ButtonLinkProps = SharedProps &
 export function ButtonLink({
   variant = "primary",
   size = "md",
+  shape = "rectangle",
   iconStart,
   iconEnd,
   iconOnly = false,
@@ -37,6 +38,7 @@ export function ButtonLink({
       className={cx("button", className)}
       data-variant={variant}
       data-size={size}
+      data-shape={shape}
       data-icon-only={iconOnly || undefined}
     >
       <Content iconStart={iconStart} iconEnd={iconEnd} iconOnly={iconOnly}>

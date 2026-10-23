@@ -16,18 +16,20 @@ describe("ButtonLink", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
-  it("uses the same variant and size attributes, with the same defaults", () => {
+  it("uses the same variant, size, and shape attributes, with the same defaults", () => {
     render(
       <>
         <ButtonLink href="/a">Default</ButtonLink>
-        <ButtonLink href="/b" variant="ghost" size="lg">Custom</ButtonLink>
+        <ButtonLink href="/b" variant="ghost" size="lg" shape="pill">Custom</ButtonLink>
       </>,
     );
     const [plain, custom] = screen.getAllByRole("link");
     expect(plain).toHaveAttribute("data-variant", "primary");
     expect(plain).toHaveAttribute("data-size", "md");
+    expect(plain).toHaveAttribute("data-shape", "rectangle");
     expect(custom).toHaveAttribute("data-variant", "ghost");
     expect(custom).toHaveAttribute("data-size", "lg");
+    expect(custom).toHaveAttribute("data-shape", "pill");
   });
 
   it("passes link attributes through", () => {

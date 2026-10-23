@@ -28,6 +28,7 @@ const meta = {
     children: "See my work",
     variant: "primary",
     size: "md",
+    shape: "rectangle",
     loading: false,
     disabled: false,
     onClick: fn(),
@@ -35,6 +36,7 @@ const meta = {
   argTypes: {
     variant: { control: "inline-radio", options: ["primary", "secondary", "ghost"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    shape: { control: "inline-radio", options: ["rectangle", "pill"] },
     iconStart: { control: false },
     iconEnd: { control: false },
   },
@@ -55,6 +57,31 @@ export const Variants: Story = {
       <Button {...args} variant="ghost">Ghost</Button>
     </div>
   ),
+};
+
+/**
+ * Rectangle, the default, has four straight edges and `radius-sm` corners, and suits most buttons. Pill is fully
+ * rounded: the softer choice, for a button that should stand apart from the forms and panels around it. Keep a group
+ * the same shape. See **Choosing a button**.
+ */
+export const Shapes: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-4">
+      <Button {...args} shape="rectangle">Rectangle</Button>
+      <Button {...args} shape="pill">Pill</Button>
+      <Button {...args} shape="rectangle" iconOnly aria-label="Add to favorites"><Heart /></Button>
+      <Button {...args} shape="pill" iconOnly aria-label="Add to favorites"><Heart /></Button>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const radius = (element: HTMLElement) => parseFloat(getComputedStyle(element).borderTopLeftRadius);
+    const rectangle = canvas.getByRole("button", { name: "Rectangle" });
+    const pill = canvas.getByRole("button", { name: "Pill" });
+    // A rectangle's corners are radius-sm, much less than half its height; a pill's are at least half its height
+    await expect(radius(rectangle)).toBe(measure("--radius-sm", canvasElement));
+    await expect(radius(rectangle)).toBeLessThan(rectangle.getBoundingClientRect().height / 3);
+    await expect(radius(pill)).toBeGreaterThanOrEqual(pill.getBoundingClientRect().height / 2);
+  },
 };
 
 /**
@@ -164,6 +191,9 @@ function Matrix() {
             </Button>
           ))}
           <Button variant={variant} iconStart={<Download />}>Icon</Button>
+          <Button variant={variant} shape="pill">Pill</Button>
+          <Button variant={variant} iconOnly aria-label="Add to favorites"><Heart /></Button>
+          <Button variant={variant} shape="pill" iconOnly aria-label="Add to favorites"><Heart /></Button>
           <Button variant={variant} loading>Loading</Button>
           <Button variant={variant} disabled>Disabled</Button>
         </div>
@@ -172,7 +202,7 @@ function Matrix() {
   );
 }
 
-/** Every variant, size, and state in all three themes at once. Chromatic snapshots this one. */
+/** Every variant, size, shape, and state in all three themes at once. Chromatic snapshots this one. */
 export const AllThemes: Story = {
   parameters: { layout: "fullscreen" },
   render: () => (

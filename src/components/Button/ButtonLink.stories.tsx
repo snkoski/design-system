@@ -29,10 +29,12 @@ const meta = {
     href: "#work",
     variant: "primary",
     size: "md",
+    shape: "rectangle",
   },
   argTypes: {
     variant: { control: "inline-radio", options: ["primary", "secondary", "ghost"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    shape: { control: "inline-radio", options: ["rectangle", "pill"] },
     iconStart: { control: false },
     iconEnd: { control: false },
   },
@@ -57,6 +59,31 @@ export const Variants: Story = {
       <ButtonLink {...args} variant="ghost">Ghost</ButtonLink>
     </div>
   ),
+};
+
+/**
+ * Rectangle, the default, has four straight edges and `radius-sm` corners, and suits most links. Pill is fully
+ * rounded: the softer choice, for a link that should stand apart from the forms and panels around it. Keep a group
+ * the same shape. See **Choosing a button**.
+ */
+export const Shapes: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-4">
+      <ButtonLink {...args} shape="rectangle">Rectangle</ButtonLink>
+      <ButtonLink {...args} shape="pill">Pill</ButtonLink>
+      <ButtonLink {...args} shape="rectangle" iconOnly aria-label="Favorites" href="#favorites"><Heart /></ButtonLink>
+      <ButtonLink {...args} shape="pill" iconOnly aria-label="Favorites" href="#favorites"><Heart /></ButtonLink>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const radius = (element: HTMLElement) => parseFloat(getComputedStyle(element).borderTopLeftRadius);
+    const rectangle = canvas.getByRole("link", { name: "Rectangle" });
+    const pill = canvas.getByRole("link", { name: "Pill" });
+    // A rectangle's corners are radius-sm, much less than half its height; a pill's are at least half its height
+    await expect(radius(rectangle)).toBe(measure("--radius-sm", canvasElement));
+    await expect(radius(rectangle)).toBeLessThan(rectangle.getBoundingClientRect().height / 3);
+    await expect(radius(pill)).toBeGreaterThanOrEqual(pill.getBoundingClientRect().height / 2);
+  },
 };
 
 /**
@@ -138,13 +165,15 @@ function Matrix() {
           ))}
           <ButtonLink href="#work" variant={variant} iconEnd={<ArrowRight />}>Icon</ButtonLink>
           <ButtonLink href="#work" variant={variant} iconOnly aria-label="Favorites"><Heart /></ButtonLink>
+          <ButtonLink href="#work" variant={variant} shape="pill">Pill</ButtonLink>
+          <ButtonLink href="#work" variant={variant} shape="pill" iconOnly aria-label="Favorites"><Heart /></ButtonLink>
         </div>
       ))}
     </div>
   );
 }
 
-/** Every variant and size in all three themes at once. Chromatic snapshots this one. */
+/** Every variant, size, and shape in all three themes at once. Chromatic snapshots this one. */
 export const AllThemes: Story = {
   parameters: { layout: "fullscreen" },
   render: () => (

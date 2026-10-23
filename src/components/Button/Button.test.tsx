@@ -22,6 +22,16 @@ describe("Button", () => {
       expect(button).toHaveAttribute("data-size", "md");
     });
 
+    it("defaults to the rectangle shape", () => {
+      render(<Button>Save</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-shape", "rectangle");
+    });
+
+    it.each(["rectangle", "pill"] as const)("maps shape=%s to data-shape", (shape) => {
+      render(<Button shape={shape}>Save</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-shape", shape);
+    });
+
     it.each(["primary", "secondary", "ghost"] as const)("maps variant=%s to data-variant", (variant) => {
       render(<Button variant={variant}>Save</Button>);
       expect(screen.getByRole("button")).toHaveAttribute("data-variant", variant);
@@ -33,7 +43,7 @@ describe("Button", () => {
     });
 
     it("never uses modifier classes", () => {
-      render(<Button variant="secondary" size="sm">Save</Button>);
+      render(<Button variant="secondary" size="sm" shape="pill">Save</Button>);
       expect(screen.getByRole("button").className).toBe("button");
     });
 
@@ -284,9 +294,10 @@ describe("Button", () => {
       expectTypeOf<{ children: string }>().toExtend<ButtonProps>();
     });
 
-    it("only accepts known variants and sizes", () => {
+    it("only accepts known variants, sizes, and shapes", () => {
       expectTypeOf<ButtonProps["variant"]>().toEqualTypeOf<"primary" | "secondary" | "ghost" | undefined>();
       expectTypeOf<ButtonProps["size"]>().toEqualTypeOf<"sm" | "md" | "lg" | undefined>();
+      expectTypeOf<ButtonProps["shape"]>().toEqualTypeOf<"rectangle" | "pill" | undefined>();
     });
 
     it("does not allow render or className-as-function overrides", () => {
