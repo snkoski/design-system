@@ -1,0 +1,141 @@
+/* SolarSystem: SolarSystem.tsx moves each planet's group and draws the orbits' paths. The SVG fills the figure's
+   width and stays square; how wide the figure is, is the layout's job. Experiment. */
+@layer components {
+  .solar-system {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .solar-system__view {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: visible;
+  }
+
+  .solar-system__orbits {
+    fill: none;
+    stroke: color-mix(in srgb, var(--ink) 35%, transparent); /* the same lightness in every theme; hot dog's --border is solid ink */
+    stroke-width: var(--border-thin);
+  }
+
+  /* Ketchup */
+  [data-theme="hotdog"] .solar-system__orbits {
+    stroke: var(--action);
+    stroke-width: var(--border-thick);
+  }
+
+  .solar-system__orbits path {
+    vector-effect: non-scaling-stroke; /* a 1px line, and dashes the same length, at any size */
+    stroke-dasharray: 4 4;
+  }
+
+  .solar-system__body,
+  .solar-system__label {
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .solar-system__label {
+    fill: var(--ink-muted);
+    font-family: var(--font-sans);
+  }
+
+  /* The ruler's parts are placed by SolarSystem.tsx, in percentages of the picture's width */
+  .solar-system__ruler {
+    position: relative;
+    --ruler-top: var(--space-2); /* where the line runs, leaving room for the start label above it */
+    height: 2.75rem;
+    color: var(--ink-muted);
+    font-size: var(--text-label);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .solar-system__ruler-line {
+    position: absolute;
+    top: var(--ruler-top);
+    border-top: var(--border-thin) solid var(--ink);
+  }
+
+  /* The start, under the Sun's middle */
+  .solar-system__ruler-line::before {
+    content: "";
+    position: absolute;
+    top: -0.3125rem; /* half its height, centred on the line */
+    left: 0;
+    height: 0.625rem;
+    border-left: var(--border-thin) solid var(--ink);
+  }
+
+  .solar-system__ruler-start {
+    position: absolute;
+    top: var(--ruler-top);
+    right: calc(50% + var(--space-2));
+    translate: 0 -50%;
+    white-space: nowrap;
+  }
+
+  .solar-system__ruler-mark {
+    position: absolute;
+    top: var(--ruler-top);
+    height: 0.3125rem;
+    border-left: var(--border-thin) solid var(--ink);
+  }
+
+  .solar-system__ruler-mark[data-numbered] {
+    height: 0.5rem;
+  }
+
+  .solar-system__ruler-number {
+    position: absolute;
+    top: calc(100% + var(--space-1));
+    left: 0;
+    translate: -50% 0;
+    white-space: nowrap;
+  }
+
+  .solar-system__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The date and the invisible dates under it share one cell, so it's as wide as the widest of them */
+  .solar-system__date {
+    display: inline-grid;
+    justify-items: end;
+  }
+
+  .solar-system__date > *,
+  .solar-system__toggle > * {
+    grid-area: 1 / 1;
+  }
+
+  .solar-system__date-room,
+  .solar-system__toggle-room {
+    visibility: hidden;
+  }
+
+  /* Pause and Play share one cell too, so the button is always as wide as the wider word */
+  .solar-system__toggle {
+    display: inline-grid;
+    justify-items: start;
+  }
+
+  @media (forced-colors: active) {
+    .solar-system__orbits,
+    [data-theme="hotdog"] .solar-system__orbits {
+      stroke: CanvasText;
+    }
+
+    .solar-system__label {
+      fill: CanvasText;
+    }
+  }
+}
