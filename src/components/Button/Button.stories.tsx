@@ -127,6 +127,38 @@ export const WithIcons: Story = {
 };
 
 /**
+ * In a narrow space, a label that doesn't fit wraps onto more lines and the button grows taller. It's never cut off
+ * with an ellipsis, so the whole label stays readable. The story checks every button stays inside its container,
+ * and every label inside its button.
+ */
+export const Narrow: Story = {
+  render: (args) => (
+    <div className="grid w-40 justify-items-start gap-3" data-testid="narrow">
+      <Button {...args} iconStart={<Download />}>Download résumé as a PDF</Button>
+      <Button {...args} variant="secondary" iconEnd={<ArrowRight />}>See the whole project</Button>
+      <Button {...args} variant="secondary">Send message</Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const container = canvas.getByTestId("narrow").getBoundingClientRect();
+    const [wrapped, , short] = canvas.getAllByRole("button");
+    // The long label wraps, so its button is taller than one with a short label
+    await expect(wrapped!.getBoundingClientRect().height).toBeGreaterThan(short!.getBoundingClientRect().height);
+    for (const element of canvas.getAllByRole("button")) {
+      const box = element.getBoundingClientRect();
+      await expect(box.right).toBeLessThanOrEqual(container.right + 0.5);
+      // The text itself, not its box: text cut off or spilling out would reach past the button's edges
+      const text = document.createRange();
+      text.selectNodeContents(element.querySelector(".button__label")!);
+      const words = text.getBoundingClientRect();
+      await expect(words.left).toBeGreaterThanOrEqual(box.left);
+      await expect(words.right).toBeLessThanOrEqual(box.right);
+      await expect(words.bottom).toBeLessThanOrEqual(box.bottom);
+    }
+  },
+};
+
+/**
  * Icon-only buttons require an `aria-label`. A small one is a 32px square, but its hit area is never smaller than
  * `target-min`: 24px with a mouse, 44px on touch. The story checks both.
  */

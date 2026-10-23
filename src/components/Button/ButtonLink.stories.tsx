@@ -127,6 +127,38 @@ export const WithIcons: Story = {
   ),
 };
 
+/**
+ * In a narrow space, a label that doesn't fit wraps onto more lines and the link grows taller. It's never cut off
+ * with an ellipsis, so the whole label stays readable. The story checks every link stays inside its container,
+ * and every label inside its link.
+ */
+export const Narrow: Story = {
+  render: (args) => (
+    <div className="grid w-40 justify-items-start gap-3" data-testid="narrow">
+      <ButtonLink {...args} iconStart={<Download />}>Download résumé as a PDF</ButtonLink>
+      <ButtonLink {...args} variant="secondary" iconEnd={<ArrowRight />}>See the whole project</ButtonLink>
+      <ButtonLink {...args} variant="secondary">Send message</ButtonLink>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const container = canvas.getByTestId("narrow").getBoundingClientRect();
+    const [wrapped, , short] = canvas.getAllByRole("link");
+    // The long label wraps, so its link is taller than one with a short label
+    await expect(wrapped!.getBoundingClientRect().height).toBeGreaterThan(short!.getBoundingClientRect().height);
+    for (const element of canvas.getAllByRole("link")) {
+      const box = element.getBoundingClientRect();
+      await expect(box.right).toBeLessThanOrEqual(container.right + 0.5);
+      // The text itself, not its box: text cut off or spilling out would reach past the link's edges
+      const text = document.createRange();
+      text.selectNodeContents(element.querySelector(".button__label")!);
+      const words = text.getBoundingClientRect();
+      await expect(words.left).toBeGreaterThanOrEqual(box.left);
+      await expect(words.right).toBeLessThanOrEqual(box.right);
+      await expect(words.bottom).toBeLessThanOrEqual(box.bottom);
+    }
+  },
+};
+
 /** Icon-only links require an `aria-label`. */
 export const IconOnly: Story = {
   render: (args) => (

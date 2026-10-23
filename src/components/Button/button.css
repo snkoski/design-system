@@ -9,6 +9,8 @@
     gap: var(--space-2);
     min-height: var(--control-md);
     min-width: var(--target-min);
+    max-width: 100%; /* a long label wraps instead of pushing out of its container */
+    padding-block: var(--space-1); /* room above and below a label that wraps; a one-line button is min-height tall */
     padding-inline: var(--space-5);
     border: var(--border-thick) solid transparent; /* visible in forced-colors mode */
     border-radius: var(--radius-sm); /* rectangle, the default shape */
@@ -18,8 +20,8 @@
     font-size: var(--text-body);
     font-weight: 600;
     line-height: 1.2;
+    text-align: center;
     text-decoration: none;
-    white-space: nowrap;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -93,6 +95,15 @@
     min-height: var(--control-lg);
     padding-inline: var(--space-6);
     font-size: var(--text-body-lg);
+  }
+
+  /* A label that doesn't fit wraps onto more lines, and the button grows taller. It's never cut off with an
+     ellipsis: the whole label stays visible at 200% text and on narrow screens (WCAG 1.4.4 and 1.4.10). A word
+     too long for the button breaks rather than spill out of it. */
+  .button__label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
 
   /* Icons */
