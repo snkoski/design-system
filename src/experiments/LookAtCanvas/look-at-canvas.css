@@ -1,0 +1,8 @@
+/* LookAtCanvas: LookAt's bar grid on one canvas. LookAtCanvas.tsx sizes it from the grid and reads `color` for the
+   bars, so a theme sets their color the same way it would an element's. */
+@layer components {
+  .look-at-canvas {
+    display: block;
+    color: var(--look-at-canvas-color, var(--action));
+  }
+}
