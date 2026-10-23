@@ -30,7 +30,7 @@
     color: var(--ink-muted);
   }
 
-  /* The track: one outlined pill. Its edge counts toward the control's height, so it lines up with an Input or
+  /* The track: one outlined rectangle, with a rectangle Button's corners. Its edge counts toward the control's height, so it lines up with an Input or
      Button, and every option is as wide as the widest. Labels wrap rather than push the page wider. */
   .segmented-control__track {
     --segment-edge: var(--border-thin);
@@ -41,7 +41,7 @@
     max-width: 100%;
     min-height: var(--control-md);
     border: var(--segment-edge) solid var(--border-strong);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     background: var(--surface);
     transition: border-color var(--duration-fast) var(--ease-out);
   }
@@ -93,14 +93,14 @@
     inset-inline: 0;
   }
 
-  /* The fill follows the pill's rounded ends */
+  /* The fill follows the track's rounded corners, just inside its edge */
   .segment:first-child .segment__button {
-    border-start-start-radius: var(--radius-full);
-    border-end-start-radius: var(--radius-full);
+    border-start-start-radius: calc(var(--radius-sm) - var(--segment-edge));
+    border-end-start-radius: calc(var(--radius-sm) - var(--segment-edge));
   }
   .segment:last-child .segment__button {
-    border-start-end-radius: var(--radius-full);
-    border-end-end-radius: var(--radius-full);
+    border-start-end-radius: calc(var(--radius-sm) - var(--segment-edge));
+    border-end-end-radius: calc(var(--radius-sm) - var(--segment-edge));
   }
 
   .segment__button:hover:not([aria-checked="true"], [data-disabled], [data-readonly]) {

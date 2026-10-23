@@ -113,9 +113,9 @@ export const Choosing: Story = {
 };
 
 /**
- * Medium is the default. Each size is as tall as an Input and a Button of the same size, so they line up in a row.
- * The story checks the heights with a mouse and on touch, and that a click anywhere from the top to the bottom
- * edge reaches an option.
+ * Medium is the default. Each size is as tall as an Input and a Button of the same size, so they line up in a row,
+ * and has the same corners as a rectangle Button. The story checks the heights with a mouse and on touch, that a
+ * click anywhere from the top to the bottom edge reaches an option, and the corners.
  */
 export const Sizes: Story = {
   render: (args) => (
@@ -145,6 +145,13 @@ export const Sizes: Story = {
         await expect(edgesReachOptions(track)).toBe(true);
       }
     };
+    // The track has a rectangle Button's corners, radius-sm
+    for (const size of ["md", "lg"]) {
+      const row = canvas.getByTestId(size);
+      const radius = (selector: string) => parseFloat(getComputedStyle(row.querySelector(selector)!).borderTopLeftRadius);
+      await expect(radius(".segmented-control__track")).toBe(measure("--radius-sm", canvasElement));
+      await expect(radius(".segmented-control__track")).toBe(radius("button.button"));
+    }
     // With a mouse, target-min is 24px
     await check(24);
     // On touch, target-min is 44px, and the control, Input, and Button all grow together

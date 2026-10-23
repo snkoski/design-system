@@ -28,6 +28,13 @@ Pick a variant by how much attention the action deserves, not by how it looks. M
 - `sm` is for dense places: toolbars, table rows, and tags. It still gets a full `target-min` hit area.
 - `lg` is for a hero call to action, once per page at most.
 
+## Shape
+
+- `rectangle` is the default and the right choice for most buttons: four straight edges with `radius-sm` corners. It sits comfortably beside text fields, cards, and panels.
+- `pill` is fully rounded. It's the softer choice, for a button that should stand apart from the forms and panels around it, such as a hero call to action.
+- Keep a group the same shape, as with size. Don't put a pill beside a rectangle.
+- An icon-only button takes the same shape: a rounded square, or a circle as a pill.
+
 ## Button or link
 
 - **A button does something:** sends, saves, opens a dialog, or changes what's on screen. Use `Button`.
@@ -37,6 +44,7 @@ Pick a variant by how much attention the action deserves, not by how it looks. M
 ## Labels and icons
 
 - Labels follow **Voice and copy**: start with a verb, say exactly what happens, and name the thing ("Delete project," not "Delete").
+- Keep labels short enough to fit on one line. When one doesn't fit, it wraps onto more lines and the button grows taller. It's never cut off with an ellipsis: a cut-off label hides what the button does, and fails WCAG at 200% text and on narrow screens.
 - Icons are decoration: the label does the talking. Put the icon before the label for an action ("Download résumé") and after it for moving forward ("Next project").
 - Icon-only buttons are for actions people already recognize from the icon alone, such as close, favorite, or more. They need an `aria-label`, and are usually `ghost` or `secondary`.
 

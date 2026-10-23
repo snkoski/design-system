@@ -124,6 +124,10 @@ Primer ships nine themes, including high-contrast and colorblind variants. Carbo
 
 Every system limits primary buttons: Carbon to one per page (dialogs and side panels aside), Primer to one per group and rarely more than one per page. Sherbet allows one per view.
 
+Some systems offer more than one button shape. Material 3's expressive update has round and square buttons, Uber's Base has a `shape` prop (pill, round, square, and others), and SwiftUI buttons take a capsule or rounded-rectangle border. Carbon and GOV.UK use square corners only. Sherbet has a rectangle with small rounded corners by default, and a pill.
+
+When a label doesn't fit, most systems let it wrap onto more lines: Carbon (which says not to truncate), Fluent, Polaris, GOV.UK, USWDS, Spectrum, and Base Web. Atlassian, and Material's web component, cut it off with an ellipsis. Primer keeps it on one line and relies on short labels. WCAG only allows a cut-off label when something else shows the full text. Sherbet wraps.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -143,6 +147,13 @@ Every system limits primary buttons: Carbon to one per page (dialogs and side pa
 - [IBM Carbon](https://carbondesignsystem.com/components/button/style/) and [Carbon buttons](https://carbondesignsystem.com/components/button/usage)
 - [Primer buttons](https://primer.style/components/button)
 - [Atlassian buttons](https://developer.atlassian.com/platform/forge/ui-kit/components/button)
+- [Material 3 buttons](https://m3.material.io/components/buttons/overview)
+- [Uber Base buttons](https://baseweb.design/components/button/)
+- [SwiftUI button border shapes](https://developer.apple.com/documentation/swiftui/buttonbordershape)
+- [Primer button guidelines](https://primer.style/product/components/button/guidelines/)
+- [Fluent 2 buttons](https://fluent2.microsoft.design/components/web/react/core/button/usage)
+- [Spectrum web components buttons](https://opensource.adobe.com/spectrum-web-components/components/button/)
+- [WCAG 2.2: Understanding Resize Text](https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html) and [Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)
 - [Microsoft Fluent 2](https://fluent2.microsoft.design/layout)
 - [Shopify Polaris](https://polaris-react.shopify.com/content/grammar-and-mechanics)
 - [GOV.UK Design System](https://design-system.service.gov.uk/patterns/question-pages)

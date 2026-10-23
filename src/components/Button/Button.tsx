@@ -19,6 +19,7 @@ export type ButtonProps = SharedProps &
 export function Button({
   variant = "primary",
   size = "md",
+  shape = "rectangle",
   iconStart,
   iconEnd,
   iconOnly = false,
@@ -41,6 +42,7 @@ export function Button({
       className={cx("button", className)}
       data-variant={variant}
       data-size={size}
+      data-shape={shape}
       data-icon-only={iconOnly || undefined}
       data-loading={loading || undefined}
       aria-busy={loading || undefined}

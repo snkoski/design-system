@@ -29,10 +29,12 @@ const meta = {
     href: "#work",
     variant: "primary",
     size: "md",
+    shape: "rectangle",
   },
   argTypes: {
     variant: { control: "inline-radio", options: ["primary", "secondary", "ghost"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    shape: { control: "inline-radio", options: ["rectangle", "pill"] },
     iconStart: { control: false },
     iconEnd: { control: false },
   },
@@ -57,6 +59,31 @@ export const Variants: Story = {
       <ButtonLink {...args} variant="ghost">Ghost</ButtonLink>
     </div>
   ),
+};
+
+/**
+ * Rectangle, the default, has four straight edges and `radius-sm` corners, and suits most links. Pill is fully
+ * rounded: the softer choice, for a link that should stand apart from the forms and panels around it. Keep a group
+ * the same shape. See **Choosing a button**.
+ */
+export const Shapes: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-4">
+      <ButtonLink {...args} shape="rectangle">Rectangle</ButtonLink>
+      <ButtonLink {...args} shape="pill">Pill</ButtonLink>
+      <ButtonLink {...args} shape="rectangle" iconOnly aria-label="Favorites" href="#favorites"><Heart /></ButtonLink>
+      <ButtonLink {...args} shape="pill" iconOnly aria-label="Favorites" href="#favorites"><Heart /></ButtonLink>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const radius = (element: HTMLElement) => parseFloat(getComputedStyle(element).borderTopLeftRadius);
+    const rectangle = canvas.getByRole("link", { name: "Rectangle" });
+    const pill = canvas.getByRole("link", { name: "Pill" });
+    // A rectangle's corners are radius-sm, much less than half its height; a pill's are at least half its height
+    await expect(radius(rectangle)).toBe(measure("--radius-sm", canvasElement));
+    await expect(radius(rectangle)).toBeLessThan(rectangle.getBoundingClientRect().height / 3);
+    await expect(radius(pill)).toBeGreaterThanOrEqual(pill.getBoundingClientRect().height / 2);
+  },
 };
 
 /**
@@ -100,6 +127,38 @@ export const WithIcons: Story = {
   ),
 };
 
+/**
+ * In a narrow space, a label that doesn't fit wraps onto more lines and the link grows taller. It's never cut off
+ * with an ellipsis, so the whole label stays readable. The story checks every link stays inside its container,
+ * and every label inside its link.
+ */
+export const Narrow: Story = {
+  render: (args) => (
+    <div className="grid w-40 justify-items-start gap-3" data-testid="narrow">
+      <ButtonLink {...args} iconStart={<Download />}>Download résumé as a PDF</ButtonLink>
+      <ButtonLink {...args} variant="secondary" iconEnd={<ArrowRight />}>See the whole project</ButtonLink>
+      <ButtonLink {...args} variant="secondary">Send message</ButtonLink>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const container = canvas.getByTestId("narrow").getBoundingClientRect();
+    const [wrapped, , short] = canvas.getAllByRole("link");
+    // The long label wraps, so its link is taller than one with a short label
+    await expect(wrapped!.getBoundingClientRect().height).toBeGreaterThan(short!.getBoundingClientRect().height);
+    for (const element of canvas.getAllByRole("link")) {
+      const box = element.getBoundingClientRect();
+      await expect(box.right).toBeLessThanOrEqual(container.right + 0.5);
+      // The text itself, not its box: text cut off or spilling out would reach past the link's edges
+      const text = document.createRange();
+      text.selectNodeContents(element.querySelector(".button__label")!);
+      const words = text.getBoundingClientRect();
+      await expect(words.left).toBeGreaterThanOrEqual(box.left);
+      await expect(words.right).toBeLessThanOrEqual(box.right);
+      await expect(words.bottom).toBeLessThanOrEqual(box.bottom);
+    }
+  },
+};
+
 /** Icon-only links require an `aria-label`. */
 export const IconOnly: Story = {
   render: (args) => (
@@ -138,13 +197,15 @@ function Matrix() {
           ))}
           <ButtonLink href="#work" variant={variant} iconEnd={<ArrowRight />}>Icon</ButtonLink>
           <ButtonLink href="#work" variant={variant} iconOnly aria-label="Favorites"><Heart /></ButtonLink>
+          <ButtonLink href="#work" variant={variant} shape="pill">Pill</ButtonLink>
+          <ButtonLink href="#work" variant={variant} shape="pill" iconOnly aria-label="Favorites"><Heart /></ButtonLink>
         </div>
       ))}
     </div>
   );
 }
 
-/** Every variant and size in all three themes at once. Chromatic snapshots this one. */
+/** Every variant, size, and shape in all three themes at once. Chromatic snapshots this one. */
 export const AllThemes: Story = {
   parameters: { layout: "fullscreen" },
   render: () => (
