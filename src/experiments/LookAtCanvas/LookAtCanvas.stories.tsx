@@ -247,24 +247,30 @@ export const HotDogFlashlight: Story = {
   ),
 };
 
-/** With reduced motion (here forced with data-motion="reduced"), nothing turns: every bar keeps pointing up. */
+/**
+ * With reduced motion (here forced with data-motion="reduced"), nothing turns: every bar keeps pointing up. Colors
+ * aren't motion, so they still follow the mouse, which is how the story checks the mouse was seen at all.
+ */
 export const ReducedMotion: Story = {
   render: (args) => (
     <div data-motion="reduced" className="grid place-items-center p-8" style={page}>
-      <LookAtCanvas {...args} columns={8} rows={4} data-testid="still" />
+      <LookAtCanvas {...args} columns={8} rows={4} colors={[BLUE, RED]} data-testid="still" />
     </div>
   ),
   play: async ({ canvas }) => {
     const field = canvas.getByTestId("still") as HTMLCanvasElement;
     const area = field.getBoundingClientRect();
     const pitch = area.width / 8;
-    movePointer(area.right + 200, area.top + pitch / 2);
+    const center = pitch / 2;
+    // Just off the first bar's center, below and to the right, where it would turn to lie diagonally
+    movePointer(area.left + center + 1, area.top + center + 1);
     await new Promise((resolve) => setTimeout(resolve, 400));
     const density = field.width / area.width;
-    const alpha = (x: number, y: number) => field.getContext("2d")!.getImageData(Math.round(x * density), Math.round(y * density), 1, 1).data[3]!;
-    const center = pitch / 2;
-    await expect(alpha(center, center - 5)).toBeGreaterThan(0); // still standing up
-    await expect(alpha(center + 5, center)).toBe(0);
+    const pixel = (x: number, y: number) => [...field.getContext("2d")!.getImageData(Math.round(x * density), Math.round(y * density), 1, 1).data];
+    const [red, , blue, alpha] = pixel(center, center - 5);
+    await expect(alpha!).toBeGreaterThan(0); // still standing up
+    await expect(pixel(center + 5, center)[3]).toBe(0);
+    await expect(red!).toBeGreaterThan(blue!); // but the mouse was seen: colors still follow it
   },
 };
 

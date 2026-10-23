@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { CanvasHTMLAttributes, Ref } from "react";
 import { cx } from "../../internal/cx";
 import type { ProximityFade } from "../Proximity/Proximity";
@@ -128,7 +128,9 @@ export function LookAtCanvas({
     wake.current();
   });
 
-  useEffect(() => {
+  // A layout effect, so it's listening as soon as it's on the page: a pointer move in the same moment (a story's
+  // play function, say) isn't lost before a passive effect would have run, as LookAt does
+  useLayoutEffect(() => {
     const surface = canvas.current!;
     let angles = new Float32Array(0);
     let levels = new Float32Array(0); // each bar's closeness to the pointer, from 0 to 1
