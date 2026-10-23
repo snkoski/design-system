@@ -15,7 +15,7 @@ const meta = {
   component: SolarSystem,
   // Most of them start on today's date, so a snapshot would never match
   parameters: { layout: "fullscreen", chromatic: { disableSnapshot: true } },
-  args: { speed: 30, scale: "log", orbits: true, labels: true, ruler: false, paused: false },
+  args: { speed: 30, scale: "log", orbits: true, moons: true, labels: true, ruler: false, paused: false },
   argTypes: {
     date: { control: "date" },
     speed: { control: { type: "range", min: -3650, max: 3650, step: 10 } },
@@ -39,7 +39,8 @@ type Story = StoryObj<typeof meta>;
 export const Playground: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(canvas.getByRole("img", { name: /hamburger for the Sun/ })).toBeVisible();
-    await expect(canvasElement.querySelectorAll("[data-planet] .solar-system__body")).toHaveLength(9);
+    await expect(canvasElement.querySelectorAll("g[data-planet] > .solar-system__body")).toHaveLength(9);
+    await expect(canvasElement.querySelectorAll("[data-moon]")).toHaveLength(21);
     const button = canvas.getByRole("button", { name: "Pause" });
     const date = canvasElement.querySelector(".solar-system__date")!;
     const before = { width: button.getBoundingClientRect().width, date: date.getBoundingClientRect().left };
@@ -75,8 +76,25 @@ export const PlutoInsideNeptune: Story = {
   args: { date: Date.UTC(1989, 8, 5), paused: true, scale: "even" },
   play: async ({ canvasElement }) => {
     const sun = canvasElement.querySelector("[data-body=Sun]")!;
-    const [pluto, neptune] = ["Pluto", "Neptune"].map((name) => canvasElement.querySelector(`g[data-planet=${name}] .solar-system__body`)!);
+    const [pluto, neptune] = ["Pluto", "Neptune"].map((name) => canvasElement.querySelector(`g[data-planet=${name}] > .solar-system__body`)!);
     await expect(distance(pluto!, sun)).toBeLessThan(distance(neptune!, sun));
+  },
+};
+
+/**
+ * The total solar eclipse of 8 April 2024, seen across North America: the Moon's hot dog sits between Earth's and the
+ * burger. Earth's Moon is the one moon that's where it really is. The story checks it points straight at the burger.
+ */
+export const SolarEclipse: Story = {
+  args: { date: Date.UTC(2024, 3, 8, 18, 18), paused: true, scale: "even" },
+  play: async ({ canvasElement }) => {
+    const sun = center(canvasElement.querySelector("[data-body=Sun]")!);
+    const earth = center(canvasElement.querySelector("g[data-planet=Earth] > .solar-system__body")!);
+    const moon = center(canvasElement.querySelector("[data-moon=Moon] text")!);
+    const toSun = Math.atan2(sun.y - earth.y, sun.x - earth.x);
+    const toMoon = Math.atan2(moon.y - earth.y, moon.x - earth.x);
+    const apart = Math.abs(((((toMoon - toSun) * 180) / Math.PI + 540) % 360) - 180);
+    await expect(apart).toBeLessThan(3); // degrees
   },
 };
 

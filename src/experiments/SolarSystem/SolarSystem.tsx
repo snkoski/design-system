@@ -4,9 +4,11 @@ import type { HTMLAttributes, Ref } from "react";
 import { Button } from "../../components/Button";
 import { cx } from "../../internal/cx";
 import "../decoration.css";
-import { PLANETS, SUN } from "./bodies";
+import { MOONS, PLANETS, SUN } from "./bodies";
+import type { Moon } from "./bodies";
 import { orbitPath, positionAt } from "./kepler";
 import type { Position } from "./kepler";
+import { moonAngle, shownPeriod } from "./moons";
 import { scaleDistance } from "./scale";
 import type { DistanceScale } from "./scale";
 import "./solar-system.css";
@@ -27,6 +29,35 @@ const sizeOf = (radius: number) => 0.065 * (radius / 6_371) ** 0.3;
 
 const RINGS = PLANETS.map((planet) => planet.orbit.at2000.a);
 const OUTERMOST = Math.max(...PLANETS.map(({ orbit: { at2000 } }) => at2000.a * (1 + at2000.e)));
+/** How big to draw a moon: smaller than a planet its size would be, but never too small to see */
+const moonSizeOf = (radius: number) => Math.max(0.7 * sizeOf(radius), 0.028);
+/** A moon going round more times a second than this is drawn as a blur round its planet, as it would look */
+const FAST_TURNS = 2.5;
+/** The furthest a planet's moons are drawn, as a multiple of the nearest's distance, so they keep near their planet */
+const MOON_REACH = 2;
+
+interface MoonLayout {
+  moon: Moon;
+  /** Its place in MOONS */
+  index: number;
+  size: number;
+  /**
+   * How far from its planet's middle to draw it: the nearest just clear of the planet, and the others out by the cube
+   * root of their real distance, or squeezed more if that would take the furthest past MOON_REACH
+   */
+  orbit: number;
+  /** Its shown period, in days */
+  period: number;
+}
+const MOON_LAYOUT: MoonLayout[] = MOONS.map((moon, index) => {
+  const planet = PLANETS.find((other) => other.name === moon.planet)!;
+  const distances = MOONS.filter((other) => other.planet === moon.planet).map((other) => other.distance);
+  const [nearest, furthest] = [Math.min(...distances), Math.max(...distances)];
+  const power = furthest === nearest ? 1 / 3 : Math.min(1 / 3, Math.log(MOON_REACH) / Math.log(furthest / nearest));
+  const clear = sizeOf(planet.radius) * 0.55 + 0.02;
+  return { moon, index, size: moonSizeOf(moon.radius), orbit: clear * (moon.distance / nearest) ** power, period: shownPeriod(moon, MOONS) };
+});
+
 /** The ruler's marks, in AU */
 const RULER_MARKS = [1, 2, 5, 10, 20, 30, 40, 50];
 /** How far apart two marks must be, in view units, for both to be numbered: room for two numbers in a narrow picture */
@@ -59,6 +90,12 @@ export interface SolarSystemProps extends Omit<HTMLAttributes<HTMLElement>, "chi
   scale?: DistanceScale;
   /** Draw each orbit's path. Default: true. */
   orbits?: boolean;
+  /**
+   * Show the bigger moons as smaller hot dogs round their planets. Earth's Moon is where it really is, so it's
+   * between Earth and the burger at a new moon. The others are slowed down to watch, so their places are for show.
+   * A moon going round too fast to follow is drawn as a blur. Default: true.
+   */
+  moons?: boolean;
   /** Name each planet. Default: true. */
   labels?: boolean;
   /**
@@ -77,11 +114,13 @@ export interface SolarSystemProps extends Omit<HTMLAttributes<HTMLElement>, "chi
  * really is on the date, from JPL's table of their orbits, and moves on from there: no gravity is simulated. An
  * experiment: not exported from the package (see CLAUDE.md, Experiments).
  */
-export function SolarSystem({ date, speed = 30, paused = false, scale = "log", orbits = true, labels = true, ruler = false, className, ref, ...rest }: SolarSystemProps) {
+export function SolarSystem({ date, speed = 30, paused = false, scale = "log", orbits = true, moons = true, labels = true, ruler = false, className, ref, ...rest }: SolarSystemProps) {
   const [running, setRunning] = useState(!paused);
   const figure = useRef<HTMLElement | null>(null);
   const planets = useRef<(SVGGElement | null)[]>([]);
   const paths = useRef<(SVGPathElement | null)[]>([]);
+  const moonGroups = useRef<(SVGGElement | null)[]>([]);
+  const moonBodies = useRef<(SVGGElement | null)[]>([]);
   const caption = useRef<HTMLTimeElement | null>(null);
   const time = useRef(0);
   const orbitsDrawnAt = useRef<number | null>(null);
@@ -102,6 +141,12 @@ export function SolarSystem({ date, speed = 30, paused = false, scale = "log", o
     PLANETS.forEach((planet, index) => {
       const [x, y] = project(positionAt(planet.orbit, now));
       planets.current[index]?.setAttribute("transform", `translate(${x.toFixed(4)} ${y.toFixed(4)})`);
+    });
+    const { speed, running } = settings.current;
+    MOON_LAYOUT.forEach(({ moon, index, orbit, period }) => {
+      const angle = (moonAngle(moon, MOONS, now) * Math.PI) / 180;
+      moonBodies.current[index]?.setAttribute("transform", `translate(${(orbit * Math.cos(angle)).toFixed(4)} ${(-orbit * Math.sin(angle)).toFixed(4)})`);
+      moonGroups.current[index]?.toggleAttribute("data-fast", running && Math.abs(speed) / period > FAST_TURNS);
     });
     if (orbitsDrawnAt.current === null || Math.abs(now - orbitsDrawnAt.current) > REDRAW_ORBITS) {
       orbitsDrawnAt.current = now;
@@ -128,7 +173,10 @@ export function SolarSystem({ date, speed = 30, paused = false, scale = "log", o
     toScreen.current = scaleDistance(scale, RINGS, OUTERMOST);
     orbitsDrawnAt.current = null;
     draw();
-  }, [scale, orbits]);
+  }, [scale, orbits, moons]);
+
+  // A moon too fast to follow blurs only while it's going round
+  useLayoutEffect(draw, [running, speed]);
 
   useEffect(() => setRunning(!paused), [paused]);
 
@@ -167,7 +215,7 @@ export function SolarSystem({ date, speed = 30, paused = false, scale = "log", o
         className="solar-system__view"
         viewBox={`${-EDGE} ${-EDGE} ${2 * EDGE} ${2 * EDGE}`}
         role="img"
-        aria-label={`The solar system, with a hamburger for the Sun and hot dogs for the planets: ${PLANETS.map((planet) => planet.name).join(", ")}${ruler ? ". A ruler underneath marks distances from the Sun." : ""}`}
+        aria-label={`The solar system, with a hamburger for the Sun and hot dogs for the planets: ${PLANETS.map((planet) => planet.name).join(", ")}${moons ? ". Smaller hot dogs go round them as moons" : ""}${ruler ? ". A ruler underneath marks distances from the Sun." : ""}`}
       >
         {orbits && (
           <g className="solar-system__orbits">
@@ -192,6 +240,18 @@ export function SolarSystem({ date, speed = 30, paused = false, scale = "log", o
                   {planet.name}
                 </text>
               )}
+              {moons &&
+                MOON_LAYOUT.filter(({ moon }) => moon.planet === planet.name).map(({ moon, index, size, orbit }) => (
+                  <g key={moon.name} ref={(node) => void (moonGroups.current[index] = node)} className="solar-system__moon" data-moon={moon.name}>
+                    <circle className="solar-system__moon-blur" r={orbit} strokeWidth={size * 0.5} />
+                    <g ref={(node) => void (moonBodies.current[index] = node)}>
+                      <title>{moon.name}</title>
+                      <text className="solar-system__body" fontSize={size}>
+                        {moon.emoji}
+                      </text>
+                    </g>
+                  </g>
+                ))}
             </g>
           );
         })}
