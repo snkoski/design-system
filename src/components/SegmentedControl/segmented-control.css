@@ -104,7 +104,7 @@
   }
 
   .segment__button:hover:not([aria-checked="true"], [data-disabled], [data-readonly]) {
-    background: var(--surface-tint);
+    background: var(--surface-hover);
   }
 
   .segment__button:focus-visible {

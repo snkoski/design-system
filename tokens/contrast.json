@@ -3,7 +3,8 @@
   "pairs": [
     { "fg": "ink", "bg": "bg", "min": 4.5, "use": "Body text on the page" },
     { "fg": "ink", "bg": "surface", "min": 4.5, "use": "Text on cards, menus, dialogs, inputs, and text areas" },
-    { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels and hovered controls, such as a segment" },
+    { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels" },
+    { "fg": "ink", "bg": "surface-hover", "min": 4.5, "use": "Labels of hovered secondary and ghost buttons and segments" },
     { "fg": "ink", "bg": "success-soft", "min": 4.5, "use": "Message text on a success background" },
     { "fg": "ink", "bg": "warning-soft", "min": 4.5, "use": "Message text on a warning background" },
     { "fg": "ink", "bg": "danger-soft", "min": 4.5, "use": "Message text on an error background" },
@@ -11,6 +12,7 @@
     { "fg": "ink-muted", "bg": "bg", "min": 4.5, "use": "Secondary text on the page" },
     { "fg": "ink-muted", "bg": "surface", "min": 4.5, "use": "Descriptions and captions on cards" },
     { "fg": "ink-muted", "bg": "surface-tint", "min": 4.5, "use": "Secondary text on tinted panels" },
+    { "fg": "ink-muted", "bg": "surface-hover", "min": 4.5, "use": "Secondary text and decorative icons on a hovered control" },
 
     { "fg": "link", "bg": "bg", "min": 4.5, "use": "Links on the page" },
     { "fg": "link", "bg": "surface", "min": 4.5, "use": "Links on cards" },
@@ -18,6 +20,7 @@
 
     { "fg": "on-action", "bg": "action", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, the switch thumb when on, and a chosen segment's label and icons, on the fill" },
     { "fg": "on-action", "bg": "action-hover", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, the switch thumb when on, and a chosen segment's label and icons, on hover" },
+    { "fg": "on-brand", "bg": "brand", "min": 4.5, "use": "Text on a brand-colored band or panel in a layout" },
     { "fg": "on-highlight", "bg": "highlight", "min": 4.5, "use": "Chip and badge text" },
 
     { "fg": "success", "bg": "bg", "min": 4.5, "use": "Success text and icons on the page" },
@@ -30,7 +33,8 @@
 
     { "fg": "border-strong", "bg": "bg", "min": 3, "use": "Control edges on the page" },
     { "fg": "border-strong", "bg": "surface", "min": 3, "use": "Control edges on cards, the segmented control's track and dividers, the unticked checkbox box, the unselected radio circle, and the switch thumb when off" },
-    { "fg": "border-strong", "bg": "surface-tint", "min": 3, "use": "Control edges on tinted panels and hovered controls (checkbox box, radio circle), and the switch thumb when off and hovered" },
+    { "fg": "border-strong", "bg": "surface-tint", "min": 3, "use": "Control edges on tinted panels" },
+    { "fg": "border-strong", "bg": "surface-hover", "min": 3, "use": "Edges of hovered controls (checkbox box, radio circle, secondary button), and the switch thumb when off and hovered" },
     { "fg": "focus", "bg": "bg", "min": 3, "use": "Focus outline on the page" },
     { "fg": "focus", "bg": "surface", "min": 3, "use": "Focus outline on cards" },
     { "fg": "focus", "bg": "surface-tint", "min": 3, "use": "Focus outline on tinted panels" },

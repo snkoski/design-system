@@ -23,7 +23,7 @@
 
   /* Ketchup */
   [data-theme="hotdog"] .solar-system__orbits {
-    stroke: var(--action);
+    stroke: var(--brand);
     stroke-width: var(--border-thick);
   }
 

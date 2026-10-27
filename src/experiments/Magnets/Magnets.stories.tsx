@@ -13,7 +13,7 @@ const box = { ...page, border: "var(--border-thin) solid var(--border-strong)", 
 /** A ball that shows its charge with a sign as well as a color: + is orange, − is teal, and neutral is gray */
 function Charge({ charge, size = "2.5rem" }: { charge: number; size?: string }) {
   const Sign = charge > 0 ? Plus : Minus;
-  const background = charge > 0 ? "var(--action)" : charge < 0 ? "var(--success)" : "var(--border-strong)";
+  const background = charge > 0 ? "var(--brand)" : charge < 0 ? "var(--success)" : "var(--border-strong)";
   return (
     <span className="grid place-items-center" style={{ width: size, height: size, borderRadius: "var(--radius-full)", background, color: "var(--bg)" }}>
       {charge !== 0 && <Sign size="60%" strokeWidth={3} />}

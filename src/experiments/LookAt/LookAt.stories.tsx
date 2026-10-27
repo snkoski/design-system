@@ -6,7 +6,7 @@ import { LookAt } from "./LookAt";
 
 /** A rounded bar, drawn pointing up, so LookAt stands it on end toward the mouse */
 function Bar({ width = "0.375rem", height = "2rem" }: { width?: string; height?: string }) {
-  return <span style={{ display: "block", width, height, borderRadius: "var(--radius-full)", background: "var(--action)" }} />;
+  return <span style={{ display: "block", width, height, borderRadius: "var(--radius-full)", background: "var(--brand)" }} />;
 }
 
 function Arrow() {

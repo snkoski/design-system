@@ -1,6 +1,6 @@
 # Design system
 
-Tokens, styles, and React components for a playful, accessible design system. The current palette is called Sherbet (tangerine, peach, and mint with espresso ink) and ships with three themes: light, dark, and hot dog.
+Tokens, styles, and React components for a playful, accessible design system. The current palette is called Sherbet (tangerine, peach, and mint, around components drawn in black, white, and gray) and ships with three themes: light, dark, and hot dog.
 
 The brand book (principles, voice, color, type, layout, mouse and touch sizing, motion, iconography, forms, accessibility, how to build with it, and a comparison with major industry design systems) lives in `docs/brand/`, and Storybook shows it under **Foundations**, next to visual pages for every token. This repo is the source of truth for both the code and the guidelines.
 
@@ -64,7 +64,7 @@ src/foundations/             Storybook Foundations pages: the brand book plus to
 
 - **Tailwind is for layout only** (spacing, sizing, flex, and grid) in the markup. Everything a component *is* (color, type, border, radius, states, and variants) lives in its own CSS file, in `@layer components`, using tokens.
 - **Classes name things, `data-*` attributes pick variants, ARIA attributes carry state.** No modifier classes.
-- **Components only use semantic tokens** (`--action`, `--ink`), never primitives (`--tangerine-500`).
+- **Components only use neutral semantic tokens** (`--action`, `--ink`), never primitives (`--tangerine-500`) or the brand tokens (`--brand`, `--surface-tint`). Brand colors belong to the layout.
 - **HSL only** for colors. **rem** for sizes; **px** only for borders, focus rings, and shadow offsets.
 - **Focus is an outline**, never only a shadow. Every control has a border (transparent if needed) so it survives Windows Contrast themes.
 - **Every story is checked for accessibility.** Violations fail the story (`a11y.test: "error"`).

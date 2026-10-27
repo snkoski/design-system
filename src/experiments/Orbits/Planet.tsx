@@ -29,7 +29,7 @@ export type PlanetProps = BounceProps & {
    * end. A couple of seconds shows which way it's heading; ten or so shows a whole orbit. Default: 0 (no trail).
    */
   trail?: number;
-  /** The trail's color: any CSS color, such as `var(--action)`. Default: `currentColor`. */
+  /** The trail's color: any CSS color, such as `var(--brand)`. Default: `currentColor`. */
   trailColor?: string;
 };
 

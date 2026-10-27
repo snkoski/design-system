@@ -7,7 +7,7 @@ import { Bounce } from "./Bounce";
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to bounce around in: positioned, so Bounce measures it, with an edge you can see */
 const box = { ...page, border: "var(--border-thin) solid var(--border-strong)", borderRadius: "var(--radius-md)", overflow: "hidden" };
-const colors = ["var(--action)", "var(--success)", "var(--warning)", "var(--danger)", "var(--link)", "var(--highlight)"];
+const colors = ["var(--brand)", "var(--success)", "var(--warning)", "var(--danger)", "var(--link)", "var(--highlight)"];
 const emoji = ["🏀", "⚽", "🎾", "🌭", "🦄", "👀", "✨", "🍕", "🐱", "🍩", "⭐", "🔥"];
 
 function Ball({ color, size = "2rem" }: { color: string; size?: string }) {
@@ -156,7 +156,7 @@ function WholePageDemo(args: Story["args"]) {
         Pause the ball
       </Button>
       <Bounce {...args} paused={paused}>
-        <Ball color="var(--action)" size="3rem" />
+        <Ball color="var(--brand)" size="3rem" />
       </Bounce>
     </div>
   );

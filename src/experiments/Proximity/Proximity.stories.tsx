@@ -73,7 +73,7 @@ export const Playground: Story = {
       columns={14}
       rows={9}
       item={(index) => (
-        <Proximity key={index} {...args} style={{ color: "var(--action)" }}>
+        <Proximity key={index} {...args} style={{ color: "var(--brand)" }}>
           <Dot />
         </Proximity>
       )}
@@ -92,7 +92,7 @@ export const FadeOut: Story = {
       columns={14}
       rows={9}
       item={(index) => (
-        <Proximity key={index} {...args} style={{ color: "var(--action)" }} data-testid={`cell-${index}`}>
+        <Proximity key={index} {...args} style={{ color: "var(--brand)" }} data-testid={`cell-${index}`}>
           <Square />
         </Proximity>
       )}
@@ -115,7 +115,7 @@ export const FadeIn: Story = {
       columns={14}
       rows={9}
       item={(index) => (
-        <Proximity key={index} {...args} style={{ color: "var(--action)" }}>
+        <Proximity key={index} {...args} style={{ color: "var(--brand)" }}>
           <Dot />
         </Proximity>
       )}

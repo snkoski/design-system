@@ -148,11 +148,11 @@ function Compare() {
               const look = <LookAt style={{ width: "1.375rem", height: "1.375rem" }}>{kind === "hotdogs" ? <HotDog /> : <Bar />}</LookAt>;
               // Proximity around each one only when it's switched on, so the plain comparison stays plain
               return colored ? (
-                <Proximity key={index} colors={colors} fade={fade} style={{ color: "var(--action)" }}>
+                <Proximity key={index} colors={colors} fade={fade} style={{ color: "var(--brand)" }}>
                   {look}
                 </Proximity>
               ) : (
-                <span key={index} style={{ display: "contents", color: "var(--action)" }}>
+                <span key={index} style={{ display: "contents", color: "var(--brand)" }}>
                   {look}
                 </span>
               );
@@ -274,7 +274,7 @@ export const ReducedMotion: Story = {
   },
 };
 
-/** The bars in all three themes: each takes its color from the theme's --action. Before the mouse moves, all point up. */
+/** The bars in all three themes: each takes its color from the theme's --brand. Before the mouse moves, all point up. */
 export const AllThemes: Story = {
   render: (args) => (
     <div className="grid">

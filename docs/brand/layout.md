@@ -41,6 +41,6 @@ See **Mouse, touch, and screen size** for the full reasoning. In short:
 ## Shape and elevation
 
 - Soft and round. Buttons are rectangles with `radius-sm` corners by default, and so are segmented controls; pill buttons, chips, badges, and avatars use `radius-full`. Inputs and menus use `radius-md`, cards and dialogs `radius-lg`, and hero panels `radius-xl`.
-- Elevation: `shadow-sm` for raised controls, `shadow-md` for popovers and hovered cards, and `shadow-lg` for dialogs. Shadows are espresso-tinted, never gray.
+- Elevation: `shadow-sm` for raised controls, `shadow-md` for popovers and hovered cards, and `shadow-lg` for dialogs. Shadows are neutral black at low opacity, so they suit any brand.
 - A shadow never carries meaning alone. Pair it with a border so the element survives forced-colors mode.
 - **In dark mode, higher surfaces are lighter**, not just shadowed (Apple's elevated backgrounds, Atlassian's elevation, and Material's tonal surfaces). That's why `surface` is lighter than `bg` in the dark theme.

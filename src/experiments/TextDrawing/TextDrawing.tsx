@@ -29,7 +29,7 @@ interface OwnProps {
   reach?: number;
   /**
    * The colors an `=` goes through as the mouse comes near, from far to near. Any CSS colors.
-   * Default: the border color to the action color.
+   * Default: the border color to the brand color.
    */
   colors?: string[];
   /** Each cell's width and height, in rem. Default: 1.25. */
@@ -40,7 +40,7 @@ interface OwnProps {
 
 export type TextDrawingProps = OwnProps & Omit<HTMLAttributes<HTMLDivElement>, keyof OwnProps>;
 
-const DEFAULT_COLORS = ["var(--border)", "var(--action)"];
+const DEFAULT_COLORS = ["var(--border)", "var(--brand)"];
 
 /**
  * Draw by typing: a text area on the left, and on the right a picture with one cell for each character, in the

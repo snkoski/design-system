@@ -3,6 +3,6 @@
 @layer components {
   .look-at-canvas {
     display: block;
-    color: var(--look-at-canvas-color, var(--action));
+    color: var(--look-at-canvas-color, var(--brand));
   }
 }

@@ -52,7 +52,7 @@ Each job has exactly one convention. Never use two conventions for the same job.
 
   .nav-link[aria-current="page"] { text-decoration: underline; font-weight: 600; }
   .input[aria-invalid="true"] { border-color: var(--danger); }
-  .menu-item[data-highlighted] { background: var(--surface-tint); }
+  .menu-item[data-highlighted] { background: var(--surface-hover); }
 }
 ```
 
@@ -73,7 +73,7 @@ Each job has exactly one convention. Never use two conventions for the same job.
 - **Primitives** are the raw palette (`tangerine-500`). **Semantic tokens** say what a value is for (`action`). Components read semantic tokens only, never primitives.
 - Tokens are CSS custom properties. Tailwind v4's `@theme` reads the same spacing and size values, so utilities and component CSS share one source.
 - **HSL only.** Colors are written `hsl(H S% L%)`. No hex, no named colors.
-- **Re-branding** a site: load a brand file after the Sherbet tokens that redefines semantic tokens (and its own primitives) under `:root` and each `[data-theme]`. Components don't change. Recheck contrast for every brand in every theme.
+- **Re-branding** a site: load a brand file after the Sherbet tokens that redefines the brand tokens (`bg`, `brand`, `on-brand`, `surface-tint`, `highlight`, `on-highlight`, and `link`, plus its own primitives) under `:root` and each `[data-theme]`. Components are neutral, so they don't change and need no new colors. Recheck contrast for every brand in every theme.
 - **A calmer type scale** for a client site: override the five heading sizes with fixed values (a 1.25 ratio from 1.125rem body) in the brand file. Everything else stays.
 
 ## Units: rem or px

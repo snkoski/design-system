@@ -4,7 +4,7 @@ Instructions for working in this repo. Read this before changing anything.
 
 ## What this is
 
-A standalone design system: tokens, CSS, and React components, published as a package that other projects (Astro sites, React apps, possibly in other GitHub orgs) install. The current palette is called Sherbet (tangerine, peach, and mint with espresso ink). It has three themes: `light`, `dark`, and `hotdog` (a deliberate joke theme in ketchup and mustard that still has to pass every accessibility check).
+A standalone design system: tokens, CSS, and React components, published as a package that other projects (Astro sites, React apps, possibly in other GitHub orgs) install. The current palette is called Sherbet (tangerine, peach, and mint). Components are neutral (black, white, and grays) and the brand colors live in the layout around them, so the components can serve other brands too. It has three themes: `light`, `dark`, and `hotdog` (a deliberate joke theme in ketchup and mustard that still has to pass every accessibility check).
 
 The brand book (principles, voice, color usage, type, layout, motion, iconography, accessibility, and building rules) lives in `docs/brand/*.md`. **This repo is the source of truth.** Storybook's Foundations pages render those files, plus visual blocks drawn from `tokens/tokens.json`. The design system artifact on claude.ai is a copy that gets re-synced from the repo; never treat it as the source.
 
@@ -77,7 +77,8 @@ src/foundations/             Storybook docs pages (MDX) that render docs/brand, 
 ## Tokens
 
 - `tokens/tokens.json` is the only place values are defined. `src/styles/tokens.css` and `tailwind-theme.css` are generated: never edit them by hand.
-- Two tiers. **Primitives** are the raw palette (`tangerine-500`, `espresso-950`). **Semantic tokens** say what a value is for (`bg`, `surface`, `surface-tint`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `link`, `highlight`, `on-highlight`, `focus`, `success`, `warning`, `danger` and their `-soft` versions). **Components use semantic tokens only, never primitives.**
+- Two tiers. **Primitives** are the raw palette (`tangerine-500`, `gray-900`). **Semantic tokens** say what a value is for (`bg`, `surface`, `surface-tint`, `surface-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `brand`, `on-brand`, `link`, `highlight`, `on-highlight`, `focus`, `success`, `warning`, `danger` and their `-soft` versions). **Components use semantic tokens only, never primitives.**
+- **Components are neutral.** The tokens they draw with (`surface`, `surface-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `focus`) point at the pure gray scale (`gray-*`, plus `white` and `char-950`), never at a brand hue. `brand`, `on-brand`, and `surface-tint` are for layouts, and `pnpm check` fails if a component uses them. A hover fill is `surface-hover`. Status colors (`success`, `warning`, `danger`) are fine where they carry meaning. See `docs/brand/color.md`.
 - Semantic colors have a value per theme, usually an alias such as `"{tangerine-500}"`.
 - **Colors are HSL only**, written `hsl(H S% L%)`. Never hex, never named colors. If a tool or library outputs hex, convert it.
 - Every token has a `usage` note saying where it's used. Text colors name the backgrounds they're checked on.
@@ -328,7 +329,7 @@ Applies to docs, JSDoc, story descriptions, README text, and any copy in compone
 ## Don't
 
 - Edit generated CSS instead of `tokens/tokens.json`.
-- Use hex colors, primitive tokens in components, or Tailwind for styling.
+- Use hex colors, primitive tokens in components, brand tokens (`brand`, `surface-tint`) in components, or Tailwind for styling.
 - Add modifier classes or `cva`.
 - Remove a focus outline without replacing it.
 - Delete, skip, weaken, or comment out a test to get something passing. Tests are only removed when the user explicitly says so.

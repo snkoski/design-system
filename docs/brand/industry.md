@@ -64,6 +64,19 @@ Every system keeps body text the same size on phones and desktops. Headings are 
 
 Primer ships nine themes, including high-contrast and colorblind variants. Carbon ships four. Sherbet has three, with high contrast as a future addition.
 
+## Component color
+
+| Source | Primary button and checked controls |
+| --- | --- |
+| Apple | The app's accent (tint) color, blue by default |
+| Material 3 | The brand's primary color, or one drawn from the wallpaper (dynamic color) |
+| Primer | Green primary button; blue checked controls |
+| Atlassian, Carbon | The brand blue |
+| GOV.UK | Green primary button; black checkbox ticks and radio dots |
+| Polaris | Near black, since its 2023 redesign |
+| shadcn/ui | Near black in its default theme |
+| **Sherbet** | **Near black (near white in dark mode). Brand colors live in the layout, so the components suit any brand** |
+
 ## Motion
 
 | Source | Durations | Reduced motion |
