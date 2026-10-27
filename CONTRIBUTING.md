@@ -14,18 +14,18 @@ Keep pull requests small and about one thing. A new component, a token change, a
 
 ## Checks
 
-Two checks run on every pull request. The Test check must pass before merging. For Chromatic, a reviewer accepts or rejects the visual changes in its web app.
+The Test check runs on every pull request and must pass before merging. Chromatic runs after merging, on `main`. (It's paused for now: see the warning in `README.md`.)
 
 - **Test** (`.github/workflows/test.yml`): typecheck, the contrast and rules checks, build, unit tests, and every story run as a test in Chromium, including the accessibility checks.
-- **Chromatic** (`.github/workflows/chromatic.yml`): publishes Storybook and compares every story to `main`. Its check passes even when snapshots changed, because it runs with `--exit-zero-on-changes`; changes wait in Chromatic's web app until a reviewer accepts them as baselines.
+- **Chromatic** (`.github/workflows/chromatic.yml`): on every push to `main`, publishes Storybook and compares the stories the change affects with the last build (`--only-changed`). It doesn't run on pull requests, to save snapshots. Its check passes even when snapshots changed, because it runs with `--exit-zero-on-changes`; changes wait in Chromatic's web app until someone accepts them as baselines.
 
 ## Reviewing a pull request
 
-- Open the Storybook preview that Chromatic links to, and use the component: keyboard, focus, and all three themes.
-- Review Chromatic's visual diff. Accept a change only if it was intended.
+- Run Storybook on the branch (`pnpm storybook`) and use the component: keyboard, focus, and all three themes.
+- After merging, review Chromatic's visual diff for the `main` build. Accept a change only if it was intended.
 - Read the tests as well as the component. A test should fail if the behavior it covers breaks.
 - A deleted, skipped, or weakened test needs an explicit reason in the pull request description.
 
 ## Screenshots and recordings
 
-Chromatic already shows how every story looks, so pull requests don't need screenshots. Add a recording only for motion and multi-step interactions, which still images can't show.
+Chromatic shows how every story looks once a change is on `main`, so pull requests don't need screenshots. Add a recording only for motion and multi-step interactions, which still images can't show.

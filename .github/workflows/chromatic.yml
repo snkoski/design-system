@@ -1,11 +1,14 @@
-# Publishes Storybook to Chromatic on every push and runs visual tests.
+# Publishes Storybook to Chromatic and runs visual tests on every push to main. Only on main, and only the stories
+# a change affects (--only-changed, Chromatic's TurboSnap), to keep within the free plan's snapshots.
 # Needs one repository secret: CHROMATIC_PROJECT_TOKEN (from chromatic.com → your project → Manage → Configure).
+#
+# PAUSED since 2026-10-27: switched off on GitHub with `gh workflow disable Chromatic` while the components are
+# being built. Turn it back on with `gh workflow enable Chromatic` (see "Visual tests are paused" in README.md).
 name: Chromatic
 
 on:
   push:
     branches: [main]
-  pull_request:
 
 jobs:
   chromatic:
@@ -25,4 +28,4 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Publish to Chromatic
-        run: pnpm chromatic --project-token="${{ secrets.CHROMATIC_PROJECT_TOKEN }}"
+        run: pnpm chromatic --project-token="${{ secrets.CHROMATIC_PROJECT_TOKEN }}" --only-changed

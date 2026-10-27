@@ -4,6 +4,17 @@ Tokens, styles, and React components for a playful, accessible design system. Th
 
 The brand book (principles, voice, color, type, layout, mouse and touch sizing, motion, iconography, forms, accessibility, how to build with it, and a comparison with major industry design systems) lives in `docs/brand/`, and Storybook shows it under **Foundations**, next to visual pages for every token. This repo is the source of truth for both the code and the guidelines.
 
+> [!WARNING]
+> **Visual tests are paused.** The Chromatic workflow has been switched off on GitHub since 2026-10-27, to save the free plan's snapshots while the components are still being built. Nothing checks how stories look until it's back on; the Test workflow still runs every story's play function and accessibility checks.
+>
+> Turn it back on once the components are close to a first beta:
+>
+> ```sh
+> gh workflow enable Chromatic
+> ```
+>
+> Then push to `main`, accept the new snapshots as baselines in Chromatic's web app, and delete this note and "Visual tests are paused" in `CLAUDE.md`.
+
 ## Getting started
 
 You need Node 22 or newer. The pnpm version is pinned in `package.json` (`packageManager`), and Corepack, which ships with Node, uses that exact version inside this repo.
@@ -100,4 +111,4 @@ See `CONTRIBUTING.md` for the pull request workflow and the checks every change 
 
 1. Sign in at chromatic.com with GitHub and create a project from this repo.
 2. Copy the project token into the repo's secrets as `CHROMATIC_PROJECT_TOKEN` (GitHub → Settings → Secrets and variables → Actions).
-3. Push to `main`. The workflow in `.github/workflows/chromatic.yml` publishes Storybook and runs visual tests on every push and pull request.
+3. Push to `main`. The workflow in `.github/workflows/chromatic.yml` publishes Storybook and runs visual tests on every push to `main`, snapshotting only the stories a change affects. Pull requests don't run it, to save snapshots.

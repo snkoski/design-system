@@ -10,6 +10,12 @@ The brand book (principles, voice, color usage, type, layout, motion, iconograph
 
 When a rule or guideline changes, update the matching file in `docs/brand/`. If it's a rule about how code is written, update this file too.
 
+## Visual tests are paused
+
+Chromatic's workflow has been switched off on GitHub since 2026-10-27, to save the free plan's snapshots while the components are still being built. The Test workflow still runs every story's play function and axe, but nothing checks how stories look, so look at every visual change yourself (see "Looking at a component").
+
+Tell the user it's still off whenever a component is finished, or when the system gets close to a first beta: that's when to turn it back on with `gh workflow enable Chromatic`, push to `main`, and accept the new snapshots as baselines in Chromatic's web app. Then delete this section and the warning in `README.md`, and the "PAUSED" note in `.github/workflows/chromatic.yml`.
+
 Decisions made for now that we may want to change, and open questions, go in `docs/revisit.md`: what we do today, why, and what would settle it. Check it before changing anything it mentions.
 
 The palette name may change, so never put "Sherbet" in file names, class names, CSS variables, or package names.
@@ -284,8 +290,8 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 
 - Work on a branch and open a pull request into `main`. See `CONTRIBUTING.md` for the workflow, the required checks, and how to review.
 - Fill in `.github/pull_request_template.md` honestly. Never tick a checklist item that isn't true, and say what you did not check.
-- Chromatic posts the Storybook preview and the visual diff, so don't add screenshots. Add a recording only for motion or multi-step interactions.
-- Chromatic's check passes even when snapshots changed. New and changed stories wait as "must be accepted as baselines" in Chromatic's web app until someone accepts them, so check the build there after a push.
+- Chromatic runs on pushes to `main` only, not on pull requests, and snapshots only the stories a change affects (`--only-changed`), to save snapshots. Its visual diff shows up after merging. Don't add screenshots to a pull request; add a recording only for motion or multi-step interactions.
+- Chromatic's check passes even when snapshots changed. New and changed stories wait as "must be accepted as baselines" in Chromatic's web app until someone accepts them, so check the build there after a push to `main`.
 - Keep a pull request to one thing, and call out breaking changes (renamed or removed props, tokens, or exports).
 - One session per folder. Run parallel Claude sessions in their own worktrees (`claude -w <name>`, which creates `.claude/worktrees/<name>/`; git ignores the folder). Switch branches only in a folder no other session is using. Each worktree needs its own `pnpm install`.
 
