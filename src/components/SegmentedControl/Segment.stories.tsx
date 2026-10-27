@@ -46,7 +46,7 @@ type Story = StoryObj<typeof meta>;
 /** Change any prop in the Controls panel. The option sits in a SegmentedControl, which owns its chosen state. */
 export const Playground: Story = {};
 
-/** Not chosen, chosen, and disabled. The chosen label is bold, so the state never relies on color alone. */
+/** Not chosen, chosen, and disabled. The chosen option has a border, so the state never relies on color alone. */
 export const States: Story = {
   parameters: { controlValue: "yearly" },
   render: () => (

@@ -85,11 +85,11 @@ Raised while building SegmentedControl (2026-10-21).
 
 ## How a chosen segment stands out
 
-**Today:** the chosen option in a SegmentedControl is filled with `action` (near black, or near white in dark mode), and its label turns semibold (600, from 400). An icon's lines get thicker (`icon-stroke-bold`, 2.75, from `icon-stroke`, 2). Since components became neutral (2026-10-27), the fill itself is far above 3:1 against `surface` in every theme, so it's a strong cue on its own, and the bold backs it up.
+**Today:** the chosen option in a SegmentedControl is a rounded `surface` highlight (white, or the card color in dark mode) set just inside the option on the gray `track`, with an `ink` border. The border is far above 3:1 against the track and the fill in every theme, so it's the cue that doesn't rely on color. The label and icons don't change: the bold label and thicker icon lines it used to have were dropped (2026-10-27), so the control never changes size and filled icons need nothing special.
 
-**Why it's in question:** a weight change is quieter than the marks other choice controls use (a tick, a dot, a thumb's position). Icons that aren't drawn with lines, such as filled icons, don't get thicker at all.
+**Why it's in question:** the border is a strong mark, but it's the only one besides color. Other choice controls add a shape (a tick, a dot, a thumb's position).
 
-**To decide:** look at it in use. What's left is whether a check mark in the chosen option, as Material's segmented buttons have, adds anything to a near-black fill.
+**To decide:** look at it in use. The `ink` fill this entry suggested trying was tried and replaced by the white option with an ink border. What's left is whether a check mark in the chosen option, as Material's segmented buttons have, adds anything to it.
 
 **Compare in Storybook:** Revisit → How a chosen segment stands out (today and the check mark).
 

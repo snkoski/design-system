@@ -7,7 +7,7 @@ Two tiers. **Primitives** (`tangerine-500`, `gray-900`, `mint-200`…) are the r
 Components are drawn in black, white, and grays. The brand colors belong to the page around them: hero bands, feature panels, illustrations, highlights, and small flourishes.
 
 - **Why:** a component that carries no brand color fits any brand, so the same components can serve another site or a work system with its own palette. It also leaves the brand colors free for the layout. A tangerine primary button on a tangerine hero band would disappear into it; a black one stands out on any band.
-- Every token a component reads is neutral: `surface`, `surface-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, and `focus`. The scale behind them is pure gray (`gray-50` to `gray-950`, no hue), so they don't pick up a tint from the palette.
+- Every token a component reads is neutral: `surface`, `surface-hover`, `track`, `track-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, and `focus`. The scale behind them is pure gray (`gray-50` to `gray-950`, no hue), so they don't pick up a tint from the palette.
 - The brand tokens are `brand` (with `on-brand` for text on it), `surface-tint`, `highlight`, `link`, and the page ground `bg`. Components never use `brand` or `surface-tint`.
 - Status colors (`success`, `warning`, `danger`) aren't brand colors. Components use them for what they mean, always with an icon or a word.
 
@@ -15,8 +15,9 @@ Components are drawn in black, white, and grays. The brand colors belong to the 
 
 - Page ground is `bg`. Cards, menus, dialogs, and inputs sit on `surface`.
 - All body text is `ink`; secondary text is `ink-muted`. Both pass AA on `bg`, `surface`, `surface-tint`, and `surface-hover` in every theme.
-- Controls: `action` fills a primary button, a ticked checkbox, a selected radio, an on switch, and a chosen segment, with `on-action` for the label or mark on it and `action-hover` on hover and press. Near black in light and hot dog, near white in dark.
-- Hover: `surface-hover`, a light gray (dark gray in dark mode), for secondary and ghost buttons, unchecked choice controls, and segments that aren't chosen.
+- Controls: `action` fills a primary button, a ticked checkbox, a selected radio, and an on switch, with `on-action` for the label or mark on it and `action-hover` on hover and press. Near black in light and hot dog, near white in dark.
+- Hover: `surface-hover`, a light gray (dark gray in dark mode), for secondary and ghost buttons and unchecked choice controls.
+- Tracks: a segmented control's options sit on `track`, a gray with no visible edge, and hover in `track-hover`. The chosen option is a rounded `surface` highlight with an `ink` border, set `segment-inset` inside the option so a little of the track shows around it; hovering an option draws the same rounded shape in `track-hover`.
 - Brand: `brand` for bands and panels in a layout, with `on-brand` text. Never white text on `brand`. Highlighted panels and callouts use `surface-tint`.
 - Links: `link`, always underlined in running text.
 - Chips, badges, and selection: `highlight` with `on-highlight`.

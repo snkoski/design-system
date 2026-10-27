@@ -51,7 +51,7 @@ function Controls({ id }: { id: string }) {
 }
 
 /**
- * Today's fill plus a check mark before the chosen label. The check follows clicks, so the controls are controlled.
+ * Today's look plus a check mark before the chosen label. The check follows clicks, so the controls are controlled.
  * With an icon, the check takes the icon's place, as in Material's segmented buttons.
  */
 function CheckControls({ id }: { id: string }) {
@@ -85,10 +85,10 @@ function CheckControls({ id }: { id: string }) {
 }
 
 /**
- * Two ways to show which segment is chosen: a neutral `action` fill with a bold label and thicker icon lines (today),
- * and today's fill with a check mark before the chosen label. Each shows text options and options with icons, and
- * today's also shows icon-only options (see the check mark's note), in all three themes. Click through them. Settles
- * "How a chosen segment stands out" in `docs/revisit.md`.
+ * Two ways to show which segment is chosen: a white option with an ink border inside it (today), and today's look
+ * with a check mark before the chosen label. Each shows text options and options
+ * with icons, and today's also shows icon-only options (see the check mark's note), in all three themes. Click through
+ * them. Settles "How a chosen segment stands out" in `docs/revisit.md`.
  */
 export const SideBySide: Story = {
   render: () => (
@@ -96,14 +96,14 @@ export const SideBySide: Story = {
       {(theme) => (
         <Options>
           <Option
-            title="Action fill and bold (today)"
-            note="A near-black fill (near white in dark mode), with the bold label and thicker icon lines backing it up."
+            title="Border (today)"
+            note="White (the card color in dark mode) on the gray track, with an ink border inside it. The label and icons don't change."
           >
             <Controls id={`${theme}-today`} />
           </Option>
           <Option
-            title="Action fill and a check mark"
-            note="A check before the chosen label, in place of its icon if it has one, as Material does. Not shown for icon-only options: there's no room for a second icon, and swapping the icon for a check would hide what the option means, so they would keep today's bold lines. The check widens the chosen option, so the track grows when the longest one is chosen."
+            title="Border and a check mark"
+            note="A check before the chosen label, in place of its icon if it has one, as Material does. Not shown for icon-only options: there's no room for a second icon, and swapping the icon for a check would hide what the option means, so they would keep today's border alone. The check widens the chosen option, so the track grows when the longest one is chosen."
           >
             <CheckControls id={`${theme}-check`} />
           </Option>
