@@ -5,7 +5,7 @@ import { Spin } from "./Spin";
 
 function Bar() {
   return (
-    <span style={{ display: "block", width: "0.375rem", height: "2rem", borderRadius: "var(--radius-full)", background: "var(--action)" }} />
+    <span style={{ display: "block", width: "0.375rem", height: "2rem", borderRadius: "var(--radius-full)", background: "var(--brand)" }} />
   );
 }
 

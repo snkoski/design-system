@@ -8,7 +8,7 @@ import { Star } from "./Star";
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to orbit in: positioned, so the planets measure it, with an edge you can see */
 const box = { ...page, border: "var(--border-thin) solid var(--border-strong)", borderRadius: "var(--radius-md)", overflow: "hidden" };
-const colors = ["var(--action)", "var(--success)", "var(--link)", "var(--danger)", "var(--warning)", "var(--ink-muted)"];
+const colors = ["var(--brand)", "var(--success)", "var(--link)", "var(--danger)", "var(--warning)", "var(--ink-muted)"];
 
 /** How wide a planet is drawn, in rem: heavier is bigger, by the cube root, as if they were all equally dense */
 const width = (mass: number) => 1.25 * Math.cbrt(mass);
@@ -127,8 +127,8 @@ export const Moons: Story = {
           <Star mass={starMass} {...from(MOONS_BOX, STAR, 0, 0)}>
             <Sunny />
           </Star>
-          <Planet {...args} mass={heavy} {...from(MOONS_BOX, width(heavy), 15, 0)} data-testid="heavy" trailColor="var(--action)">
-            <Ball mass={heavy} color="var(--action)" />
+          <Planet {...args} mass={heavy} {...from(MOONS_BOX, width(heavy), 15, 0)} data-testid="heavy" trailColor="var(--brand)">
+            <Ball mass={heavy} color="var(--brand)" />
           </Planet>
           <Planet {...args} mass={moon} {...from(MOONS_BOX, width(moon), 18, 0)} data-testid="moon" trailColor="var(--ink-muted)">
             <Ball mass={moon} color="var(--ink-muted)" />
@@ -328,8 +328,8 @@ export const Orbiting: Story = {
         <Star mass={starMass} {...from(ORBIT_BOX, STAR, 0, 0)} data-testid="star">
           <Sunny />
         </Star>
-        <Planet {...args} {...from(ORBIT_BOX, width(1), 10, 0)} data-testid="planet" trailColor="var(--action)">
-          <Ball mass={1} color="var(--action)" />
+        <Planet {...args} {...from(ORBIT_BOX, width(1), 10, 0)} data-testid="planet" trailColor="var(--brand)">
+          <Ball mass={1} color="var(--brand)" />
         </Planet>
       </div>
     </div>

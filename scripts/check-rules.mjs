@@ -49,6 +49,8 @@ if (existsSync(twTheme)) for (const match of read(twTheme).matchAll(/(--[\w-]+)\
 
 const tokens = JSON.parse(read(join(root, "tokens/tokens.json")));
 const primitives = tokens.color.tokens.filter((token) => /^Primitive\./.test(token.usage)).map((token) => token.name);
+// Brand colors belong to the layout around components, never to a component (docs/brand/color.md)
+const BRAND_TOKENS = ["brand", "on-brand", "surface-tint"];
 
 const cssFiles = [...walk(join(root, "src/components")), ...walk(join(root, "src/internal"))].filter((file) => file.endsWith(".css"));
 for (const file of cssFiles) {
@@ -81,6 +83,11 @@ for (const file of cssFiles) {
   for (const primitive of primitives) {
     for (const match of css.matchAll(new RegExp(`var\\(\\s*--${primitive}\\s*[,)]`, "g"))) {
       report(file, lineOf(css, match.index), "primitive-token", `--${primitive} is a primitive; components use semantic tokens only`);
+    }
+  }
+  for (const brand of BRAND_TOKENS) {
+    for (const match of css.matchAll(new RegExp(`var\\(\\s*--${brand}\\s*[,)]`, "g"))) {
+      report(file, lineOf(css, match.index), "brand-token", `--${brand} is a brand color for layouts; components are neutral`);
     }
   }
 

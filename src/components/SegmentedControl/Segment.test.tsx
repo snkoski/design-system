@@ -52,16 +52,15 @@ describe("Segment", () => {
       expect(label).toHaveTextContent("List");
     });
 
-    // A hidden bold copy of the label sets the width, so the control doesn't shift when the bold option changes
-    it("reserves its bold width with a copy of the label hidden from screen readers, so the name isn't doubled", () => {
+    // The chosen option doesn't turn bold, so there's no hidden copy of the label to keep its width
+    it("renders its label once, with nothing hidden from screen readers, so the name isn't doubled", () => {
       render(
         <SegmentedControl label="View">
           <Segment value="list">List</Segment>
         </SegmentedControl>,
       );
-      const copy = getOption("List").querySelector(".segment__sizer");
-      expect(copy).toHaveTextContent("List");
-      expect(copy).toHaveAttribute("aria-hidden", "true");
+      expect(getOption("List")).toHaveTextContent(/^List$/);
+      expect(getOption("List").querySelector('[aria-hidden="true"]')).toBeNull();
       expect(getOption("List")).toHaveAccessibleName("List");
     });
 

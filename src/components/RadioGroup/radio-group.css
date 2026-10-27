@@ -99,7 +99,7 @@
 
   .radio__row:hover .radio__circle:not([data-disabled], [data-readonly]),
   .radio__circle:hover:not([data-disabled], [data-readonly]) {
-    background: var(--surface-tint);
+    background: var(--surface-hover);
   }
 
   .radio__circle:focus-visible {

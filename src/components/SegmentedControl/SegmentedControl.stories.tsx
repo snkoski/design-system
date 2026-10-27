@@ -86,8 +86,8 @@ export const States: Story = {
 };
 
 /**
- * The chosen option is filled, and its label turns bold, so it doesn't rely on color. A hidden bold copy of each
- * label sets its width, so the control stays the same width whichever option is chosen. The story checks it.
+ * The chosen option is a white highlight with a border, so it doesn't rely on color. Its label keeps the same weight,
+ * so the control stays the same width whichever option is chosen. The story checks it.
  */
 export const Choosing: Story = {
   args: { label: "Plan", name: "plan" },
@@ -106,7 +106,8 @@ export const Choosing: Story = {
     for (const name of ["Professional", "Team", "Free"]) {
       await userEvent.click(canvas.getByRole("radio", { name }));
       await expect(canvas.getByRole("radio", { name })).toHaveAttribute("aria-checked", "true");
-      await expect(getComputedStyle(canvas.getByRole("radio", { name })).fontWeight).toBe("600");
+      // Every option keeps the same weight, chosen or not
+      await expect(new Set(canvas.getAllByRole("radio").map((option) => getComputedStyle(option).fontWeight)).size).toBe(1);
       await expect(track.getBoundingClientRect().width).toBe(width);
     }
   },
@@ -166,7 +167,7 @@ export const Sizes: Story = {
 
 /**
  * Icons before or after the label, or both, like Button. Icons are decorative: the label names the option. A
- * chosen option's icon gets thicker lines, the icon version of bold.
+ * chosen option's icons look the same as the others'.
  */
 export const WithIcons: Story = {
   render: (args) => (
@@ -196,7 +197,7 @@ export const WithIcons: Story = {
 /**
  * Icon-only options need an `aria-label`. Use icons whose meaning is obvious, since sighted people see no words.
  * Each option is still at least `target-min` wide: 24px with a mouse, 44px on touch. The story checks both, and
- * the thicker lines of the chosen option.
+ * that the chosen option's icon keeps the same line width as the others.
  */
 export const IconOnly: Story = {
   args: { label: undefined, "aria-label": "View", name: "view" },
@@ -227,9 +228,11 @@ export const IconOnly: Story = {
     } finally {
       delete canvasElement.dataset.pointer;
     }
-    await expect(parseFloat(stroke("List"))).toBeGreaterThan(parseFloat(stroke("Grid")));
+    await expect(parseFloat(stroke("List"))).toBeGreaterThan(0);
+    await expect(stroke("List")).toBe(stroke("Grid"));
     await userEvent.click(canvas.getByRole("radio", { name: "Grid" }));
-    await expect(parseFloat(stroke("Grid"))).toBeGreaterThan(parseFloat(stroke("List")));
+    await expect(canvas.getByRole("radio", { name: "Grid" })).toHaveAttribute("aria-checked", "true");
+    await expect(stroke("Grid")).toBe(stroke("List"));
   },
 };
 
@@ -283,7 +286,7 @@ export const Narrow: Story = {
     // The text itself, not its box: a word too long for the box sticks out of it
     for (const option of canvas.getAllByRole("radio")) {
       const label = option.querySelector(".segment__label")!.getBoundingClientRect();
-      for (const part of option.querySelectorAll(".segment__text, .segment__sizer")) {
+      for (const part of option.querySelectorAll(".segment__text")) {
         const text = document.createRange();
         text.selectNodeContents(part);
         await expect(text.getBoundingClientRect().right).toBeLessThanOrEqual(label.right + 0.5);

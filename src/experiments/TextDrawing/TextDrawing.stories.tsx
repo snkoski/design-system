@@ -3,7 +3,7 @@ import { expect } from "storybook/test";
 import { TextDrawing } from "./TextDrawing";
 
 const PRESETS: Record<string, string[] | undefined> = {
-  "border to action": undefined,
+  "border to brand": undefined,
   "blue to red": ["hsl(220 90% 55%)", "hsl(0 85% 55%)"],
   "blue, green, red": ["hsl(220 90% 55%)", "hsl(140 75% 40%)", "hsl(0 85% 55%)"],
 };
@@ -45,6 +45,6 @@ export const Playground: Story = {
     const cell = canvasElement.querySelector<HTMLElement>('[data-kind="glow"]')!;
     const { left, top, width, height } = cell.getBoundingClientRect();
     window.dispatchEvent(new PointerEvent("pointermove", { clientX: left + width / 2, clientY: top + height / 2 }));
-    await expect(cell.style.getPropertyValue("--proximity-color")).toBe("color-mix(in srgb, var(--border), var(--action) 100%)");
+    await expect(cell.style.getPropertyValue("--proximity-color")).toBe("color-mix(in srgb, var(--border), var(--brand) 100%)");
   },
 };

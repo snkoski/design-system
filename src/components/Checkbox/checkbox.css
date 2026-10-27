@@ -62,7 +62,7 @@
 
   .checkbox__row:hover .checkbox__box:not([data-disabled], [aria-readonly="true"]),
   .checkbox__box:hover:not([data-disabled], [aria-readonly="true"]) {
-    background: var(--surface-tint);
+    background: var(--surface-hover);
   }
 
   .checkbox__box:focus-visible {

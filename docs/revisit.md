@@ -85,13 +85,13 @@ Raised while building SegmentedControl (2026-10-21).
 
 ## How a chosen segment stands out
 
-**Today:** the chosen option in a SegmentedControl is filled with `action`, and its label turns semibold (600, from 400). An icon's lines get thicker (`icon-stroke-bold`, 2.75, from `icon-stroke`, 2). The bold is the cue that doesn't rely on color, because `action` is only 2.89:1 against `surface` in light mode, under the 3:1 a non-text cue needs.
+**Today:** the chosen option in a SegmentedControl is a rounded `surface` highlight (white, or the card color in dark mode) set just inside the option on the gray `track`, with an `ink` border. The border is far above 3:1 against the track and the fill in every theme, so it's the cue that doesn't rely on color. The label and icons don't change: the bold label and thicker icon lines it used to have were dropped (2026-10-27), so the control never changes size and filled icons need nothing special.
 
-**Why it's in question:** a weight change is quieter than the marks other choice controls use (a tick, a dot, a thumb's position). Icons that aren't drawn with lines, such as filled icons, don't get thicker at all.
+**Why it's in question:** the border is a strong mark, but it's the only one besides color. Other choice controls add a shape (a tick, a dot, a thumb's position).
 
-**To decide:** look at it in use. If the bold isn't clear enough, try a different fill (such as `ink`, which is strong in every theme) or a check mark in the chosen option, as Material's segmented buttons do.
+**To decide:** look at it in use. The `ink` fill this entry suggested trying was tried and replaced by the white option with an ink border. What's left is whether a check mark in the chosen option, as Material's segmented buttons have, adds anything to it.
 
-**Compare in Storybook:** Revisit → How a chosen segment stands out.
+**Compare in Storybook:** Revisit → How a chosen segment stands out (today and the check mark).
 
 Raised while building SegmentedControl (2026-10-21).
 
@@ -117,7 +117,7 @@ Raised while building RichText (2026-10-21).
 
 ## Syntax colors in RichText code blocks
 
-**Today:** code blocks in the RichText experiment are plain monospace text on `surface-tint`. A language after the fence (```` ```js ````) is kept in the markdown but not shown.
+**Today:** code blocks in the RichText experiment are plain monospace text on `surface-hover`. A language after the fence (```` ```js ````) is kept in the markdown but not shown.
 
 **Why it's in question:** colored code is easier to read. It needs a highlighting library (Tiptap's CodeBlockLowlight with lowlight), which adds noticeably to the size, and a set of syntax colors that meet 4.5:1 in all three themes, hot dog included.
 
@@ -163,7 +163,7 @@ Raised while building RichText (2026-10-21).
 
 **Why it's in question:** most systems give destructive actions their own look (Carbon, Primer, Atlassian, and Uber's Base), so they stand out in a confirmation dialog or a settings page.
 
-**To decide:** a `tone="danger"` prop (`data-tone="danger"`) on `primary`, `secondary`, and `ghost`, never on icon-only buttons. It needs `danger-hover` and `on-danger` tokens that pass contrast in all three themes, and its own look in hot dog mode, where `action` is already ketchup red and a danger fill would match the primary button.
+**To decide:** a `tone="danger"` prop (`data-tone="danger"`) on `primary`, `secondary`, and `ghost`, never on icon-only buttons. It needs `danger-hover` and `on-danger` tokens that pass contrast in all three themes. Now that components are neutral, a red danger button no longer clashes with a brand-colored primary one. Hot dog mode still needs care: its `brand` is ketchup red, so a danger button on a ketchup band would disappear into it.
 
 Raised while comparing button systems (2026-10-22).
 
@@ -191,14 +191,22 @@ Raised while reviewing the forms guidance (2026-10-22).
 
 Raised while reviewing the iconography guidance (2026-10-22).
 
-## Neutral buttons, with the brand colors in the layout
+## Brand colors that are still near components
 
-**Today:** a primary button is filled with the action color (tangerine, or ketchup in hot dog), and so are a ticked checkbox, an on switch, a selected radio, and a chosen segment. Secondary and ghost buttons hover with the peach `surface-tint`.
+**Today:** components are neutral and never use `brand` or `surface-tint` (`pnpm check` enforces it). Two brand-colored tokens still sit close to components: `link` (tangerine, mint in dark, ketchup in hot dog), which `base.css` gives every `<a>`, and `highlight` (mint, peach in dark, ketchup in hot dog), meant for chips, badges, and selection.
 
-**Why it's in question:** with the brand color on every control, it's hard to use it in the layout as well. A primary button on a tangerine hero band is the band's own color. Neutral controls would leave the brand colors free for bands, cards, and highlights around them, and would also leave room for a red danger style (see "A danger style for buttons").
+**Why it's in question:** a link inside a component (a help link in a field's description, say) or a future Chip or Badge component would carry the brand color into it, which goes against keeping components neutral and reusable. But links in running text are one of the brand's "small flourishes", and a neutral link is harder to spot.
 
-**To decide:** whether buttons become neutral: a primary filled with `ink` and labeled in `bg` (near black in light and hot dog, near white in dark), and secondary and ghost buttons hovering gray. Then whether the choice controls follow. Going ahead means new button tokens (or pointing Button at `ink`), their contrast pairs in all three themes, a new look for hot dog's pressed shadow on a black button, and updates to `docs/brand/color.md` and `buttons.md`.
+**To decide:** when a component first needs a link or a chip. Options: keep `link` and `highlight` as brand colors, set by the site; give components neutral versions (an underlined `ink` link, a gray chip); or let a Badge take a status color only.
 
-**Compare in Storybook:** Revisit → Neutral buttons.
+Raised while making components neutral (2026-10-27).
 
-Raised while planning neutral buttons (2026-10-27).
+## Hot dog's pressed shadow on a black button
+
+**Today:** in hot dog mode, a primary button is now black with a black hard shadow, so the shadow reads as a thicker edge on the bottom and right rather than a separate shape. Pressing still moves the button into it. Secondary buttons, checkboxes, and switches are white or black with the same black shadow.
+
+**Why it's in question:** before, the shadow stood out against a ketchup button. Hot dog mode is the one place where the brand is the joke, so a ketchup or mustard shadow could bring the theme's color back to its controls without making them brand-colored.
+
+**To decide:** look at hot dog buttons pressed and at rest. If the press doesn't read, try a ketchup shadow under black buttons only (a `shadow` token change in hot dog), and check it on a ketchup `brand` band.
+
+Raised while making components neutral (2026-10-27).

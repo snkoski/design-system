@@ -4,7 +4,6 @@ import { useState } from "react";
 import { expect } from "storybook/test";
 import { Segment, SegmentedControl } from "../../components/SegmentedControl";
 import { Option, Options, Themes } from "./Compare";
-import "./chosen-segment.css";
 
 const meta = {
   title: "Revisit/How a chosen segment stands out",
@@ -52,7 +51,7 @@ function Controls({ id }: { id: string }) {
 }
 
 /**
- * Today's fill plus a check mark before the chosen label. The check follows clicks, so the controls are controlled.
+ * Today's look plus a check mark before the chosen label. The check follows clicks, so the controls are controlled.
  * With an icon, the check takes the icon's place, as in Material's segmented buttons.
  */
 function CheckControls({ id }: { id: string }) {
@@ -86,10 +85,10 @@ function CheckControls({ id }: { id: string }) {
 }
 
 /**
- * Three ways to show which segment is chosen: an `action` fill with a bold label and thicker icon lines (today), an
- * `ink` fill with `bg`-colored text, still bold, and today's fill with a check mark before the chosen label. Each
- * shows text options, options with icons, and icon-only options (except the check mark: see its note), in all three
- * themes. Click through them. Settles "How a chosen segment stands out" in `docs/revisit.md`.
+ * Two ways to show which segment is chosen: a white option with an ink border inside it (today), and today's look
+ * with a check mark before the chosen label. Each shows text options and options
+ * with icons, and today's also shows icon-only options (see the check mark's note), in all three themes. Click through
+ * them. Settles "How a chosen segment stands out" in `docs/revisit.md`.
  */
 export const SideBySide: Story = {
   render: () => (
@@ -97,21 +96,14 @@ export const SideBySide: Story = {
       {(theme) => (
         <Options>
           <Option
-            title="Action fill and bold (today)"
-            note="The bold label and thicker icon lines are the cue that doesn't rely on color."
+            title="Border (today)"
+            note="White (the card color in dark mode) on the gray track, with an ink border inside it. The label and icons don't change."
           >
             <Controls id={`${theme}-today`} />
           </Option>
           <Option
-            title="Ink fill and bold"
-            note="The fill takes the text color and the label the page color: dark in light mode, light in dark mode. It has the strongest contrast with the track in every theme."
-            className="chosen-ink"
-          >
-            <Controls id={`${theme}-ink`} />
-          </Option>
-          <Option
-            title="Action fill and a check mark"
-            note="A check before the chosen label, in place of its icon if it has one, as Material does. Not shown for icon-only options: there's no room for a second icon, and swapping the icon for a check would hide what the option means, so they would keep today's bold lines. The check widens the chosen option, so the track grows when the longest one is chosen."
+            title="Border and a check mark"
+            note="A check before the chosen label, in place of its icon if it has one, as Material does. Not shown for icon-only options: there's no room for a second icon, and swapping the icon for a check would hide what the option means, so they would keep today's border alone. The check widens the chosen option, so the track grows when the longest one is chosen."
           >
             <CheckControls id={`${theme}-check`} />
           </Option>
@@ -120,12 +112,7 @@ export const SideBySide: Story = {
     </Themes>
   ),
   play: async ({ canvasElement, canvas, userEvent }) => {
-    const [today, ink, check] = [...canvasElement.querySelectorAll<HTMLElement>("section[data-theme=light] .compare-option")];
-    const chosen = (root: HTMLElement) => getComputedStyle(root.querySelector('.segment__button[aria-checked="true"]')!);
-
-    // The ink option really differs from today: a different fill, with the label in the page color
-    await expect(chosen(ink!).backgroundColor).not.toBe(chosen(today!).backgroundColor);
-    await expect(chosen(ink!).color).toBe(getComputedStyle(canvasElement.querySelector("section[data-theme=light]")!).backgroundColor);
+    const [, check] = [...canvasElement.querySelectorAll<HTMLElement>("section[data-theme=light] .compare-option")];
 
     // The check mark follows the choice
     await expect(check!.querySelectorAll(".segment__button[aria-checked=true] .lucide-check")).toHaveLength(2);

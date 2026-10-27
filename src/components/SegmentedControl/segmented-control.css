@@ -1,4 +1,4 @@
-/* SegmentedControl and Segment: what they are (label, description, the outlined track, the options inside it, error).
+/* SegmentedControl and Segment: what they are (label, description, the gray track, the options inside it, error).
    Where the control sits (margin) is the layout's job. The label, description, and error repeat RadioGroup's. */
 @layer components {
   /* The control. align-content: start keeps it at its own height when a grid or flex layout stretches it. */
@@ -30,8 +30,9 @@
     color: var(--ink-muted);
   }
 
-  /* The track: one outlined rectangle, with a rectangle Button's corners. Its edge counts toward the control's height, so it lines up with an Input or
-     Button, and every option is as wide as the widest. Labels wrap rather than push the page wider. */
+  /* The track: one gray rectangle, with a rectangle Button's corners. Its edge is transparent, so it only shows in forced
+     colors and when the control is invalid, but it still counts toward the control's height, so the track lines up with
+     an Input or Button. Every option is as wide as the widest. Labels wrap rather than push the page wider. */
   .segmented-control__track {
     --segment-edge: var(--border-thin);
     display: grid;
@@ -40,25 +41,28 @@
     box-sizing: border-box;
     max-width: 100%;
     min-height: var(--control-md);
-    border: var(--segment-edge) solid var(--border-strong);
+    border: var(--segment-edge) solid transparent;
     border-radius: var(--radius-sm);
-    background: var(--surface);
+    background: var(--track);
     transition: border-color var(--duration-fast) var(--ease-out);
   }
 
-  /* One option. The thin line between options is part of the control's edge, so it shows in forced colors. */
+  /* One option. The thin line between options is part of the control's edge: transparent, but drawn in forced colors. */
   .segment {
     position: relative;
     display: grid;
     min-width: 0;
   }
   .segment + .segment {
-    border-inline-start: var(--border-thin) solid var(--border-strong);
+    border-inline-start: var(--border-thin) solid transparent;
   }
 
-  /* The option has no border of its own: the track and the lines between options are its edges */
+  /* The option has no border of its own: the track and the lines between options are its edges. Its fill is drawn by
+     ::before, inset from its edges, so isolation keeps that layer behind the label. Every option has the track's
+     rounded corners, just inside its edge, so its focus outline is rounded wherever it sits. */
   .segment__button {
     position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -69,7 +73,7 @@
     padding-block: 0;
     padding-inline: var(--space-4);
     border: 0;
-    border-radius: 0;
+    border-radius: calc(var(--radius-sm) - var(--segment-edge));
     background: transparent;
     color: var(--ink);
     font: inherit;
@@ -80,9 +84,21 @@
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  /* The highlight: the hover fill, and the chosen option's fill and border. It sits segment-inset inside the option, so
+     a little of the gray track shows around it, and its corners are rounded on every side, wherever the option sits,
+     matching the track's corners. */
+  .segment__button::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: var(--segment-inset);
+    border-radius: calc(var(--radius-sm) - var(--segment-edge) - var(--segment-inset));
     transition:
       background-color var(--duration-fast) var(--ease-out),
-      color var(--duration-fast) var(--ease-out);
+      box-shadow var(--duration-fast) var(--ease-out);
   }
 
   /* The track's edge takes a little of the height, so the hit area reaches over it: every option is target-min tall */
@@ -93,18 +109,8 @@
     inset-inline: 0;
   }
 
-  /* The fill follows the track's rounded corners, just inside its edge */
-  .segment:first-child .segment__button {
-    border-start-start-radius: calc(var(--radius-sm) - var(--segment-edge));
-    border-end-start-radius: calc(var(--radius-sm) - var(--segment-edge));
-  }
-  .segment:last-child .segment__button {
-    border-start-end-radius: calc(var(--radius-sm) - var(--segment-edge));
-    border-end-end-radius: calc(var(--radius-sm) - var(--segment-edge));
-  }
-
-  .segment__button:hover:not([aria-checked="true"], [data-disabled], [data-readonly]) {
-    background: var(--surface-tint);
+  .segment__button:hover:not([aria-checked="true"], [data-disabled], [data-readonly])::before {
+    background: var(--track-hover);
   }
 
   .segment__button:focus-visible {
@@ -113,17 +119,15 @@
     outline-offset: var(--focus-offset);
   }
 
-  /* Chosen: filled, with its label and icons in bold. The bold is what says "chosen" without color. */
-  .segment__button[aria-checked="true"] {
-    background: var(--action);
-    color: var(--on-action);
-    font-weight: 600;
-  }
-  .segment__button[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
-    background: var(--action-hover);
+  /* Chosen: the highlight turns the surface color, lifted out of the gray track, with an ink border drawn inside it (an
+     inset shadow, so it takes no room). The border is the cue that doesn't rely on color, so the label and icons stay
+     as they are and the option never changes size. Hovering it changes nothing: it's already chosen. Forced colors
+     fills the whole option with Highlight instead (below). */
+  .segment__button[aria-checked="true"]::before {
+    background: var(--surface);
+    box-shadow: inset 0 0 0 var(--border-thick) var(--ink);
   }
 
-  /* The label and a hidden bold copy share one cell, so the copy sets the width whether or not it's chosen */
   /* Options can get narrower than their longest word, so the page never scrolls sideways. A word that doesn't fit
      then breaks, rather than spill into the next option. */
   .segment__label {
@@ -131,17 +135,9 @@
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  .segment__text,
-  .segment__sizer {
-    grid-area: 1 / 1;
-  }
-  .segment__sizer {
-    visibility: hidden;
-    font-weight: 600;
-  }
 
-  /* Icons. Bold for an icon is thicker lines: line icons such as Lucide's get thicker when chosen. This sets the
-     width of every line in the icon, so an icon's own stroke-width is replaced here. */
+  /* Icons. This sets the width of every line in the icon, so an icon's own stroke-width is replaced here and every
+     option's icons match. */
   .segment__icon {
     display: inline-flex;
     flex: none;
@@ -155,10 +151,6 @@
   .segment__icon svg,
   .segment__icon svg * {
     stroke-width: var(--icon-stroke);
-  }
-  .segment__button[aria-checked="true"] .segment__icon svg,
-  .segment__button[aria-checked="true"] .segment__icon svg * {
-    stroke-width: var(--icon-stroke-bold);
   }
   .segment__button[data-icon-only] {
     padding-inline: var(--space-3);
@@ -202,8 +194,8 @@
     opacity: 0.5;
   }
 
-  /* Hot dog mode: a chunky ink edge and a hard shadow. The options don't press into it: the shadow belongs to the
-     whole track. */
+  /* Hot dog mode: a chunky ink edge around the gray track, like every hot dog control, and a hard shadow. The options
+     don't press into it: the shadow belongs to the whole track. */
   [data-theme="hotdog"] .segmented-control__track {
     --segment-edge: var(--border-thick);
     border-color: var(--ink);
@@ -239,9 +231,13 @@
     .segment__button[aria-checked="true"]:focus-visible {
       outline-color: CanvasText;
     }
-    .segment__button[aria-checked="true"],
-    .segment__button[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
-      background: Highlight; /* the hover fill would otherwise become Canvas */
+    /* The highlight layer goes (with forced-color-adjust off, the browser would keep its fill and border): the whole
+       option shows the choice in Highlight */
+    .segment__button::before {
+      display: none;
+    }
+    .segment__button[aria-checked="true"] {
+      background: Highlight;
       color: HighlightText;
     }
     .segmented-control[data-disabled] .segmented-control__track:not(:has(:focus-visible)),

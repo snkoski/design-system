@@ -44,7 +44,7 @@ interface OwnProps {
    * (`--duration-fast`, like LookAt).
    */
   turnDuration?: number;
-  /** The bars' color, as any CSS color, when they have no `colors`. Default: `var(--action)`, like LookAt's bar grid. */
+  /** The bars' color, as any CSS color, when they have no `colors`. Default: `var(--brand)`, like LookAt's bar grid. */
   color?: string;
   /**
    * How far away the mouse starts to count for `colors` and `fade`, in px from the nearest edge of a bar's cell, as

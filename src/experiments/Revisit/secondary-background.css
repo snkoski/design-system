@@ -23,12 +23,12 @@
   color: var(--ink-muted);
 }
 
-/* "transparent": the Building page's example. The hover fill stays surface-tint, as today. */
+/* "transparent": the Building page's example. The hover fill stays surface-hover, as today. */
 .secondary-transparent .button[data-variant="secondary"] {
   background: transparent;
 }
 .secondary-transparent .button[data-variant="secondary"]:hover {
-  background: var(--surface-tint);
+  background: var(--surface-hover);
 }
 .secondary-transparent .button[data-disabled][data-variant="secondary"]:not([data-loading]):hover {
   background: transparent;

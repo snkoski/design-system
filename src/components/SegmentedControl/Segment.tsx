@@ -60,8 +60,8 @@ export type SegmentProps = Labelled &
   >;
 
 /**
- * One option in a SegmentedControl, drawn as a button with label text, icons, or both. The chosen option is filled, and its
- * label and icons turn bold. Only works inside a SegmentedControl, which owns the name, the chosen value, the size,
+ * One option in a SegmentedControl, drawn as a button with label text, icons, or both. The chosen option is a white
+ * highlight with a border. Only works inside a SegmentedControl, which owns the name, the chosen value, the size,
  * and whether the options are required, invalid, or read-only.
  */
 export function Segment({ children, iconOnly = false, iconStart, iconEnd, disabled, className, ...rest }: SegmentProps) {
@@ -88,13 +88,8 @@ export function Segment({ children, iconOnly = false, iconStart, iconEnd, disabl
                 {iconStart}
               </span>
             )}
-            {/* The hidden bold copy sits in the same place and sets the width, so the control doesn't shift
-                when this option turns bold */}
             <span className="segment__label">
               <span className="segment__text">{children}</span>
-              <span className="segment__sizer" aria-hidden="true">
-                {children}
-              </span>
             </span>
             {iconEnd && (
               <span className="segment__icon" aria-hidden="true">

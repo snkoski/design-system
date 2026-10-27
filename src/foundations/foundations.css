@@ -59,7 +59,7 @@
 
 /* Spacing, radius, shadows */
 .fd-space-row { display: grid; grid-template-columns: 6rem 8.5rem minmax(0, 1fr); gap: var(--space-3); align-items: center; }
-.fd-space-bar { display: block; height: 1rem; background: var(--action); border-radius: var(--radius-xs); min-width: 1px; }
+.fd-space-bar { display: block; height: 1rem; background: var(--brand); border-radius: var(--radius-xs); min-width: 1px; }
 .fd-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: var(--space-6); }
 .fd-tile { display: grid; gap: var(--space-3); }
 .fd-tile figcaption { display: grid; gap: 0.125rem; font-size: 0.875rem; }
@@ -103,7 +103,7 @@
 .fd-lane { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
 .fd-track { position: relative; flex: 1; height: 2rem; border-radius: var(--radius-full); background: var(--bg); border: var(--border-thin) dashed var(--border-strong); }
 .fd-track-end { position: absolute; top: 0.25rem; right: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); border: var(--border-thin) dashed var(--border-strong); }
-.fd-puck { position: absolute; top: 0.25rem; left: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); background: var(--action); border: var(--border-thin) solid var(--ink); }
+.fd-puck { position: absolute; top: 0.25rem; left: 0.25rem; width: 2.5rem; height: 1.375rem; border-radius: var(--radius-full); background: var(--brand); border: var(--border-thin) solid var(--ink); }
 .fd-curve { width: 3.5rem; height: 3.5rem; overflow: visible; }
 .fd-curve .axis { stroke: var(--border-strong); stroke-width: 1; fill: none; }
 .fd-curve .line { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-linecap: round; }

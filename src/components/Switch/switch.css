@@ -62,7 +62,7 @@
 
   .switch__row:hover .switch__track:not([data-disabled], [aria-readonly="true"]),
   .switch__track:hover:not([data-disabled], [aria-readonly="true"]) {
-    background: var(--surface-tint);
+    background: var(--surface-hover);
   }
 
   .switch__track:focus-visible {
