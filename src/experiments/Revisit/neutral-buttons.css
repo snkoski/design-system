@@ -1,0 +1,64 @@
+/* A small page drawn in the brand colors: a hero band in the action color, a tinted card with a highlight badge,
+   and a settings card on the surface */
+.neutral-page {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+.neutral-page__part {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+}
+.neutral-page__part[data-ground="action"] {
+  background: var(--action);
+  color: var(--on-action);
+}
+.neutral-page__part[data-ground="surface-tint"] {
+  background: var(--surface-tint);
+}
+.neutral-page__part[data-ground="surface"] {
+  background: var(--surface);
+  border: var(--border-thin) solid var(--border);
+}
+.neutral-page__heading {
+  margin: 0;
+  font-size: var(--text-heading-sm);
+  font-weight: 700;
+}
+.neutral-page__text {
+  margin: 0;
+}
+.neutral-page__badge {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--highlight);
+  color: var(--on-highlight);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* "Neutral buttons": a primary button is filled with the ink color (near black in light and hot dog, near white
+   in dark) and labeled in the page color. Secondary and ghost buttons hover gray instead of the peach tint. */
+.neutral-buttons .button {
+  --action: var(--ink);
+  --action-hover: color-mix(in srgb, var(--ink) 80%, var(--bg));
+  --on-action: var(--bg);
+}
+.neutral-buttons .button[data-variant="secondary"]:hover:not([data-disabled]) {
+  background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+}
+.neutral-buttons .button[data-variant="ghost"]:hover:not([data-disabled]) {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+/* "Neutral controls": a ticked checkbox, an on switch, a selected radio, and a chosen segment fill with the ink
+   color too, with their mark, thumb, dot, or label in the page color */
+.neutral-controls :is(.checkbox__box, .switch__track, .radio__circle, .segment__button) {
+  --action: var(--ink);
+  --action-hover: color-mix(in srgb, var(--ink) 80%, var(--bg));
+  --on-action: var(--bg);
+}

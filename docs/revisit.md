@@ -190,3 +190,15 @@ Raised while reviewing the forms guidance (2026-10-22).
 **Compare in Storybook:** Revisit → Icon size in large controls.
 
 Raised while reviewing the iconography guidance (2026-10-22).
+
+## Neutral buttons, with the brand colors in the layout
+
+**Today:** a primary button is filled with the action color (tangerine, or ketchup in hot dog), and so are a ticked checkbox, an on switch, a selected radio, and a chosen segment. Secondary and ghost buttons hover with the peach `surface-tint`.
+
+**Why it's in question:** with the brand color on every control, it's hard to use it in the layout as well. A primary button on a tangerine hero band is the band's own color. Neutral controls would leave the brand colors free for bands, cards, and highlights around them, and would also leave room for a red danger style (see "A danger style for buttons").
+
+**To decide:** whether buttons become neutral: a primary filled with `ink` and labeled in `bg` (near black in light and hot dog, near white in dark), and secondary and ghost buttons hovering gray. Then whether the choice controls follow. Going ahead means new button tokens (or pointing Button at `ink`), their contrast pairs in all three themes, a new look for hot dog's pressed shadow on a black button, and updates to `docs/brand/color.md` and `buttons.md`.
+
+**Compare in Storybook:** Revisit → Neutral buttons.
+
+Raised while planning neutral buttons (2026-10-27).
