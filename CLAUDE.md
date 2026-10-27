@@ -60,6 +60,7 @@ scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 docs/revisit.md              decisions to come back to, and open questions
+docs/reading-list.md         articles and references to read later, by topic
 src/experiments/             ideas being tried out; relaxed rules, never published (see Experiments)
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).

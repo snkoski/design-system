@@ -1,0 +1,474 @@
+# Reading list
+
+Articles, guides, and references to read later. Add new links under the closest topic, with a line on why each one is worth reading. When something here changes a decision, record the decision in `docs/brand/` and note it beside the link.
+
+Design system links appear twice on purpose: once by system, to see everything Atlassian says, and again by topic, to compare how every system handles, say, design tokens or checkboxes. When adding one, add it in both places.
+
+## Contents
+
+- [Choosing and building colors](#choosing-and-building-colors)
+  - [Building a palette](#building-a-palette)
+  - [Choosing brand colors](#choosing-brand-colors)
+  - [Color psychology](#color-psychology)
+- [Accessibility standards](#accessibility-standards)
+  - [WCAG](#wcag)
+  - [ARIA Authoring Practices Guide](#aria-authoring-practices-guide)
+- [Design systems, by system](#design-systems-by-system)
+  - [Apple Human Interface Guidelines](#apple-human-interface-guidelines)
+  - [Material Design 3 (Google)](#material-design-3-google)
+  - [GitHub Primer](#github-primer)
+  - [Atlassian Design System](#atlassian-design-system)
+  - [IBM Carbon](#ibm-carbon)
+  - [Microsoft Fluent 2](#microsoft-fluent-2)
+  - [Shopify Polaris](#shopify-polaris)
+  - [GOV.UK Design System](#govuk-design-system)
+  - [U.S. Web Design System](#us-web-design-system)
+- [Design systems, by topic](#design-systems-by-topic)
+  - [Design tokens](#design-tokens)
+  - [Color](#color)
+  - [Typography](#typography)
+  - [Spacing, layout, and grids](#spacing-layout-and-grids)
+  - [Shape and elevation](#shape-and-elevation)
+  - [Motion](#motion)
+  - [Icons](#icons)
+  - [Writing and content](#writing-and-content)
+  - [Accessibility](#accessibility)
+  - [Focus](#focus)
+  - [Platforms and input](#platforms-and-input)
+- [Components, by type](#components-by-type)
+  - [Buttons](#buttons)
+  - [Checkboxes](#checkboxes)
+  - [Radio buttons](#radio-buttons)
+  - [Switches](#switches)
+  - [Segmented controls](#segmented-controls)
+  - [Text fields](#text-fields)
+  - [Text areas](#text-areas)
+  - [Forms and errors](#forms-and-errors)
+  - [Dialogs](#dialogs)
+  - [Tooltips](#tooltips)
+
+## Choosing and building colors
+
+### Building a palette
+
+- [Refactoring UI: Building your color palette](https://refactoringui.com/previews/building-your-color-palette): the most practical short read. Grays, primary, and accent colors, and how to build 9 to 10 shades of each.
+- [Stripe: Designing accessible color systems](https://stripe.com/blog/accessible-color-systems): why HSL lightness doesn't match how bright a color looks, and how Stripe rebuilt its palette so every hue has the same contrast at each step.
+- [Matt Strom: How to generate color palettes for design systems](https://mattstromawn.com/writing/generating-color-palettes/): perceptual color spaces, shifting hue as colors get lighter or darker, and generating scales from formulas.
+- [Radix Colors: Composing a palette](https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette): choosing a brand color, a gray tinted toward it, and status colors.
+- [Radix Colors: Understanding the scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale): what each of 12 shades is for (backgrounds, borders, fills, and text).
+- [OneSignal: 11 shades of gray](https://onesignal.com/blog/11-shades-of-gray-a-color-system-story/): a case study of building a gray scale.
+- [The 60-30-10 rule for UI design](https://bootcamp.uxdesign.cc/the-60-30-10-color-rule-for-ui-design-32695d04a7c2): a rough guide to how much of a screen is neutral, supporting color, and accent.
+
+### Choosing brand colors
+
+- [Shopify: How to choose brand colors](https://www.shopify.com/blog/choose-brand-colors): a general branding guide.
+- [Adobe: Picking your brand colors](https://www.adobe.com/express/learn/blog/3-easy-steps-to-picking-your-brand-colors): another general guide, in three steps.
+
+### Color psychology
+
+- [Color psychology: how colors influence the mind](https://www.psychologytoday.com/intl/blog/habits-not-hacks/201408/color-psychology-how-colors-influence-the-mind): a skeptical, research-based take. Fit with the brand's personality and standing out matter more than what a hue "means."
+- [Labrecque and Milne, "Exciting red and competent blue"](https://colab.ws/articles/10.1007/s11747-010-0245-y): research on how hue, saturation, and lightness shift a brand's perceived personality.
+- [Singh, "Impact of color on marketing"](https://newion.uwinnipeg.ca/~ssingh5/x/color.pdf): the source of the often-quoted "up to 90% of snap judgments" figure. Widely repeated, loosely sourced.
+
+## Accessibility standards
+
+Each design system's own accessibility pages are under **Accessibility** in the by-topic section.
+
+### WCAG
+
+- [WCAG 2.2](https://www.w3.org/TR/WCAG22/), the full standard, and the [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/), the easier way in.
+- [What's new in WCAG 2.2](https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/)
+- Understanding WCAG: [Target size (minimum)](https://w3c.github.io/wcag/understanding/target-size-minimum.html), [Focus not obscured](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html), and [Focus appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html)
+
+### ARIA Authoring Practices Guide
+
+How each kind of component should work with a keyboard and screen reader. Read the matching pattern before building a component.
+
+- [Home](https://www.w3.org/WAI/ARIA/apg/)
+- Patterns: [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/), [Dialog (modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), [Menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), [Menu bar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/), [Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/), and [Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
+
+## Design systems, by system
+
+Everything we read from each system, grouped by topic.
+
+### Apple Human Interface Guidelines
+
+- **Getting started:** [Home](https://developer.apple.com/design/human-interface-guidelines/)
+- **Color:** [Dark mode](https://developer.apple.com/design/human-interface-guidelines/dark-mode)
+- **Typography:** [Typography](https://developer.apple.com/design/human-interface-guidelines/typography)
+- **Spacing, layout, and grids:** [Layout](https://developer.apple.com/design/human-interface-guidelines/layout)
+- **Motion:** [Motion](https://developer.apple.com/design/human-interface-guidelines/motion)
+- **Icons:** [Icons](https://developer.apple.com/design/human-interface-guidelines/icons) and [SF Symbols](https://developer.apple.com/design/human-interface-guidelines/sf-symbols)
+- **Accessibility:** [Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
+- **Focus:** [Focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection)
+- **Platforms and input:** [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices) and [Designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos) (where the 28pt Mac target size comes from)
+- **Buttons:** [Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons)
+- **Checkboxes:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (checkboxes are a macOS toggle style)
+- **Radio buttons:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (radio buttons are in the macOS section)
+- **Switches:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles)
+- **Segmented controls:** [Segmented controls](https://developer.apple.com/design/human-interface-guidelines/segmented-controls)
+- **Text fields:** [Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)
+- **Text areas:** [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
+- **Dialogs:** [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts), [Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets), and [Modality](https://developer.apple.com/design/human-interface-guidelines/modality)
+- **Tooltips:** [Offering help](https://developer.apple.com/design/human-interface-guidelines/offering-help) (help tags; there's no tooltip page)
+- **Navigation:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
+
+### Material Design 3 (Google)
+
+- **Getting started:** [Home](https://m3.material.io/) and [Structure](https://m3.material.io/foundations/designing/structure)
+- **Typography:** [Typography (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Typography.md)
+- **Spacing, layout, and grids:** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (Material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
+- **Motion:** [Motion (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md)
+- **Buttons:** [Buttons (Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/Button.md)
+- **Checkboxes:** [Checkbox](https://m3.material.io/components/checkbox/guidelines)
+- **Radio buttons:** [Radio button](https://m3.material.io/components/radio-button/guidelines)
+- **Switches:** [Switch](https://m3.material.io/components/switch/guidelines)
+- **Segmented controls:** [Segmented buttons](https://m3.material.io/components/segmented-buttons/overview) and [Button groups](https://m3.material.io/components/button-groups/overview) (the newer connected button group)
+- **Text fields:** [Text fields](https://m3.material.io/components/text-fields/guidelines)
+- **Text areas:** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line is part of text fields)
+- **Dialogs:** [Dialogs](https://m3.material.io/components/dialogs/guidelines)
+- **Tooltips:** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
+
+### GitHub Primer
+
+- **Getting started:** [Home](https://primer.style/) and [Product foundations](https://primer.style/product)
+- **Design tokens:** [Primitives](https://primer.style/product/primitives) and [Token names](https://primer.style/product/primitives/token-names/)
+- **Color:** [Color usage](https://primer.style/product/getting-started/foundations/color-usage/) and [Color primitives](https://primer.style/product/primitives/color/)
+- **Typography:** [Typography](https://primer.style/product/getting-started/foundations/typography/) and [Typography primitives](https://primer.style/product/primitives/typography/)
+- **Spacing, layout, and grids:** [Layout](https://primer.style/product/getting-started/foundations/layout/), [Responsive](https://primer.style/product/getting-started/foundations/responsive/), and [Size primitives](https://primer.style/product/primitives/size/)
+- **Writing and content:** [Content](https://primer.style/product/getting-started/foundations/content/)
+- **Accessibility:** [Accessibility](https://primer.style/accessibility), [Color considerations](https://primer.style/accessibility/design-guidance/color-considerations/), [Focus management](https://primer.style/accessibility/design-guidance/focus-management/), [Links and buttons](https://primer.style/accessibility/design-guidance/links-and-buttons/), [Motion and animation](https://primer.style/accessibility/design-guidance/motion-and-animation/), [Text resize and spacing](https://primer.style/accessibility/design-guidance/text-resize-and-spacing/), and [Mobile checklist](https://primer.style/accessibility/tools-and-resources/checklists/mobile-checklist/)
+- **Buttons:** [Button](https://primer.style/product/components/button/) and [Button group](https://primer.style/product/components/button-group)
+- **Checkboxes:** [Checkbox](https://primer.style/product/components/checkbox)
+- **Radio buttons:** [RadioGroup](https://primer.style/product/components/radio-group)
+- **Switches:** [ToggleSwitch](https://primer.style/product/components/toggle-switch)
+- **Segmented controls:** [SegmentedControl](https://primer.style/product/components/segmented-control)
+- **Text fields:** [TextInput](https://primer.style/product/components/text-input)
+- **Text areas:** [Textarea](https://primer.style/product/components/textarea)
+- **Forms and errors:** [Forms](https://primer.style/product/ui-patterns/forms/)
+- **Dialogs:** [Dialog](https://primer.style/product/components/dialog)
+- **Tooltips:** [Tooltip](https://primer.style/product/components/tooltip)
+
+### Atlassian Design System
+
+- **Getting started:** [Home](https://atlassian.design/) and [Components](https://atlassian.design/components)
+- **Design tokens:** [Design tokens](https://atlassian.design/foundations/tokens)
+- **Color:** [Color](https://atlassian.design/foundations/color) and [Color (new)](https://atlassian.design/foundations/color-new)
+- **Typography:** [Typography](https://atlassian.design/foundations/typography)
+- **Spacing, layout, and grids:** [Spacing](https://atlassian.design/foundations/spacing) and [Grid](https://atlassian.design/foundations/grid)
+- **Shape and elevation:** [Radius](https://atlassian.design/foundations/radius), [Border](https://atlassian.design/foundations/border), and [Elevation](https://atlassian.design/foundations/elevation)
+- **Motion:** [Motion](https://atlassian.design/foundations/motion) and [Applying motion](https://atlassian.design/foundations/motion/applying-motion)
+- **Writing and content:** [Content](https://atlassian.design/foundations/content), [Voice and tone](https://atlassian.design/foundations/content/voice-tone), [Language and grammar](https://atlassian.design/foundations/content/language-and-grammar), and [Designing messages](https://atlassian.design/foundations/content/designing-messages)
+- **Accessibility:** [Accessibility](https://atlassian.design/foundations/accessibility)
+- **Focus:** [Focus ring](https://atlassian.design/components/focus-ring/usage) and [Focusable](https://atlassian.design/components/primitives/focusable)
+- **Buttons:** [Button usage](https://atlassian.design/components/button/usage), [Button examples](https://atlassian.design/components/button/examples), [Evolving buttons and links](https://atlassian.design/whats-new/evolving-button-and-links), and [Button (Forge UI Kit)](https://developer.atlassian.com/platform/forge/ui-kit/components/button) (default, primary, subtle, warning, and danger)
+- **Checkboxes:** [Checkbox](https://atlassian.design/components/checkbox/usage)
+- **Radio buttons:** [Radio](https://atlassian.design/components/radio/usage)
+- **Switches:** [Toggle](https://atlassian.design/components/toggle/usage)
+- **Text fields:** [Text field usage](https://atlassian.design/components/textfield/usage) and [Text field examples](https://atlassian.design/components/textfield/examples)
+- **Text areas:** [Text area](https://atlassian.design/components/textarea/usage)
+- **Forms and errors:** [Form](https://atlassian.design/components/form/usage)
+- **Dialogs:** [Modal dialog](https://atlassian.design/components/modal-dialog/usage)
+- **Tooltips:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
+
+### IBM Carbon
+
+- **Getting started:** [Home](https://carbondesignsystem.com/)
+- **Color:** [Color](https://carbondesignsystem.com/elements/color/overview/) and [Themes](https://carbondesignsystem.com/elements/themes/overview/)
+- **Typography:** [Typography](https://carbondesignsystem.com/elements/typography/overview/) and [Type sets](https://carbondesignsystem.com/elements/typography/type-sets/)
+- **Spacing, layout, and grids:** [Spacing](https://carbondesignsystem.com/elements/spacing/overview/) and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/)
+- **Motion:** [Motion](https://carbondesignsystem.com/elements/motion/overview/)
+- **Writing and content:** [Writing style](https://carbondesignsystem.com/guidelines/content/writing-style/)
+- **Accessibility:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/)
+- **Buttons:** [Button usage](https://carbondesignsystem.com/components/button/usage/) (emphasis levels, one primary per page, and danger buttons) and [Button style](https://carbondesignsystem.com/components/button/style/)
+- **Checkboxes:** [Checkbox](https://www.carbondesignsystem.com/building-blocks/core/components/checkbox/guidelines)
+- **Radio buttons:** [Radio button](https://www.carbondesignsystem.com/building-blocks/core/components/radio-button)
+- **Switches:** [Toggle](https://www.carbondesignsystem.com/building-blocks/core/components/toggle)
+- **Segmented controls:** [Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher)
+- **Text fields:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
+- **Text areas:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text area is a section of it)
+- **Forms and errors:** [Forms pattern](https://carbondesignsystem.com/patterns/forms-pattern/)
+- **Dialogs:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
+- **Tooltips:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
+
+### Microsoft Fluent 2
+
+- **Getting started:** [Home](https://fluent2.microsoft.design/) and [Getting started](https://fluent2.microsoft.design/get-started/design)
+- **Design tokens:** [Design tokens](https://fluent2.microsoft.design/design-tokens)
+- **Color:** [Color](https://fluent2.microsoft.design/color)
+- **Typography:** [Typography](https://fluent2.microsoft.design/typography)
+- **Spacing, layout, and grids:** [Layout](https://fluent2.microsoft.design/layout)
+- **Shape and elevation:** [Shapes](https://fluent2.microsoft.design/shapes) and [Elevation](https://fluent2.microsoft.design/elevation)
+- **Motion:** [Motion](https://fluent2.microsoft.design/motion)
+- **Writing and content:** [Content design](https://fluent2.microsoft.design/content-design)
+- **Accessibility:** [Accessibility](https://fluent2.microsoft.design/accessibility)
+- **Buttons:** [Button (web)](https://fluent2.microsoft.design/components/web/react/core/button/usage), [Button (iOS)](https://fluent2.microsoft.design/components/ios/core/button/usage), and [Button (Android)](https://fluent2.microsoft.design/components/android/core/button/usage) (how one system sizes a control per platform)
+- **Checkboxes:** [Checkbox](https://fluent2.microsoft.design/components/web/react/core/checkbox/usage)
+- **Radio buttons:** [Radio group](https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage)
+- **Switches:** [Switch](https://fluent2.microsoft.design/components/web/react/core/switch/usage)
+- **Segmented controls:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (iOS only; the web has none)
+- **Text fields:** [Input](https://fluent2.microsoft.design/components/web/react/core/input/usage) and [Field](https://fluent2.microsoft.design/components/web/react/core/field/usage)
+- **Text areas:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
+- **Dialogs:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
+- **Tooltips:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
+
+### Shopify Polaris
+
+- **Getting started:** [Polaris React](https://polaris-react.shopify.com/), [Polaris web components](https://shopify.dev/docs/api/polaris) (the newer version), and [App design guidelines](https://shopify.dev/docs/apps/design)
+- **Design tokens:** [Space](https://polaris-react.shopify.com/tokens/space), [Font](https://polaris-react.shopify.com/tokens/font), [Text](https://polaris-react.shopify.com/tokens/text), [Breakpoints](https://polaris-react.shopify.com/tokens/breakpoints), [Border](https://polaris-react.shopify.com/tokens/border), [Shadow](https://polaris-react.shopify.com/tokens/shadow), and [Motion](https://polaris-react.shopify.com/tokens/motion)
+- **Color:** [Visual design](https://shopify.dev/docs/apps/design/visual-design)
+- **Typography:** [Font tokens](https://polaris-react.shopify.com/tokens/font) and [Text tokens](https://polaris-react.shopify.com/tokens/text)
+- **Spacing, layout, and grids:** [Space tokens](https://polaris-react.shopify.com/tokens/space), [Breakpoint tokens](https://polaris-react.shopify.com/tokens/breakpoints), and [Layout](https://shopify.dev/docs/apps/design/layout)
+- **Shape and elevation:** [Border tokens](https://polaris-react.shopify.com/tokens/border) and [Shadow tokens](https://polaris-react.shopify.com/tokens/shadow)
+- **Motion:** [Motion tokens](https://polaris-react.shopify.com/tokens/motion)
+- **Writing and content:** [Grammar and mechanics](https://polaris-react.shopify.com/content/grammar-and-mechanics), [Actionable language](https://polaris-react.shopify.com/content/actionable-language), and [Error messages](https://polaris-react.shopify.com/content/error-messages)
+- **Accessibility:** [Accessibility](https://polaris-react.shopify.com/foundations/accessibility) and [App accessibility](https://shopify.dev/docs/apps/build/accessibility)
+- **Buttons:** [Button](https://polaris-react.shopify.com/components/actions/button)
+- **Checkboxes:** [Checkbox (web components)](https://shopify.dev/docs/api/app-home/latest/web-components/forms/checkbox) (the React page now redirects here)
+- **Radio buttons:** [Radio button](https://polaris-react.shopify.com/components/selection-and-input/radio-button) and [Choice list](https://polaris-react.shopify.com/components/selection-and-input/choice-list)
+- **Segmented controls:** [Button group](https://polaris-react.shopify.com/components/actions/button-group) (its segmented variant)
+- **Text fields:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field)
+- **Text areas:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (its multiline option)
+- **Tooltips:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
+
+### GOV.UK Design System
+
+- **Getting started:** [Home](https://design-system.service.gov.uk/)
+- **Color:** [Colour](https://design-system.service.gov.uk/styles/colour/)
+- **Typography:** [Type scale](https://design-system.service.gov.uk/styles/type-scale/) and [The new type scale](https://design-system.service.gov.uk/get-started/new-type-scale/)
+- **Spacing, layout, and grids:** [Spacing](https://design-system.service.gov.uk/styles/spacing/) and [Layout](https://design-system.service.gov.uk/styles/layout/)
+- **Accessibility:** [Accessibility strategy](https://design-system.service.gov.uk/accessibility/accessibility-strategy/)
+- **Focus:** [Focus states](https://design-system.service.gov.uk/get-started/focus-states/) (the yellow focus style)
+- **Buttons:** [Button](https://design-system.service.gov.uk/components/button/)
+- **Checkboxes:** [Checkboxes](https://design-system.service.gov.uk/components/checkboxes/)
+- **Radio buttons:** [Radios](https://design-system.service.gov.uk/components/radios/)
+- **Text fields:** [Text input](https://design-system.service.gov.uk/components/text-input/)
+- **Text areas:** [Textarea](https://design-system.service.gov.uk/components/textarea/)
+- **Forms and errors:** [Question pages](https://design-system.service.gov.uk/patterns/question-pages) (where "mark optional fields, no asterisks" comes from), [Error message](https://design-system.service.gov.uk/components/error-message/), and [Error summary](https://design-system.service.gov.uk/components/error-summary/)
+
+### U.S. Web Design System
+
+- **Getting started:** [Home](https://designsystem.digital.gov/) and [Settings](https://designsystem.digital.gov/documentation/settings/)
+- **Design tokens:** [Color tokens](https://designsystem.digital.gov/design-tokens/color/overview/) and [Spacing units](https://designsystem.digital.gov/design-tokens/spacing-units/)
+- **Color:** [Color tokens](https://designsystem.digital.gov/design-tokens/color/overview/)
+- **Typography:** [Typography](https://designsystem.digital.gov/components/typography/)
+- **Spacing, layout, and grids:** [Spacing units](https://designsystem.digital.gov/design-tokens/spacing-units/) and [Layout grid](https://designsystem.digital.gov/utilities/layout-grid/)
+- **Accessibility:** [Button accessibility tests](https://designsystem.digital.gov/components/button/accessibility-tests/) (an example of publishing how each component was tested)
+- **Focus:** [Outline](https://designsystem.digital.gov/utilities/outline/) (the 4px focus outline)
+- **Buttons:** [Button](https://designsystem.digital.gov/components/button/)
+- **Checkboxes:** [Checkbox](https://designsystem.digital.gov/components/checkbox/)
+- **Radio buttons:** [Radio buttons](https://designsystem.digital.gov/components/radio-buttons/)
+- **Segmented controls:** [Button group](https://designsystem.digital.gov/components/button-group/) (its segmented variant)
+- **Text fields:** [Text input](https://designsystem.digital.gov/components/text-input/)
+- **Text areas:** [Text input](https://designsystem.digital.gov/components/text-input/) (text area is a section of it)
+- **Forms and errors:** [Form](https://designsystem.digital.gov/components/form/)
+- **Dialogs:** [Modal](https://designsystem.digital.gov/components/modal/)
+- **Tooltips:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
+
+## Design systems, by topic
+
+The same links, grouped so each topic can be compared across systems. A system missing from a topic has no page for it.
+
+### Design tokens
+
+- **GitHub Primer:** [Primitives](https://primer.style/product/primitives) and [Token names](https://primer.style/product/primitives/token-names/)
+- **Atlassian Design System:** [Design tokens](https://atlassian.design/foundations/tokens)
+- **Microsoft Fluent 2:** [Design tokens](https://fluent2.microsoft.design/design-tokens)
+- **Shopify Polaris:** [Space](https://polaris-react.shopify.com/tokens/space), [Font](https://polaris-react.shopify.com/tokens/font), [Text](https://polaris-react.shopify.com/tokens/text), [Breakpoints](https://polaris-react.shopify.com/tokens/breakpoints), [Border](https://polaris-react.shopify.com/tokens/border), [Shadow](https://polaris-react.shopify.com/tokens/shadow), and [Motion](https://polaris-react.shopify.com/tokens/motion)
+- **U.S. Web Design System:** [Color tokens](https://designsystem.digital.gov/design-tokens/color/overview/) and [Spacing units](https://designsystem.digital.gov/design-tokens/spacing-units/)
+
+### Color
+
+- **Apple Human Interface Guidelines:** [Dark mode](https://developer.apple.com/design/human-interface-guidelines/dark-mode)
+- **GitHub Primer:** [Color usage](https://primer.style/product/getting-started/foundations/color-usage/) and [Color primitives](https://primer.style/product/primitives/color/)
+- **Atlassian Design System:** [Color](https://atlassian.design/foundations/color) and [Color (new)](https://atlassian.design/foundations/color-new)
+- **IBM Carbon:** [Color](https://carbondesignsystem.com/elements/color/overview/) and [Themes](https://carbondesignsystem.com/elements/themes/overview/)
+- **Microsoft Fluent 2:** [Color](https://fluent2.microsoft.design/color)
+- **Shopify Polaris:** [Visual design](https://shopify.dev/docs/apps/design/visual-design)
+- **GOV.UK Design System:** [Colour](https://design-system.service.gov.uk/styles/colour/)
+- **U.S. Web Design System:** [Color tokens](https://designsystem.digital.gov/design-tokens/color/overview/)
+
+### Typography
+
+- **Apple Human Interface Guidelines:** [Typography](https://developer.apple.com/design/human-interface-guidelines/typography)
+- **Material Design 3 (Google):** [Typography (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Typography.md)
+- **GitHub Primer:** [Typography](https://primer.style/product/getting-started/foundations/typography/) and [Typography primitives](https://primer.style/product/primitives/typography/)
+- **Atlassian Design System:** [Typography](https://atlassian.design/foundations/typography)
+- **IBM Carbon:** [Typography](https://carbondesignsystem.com/elements/typography/overview/) and [Type sets](https://carbondesignsystem.com/elements/typography/type-sets/)
+- **Microsoft Fluent 2:** [Typography](https://fluent2.microsoft.design/typography)
+- **Shopify Polaris:** [Font tokens](https://polaris-react.shopify.com/tokens/font) and [Text tokens](https://polaris-react.shopify.com/tokens/text)
+- **GOV.UK Design System:** [Type scale](https://design-system.service.gov.uk/styles/type-scale/) and [The new type scale](https://design-system.service.gov.uk/get-started/new-type-scale/)
+- **U.S. Web Design System:** [Typography](https://designsystem.digital.gov/components/typography/)
+
+### Spacing, layout, and grids
+
+- **Apple Human Interface Guidelines:** [Layout](https://developer.apple.com/design/human-interface-guidelines/layout)
+- **Material Design 3 (Google):** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (Material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
+- **GitHub Primer:** [Layout](https://primer.style/product/getting-started/foundations/layout/), [Responsive](https://primer.style/product/getting-started/foundations/responsive/), and [Size primitives](https://primer.style/product/primitives/size/)
+- **Atlassian Design System:** [Spacing](https://atlassian.design/foundations/spacing) and [Grid](https://atlassian.design/foundations/grid)
+- **IBM Carbon:** [Spacing](https://carbondesignsystem.com/elements/spacing/overview/) and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/)
+- **Microsoft Fluent 2:** [Layout](https://fluent2.microsoft.design/layout)
+- **Shopify Polaris:** [Space tokens](https://polaris-react.shopify.com/tokens/space), [Breakpoint tokens](https://polaris-react.shopify.com/tokens/breakpoints), and [Layout](https://shopify.dev/docs/apps/design/layout)
+- **GOV.UK Design System:** [Spacing](https://design-system.service.gov.uk/styles/spacing/) and [Layout](https://design-system.service.gov.uk/styles/layout/)
+- **U.S. Web Design System:** [Spacing units](https://designsystem.digital.gov/design-tokens/spacing-units/) and [Layout grid](https://designsystem.digital.gov/utilities/layout-grid/)
+
+### Shape and elevation
+
+- **Atlassian Design System:** [Radius](https://atlassian.design/foundations/radius), [Border](https://atlassian.design/foundations/border), and [Elevation](https://atlassian.design/foundations/elevation)
+- **Microsoft Fluent 2:** [Shapes](https://fluent2.microsoft.design/shapes) and [Elevation](https://fluent2.microsoft.design/elevation)
+- **Shopify Polaris:** [Border tokens](https://polaris-react.shopify.com/tokens/border) and [Shadow tokens](https://polaris-react.shopify.com/tokens/shadow)
+
+### Motion
+
+- **Apple Human Interface Guidelines:** [Motion](https://developer.apple.com/design/human-interface-guidelines/motion)
+- **Material Design 3 (Google):** [Motion (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md)
+- **Atlassian Design System:** [Motion](https://atlassian.design/foundations/motion) and [Applying motion](https://atlassian.design/foundations/motion/applying-motion)
+- **IBM Carbon:** [Motion](https://carbondesignsystem.com/elements/motion/overview/)
+- **Microsoft Fluent 2:** [Motion](https://fluent2.microsoft.design/motion)
+- **Shopify Polaris:** [Motion tokens](https://polaris-react.shopify.com/tokens/motion)
+
+### Icons
+
+- **Apple Human Interface Guidelines:** [Icons](https://developer.apple.com/design/human-interface-guidelines/icons) and [SF Symbols](https://developer.apple.com/design/human-interface-guidelines/sf-symbols)
+
+### Writing and content
+
+- **GitHub Primer:** [Content](https://primer.style/product/getting-started/foundations/content/)
+- **Atlassian Design System:** [Content](https://atlassian.design/foundations/content), [Voice and tone](https://atlassian.design/foundations/content/voice-tone), [Language and grammar](https://atlassian.design/foundations/content/language-and-grammar), and [Designing messages](https://atlassian.design/foundations/content/designing-messages)
+- **IBM Carbon:** [Writing style](https://carbondesignsystem.com/guidelines/content/writing-style/)
+- **Microsoft Fluent 2:** [Content design](https://fluent2.microsoft.design/content-design)
+- **Shopify Polaris:** [Grammar and mechanics](https://polaris-react.shopify.com/content/grammar-and-mechanics), [Actionable language](https://polaris-react.shopify.com/content/actionable-language), and [Error messages](https://polaris-react.shopify.com/content/error-messages)
+
+### Accessibility
+
+- **Apple Human Interface Guidelines:** [Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
+- **GitHub Primer:** [Accessibility](https://primer.style/accessibility), [Color considerations](https://primer.style/accessibility/design-guidance/color-considerations/), [Focus management](https://primer.style/accessibility/design-guidance/focus-management/), [Links and buttons](https://primer.style/accessibility/design-guidance/links-and-buttons/), [Motion and animation](https://primer.style/accessibility/design-guidance/motion-and-animation/), [Text resize and spacing](https://primer.style/accessibility/design-guidance/text-resize-and-spacing/), and [Mobile checklist](https://primer.style/accessibility/tools-and-resources/checklists/mobile-checklist/)
+- **Atlassian Design System:** [Accessibility](https://atlassian.design/foundations/accessibility)
+- **IBM Carbon:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/)
+- **Microsoft Fluent 2:** [Accessibility](https://fluent2.microsoft.design/accessibility)
+- **Shopify Polaris:** [Accessibility](https://polaris-react.shopify.com/foundations/accessibility) and [App accessibility](https://shopify.dev/docs/apps/build/accessibility)
+- **GOV.UK Design System:** [Accessibility strategy](https://design-system.service.gov.uk/accessibility/accessibility-strategy/)
+- **U.S. Web Design System:** [Button accessibility tests](https://designsystem.digital.gov/components/button/accessibility-tests/) (an example of publishing how each component was tested)
+
+### Focus
+
+- **Apple Human Interface Guidelines:** [Focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection)
+- **Atlassian Design System:** [Focus ring](https://atlassian.design/components/focus-ring/usage) and [Focusable](https://atlassian.design/components/primitives/focusable)
+- **GOV.UK Design System:** [Focus states](https://design-system.service.gov.uk/get-started/focus-states/) (the yellow focus style)
+- **U.S. Web Design System:** [Outline](https://designsystem.digital.gov/utilities/outline/) (the 4px focus outline)
+
+### Platforms and input
+
+- **Apple Human Interface Guidelines:** [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices) and [Designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos) (where the 28pt Mac target size comes from)
+
+## Components, by type
+
+Each system's page for the same kind of component. The names differ: Atlassian's "toggle" is a switch, and Carbon's "content switcher" is a segmented control.
+
+### Buttons
+
+- **Apple Human Interface Guidelines:** [Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons)
+- **Material Design 3 (Google):** [Buttons (Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/Button.md)
+- **GitHub Primer:** [Button](https://primer.style/product/components/button/) and [Button group](https://primer.style/product/components/button-group)
+- **Atlassian Design System:** [Button usage](https://atlassian.design/components/button/usage), [Button examples](https://atlassian.design/components/button/examples), [Evolving buttons and links](https://atlassian.design/whats-new/evolving-button-and-links), and [Button (Forge UI Kit)](https://developer.atlassian.com/platform/forge/ui-kit/components/button) (default, primary, subtle, warning, and danger)
+- **IBM Carbon:** [Button usage](https://carbondesignsystem.com/components/button/usage/) (emphasis levels, one primary per page, and danger buttons) and [Button style](https://carbondesignsystem.com/components/button/style/)
+- **Microsoft Fluent 2:** [Button (web)](https://fluent2.microsoft.design/components/web/react/core/button/usage), [Button (iOS)](https://fluent2.microsoft.design/components/ios/core/button/usage), and [Button (Android)](https://fluent2.microsoft.design/components/android/core/button/usage) (how one system sizes a control per platform)
+- **Shopify Polaris:** [Button](https://polaris-react.shopify.com/components/actions/button)
+- **GOV.UK Design System:** [Button](https://design-system.service.gov.uk/components/button/)
+- **U.S. Web Design System:** [Button](https://designsystem.digital.gov/components/button/)
+
+### Checkboxes
+
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (checkboxes are a macOS toggle style)
+- **Material Design 3 (Google):** [Checkbox](https://m3.material.io/components/checkbox/guidelines)
+- **GitHub Primer:** [Checkbox](https://primer.style/product/components/checkbox)
+- **Atlassian Design System:** [Checkbox](https://atlassian.design/components/checkbox/usage)
+- **IBM Carbon:** [Checkbox](https://www.carbondesignsystem.com/building-blocks/core/components/checkbox/guidelines)
+- **Microsoft Fluent 2:** [Checkbox](https://fluent2.microsoft.design/components/web/react/core/checkbox/usage)
+- **Shopify Polaris:** [Checkbox (web components)](https://shopify.dev/docs/api/app-home/latest/web-components/forms/checkbox) (the React page now redirects here)
+- **GOV.UK Design System:** [Checkboxes](https://design-system.service.gov.uk/components/checkboxes/)
+- **U.S. Web Design System:** [Checkbox](https://designsystem.digital.gov/components/checkbox/)
+
+### Radio buttons
+
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (radio buttons are in the macOS section)
+- **Material Design 3 (Google):** [Radio button](https://m3.material.io/components/radio-button/guidelines)
+- **GitHub Primer:** [RadioGroup](https://primer.style/product/components/radio-group)
+- **Atlassian Design System:** [Radio](https://atlassian.design/components/radio/usage)
+- **IBM Carbon:** [Radio button](https://www.carbondesignsystem.com/building-blocks/core/components/radio-button)
+- **Microsoft Fluent 2:** [Radio group](https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage)
+- **Shopify Polaris:** [Radio button](https://polaris-react.shopify.com/components/selection-and-input/radio-button) and [Choice list](https://polaris-react.shopify.com/components/selection-and-input/choice-list)
+- **GOV.UK Design System:** [Radios](https://design-system.service.gov.uk/components/radios/)
+- **U.S. Web Design System:** [Radio buttons](https://designsystem.digital.gov/components/radio-buttons/)
+
+### Switches
+
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles)
+- **Material Design 3 (Google):** [Switch](https://m3.material.io/components/switch/guidelines)
+- **GitHub Primer:** [ToggleSwitch](https://primer.style/product/components/toggle-switch)
+- **Atlassian Design System:** [Toggle](https://atlassian.design/components/toggle/usage)
+- **IBM Carbon:** [Toggle](https://www.carbondesignsystem.com/building-blocks/core/components/toggle)
+- **Microsoft Fluent 2:** [Switch](https://fluent2.microsoft.design/components/web/react/core/switch/usage)
+
+### Segmented controls
+
+- **Apple Human Interface Guidelines:** [Segmented controls](https://developer.apple.com/design/human-interface-guidelines/segmented-controls)
+- **Material Design 3 (Google):** [Segmented buttons](https://m3.material.io/components/segmented-buttons/overview) and [Button groups](https://m3.material.io/components/button-groups/overview) (the newer connected button group)
+- **GitHub Primer:** [SegmentedControl](https://primer.style/product/components/segmented-control)
+- **IBM Carbon:** [Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher)
+- **Microsoft Fluent 2:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (iOS only; the web has none)
+- **Shopify Polaris:** [Button group](https://polaris-react.shopify.com/components/actions/button-group) (its segmented variant)
+- **U.S. Web Design System:** [Button group](https://designsystem.digital.gov/components/button-group/) (its segmented variant)
+
+### Text fields
+
+- **Apple Human Interface Guidelines:** [Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)
+- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines)
+- **GitHub Primer:** [TextInput](https://primer.style/product/components/text-input)
+- **Atlassian Design System:** [Text field usage](https://atlassian.design/components/textfield/usage) and [Text field examples](https://atlassian.design/components/textfield/examples)
+- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
+- **Microsoft Fluent 2:** [Input](https://fluent2.microsoft.design/components/web/react/core/input/usage) and [Field](https://fluent2.microsoft.design/components/web/react/core/field/usage)
+- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field)
+- **GOV.UK Design System:** [Text input](https://design-system.service.gov.uk/components/text-input/)
+- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/)
+
+### Text areas
+
+- **Apple Human Interface Guidelines:** [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
+- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line is part of text fields)
+- **GitHub Primer:** [Textarea](https://primer.style/product/components/textarea)
+- **Atlassian Design System:** [Text area](https://atlassian.design/components/textarea/usage)
+- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text area is a section of it)
+- **Microsoft Fluent 2:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
+- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (its multiline option)
+- **GOV.UK Design System:** [Textarea](https://design-system.service.gov.uk/components/textarea/)
+- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text area is a section of it)
+
+### Forms and errors
+
+- **GitHub Primer:** [Forms](https://primer.style/product/ui-patterns/forms/)
+- **Atlassian Design System:** [Form](https://atlassian.design/components/form/usage)
+- **IBM Carbon:** [Forms pattern](https://carbondesignsystem.com/patterns/forms-pattern/)
+- **GOV.UK Design System:** [Question pages](https://design-system.service.gov.uk/patterns/question-pages) (where "mark optional fields, no asterisks" comes from), [Error message](https://design-system.service.gov.uk/components/error-message/), and [Error summary](https://design-system.service.gov.uk/components/error-summary/)
+- **U.S. Web Design System:** [Form](https://designsystem.digital.gov/components/form/)
+
+### Dialogs
+
+- **Apple Human Interface Guidelines:** [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts), [Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets), and [Modality](https://developer.apple.com/design/human-interface-guidelines/modality)
+- **Material Design 3 (Google):** [Dialogs](https://m3.material.io/components/dialogs/guidelines)
+- **GitHub Primer:** [Dialog](https://primer.style/product/components/dialog)
+- **Atlassian Design System:** [Modal dialog](https://atlassian.design/components/modal-dialog/usage)
+- **IBM Carbon:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
+- **Microsoft Fluent 2:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
+- **U.S. Web Design System:** [Modal](https://designsystem.digital.gov/components/modal/)
+
+### Tooltips
+
+- **Apple Human Interface Guidelines:** [Offering help](https://developer.apple.com/design/human-interface-guidelines/offering-help) (help tags; there's no tooltip page)
+- **Material Design 3 (Google):** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
+- **GitHub Primer:** [Tooltip](https://primer.style/product/components/tooltip)
+- **Atlassian Design System:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
+- **IBM Carbon:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
+- **Microsoft Fluent 2:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
+- **Shopify Polaris:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
+- **U.S. Web Design System:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
