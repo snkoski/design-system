@@ -1,0 +1,62 @@
+/* Text drawing: a text area beside the picture it draws. Experiment. */
+@layer components {
+  .text-drawing {
+    display: grid;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 48em) {
+    .text-drawing {
+      grid-template-columns: minmax(0, 22rem) 1fr;
+    }
+  }
+
+  /* Monospace, and never wrapped, so the characters line up in the same rows and columns as the picture */
+  .text-drawing__editor .text-area__control {
+    font-family: var(--font-mono);
+    line-height: 1.4;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .text-drawing__picture {
+    display: grid;
+    gap: var(--space-1);
+    justify-content: start;
+  }
+
+  .text-drawing__cell {
+    display: block;
+    border-radius: var(--radius-sm);
+  }
+
+  .text-drawing__cell[data-kind="still"] {
+    background: var(--ink-muted);
+  }
+
+  /* Hot dog's border is as dark as its muted ink, so a still cell is a white bun in an ink outline instead */
+  [data-theme="hotdog"] .text-drawing__cell[data-kind="still"] {
+    background: var(--surface);
+    border: var(--border-thick) solid var(--ink);
+  }
+
+  /* Proximity sets its color as the mouse comes near */
+  .text-drawing__cell[data-kind="glow"] {
+    background: currentColor;
+  }
+
+  .text-drawing__cell[data-kind="unknown"] {
+    border: var(--border-thin) dashed var(--ink-muted);
+  }
+
+  @media (forced-colors: active) {
+    .text-drawing__cell[data-kind="still"] {
+      background: CanvasText;
+    }
+
+    .text-drawing__cell[data-kind="glow"] {
+      forced-color-adjust: none;
+    }
+  }
+}
