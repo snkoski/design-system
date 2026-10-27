@@ -14,7 +14,7 @@
 
 ## Review
 
-Chromatic posts a Storybook preview link and a visual diff on this pull request. Check both.
+Chromatic doesn't run on pull requests. Run Storybook on this branch to check the change, and review Chromatic's visual diff after merging (while visual tests are paused, see `README.md`, look at it yourself).
 
 Add a screen recording here only for what a still image can't show, such as motion or a multi-step interaction. Note anything you checked by hand that the tests don't cover: forced-colors mode, a screen reader, or 400% zoom.
 
