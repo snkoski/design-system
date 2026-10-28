@@ -1,8 +1,10 @@
+<!-- Generated from docs/reading-list.json by scripts/build-reading-list.mjs. Edit the JSON, then run `pnpm reading-list`. -->
+
 # Reading list
 
-Articles, guides, and references to read later. Add new links under the closest topic, with a line on why each one is worth reading. When something here changes a decision, record the decision in `docs/brand/` and note it beside the link.
+Articles, guides, and references to read later. When something here changes a decision, record the decision in `docs/brand/`.
 
-Design system links appear twice on purpose: once by system, to see everything Atlassian says, and again by topic, to compare how every system handles, say, design tokens or checkboxes. When adding one, add it in both places.
+Design system links appear twice on purpose: once by system, to see everything one system says, and again by topic, to compare how every system handles, say, design tokens or checkboxes. Both come from the same entry in `docs/reading-list.json`, so a link is only ever added once. `docs/reading-list.html` is the same list as a page you can search and filter.
 
 ## Contents
 
@@ -24,6 +26,7 @@ Design system links appear twice on purpose: once by system, to see everything A
   - [GOV.UK Design System](#govuk-design-system)
   - [U.S. Web Design System](#us-web-design-system)
 - [Design systems, by topic](#design-systems-by-topic)
+  - [Getting started](#getting-started)
   - [Design tokens](#design-tokens)
   - [Color](#color)
   - [Typography](#typography)
@@ -46,6 +49,7 @@ Design system links appear twice on purpose: once by system, to see everything A
   - [Forms and errors](#forms-and-errors)
   - [Dialogs](#dialogs)
   - [Tooltips](#tooltips)
+  - [Navigation](#navigation)
 
 ## Choosing and building colors
 
@@ -55,37 +59,45 @@ Design system links appear twice on purpose: once by system, to see everything A
 - [Stripe: Designing accessible color systems](https://stripe.com/blog/accessible-color-systems): why HSL lightness doesn't match how bright a color looks, and how Stripe rebuilt its palette so every hue has the same contrast at each step.
 - [Matt Strom: How to generate color palettes for design systems](https://mattstromawn.com/writing/generating-color-palettes/): perceptual color spaces, shifting hue as colors get lighter or darker, and generating scales from formulas.
 - [Radix Colors: Composing a palette](https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette): choosing a brand color, a gray tinted toward it, and status colors.
-- [Radix Colors: Understanding the scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale): what each of 12 shades is for (backgrounds, borders, fills, and text).
-- [OneSignal: 11 shades of gray](https://onesignal.com/blog/11-shades-of-gray-a-color-system-story/): a case study of building a gray scale.
-- [The 60-30-10 rule for UI design](https://bootcamp.uxdesign.cc/the-60-30-10-color-rule-for-ui-design-32695d04a7c2): a rough guide to how much of a screen is neutral, supporting color, and accent.
+- [Radix Colors: Understanding the scale](https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale): what each of 12 shades is for: backgrounds, borders, fills, and text.
+- [OneSignal: 11 shades of gray](https://onesignal.com/blog/11-shades-of-gray-a-color-system-story/): A case study of building a gray scale.
+- [The 60-30-10 rule for UI design](https://bootcamp.uxdesign.cc/the-60-30-10-color-rule-for-ui-design-32695d04a7c2): A rough guide to how much of a screen is neutral, supporting color, and accent.
 
 ### Choosing brand colors
 
-- [Shopify: How to choose brand colors](https://www.shopify.com/blog/choose-brand-colors): a general branding guide.
+- [Shopify: How to choose brand colors](https://www.shopify.com/blog/choose-brand-colors): A general branding guide.
 - [Adobe: Picking your brand colors](https://www.adobe.com/express/learn/blog/3-easy-steps-to-picking-your-brand-colors): another general guide, in three steps.
 
 ### Color psychology
 
-- [Color psychology: how colors influence the mind](https://www.psychologytoday.com/intl/blog/habits-not-hacks/201408/color-psychology-how-colors-influence-the-mind): a skeptical, research-based take. Fit with the brand's personality and standing out matter more than what a hue "means."
+- [Color psychology: how colors influence the mind](https://www.psychologytoday.com/intl/blog/habits-not-hacks/201408/color-psychology-how-colors-influence-the-mind): A skeptical, research-based take. Fit with the brand's personality and standing out matter more than what a hue "means."
 - [Labrecque and Milne, "Exciting red and competent blue"](https://colab.ws/articles/10.1007/s11747-010-0245-y): research on how hue, saturation, and lightness shift a brand's perceived personality.
 - [Singh, "Impact of color on marketing"](https://newion.uwinnipeg.ca/~ssingh5/x/color.pdf): the source of the often-quoted "up to 90% of snap judgments" figure. Widely repeated, loosely sourced.
 
 ## Accessibility standards
 
-Each design system's own accessibility pages are under **Accessibility** in the by-topic section.
+Each design system's own accessibility pages are under Accessibility in the design systems section.
 
 ### WCAG
 
-- [WCAG 2.2](https://www.w3.org/TR/WCAG22/), the full standard, and the [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/), the easier way in.
+- [WCAG 2.2](https://www.w3.org/TR/WCAG22/): the full standard.
+- [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/): the easier way in: every criterion, filterable, with techniques.
 - [What's new in WCAG 2.2](https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/)
-- Understanding WCAG: [Target size (minimum)](https://w3c.github.io/wcag/understanding/target-size-minimum.html), [Focus not obscured](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html), and [Focus appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html)
+- [Understanding WCAG: Target size (minimum)](https://w3c.github.io/wcag/understanding/target-size-minimum.html): where the 24px minimum comes from.
+- [Understanding WCAG: Focus not obscured](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html)
+- [Understanding WCAG: Focus appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html)
 
 ### ARIA Authoring Practices Guide
 
 How each kind of component should work with a keyboard and screen reader. Read the matching pattern before building a component.
 
-- [Home](https://www.w3.org/WAI/ARIA/apg/)
-- Patterns: [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/), [Dialog (modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/), [Menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/), [Menu bar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/), [Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/), and [Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
+- [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/)
+- [APG pattern: Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+- [APG pattern: Dialog (modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+- [APG pattern: Menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/)
+- [APG pattern: Menu bar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
+- [APG pattern: Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
+- [APG pattern: Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
 
 ## Design systems, by system
 
@@ -103,9 +115,9 @@ Everything we read from each system, grouped by topic.
 - **Focus:** [Focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection)
 - **Platforms and input:** [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices) and [Designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos) (where the 28pt Mac target size comes from)
 - **Buttons:** [Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons)
-- **Checkboxes:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (checkboxes are a macOS toggle style)
-- **Radio buttons:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (radio buttons are in the macOS section)
-- **Switches:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles)
+- **Checkboxes:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
+- **Radio buttons:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
+- **Switches:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
 - **Segmented controls:** [Segmented controls](https://developer.apple.com/design/human-interface-guidelines/segmented-controls)
 - **Text fields:** [Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)
 - **Text areas:** [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
@@ -117,15 +129,15 @@ Everything we read from each system, grouped by topic.
 
 - **Getting started:** [Home](https://m3.material.io/) and [Structure](https://m3.material.io/foundations/designing/structure)
 - **Typography:** [Typography (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Typography.md)
-- **Spacing, layout, and grids:** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (Material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
+- **Spacing, layout, and grids:** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
 - **Motion:** [Motion (Android)](https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md)
 - **Buttons:** [Buttons (Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/Button.md)
 - **Checkboxes:** [Checkbox](https://m3.material.io/components/checkbox/guidelines)
 - **Radio buttons:** [Radio button](https://m3.material.io/components/radio-button/guidelines)
 - **Switches:** [Switch](https://m3.material.io/components/switch/guidelines)
 - **Segmented controls:** [Segmented buttons](https://m3.material.io/components/segmented-buttons/overview) and [Button groups](https://m3.material.io/components/button-groups/overview) (the newer connected button group)
-- **Text fields:** [Text fields](https://m3.material.io/components/text-fields/guidelines)
-- **Text areas:** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line is part of text fields)
+- **Text fields:** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line text is part of text fields; there's no separate text area)
+- **Text areas:** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line text is part of text fields; there's no separate text area)
 - **Dialogs:** [Dialogs](https://m3.material.io/components/dialogs/guidelines)
 - **Tooltips:** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
 
@@ -185,8 +197,8 @@ Everything we read from each system, grouped by topic.
 - **Radio buttons:** [Radio button](https://www.carbondesignsystem.com/building-blocks/core/components/radio-button)
 - **Switches:** [Toggle](https://www.carbondesignsystem.com/building-blocks/core/components/toggle)
 - **Segmented controls:** [Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher)
-- **Text fields:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
-- **Text areas:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text area is a section of it)
+- **Text fields:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text areas are a section of this page) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
+- **Text areas:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text areas are a section of this page)
 - **Forms and errors:** [Forms pattern](https://carbondesignsystem.com/patterns/forms-pattern/)
 - **Dialogs:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
 - **Tooltips:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
@@ -206,7 +218,7 @@ Everything we read from each system, grouped by topic.
 - **Checkboxes:** [Checkbox](https://fluent2.microsoft.design/components/web/react/core/checkbox/usage)
 - **Radio buttons:** [Radio group](https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage)
 - **Switches:** [Switch](https://fluent2.microsoft.design/components/web/react/core/switch/usage)
-- **Segmented controls:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (iOS only; the web has none)
+- **Segmented controls:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (IOS only; the web has none)
 - **Text fields:** [Input](https://fluent2.microsoft.design/components/web/react/core/input/usage) and [Field](https://fluent2.microsoft.design/components/web/react/core/field/usage)
 - **Text areas:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
 - **Dialogs:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
@@ -227,8 +239,8 @@ Everything we read from each system, grouped by topic.
 - **Checkboxes:** [Checkbox (web components)](https://shopify.dev/docs/api/app-home/latest/web-components/forms/checkbox) (the React page now redirects here)
 - **Radio buttons:** [Radio button](https://polaris-react.shopify.com/components/selection-and-input/radio-button) and [Choice list](https://polaris-react.shopify.com/components/selection-and-input/choice-list)
 - **Segmented controls:** [Button group](https://polaris-react.shopify.com/components/actions/button-group) (its segmented variant)
-- **Text fields:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field)
-- **Text areas:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (its multiline option)
+- **Text fields:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
+- **Text areas:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **Tooltips:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
 
 ### GOV.UK Design System
@@ -259,15 +271,27 @@ Everything we read from each system, grouped by topic.
 - **Checkboxes:** [Checkbox](https://designsystem.digital.gov/components/checkbox/)
 - **Radio buttons:** [Radio buttons](https://designsystem.digital.gov/components/radio-buttons/)
 - **Segmented controls:** [Button group](https://designsystem.digital.gov/components/button-group/) (its segmented variant)
-- **Text fields:** [Text input](https://designsystem.digital.gov/components/text-input/)
-- **Text areas:** [Text input](https://designsystem.digital.gov/components/text-input/) (text area is a section of it)
+- **Text fields:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
+- **Text areas:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
 - **Forms and errors:** [Form](https://designsystem.digital.gov/components/form/)
 - **Dialogs:** [Modal](https://designsystem.digital.gov/components/modal/)
 - **Tooltips:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
 
 ## Design systems, by topic
 
-The same links, grouped so each topic can be compared across systems. A system missing from a topic has no page for it.
+The same links as the by-system section, grouped so each topic can be compared across systems. A system missing from a topic has no page for it.
+
+### Getting started
+
+- **Apple Human Interface Guidelines:** [Home](https://developer.apple.com/design/human-interface-guidelines/)
+- **Material Design 3 (Google):** [Home](https://m3.material.io/) and [Structure](https://m3.material.io/foundations/designing/structure)
+- **GitHub Primer:** [Home](https://primer.style/) and [Product foundations](https://primer.style/product)
+- **Atlassian Design System:** [Home](https://atlassian.design/) and [Components](https://atlassian.design/components)
+- **IBM Carbon:** [Home](https://carbondesignsystem.com/)
+- **Microsoft Fluent 2:** [Home](https://fluent2.microsoft.design/) and [Getting started](https://fluent2.microsoft.design/get-started/design)
+- **Shopify Polaris:** [Polaris React](https://polaris-react.shopify.com/), [Polaris web components](https://shopify.dev/docs/api/polaris) (the newer version), and [App design guidelines](https://shopify.dev/docs/apps/design)
+- **GOV.UK Design System:** [Home](https://design-system.service.gov.uk/)
+- **U.S. Web Design System:** [Home](https://designsystem.digital.gov/) and [Settings](https://designsystem.digital.gov/documentation/settings/)
 
 ### Design tokens
 
@@ -303,7 +327,7 @@ The same links, grouped so each topic can be compared across systems. A system m
 ### Spacing, layout, and grids
 
 - **Apple Human Interface Guidelines:** [Layout](https://developer.apple.com/design/human-interface-guidelines/layout)
-- **Material Design 3 (Google):** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (Material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
+- **Material Design 3 (Google):** [Window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes) (material's breakpoints) and [Window size classes (Android)](https://developer.android.com/guide/topics/ui/layout/window-size-classes)
 - **GitHub Primer:** [Layout](https://primer.style/product/getting-started/foundations/layout/), [Responsive](https://primer.style/product/getting-started/foundations/responsive/), and [Size primitives](https://primer.style/product/primitives/size/)
 - **Atlassian Design System:** [Spacing](https://atlassian.design/foundations/spacing) and [Grid](https://atlassian.design/foundations/grid)
 - **IBM Carbon:** [Spacing](https://carbondesignsystem.com/elements/spacing/overview/) and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/)
@@ -379,7 +403,7 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 
 ### Checkboxes
 
-- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (checkboxes are a macOS toggle style)
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
 - **Material Design 3 (Google):** [Checkbox](https://m3.material.io/components/checkbox/guidelines)
 - **GitHub Primer:** [Checkbox](https://primer.style/product/components/checkbox)
 - **Atlassian Design System:** [Checkbox](https://atlassian.design/components/checkbox/usage)
@@ -391,7 +415,7 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 
 ### Radio buttons
 
-- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (radio buttons are in the macOS section)
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
 - **Material Design 3 (Google):** [Radio button](https://m3.material.io/components/radio-button/guidelines)
 - **GitHub Primer:** [RadioGroup](https://primer.style/product/components/radio-group)
 - **Atlassian Design System:** [Radio](https://atlassian.design/components/radio/usage)
@@ -403,7 +427,7 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 
 ### Switches
 
-- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles)
+- **Apple Human Interface Guidelines:** [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) (switches, plus checkboxes and radio buttons in its macOS section)
 - **Material Design 3 (Google):** [Switch](https://m3.material.io/components/switch/guidelines)
 - **GitHub Primer:** [ToggleSwitch](https://primer.style/product/components/toggle-switch)
 - **Atlassian Design System:** [Toggle](https://atlassian.design/components/toggle/usage)
@@ -416,33 +440,33 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Material Design 3 (Google):** [Segmented buttons](https://m3.material.io/components/segmented-buttons/overview) and [Button groups](https://m3.material.io/components/button-groups/overview) (the newer connected button group)
 - **GitHub Primer:** [SegmentedControl](https://primer.style/product/components/segmented-control)
 - **IBM Carbon:** [Content switcher](https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher)
-- **Microsoft Fluent 2:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (iOS only; the web has none)
+- **Microsoft Fluent 2:** [Segmented control (iOS)](https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage) (IOS only; the web has none)
 - **Shopify Polaris:** [Button group](https://polaris-react.shopify.com/components/actions/button-group) (its segmented variant)
 - **U.S. Web Design System:** [Button group](https://designsystem.digital.gov/components/button-group/) (its segmented variant)
 
 ### Text fields
 
 - **Apple Human Interface Guidelines:** [Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields)
-- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines)
+- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line text is part of text fields; there's no separate text area)
 - **GitHub Primer:** [TextInput](https://primer.style/product/components/text-input)
 - **Atlassian Design System:** [Text field usage](https://atlassian.design/components/textfield/usage) and [Text field examples](https://atlassian.design/components/textfield/examples)
-- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
+- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text areas are a section of this page) and [Text input style](https://carbondesignsystem.com/components/text-input/style/)
 - **Microsoft Fluent 2:** [Input](https://fluent2.microsoft.design/components/web/react/core/input/usage) and [Field](https://fluent2.microsoft.design/components/web/react/core/field/usage)
-- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field)
+- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **GOV.UK Design System:** [Text input](https://design-system.service.gov.uk/components/text-input/)
-- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/)
+- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
 
 ### Text areas
 
 - **Apple Human Interface Guidelines:** [Text views](https://developer.apple.com/design/human-interface-guidelines/text-views)
-- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line is part of text fields)
+- **Material Design 3 (Google):** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line text is part of text fields; there's no separate text area)
 - **GitHub Primer:** [Textarea](https://primer.style/product/components/textarea)
 - **Atlassian Design System:** [Text area](https://atlassian.design/components/textarea/usage)
-- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text area is a section of it)
+- **IBM Carbon:** [Text input](https://www.carbondesignsystem.com/building-blocks/core/components/text-input) (text areas are a section of this page)
 - **Microsoft Fluent 2:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
-- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (its multiline option)
+- **Shopify Polaris:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **GOV.UK Design System:** [Textarea](https://design-system.service.gov.uk/components/textarea/)
-- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text area is a section of it)
+- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
 
 ### Forms and errors
 
@@ -472,3 +496,7 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Microsoft Fluent 2:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
 - **Shopify Polaris:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
 - **U.S. Web Design System:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
+
+### Navigation
+
+- **Apple Human Interface Guidelines:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)

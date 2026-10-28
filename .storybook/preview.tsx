@@ -35,6 +35,7 @@ const preview: Preview = {
             "Building",
             "Industry standards",
           ],
+          "Resources",
           "Components",
           "Revisit",
           "Experiments",
