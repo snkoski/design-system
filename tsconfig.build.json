@@ -9,5 +9,5 @@
     "types": ["node", "vite/client"]
   },
   "include": ["src"],
-  "exclude": ["src/**/*.stories.tsx", "src/**/*.test.ts", "src/**/*.test.tsx", "src/foundations", "src/experiments"]
+  "exclude": ["src/**/*.stories.tsx", "src/**/*.test.ts", "src/**/*.test.tsx", "src/foundations", "src/experiments", "src/how-it-works"]
 }

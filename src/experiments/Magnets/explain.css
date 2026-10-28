@@ -1,0 +1,39 @@
+/* Magnets' "How it works" demos: the before-and-after picture of separate(). The rest comes from
+   src/how-it-works/demo.css. Experiment. */
+.explain-picture {
+  margin: 0;
+}
+.explain-picture svg {
+  display: block;
+  width: 100%;
+  max-width: 32rem;
+  height: auto;
+  overflow: visible;
+}
+.explain-picture__title {
+  fill: var(--ink);
+  font-weight: 600;
+  font-size: var(--text-small);
+}
+.explain-picture__ball {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+/* Held in place: shaded, like something pinned down */
+.explain-picture__ball[data-fixed] {
+  fill: var(--track);
+  stroke-dasharray: 6 4;
+}
+.explain-picture__label {
+  fill: var(--ink);
+  font-weight: 600;
+  font-size: var(--text-small);
+}
+.explain-picture__arrow {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.explain-picture__head {
+  fill: var(--ink);
+}

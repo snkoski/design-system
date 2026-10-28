@@ -1,0 +1,120 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SpinStories from "./Spin.stories";
+import { Code } from "../../how-it-works/Code";
+import { Clicks } from "./explain";
+
+<Meta of={SpinStories} name="How it works" />
+
+# How Spin works
+
+Spin is a button that turns its content when you click it. It splits the work in two: React decides where the spin should end, and CSS does all the turning. Two files, plus one shared with other experiments:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Spin.tsx</code></td><td>The component. On each click it works out the angle to spin to, and writes it, with the duration and easing, into CSS custom properties on the button.</td></tr>
+    <tr><td><code>spin.css</code></td><td>The turning. A CSS transition rotates the content from wherever it is to that angle.</td></tr>
+    <tr><td><code>decoration.css</code></td><td>Shared by the experiments. It sets <code>--experiment-decoration</code> to 1 normally and 0 for people who've asked for reduced motion.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demo is the real Spin.
+
+## 1. A click works out an angle
+
+A CSS custom property is a variable you set in CSS or in an element's `style`, written with two dashes (`--spin-angle`), and read anywhere below it with `var()`. Spin keeps one number in React state, `angle`: the angle it's spinning to, in degrees. It starts at 0. Each click adds to it, and React writes it to the button as `--spin-angle`. The whole component is one function:
+
+<Code file="experiments/Spin/Spin.tsx" name="Spin" />
+
+The `spin()` function inside it runs on every click, and on Space and Enter, because it's a real `<button>`. It does three things:
+
+1. **How many turns.** `turns = speed × duration ÷ 1000`. Speed is in turns per second and duration in milliseconds, so dividing by 1000 turns the duration into seconds. With the defaults, 2 turns a second for 1000 ms is 2 turns. Negative speeds and durations count as 0.
+2. **Which way.** `sign` is 1 for clockwise and −1 for counterclockwise. In CSS, a positive angle turns clockwise. The new angle is `current + sign × turns × 360`: 2 turns clockwise from 0 is 720°.
+3. **Land upright.** With `upright` on, the default, the angle is rounded to a whole number of turns, so the content always ends the right way up. It rounds away from where it started: up (`Math.ceil`) when spinning clockwise, and down (`Math.floor`) when spinning counterclockwise. Rounding the other way would stop it short and turn it back a little.
+
+It updates the angle with `setAngle((current) => …)`, which hands it the latest angle, rather than reading `angle` directly. Two clicks in quick succession then build on each other instead of both starting from the same old value.
+
+Some worked numbers:
+
+<table>
+  <thead>
+    <tr><th>Heading for</th><th>Click</th><th>Before rounding</th><th>Upright on</th><th>Upright off</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0°</td><td>2 turns/s for 1000 ms, clockwise</td><td>0 + 720 = 720°</td><td>720° (already whole)</td><td>720°</td></tr>
+    <tr><td>0°</td><td>1.5 turns/s for 1000 ms, clockwise</td><td>0 + 540 = 540°</td><td>ceil(1.5) × 360 = 720°</td><td>540°, upside down</td></tr>
+    <tr><td>720°</td><td>1.5 turns/s for 1000 ms, counterclockwise</td><td>720 − 540 = 180°</td><td>floor(0.5) × 360 = 0°</td><td>180°</td></tr>
+    <tr><td>0°</td><td>1.3 turns/s for 1000 ms, clockwise</td><td>0 + 468 = 468°</td><td>ceil(1.3) × 360 = 720°</td><td>468°, tipped 108° to the right</td></tr>
+  </tbody>
+</table>
+
+Rounding up makes the spin a little longer than `speed × duration`, but it still takes `duration` to happen, so an upright spin is slightly faster than `speed` says. The BarGrid and PrizeWheel stories turn `upright` off, so each one stops wherever it lands.
+
+The button also gets `--spin-duration`, and `--spin-ease` when you pass an `easing`. Its content is `aria-hidden`, so a screen reader announces only the button's `label`, "Spin" by default, not an emoji's name.
+
+## 2. CSS does the turning
+
+<Code file="experiments/Spin/spin.css" />
+
+The rule that matters is `.spin__content`:
+
+- **`transform: rotate(…)`** turns the content to the angle in `--spin-angle`. It's multiplied by `--experiment-decoration` (section 3), which is 1 normally, so `rotate(720deg)`.
+- **`transition: transform …`** means that when the transform changes, the browser doesn't jump to the new angle. It moves there over `--spin-duration`, following the easing.
+
+React changes a custom property once per click, and the browser animates the rest on its own, without React rendering again. A transform doesn't change the page's layout, so the browser can turn it without recalculating anything else.
+
+### Why 720° spins twice
+
+Standing still, `rotate(0deg)` and `rotate(720deg)` look the same. But when a transition runs between two `rotate()` values, the browser counts the degrees between them, not the difference in how they look: halfway from 0° to 720° is `rotate(360deg)`, and a quarter of the way is `rotate(180deg)`. So it passes through two whole turns. That's why `angle` keeps growing with every click instead of wrapping back to 0: it's a count of every degree turned so far.
+
+### Clicking again while it spins
+
+A second click sets a new angle while the first transition is still running. The browser starts a new transition from wherever the content is at that moment, so there's no jump, and it takes the full duration again. With the defaults, a click half a second into the first spin sets the angle to 1440°. The default easing does most of its turning early, so by then the content has turned about 680°, and it goes from there to 1440° in a fresh second. It speeds up, the way a spun wheel does when you push it again.
+
+### Easing
+
+Easing is how the speed changes during the transition. The default, `--ease-out`, is `cubic-bezier(0.2, 0.8, 0.2, 1)`: it starts fast and slows to a stop, like a spun wheel. That's why the `speed` prop says "on average". At the very start this curve moves 4 times faster than the average (0.8 ÷ 0.2, the slope of its first handle), so a 2 turns/s spin begins at about 8 turns a second and slows from there. `linear` keeps one speed, 2 turns a second the whole way, and stops dead.
+
+### Try it
+
+The real Spin, with the working for each click. "Heading for" is `--spin-angle`, the angle React set. "Facing" is read from the browser each frame, as the transition turns it. Try a slow, long spin (0.5 turns/s, 4000 ms) and click twice: "Heading for" jumps at once, and "Facing" catches up.
+
+<Unstyled>
+  <Clicks />
+</Unstyled>
+
+## 3. Reduced motion
+
+Spinning is decoration, so it switches off for people who've asked their system for reduced motion. `decoration.css` sets `--experiment-decoration` to 0 for them, or under any element with `data-motion="reduced"`:
+
+<Code file="experiments/decoration.css" />
+
+`spin.css` multiplies the angle by it. With 0, the transform is `rotate(0deg)` however far the angle has grown. Its value never changes, so there's nothing for the transition to animate. A click still updates `--spin-angle` (the ReducedMotion story checks this), but nothing moves. The button keeps working as a button: its `onClick` still runs.
+
+## 4. The button itself
+
+The rest of `spin.css` makes the button invisible around its content while staying a good button:
+
+- **A transparent border**, so the button's edge shows in Windows forced-colors mode, which replaces colors with a small fixed palette and draws borders in it.
+- **A focus outline** on `:focus-visible`, which matches keyboard focus but not a mouse click, from the design system's focus tokens.
+- **`-webkit-tap-highlight-color: transparent`**, so a phone doesn't flash a gray box over it on tap.
+
+`data-direction` is set on the button, but no CSS uses it yet: it's there for anything that wants to style the two directions differently.
+
+## The whole files
+
+<details>
+<summary><code>Spin.tsx</code></summary>
+
+<Code file="experiments/Spin/Spin.tsx" />
+
+</details>
+
+<details>
+<summary><code>spin.css</code></summary>
+
+<Code file="experiments/Spin/spin.css" />
+
+</details>

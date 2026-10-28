@@ -1,0 +1,192 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as MagnetsStories from "./Magnets.stories";
+import { Code } from "../../how-it-works/Code";
+import { Pull, Touch } from "./explain";
+
+<Meta of={MagnetsStories} name="How it works" />
+
+# How Magnets works
+
+A Magnet is a Bounce with a charge. Everything about moving (speed, bouncing off the walls, friction, dragging, and throwing) is Bounce's, and [Bounce's How it works page](?path=/docs/experiments-bounce--how-it-works) explains it. This page covers what Magnets adds: the push and pull between magnets, and how they touch instead of passing through each other.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>forces.ts</code></td><td>The math. <code>forces()</code> works out how hard every magnet pushes or pulls every other one. <code>separate()</code> moves magnets that overlap apart, so they touch. Plain functions, with no React and no DOM.</td></tr>
+    <tr><td><code>Magnet.tsx</code></td><td>The component. It renders a Bounce, remembers each magnet's charge, and adds magnetism to Bounce's loop while any magnet is on the page.</td></tr>
+    <tr><td><code>Bounce/mover.ts</code></td><td>Bounce's loop, which moves everything. Its <code>interact()</code> is the door Magnets comes in through.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real `forces()` and `separate()`.
+
+## 1. A Bounce with a charge
+
+`Magnet` takes every Bounce prop, plus `charge`. It renders a Bounce and adds two things: a `data-charge` attribute, for styling, and an entry in `charges`.
+
+<Code file="experiments/Magnets/Magnet.tsx" name="Magnet" />
+
+`charges` is a `WeakMap`: a lookup table from each magnet's element to its charge. The loop only hands interactions elements and numbers, so this is how magnetism finds out what charge an element has. "Weak" means an entry disappears with its element, so a magnet that leaves the page doesn't stay in memory.
+
+<Code file="experiments/Magnets/Magnet.tsx" name="charges" />
+
+The charge is set in a `useLayoutEffect` that depends on `[charge]`, so a new charge takes effect on the next frame, without restarting the magnet. That's how the FlipCharge story flips a ball from + to − mid-flight.
+
+## 2. Joining Bounce's loop
+
+Bounce's loop has a way for other experiments to act between movers: an `Interaction`. It can have two parts, and the loop calls each once a frame, for each box:
+
+<Code file="experiments/Bounce/mover.ts" name="Interaction" />
+
+- **`push`** runs before anything moves. It returns an acceleration for each mover: a change of speed, in pixels per second per second, like gravity.
+- **`settle`** runs after everything has moved. It returns where each mover should be instead, and how fast it should be going.
+
+Both get the movers as `Member`s: a plain snapshot of each one's position, speed, size, and whether it's `fixed` (paused, held, or under reduced motion). The loop measured the sizes once at the start of the frame, so an interaction never makes the browser recalculate the layout.
+
+<Code file="experiments/Bounce/mover.ts" name="Member" />
+
+Magnets' interaction is short. Both halves look up each member's charge, then hand the work to `forces.ts`:
+
+<Code file="experiments/Magnets/Magnet.tsx" name="charged" />
+
+<Code file="experiments/Magnets/Magnet.tsx" name="magnetism" />
+
+A plain Bounce has no entry in `charges`, so it gets a charge of 0, and both functions skip anything with 0. That's why the gray balls in the FixedMagnet story ignore the big magnet.
+
+`interact()` adds an interaction to the loop and returns the function that takes it out again. Magnets only joins once, however many magnets there are: `join()` counts them, joins when the first one appears, and leaves when the last one goes.
+
+<Code file="experiments/Bounce/mover.ts" name="interact" />
+
+<Code file="experiments/Magnets/Magnet.tsx" name="join" />
+
+### Where it fits in a frame
+
+Bounce's `tick()` (section 5 of [Bounce's page](?path=/docs/experiments-bounce--how-it-works)) runs one frame. With an interaction, it does this:
+
+1. **Read.** Measure every mover, and group them by the box they're in (their `offsetParent`). Only magnets in the same box affect each other.
+2. **Push.** Call `forces()` for each box, and add up the accelerations.
+3. **Move.** For each mover, add its acceleration to its velocity, `vx + ax * seconds`, exactly the way `step()` adds gravity. Then call `step()`, which applies friction, moves it, and bounces it off the walls.
+4. **Settle.** Call `separate()` for each box. Where it puts each mover is kept inside the box. A fixed mover is left where it is.
+5. **Write.** Put every element where its body is.
+
+So a magnet's pull never moves anything directly. It changes speeds, and `step()` turns speeds into movement.
+
+## 3. Push and pull: `forces()`
+
+<Code file="experiments/Magnets/forces.ts" name="forces" />
+
+It looks at every pair of magnets once. For each pair:
+
+1. **The line between them.** `dx` and `dy` are how far it is from A's center to B's, across and down. `distance` is the straight-line length, `Math.hypot(dx, dy)`, which is Pythagoras: √(dx² + dy²).
+2. **The direction.** `ux` and `uy` are `dx` and `dy` divided by the distance. Together they make a *unit vector*: an arrow from A towards B exactly 1 long, which says which way without saying how far.
+3. **The strength.** `apart = PULL × chargeA × chargeB / distance²`. Multiplying the charges gives the sign: two of the same sign make a positive number, which pushes apart, and opposite signs make a negative one, which pulls together.
+4. **Both get it.** A gets `apart` along the arrow away from B (`-=`), and B gets the same along the arrow away from A (`+=`). Because the pair is visited once and both are changed together, the two pushes are always equal and opposite.
+
+The strength falls off with the *square* of the distance, like real magnets and electric charges. Twice as far is a quarter as strong; three times as far, a ninth.
+
+<Code file="experiments/Magnets/forces.ts" name="PULL" />
+
+`PULL` sets how strong a charge of 1 is. Some worked numbers:
+
+<table>
+  <thead>
+    <tr><th>Charges</th><th>Centers apart</th><th>Push or pull on each</th><th>Speed gained in one 60 Hz frame</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1 and −1</td><td>100 px</td><td>6,000,000 × −1 / 100² = −600 px/s² (pull)</td><td>10 px/s</td></tr>
+    <tr><td>1 and −1</td><td>200 px</td><td>−150 px/s² (a quarter)</td><td>2.5 px/s</td></tr>
+    <tr><td>2 and −3</td><td>100 px</td><td>−3,600 px/s² (six times)</td><td>60 px/s</td></tr>
+    <tr><td>1 and 1</td><td>100 px</td><td>600 px/s² (push)</td><td>10 px/s</td></tr>
+    <tr><td>−12 and 1</td><td>300 px</td><td>−800 px/s² (FixedMagnet's big magnet)</td><td>13 px/s</td></tr>
+  </tbody>
+</table>
+
+### Closer than touching
+
+Divide by the square of a tiny distance and you get a huge number: two magnets 1 px apart would pull at 6,000,000 px/s², and fling each other off the screen in one frame. So the distance is never counted as less than the distance at which they'd touch:
+
+<Code file="experiments/Magnets/forces.ts" name="touching" />
+
+For two round magnets, that's their two radii added together: (40 + 40 + 40 + 40) ÷ 4 = 40 px for two 40 px balls. Closer than that, the force stops growing, at 6,000,000 ÷ 40² = 3,750 px/s² for charges of 1. Keeping them from overlapping is `separate()`'s job (section 4).
+
+### No mass
+
+`forces()` returns accelerations, not forces, and a magnet has no mass. So a big magnet and a small one are pulled exactly as hard as each other: charges of −12 and 1 give both of them 800 px/s². In the FixedMagnet story the big one only stays put because it's paused. Orbits does have mass, and there the heavy things hardly move.
+
+### Try it
+
+Two magnets on a line, worked out with your numbers. The chart shows the push or pull at every distance: flat while they'd overlap, then falling away with the square of the distance.
+
+<Unstyled>
+  <Pull />
+</Unstyled>
+
+Things to try:
+
+- Charges 1 and −1, then 1 and 1: the same size of force, the other way.
+- Halve the distance from 200 to 100: the force goes up four times, from 150 to 600.
+- Drag the distance below the size: the force stops growing, because they'd overlap.
+
+## 4. Touching: `separate()`
+
+The pull grows as two magnets close in, so they arrive fast. In one frame they can move from just apart to well inside each other. On its own, `forces()` would let them fly straight through and out the other side. `separate()` runs after everything has moved, and fixes any overlap.
+
+<Code file="experiments/Magnets/forces.ts" name="separate" />
+
+For each pair that overlaps:
+
+1. **How much.** `overlap` is how far inside each other they are: the touching distance minus the distance between centers.
+2. **Who moves.** If neither is fixed, each moves half the overlap. If one is fixed, the other moves all of it. Both fixed: neither can move, so the pair is skipped.
+3. **Move apart.** Each moves its share along the line between them, so they end up exactly touching. Game engines call this *position correction*.
+4. **Closing speed.** `(a.vx - b.vx) * ux + (a.vy - b.vy) * uy` is how fast the gap between them is shrinking. Multiplying by `ux` and `uy` (a *dot product*) keeps only the part of their speeds along the line between them. If it's 0 or less, they're already moving apart, and their speeds are left alone.
+5. **Take it away.** The closing speed is shared out the same way as the move. With halves, they end up moving at the same speed along the line, the average of the two, so neither moves into the other any more. Speed sideways to that line isn't touched, so they can still slide round each other.
+
+Taking away all the closing speed makes the collision *perfectly inelastic*: they don't bounce off each other at all, the way two magnets snap together and stay. Orbits' `collide()` is the same idea, with a bounce and with mass.
+
+Some worked numbers, for two 40 px magnets 30 px apart: the overlap is 10 px, so each moves 5 px out: A from 0 to −5, and B from 30 to 35, which puts them 40 px apart, just touching. If A was moving right at 100 px/s and B left at 20 px/s, they were closing at 120 px/s. Each loses 60 of it, so both move right at 40 px/s.
+
+<Unstyled>
+  <Touch />
+</Unstyled>
+
+`separate()` deals with each pair in turn and changes the magnets as it goes, so pushing one pair apart can push one of them into a third. In a clump, a frame doesn't always sort everything out, but the next frame starts from the better positions, and it settles within a few frames.
+
+## 5. Why the stories use friction
+
+Friction (section 3 of [Bounce's page](?path=/docs/experiments-bounce--how-it-works)) takes a share of every magnet's speed every second. Without it, magnets never settle:
+
+- **Opposites** speed up as they fall together. `separate()` stops them moving into each other, but any speed sideways stays, so pairs and clumps keep rolling round each other.
+- **Like charges** push apart, bounce off the walls with all their speed, and come back, forever.
+
+With friction, all that speed drains away, and they come to rest where the pushes and pulls on each one cancel out. In the PersonalSpace story, that's along the walls: every ball is pushed away from all the others, and the walls are as far as they can get. Charge spreads over the outside of a piece of metal for the same reason.
+
+## 6. Paused and held magnets
+
+A paused or held magnet, or any magnet under reduced motion, is `fixed`. The loop doesn't move it, but it's still a member, with its charge:
+
+- `forces()` doesn't look at `fixed`, so a fixed magnet still pulls and pushes the others. The loop just doesn't apply the push it gets back.
+- `separate()` gives a fixed magnet a share of 0, so the free one moves all of the overlap and loses all of its closing speed. It stops against the fixed one, as if it hit a wall.
+
+That's how the FixedMagnet story works: the big magnet is paused, and dragging it holds it, so it never moves by itself, but everything follows it.
+
+## 7. How the work grows
+
+Both functions look at every pair, so the work grows with the square of the number of magnets: 12 magnets make 66 pairs, and 150 make 11,175, each looked at twice a frame. The arithmetic per pair is small, so a hundred or so is fine, but a few thousand would not be. A physics engine with that many things splits the space into a grid and only compares neighbors.
+
+## The whole files
+
+<details>
+<summary><code>forces.ts</code></summary>
+
+<Code file="experiments/Magnets/forces.ts" />
+
+</details>
+
+<details>
+<summary><code>Magnet.tsx</code></summary>
+
+<Code file="experiments/Magnets/Magnet.tsx" />
+
+</details>

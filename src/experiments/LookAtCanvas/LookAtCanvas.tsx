@@ -12,7 +12,7 @@ import { approach, catchUp, fadeAlpha, step } from "./field";
  * How many steps of closeness the colors and fading are drawn in. Every bar at the same step is drawn together,
  * so a frame is at most this many strokes however many bars there are, and the eye can't see steps this small.
  */
-const LEVELS = 32;
+export const LEVELS = 32;
 
 /** Below this opacity, a bar can't be seen at all (less than one step of 256), so it isn't drawn */
 const INVISIBLE = 1 / 256;

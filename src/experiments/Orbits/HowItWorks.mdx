@@ -1,0 +1,223 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as OrbitsStories from "./Orbits.stories";
+import { Code } from "../../how-it-works/Code";
+import { Launch, Orbit } from "./explain";
+
+<Meta of={OrbitsStories} name="How it works" />
+
+# How Orbits works
+
+A Planet is a Bounce with mass, and a Star is a Planet that never moves by itself. Everything about moving (speed, bouncing off the walls, friction, dragging, and throwing) is Bounce's, explained on [Bounce's How it works page](?path=/docs/experiments-bounce--how-it-works). Orbits joins Bounce's loop the same way Magnets does, explained on [Magnets' How it works page](?path=/docs/experiments-magnets--how-it-works). This page covers what Orbits adds: gravity, starting an orbit, bumping, and trails.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>gravity.ts</code></td><td>The math. <code>pulls()</code> works out how hard everything pulls on everything else. <code>orbitVelocity()</code> works out the speed and direction for a circular orbit. <code>collide()</code> bumps things apart when they meet. Plain functions, with no React and no DOM.</td></tr>
+    <tr><td><code>Planet.tsx</code></td><td>The component. It renders a Bounce, remembers each planet's mass and orbit, adds gravity to Bounce's loop, and draws the trails.</td></tr>
+    <tr><td><code>Star.tsx</code></td><td>A heavy Planet that stays where it's put.</td></tr>
+    <tr><td><code>orbits.css</code></td><td>Where the trails sit: behind the planets, over the whole box.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real `orbitVelocity()`, `pulls()`, `collide()`, and Bounce's `step()`.
+
+## 1. Planets and stars
+
+`Planet` takes every Bounce prop, plus `mass`, `orbit`, `trail`, and `trailColor`. It keeps each planet's mass and orbit in `planets`, a `WeakMap` from its element (a lookup table whose entries disappear with their element), because the loop only hands interactions elements and numbers.
+
+<Code file="experiments/Orbits/Planet.tsx" name="planets" />
+
+<Code file="experiments/Orbits/Planet.tsx" name="massive" />
+
+`massive()` adds each member's mass. A plain Bounce isn't in `planets`, so it gets a mass of 0 and takes no part: nothing pulls it, and it pulls nothing.
+
+A Star is a Planet with a mass of 100 that's always `paused`. The loop doesn't move a paused mover (it's `fixed`), but it's still there, with its mass, so it still pulls everything else.
+
+<Code file="experiments/Orbits/Star.tsx" name="Star" />
+
+## 2. Each frame
+
+Gravity joins Bounce's loop through `interact()`, while any planet is on the page, exactly as Magnets does (section 2 of [Magnets' page](?path=/docs/experiments-magnets--how-it-works)). Its interaction has both halves:
+
+<Code file="experiments/Orbits/Planet.tsx" name="gravity" />
+
+In the order a frame runs them:
+
+1. **Push**, before anything moves: `pulls()` gives each planet an acceleration towards everything else (section 3). The loop adds it to the planet's velocity.
+2. **Move**: Bounce's `step()` applies friction, moves each planet, and bounces it off the walls.
+3. **Settle**, after they've moved: any planet waiting to start its orbit is sent off (section 4), `collide()` bumps apart any that overlap (section 6), and each trail gets the planet's new position (section 7).
+
+## 3. Gravity: `pulls()`
+
+<Code file="experiments/Orbits/gravity.ts" name="pulls" />
+
+It looks at every pair once, finds the distance and direction between their centers with `between()`, and pulls each towards the other. This is Newton's law of gravity: the pull on A is `G × B's mass / distance²`, towards B.
+
+<Code file="experiments/Orbits/gravity.ts" name="between" />
+
+<Code file="experiments/Orbits/gravity.ts" name="G" />
+
+`G` sets how strong gravity is. `field` is `G / distance²`, the pull a mass of 1 would make at that distance. A is pulled by `field × b.mass`, and B by `field × a.mass`. Some worked numbers:
+
+<table>
+  <thead>
+    <tr><th>Pulled by</th><th>Distance</th><th>Pull</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>A mass of 1</td><td>100 px</td><td>45,000 × 1 / 100² = 4.5 px/s²</td></tr>
+    <tr><td>A star of mass 100</td><td>200 px</td><td>45,000 × 100 / 200² = 112.5 px/s²</td></tr>
+    <tr><td>A star of mass 100</td><td>400 px</td><td>28.1 px/s² (a quarter: twice as far)</td></tr>
+    <tr><td>A planet of mass 25</td><td>48 px</td><td>45,000 × 25 / 48² = 488 px/s²</td></tr>
+  </tbody>
+</table>
+
+### Mass, and how it differs from Magnets
+
+Magnets' `forces()` gives both magnets in a pair the same acceleration. `pulls()` doesn't: each is pulled by the *other* one's mass. With a mass of 1 and a mass of 10, 100 px apart, the light one is pulled at 45 px/s² and the heavy one at 4.5. The heavy one hardly moves.
+
+A thing's own mass doesn't change how fast it falls, as Galileo found: a mass of 0.1 and a mass of 20 fall towards a star at exactly the same rate. What its mass changes is how hard it pulls everything else. (In Newton's terms, the force on each is mass × acceleration, 1 × 45 and 10 × 4.5, which are equal and opposite.)
+
+Mass is never negative, so gravity only ever pulls. Something with a mass of 0 or less takes no part. And, as in Magnets, the distance is never counted as less than the distance at which the two would touch, so the pull can't become huge when they get very close.
+
+<Code file="experiments/Orbits/gravity.ts" name="touching" />
+
+### Why the moons in the Moons story stay or go
+
+In the Moons story, each moon starts 3 rem, or 48 px, from its planet. The two outer moons start 288 px from the star, which pulls them at 45,000 × 100 / 288² = 54 px/s². The heavy planet's inner moon starts 192 px from the star, which pulls it at 122 px/s².
+
+- The heavy planet, mass 25, pulls both its moons at 45,000 × 25 / 48² = 488 px/s², several times harder than the star does. So they're sent off round the planet.
+- The light planet, mass 1, pulls its would-be moon at only 45,000 / 48² = 20 px/s², less than the star's 54. The star wins, so the moon goes round the star on its own, and drifts away.
+
+## 4. Starting an orbit: `orbitVelocity()`
+
+Something moving in a circle is always turning towards the middle. To keep turning, something has to keep pulling it inwards, and the faster it goes, or the tighter the circle, the harder that pull must be: `speed² / radius`. A circular orbit is one where gravity gives exactly that pull:
+
+- `speed² / distance = G × mass / distance²`, so
+- `speed = √(G × mass / distance)`.
+
+Slower than that, gravity wins and it falls inwards. Faster, it swings outwards.
+
+<Code file="experiments/Orbits/gravity.ts" name="orbitVelocity" />
+
+1. **What to orbit.** It looks for whatever pulls hardest, `mass / distance²`: not whatever is closest, or heaviest. That's how a moon ends up round its planet rather than the star.
+2. **How fast.** `Math.sqrt((G * other.mass) / distance)`. A star of mass 100 needs 150 px/s at 200 px.
+3. **Which way.** `ux` and `uy` point from the planet towards what it orbits, as a unit vector (an arrow 1 long). Turning an arrow a quarter turn swaps its parts and flips one sign: `(uy, −ux)` or `(−uy, ux)`. On screen, `y` grows downwards, which mirrors everything, so `(uy, −ux)` is the one that goes clockwise.
+4. **Carried along.** It adds the velocity of what it orbits, so a moon keeps up with its moving planet.
+
+Farther out is slower, and much longer round, because the distance is longer too. The time for one orbit, `2π × distance / speed`, grows with distance to the power 1.5 (Kepler's third law). In the FullOrbits story, the innermost planet, 80 px out, goes round in about 2 seconds; the outermost, 272 px out, takes about 13.
+
+### Try it
+
+<Unstyled>
+  <Launch />
+</Unstyled>
+
+### When it's sent off
+
+`orbitVelocity()` needs to know where everything is, so a planet with an `orbit` doesn't get its velocity until its first `settle`, in the `gravity` interaction above. By then every planet has been measured. When the page first loads, the loop moves nothing on its first frame (no time has passed yet), so the planet hasn't fallen at all. A planet added to a loop that's already running has fallen for one frame, too little to see.
+
+- **Heaviest first.** Planets are sent off in order of mass, heaviest first, so a moon reads its planet's new velocity, not the standstill it started from.
+- **Once.** `launched` stops it being sent off again. A planet that's fixed, or that has nothing to orbit yet, waits for a later frame.
+- **Again when placed.** A new `orbit`, `startX`, `startY`, or `bounds` sets `launched` back to false, so it's sent off afresh from its new place.
+
+## 5. Why orbits stay round
+
+Each frame, the loop changes a planet's velocity (the pull) before it changes its position (in `step()`). Section 2 of [Bounce's page](?path=/docs/experiments-bounce--how-it-works) explains why that order, called semi-implicit Euler, matters for a bouncing ball. It matters even more here. Done the other way round, an orbit gains a little energy every frame and spirals outwards: in ten seconds at 60 frames a second, a circular orbit 150 px out would drift out to about 200 px. Done this way, a circular orbit stays within about 1% of its radius at 60 frames a second, and within about 3% at 20, however long it runs.
+
+This demo runs that frame for ten seconds, with the real `pulls()`, `step()`, and `collide()`, for one planet sent off sideways from beside a star of mass 100. It starts at a share of the speed `orbitVelocity()` gives.
+
+<Unstyled>
+  <Orbit />
+</Unstyled>
+
+Things to try:
+
+- **100%**: a circle. Hover the charts: the distance and speed hardly change.
+- **80%**: an ellipse. It falls inwards, speeding up, and swings round much closer to the star. Sent off sideways at a share `s` of circular speed, the other end of its orbit is at `distance × s² / (2 − s²)`: 70.6 px, from 150 px. It's going fastest at the closest point, 294 px/s, more than twice its starting speed (Kepler's second law: it sweeps out equal areas in equal times).
+- **0%**: it falls straight in, bounces off the star twice, each time at half the speed, and then rests on it.
+- **145%**: past √2, about 141%, it's going fast enough to escape the star for good. In a box, it hits a wall instead, and comes back.
+- **Friction**: any at all, and it slowly loses the speed an orbit needs, so it spirals in.
+- **20 frames a second**: the circle wobbles a little more, but it doesn't drift.
+
+## 6. Bumping: `collide()`
+
+When two things with mass meet, `collide()` moves them apart so they just touch, and bounces them off each other. It's Magnets' `separate()` (section 4 of [Magnets' page](?path=/docs/experiments-magnets--how-it-works)), with two differences: the heavier one moves less, and they bounce a little.
+
+<Code file="experiments/Orbits/gravity.ts" name="collide" />
+
+**The heavier one moves less.** `easeA` and `easeB` are how easy each one is to move: one over its mass, so a mass of 1 has an ease of 1 and a mass of 3 an ease of a third. Each moves its share of the overlap, `ease / (easeA + easeB)`. With masses 1 and 3 overlapping by 10 px, the light one moves 7.5 px and the heavy one 2.5. A fixed thing has an ease of 0, as if it were infinitely heavy, so the other one moves all the way.
+
+**They bounce.** `closing` is how fast they're moving into each other along the line between them, as in Magnets. The bounce is an *impulse*: a sudden change of momentum (mass × velocity), the same size for both, in opposite directions. Dividing it by each one's mass, which is the same as multiplying by its ease, gives the change in its speed.
+
+`impulse = (1 + RESTITUTION) × closing / (easeA + easeB)`. A restitution of 0 would only stop them moving into each other, as Magnets does; 1 would bounce them apart as fast as they came together. Orbits uses half:
+
+<Code file="experiments/Orbits/gravity.ts" name="RESTITUTION" />
+
+A worked example: a mass of 1 moving at 300 px/s hits a mass of 2 standing still. `ease` is 1 + ½ = 1.5, so the impulse is 1.5 × 300 / 1.5 = 300. The light one's speed changes by 300 × 1 and stops dead. The heavy one's changes by 300 × ½ and moves off at 150 px/s. They now separate at 150 px/s, half the 300 they met at, and the total momentum, 1 × 300 before and 2 × 150 after, is kept.
+
+<Code file="experiments/Orbits/gravity.ts" name="REST" />
+
+Something falling into a star would otherwise bounce a tiny amount every frame, because gravity pulls it back in at once. Below `REST`, there's no bounce: it just stops moving into the star, and rests on it.
+
+## 7. Trails
+
+A planet with a `trail` draws a line behind it, showing where it's been in the last `trail` seconds, fading out towards the oldest end. `Planet` renders an `svg` with 20 `polyline`s, each a little more opaque than the last. `orbits.css` stretches it over the whole box, behind the planets, and lets clicks through.
+
+<Code file="experiments/Orbits/Planet.tsx" name="trails" />
+
+Every frame, the `gravity` interaction's `settle` calls `extend()` with the planet's center:
+
+<Code file="experiments/Orbits/Planet.tsx" name="extend" />
+
+1. **Forget the old.** Points older than the trail's length are dropped.
+2. **Add the new.** Its position is saved only once it's moved `SPACING`, 3 px, from the last saved point, so a planet resting on a star doesn't pile up hundreds of points in one place. Where it is right now is always drawn, as the `head`, saved or not.
+3. **Sort by age into bands.** A point's band is `(1 − age / length) × 20`, rounded down: the newest points are in band 19, and points almost as old as the trail is long are in band 0. Each band is drawn as its own line, with an opacity of `(band + 1) / 20`, so the trail fades in 20 steps. A point where the band changes goes into both bands, so the lines join up without a gap.
+4. **Draw.** It sets each line's `points` attribute directly, without React, so drawing a trail never re-renders anything.
+
+<Code file="experiments/Orbits/Planet.tsx" name="BANDS" />
+
+<Code file="experiments/Orbits/Planet.tsx" name="SPACING" />
+
+Why 20 lines, and not one with a gradient? An SVG gradient runs in a straight line across the picture, not along a curve, so it can't fade a looping orbit from its tail to its head. Twenty steps are enough to look smooth.
+
+## 8. Paused, held, and dragged
+
+A paused planet, a held one, any planet under reduced motion, and every Star are `fixed`. The loop doesn't move them, but they're still members, with their mass:
+
+- `pulls()` doesn't look at `fixed`, so they still pull everything else.
+- `collide()` gives them an ease of 0, so anything that hits them bounces off as if they were infinitely heavy.
+- They're never sent off into an orbit while fixed.
+
+Dragging a star holds it, so the loop leaves it to the pointer. Its planets are pulled towards wherever it is now, so they follow it round the box.
+
+## The whole files
+
+<details>
+<summary><code>gravity.ts</code></summary>
+
+<Code file="experiments/Orbits/gravity.ts" />
+
+</details>
+
+<details>
+<summary><code>Planet.tsx</code></summary>
+
+<Code file="experiments/Orbits/Planet.tsx" />
+
+</details>
+
+<details>
+<summary><code>Star.tsx</code></summary>
+
+<Code file="experiments/Orbits/Star.tsx" />
+
+</details>
+
+<details>
+<summary><code>orbits.css</code></summary>
+
+<Code file="experiments/Orbits/orbits.css" />
+
+</details>

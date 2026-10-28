@@ -24,7 +24,7 @@ export interface Physics {
 export type Edge = "top" | "right" | "bottom" | "left";
 
 /** Under gravity, a bounce slower than this many seconds' worth of gravity counts as resting on the floor */
-const REST = 0.05;
+export const REST = 0.05;
 
 /** The velocity for a speed in px per second and an angle in degrees: 0 is right, 90 is down */
 export function velocity(speed: number, angle: number) {

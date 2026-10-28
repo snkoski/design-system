@@ -27,8 +27,8 @@ const LABEL_SIZE = 0.046;
 /** How big to draw a planet: bigger for bigger, but squeezed, so Jupiter isn't 59 times as wide as Pluto. Earth is 0.065. */
 const sizeOf = (radius: number) => 0.065 * (radius / 6_371) ** 0.3;
 
-const RINGS = PLANETS.map((planet) => planet.orbit.at2000.a);
-const OUTERMOST = Math.max(...PLANETS.map(({ orbit: { at2000 } }) => at2000.a * (1 + at2000.e)));
+export const RINGS = PLANETS.map((planet) => planet.orbit.at2000.a);
+export const OUTERMOST = Math.max(...PLANETS.map(({ orbit: { at2000 } }) => at2000.a * (1 + at2000.e)));
 /** How big to draw a moon: smaller than a planet its size would be, but never too small to see */
 const moonSizeOf = (radius: number) => Math.max(0.7 * sizeOf(radius), 0.028);
 /** A moon going round more times a second than this is drawn as a blur round its planet, as it would look */

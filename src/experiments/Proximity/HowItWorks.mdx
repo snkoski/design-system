@@ -1,0 +1,167 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as ProximityStories from "./Proximity.stories";
+import { Code } from "../../how-it-works/Code";
+import { Closeness, Mixing } from "./explain";
+
+<Meta of={ProximityStories} name="How it works" />
+
+# How Proximity works
+
+Proximity is three files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>tracker.ts</code></td><td>The math and the listening. Two plain functions turn a pointer position into a number from 0 to 1 and that number into a color. One shared listener follows the pointer and writes the results onto every Proximity on the page.</td></tr>
+    <tr><td><code>Proximity.tsx</code></td><td>The component. It renders one <code>span</code>, signs it up with the tracker, and passes the props along.</td></tr>
+    <tr><td><code>proximity.css</code></td><td>The look. It turns the tracker's numbers into opacity and color, and smooths the change between pointer moves.</td></tr>
+  </tbody>
+</table>
+
+The whole experiment rests on one idea: JavaScript works out a single number, `--proximity`, and CSS decides what that number looks like. JavaScript never sets an opacity or a color directly.
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. How close is the pointer: `closeness()`
+
+`closeness()` answers one question: how near is this point to this box, on a scale from 0 to 1? 1 means the pointer is over the box or on its edge. 0 means it's `reach` pixels away or further. In between, it falls in a straight line.
+
+<Code file="experiments/Proximity/tracker.ts" name="closeness" />
+
+The box is the element's `getBoundingClientRect()`: where its left, top, right, and bottom edges are on the screen, in pixels. The pointer's `x` and `y` are in the same pixels. It works in three steps.
+
+**How far outside the box, across and down.** `dx = Math.max(rect.left - at.x, 0, at.x - rect.right)` picks the largest of three numbers, and only one of them can be above 0:
+
+- Left of the box, `rect.left - at.x` is how far left it is.
+- Right of the box, `at.x - rect.right` is how far right it is.
+- Level with the box (between its left and right edges), both are negative, so the `0` wins.
+
+`dy` does the same for above and below. So a pointer 60 px right of the box and 80 px above it has `dx = 60` and `dy = 80`.
+
+**The straight-line distance.** `Math.hypot(dx, dy)` is Pythagoras: the square root of `dx² + dy²`. It's the length of the slanted side of a right-angled triangle whose other two sides are `dx` and `dy`. For 60 and 80, that's √(3600 + 6400) = √10000 = 100 px. When the pointer is level with the box, one of them is 0, and the distance is simply the other one.
+
+This measures from the box's nearest edge, not its center. A wide button and a small dot both count as "touched" the moment the pointer reaches their edge.
+
+**Distance to closeness.** `1 - distance / reach` turns the distance into a share of the reach: at a distance of 0 it's 1, at half the reach it's 0.5, and at the reach it's 0. Beyond the reach it would go negative, so `Math.min(Math.max(…, 0), 1)` holds it between 0 and 1. This is called clamping. With a reach of 200, the pointer 100 px away gives 1 − 100 / 200 = 0.5.
+
+A reach of 0 would divide by zero, so it's handled first: then only being over the box counts.
+
+### Try it
+
+The rings mark where closeness is 0.75, 0.5, 0.25, and 0. They're rectangles with rounded corners, because every point on one is the same distance from the box's nearest edge: straight out from a side, or round a corner. Move to a corner and the dashed lines show `dx` and `dy`, with the distance as the slanted side between them.
+
+<Unstyled>
+  <Closeness />
+</Unstyled>
+
+## 2. From closeness to color: `colorAt()`
+
+With `colors`, Proximity also changes color as the pointer comes near. `colorAt()` turns a closeness into a CSS color.
+
+<Code file="experiments/Proximity/tracker.ts" name="colorAt" />
+
+It doesn't work out a color itself. It writes a CSS `color-mix()` and lets the browser do the mixing. `color-mix(in srgb, blue, red 25%)` means "25% red and the rest blue, mixed in the srgb color space."
+
+With two colors, closeness is the percentage: 0 is all the first color, 0.25 is a quarter of the way to the second, and 1 is all the second. With more colors, it passes through each in turn, at even steps. Three colors have two gaps between them, so the first half of the closeness goes from the first color to the second, and the second half from the second to the third:
+
+- `along` is how many colors along the list it is: closeness × (number of colors − 1). For blue, green, and red at closeness 0.75, that's 0.75 × 2 = 1.5.
+- `from` is the color it's leaving: the whole part of `along`, so 1, which is green. `Math.floor` rounds down.
+- `toward` is the part after the decimal point, as a percentage: 0.5, so 50% of the way to red. It's rounded to one decimal place, to keep the CSS short.
+
+So 0.75 gives `color-mix(in srgb, green, red 50%)`. At exactly 1, `along` is 2, and `floor` would point at color 2, which has no color after it. `Math.min(…, colors.length - 2)` holds it on the last pair, at 100%.
+
+### Color spaces
+
+A color space is a way of describing colors as numbers, and mixing two colors means going in a straight line between their numbers. Different spaces give different colors in between:
+
+- **`srgb`** mixes the red, green, and blue light a screen is made of. Blue to red goes through a dull purple, a little darker than either end, because the numbers are stored on a curve rather than as raw brightness.
+- **`oklch`** describes a color as lightness, chroma (how vivid it is), and hue (where it is round the color wheel). It's designed so equal steps look equally different to the eye, so the colors in between stay as bright and vivid as the ends.
+- **`hsl`** is hue, saturation, and lightness, and goes round the color wheel. Blue's hue is 220° and red's is 0°, which is also 360°. `color-mix()` takes the shorter way round, from 220° up to 360°, so it passes through magenta.
+
+### Try it
+
+<Unstyled>
+  <Mixing />
+</Unstyled>
+
+## 3. From numbers to looks: `proximity.css`
+
+The tracker sets `--proximity` and, with colors, `--proximity-color`, as CSS custom properties on each element. The CSS does the rest:
+
+<Code file="experiments/Proximity/proximity.css" />
+
+- **Fade out:** `opacity: 1 - p × (1 - faintest)`. Far away (`p` is 0) it's fully there. Right over it (`p` is 1) it's at `faintest`. With a faintest of 0.1, halfway gives 1 − 0.5 × 0.9 = 0.55.
+- **Fade in:** `opacity: faintest + p × (1 - faintest)`, the same line the other way: `faintest` far away, fully there up close.
+- **Colors:** `color: var(--proximity-color)`. It sets `color`, not a background, so the content takes it on wherever it's drawn in `currentColor`.
+- **Smoothing:** the pointer reports its position many times a second, but in steps, and a quick move can jump a long way between two reports. The `transition` eases opacity and color over `--duration-fast` (120 ms), so a jump becomes a short fade.
+
+The `0` in `var(--proximity, 0)` is a fallback: before the tracker has written anything, it counts as out of reach.
+
+## 4. The tracker: one listener for every Proximity
+
+A grid of 126 dots could give each one its own `pointermove` listener. Instead, every Proximity on the page shares one. A watcher is everything the tracker needs to know about one Proximity:
+
+<Code file="experiments/Proximity/tracker.ts" name="Watcher" />
+
+`watch()` adds a watcher to the set, and the first one in adds the listeners on `window`. It returns the function that takes the watcher back out, and the last one out removes the listeners again.
+
+<Code file="experiments/Proximity/tracker.ts" name="watch" />
+
+It listens for more than the pointer moving, because closeness can change while the pointer stands still:
+
+- **`scroll` and `resize`** move the elements under the pointer. Scroll events don't bubble up from a scrolling box to the window, so the listener uses `capture: true`, which hears them on the way down instead and catches scrolling anywhere on the page.
+- **`focusin` and `focusout`** catch keyboard focus moving (see below).
+- **`pointerout`** with no `relatedTarget` means the pointer left the window, not just one element for another, so nothing is near it any more.
+
+Every one of them ends up in `update()`:
+
+<Code file="experiments/Proximity/tracker.ts" name="update" />
+
+- **Read everything, then write everything.** Measuring an element with `getBoundingClientRect()` right after changing another one's style forces the browser to work out the layout of the page again before it can answer. Doing that once per element, on every pointer move, gets slow with a grid of hundreds. So `update()` measures every element first, then writes all the results.
+- **Keyboard focus counts as the pointer right over it.** If something inside a Proximity has focus (`:focus-within`), its closeness is 1. Otherwise content that fades in would stay invisible to someone using the keyboard, even as they tabbed through it.
+- **Rounded.** `--proximity` is rounded to three decimal places, which is far finer than anyone can see and keeps the style attribute short.
+- **No colors, no property.** With fewer than two colors, `colorAt()` returns `null` and the property is removed, so the element keeps its own color.
+
+<Code file="experiments/Proximity/tracker.ts" name="onPointerMove" />
+
+<Code file="experiments/Proximity/tracker.ts" name="onPointerOut" />
+
+## 5. The component: `Proximity.tsx`
+
+The component renders one `span` and hands it to the tracker. React never re-renders to change the opacity or color: the tracker writes the custom properties directly.
+
+<Code file="experiments/Proximity/Proximity.tsx" name="Proximity" />
+
+- **Joining once.** The first `useLayoutEffect` has an empty dependency list (`[]`), so it creates the watcher and calls `watch()` once, when the component appears, and stops when it goes away. It's a layout effect, so it runs before the browser paints: a pointer move in the same moment isn't lost.
+- **Changing props without starting again.** The second effect copies a new `reach`, `colors`, or `colorSpace` into the same watcher and calls `refresh()`, so the change shows straight away, without waiting for the pointer to move.
+- **Comparing colors.** A new `colors` array is made on every render, even when its contents haven't changed, so the effect watches `colorKey`, the colors joined into one string, rather than the array.
+- **Props to attributes.** `fade` becomes `data-fade`, which the CSS selects on. Two or more colors set `data-colored`. `faintest` is held between 0 and 1 and passed as `--proximity-faintest`.
+
+<Code file="experiments/Proximity/tracker.ts" name="refresh" />
+
+Look at canvas reuses `closeness()` and `colorAt()` to color and fade thousands of bars on a canvas. Its [How it works](?path=/docs/experiments-look-at-canvas--how-it-works) page shows how.
+
+## The whole files
+
+<details>
+<summary><code>tracker.ts</code></summary>
+
+<Code file="experiments/Proximity/tracker.ts" />
+
+</details>
+
+<details>
+<summary><code>Proximity.tsx</code></summary>
+
+<Code file="experiments/Proximity/Proximity.tsx" />
+
+</details>
+
+<details>
+<summary><code>proximity.css</code></summary>
+
+<Code file="experiments/Proximity/proximity.css" />
+
+</details>

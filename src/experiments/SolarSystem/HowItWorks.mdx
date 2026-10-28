@@ -1,0 +1,336 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SolarSystemStories from "./SolarSystem.stories";
+import { Code } from "../../how-it-works/Code";
+import { OneOrbit, ScaleTable, SolveKepler } from "./explain";
+
+<Meta of={SolarSystemStories} name="How it works" />
+
+# How the solar system works
+
+The solar system shows each planet where it really is on a date, then lets the date run on. Unlike Bounce, nothing here is simulated: there's no gravity pulling planets along, step by step. Each frame asks one question, "where is each planet on this date?", and works out the answer from the date alone, with the same method astronomers at NASA's Jet Propulsion Laboratory (JPL) publish for it. So it can jump to any date, and it never drifts off course however long it runs.
+
+It's six files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>bodies.ts</code></td><td>The data. Each planet's orbit, as six numbers from JPL's table, and each moon's distance and how long it takes to go round. No code to speak of.</td></tr>
+    <tr><td><code>kepler.ts</code></td><td>The astronomy. Given an orbit and a date, where is the planet? This is where Kepler's equation is solved.</td></tr>
+    <tr><td><code>moons.ts</code></td><td>The moons. Where Earth's Moon really is, and how fast to show the others going round so you can see them.</td></tr>
+    <tr><td><code>scale.ts</code></td><td>Fitting it on a screen. Pluto gets 127 times as far from the Sun as Mercury's average distance, so the distances are squeezed, in one of four ways.</td></tr>
+    <tr><td><code>SolarSystem.tsx</code></td><td>The component. Draws the burger, the hot dogs, and their orbits in an SVG, and runs the clock.</td></tr>
+    <tr><td><code>solar-system.css</code></td><td>Its look: the dashed orbits, the labels, the ruler, and the caption.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. An orbit is six numbers
+
+A planet goes round the Sun in an **ellipse**: a stretched circle. The Sun isn't at the ellipse's middle, but off to one side, at a point called a focus. Six numbers say everything about the ellipse and where the planet is on it:
+
+<Code file="experiments/SolarSystem/kepler.ts" name="Elements" />
+
+- **`a`, the semi-major axis**, is half the ellipse's long side, which is also the planet's average distance from the Sun. It's in **AU**, astronomical units: 1 AU is Earth's average distance from the Sun, about 150 million km.
+- **`e`, the eccentricity**, is how stretched the ellipse is. 0 is a circle, and the nearer 1, the longer and thinner it gets. It's also how far the Sun is from the ellipse's middle, as a share of `a`. So the closest a planet gets to the Sun, its **perihelion**, is `a × (1 − e)`, and the furthest is `a × (1 + e)`. Earth's `e` is 0.017, almost a circle: it's between 0.983 and 1.017 AU from the Sun. Pluto's is 0.249: between 29.7 and 49.3 AU.
+- **`inclination`** is how far the orbit is tilted from Earth's, in degrees. Pluto's is 17°; the planets' are all under 8°.
+- The last three are **longitudes**: angles measured round the Sun, from a fixed direction in space (the direction of the Sun from Earth at the March equinox). `meanLongitude` is where the planet would be if it went round at a steady speed. `perihelion` is which way the orbit's closest point faces. `node` is where the orbit crosses Earth's going north, which together with `inclination` says how it's tilted.
+
+The orbits change, very slowly: other planets' pull makes each ellipse turn and stretch a little over centuries. So JPL lists each number on 1 January 2000 and how much it changes in a century:
+
+<Code file="experiments/SolarSystem/kepler.ts" name="Orbit" />
+
+`bodies.ts` copies JPL's table in, a row and its rates for each planet, through a small helper that names the six numbers:
+
+<Code file="experiments/SolarSystem/bodies.ts" name="orbit" />
+
+Earth's row, for example, is `a` = 1.00000261, `e` = 0.01671123, `inclination` = −0.00001531, `meanLongitude` = 100.46457166, `perihelion` = 102.93768193, and `node` = 0. Its rates say `meanLongitude` grows by 35,999.37° a century. That's almost exactly 360° a year: one trip round the Sun. Mercury's grows by 149,472.67° a century, 4.15 trips a year, which is its 88-day year.
+
+## 2. From a date to the orbit on that date
+
+The rates are per century, so the first step turns the date into centuries since the table's starting point, noon on 1 January 2000. Astronomers call that moment J2000.
+
+<Code file="experiments/SolarSystem/kepler.ts" name="centuriesSince2000" />
+
+Dates in JavaScript are milliseconds, so it divides by the milliseconds in a day, then by the 36,525 days in a century. Midnight on 27 October 2026 is 9,795.5 days after J2000, which is 0.26819 centuries.
+
+Then each of the six numbers moves on by its rate times that many centuries:
+
+<Code file="experiments/SolarSystem/kepler.ts" name="elementsAt" />
+
+For Earth on 27 October 2026:
+
+- `meanLongitude` = 100.46457 + 35,999.37245 × 0.26819 = 9,755.0°. That's 27 whole trips round the Sun (27 × 360° = 9,720°), plus 35.0°.
+- `perihelion` = 102.93768 + 0.32327 × 0.26819 = 103.02°. The direction of Earth's closest point has turned a twelfth of a degree since 2000.
+
+## 3. Where it would be at a steady speed
+
+<Code file="experiments/SolarSystem/kepler.ts" name="positionAt" />
+
+`positionAt()` starts with the **mean anomaly**, `M`: how far round its orbit the planet would be from its closest point if it went at a steady speed. ("Anomaly" is astronomers' old word for an angle like this.) It's the mean longitude minus the direction of the closest point. For Earth today, 35.0° − 103.0° = −68.0°: if Earth went round at a steady speed, it would be 68° short of its closest point, which it reaches in early January.
+
+`Math.atan2(Math.sin(M), Math.cos(M))` wraps the angle into −180° to 180° (in radians, −π to π), however many trips round it's made. Angles in code are in **radians**, not degrees: a full turn is 2π radians, about 6.283, so one radian is about 57.3°. `radians()` converts.
+
+But planets don't go at a steady speed.
+
+## 4. Kepler's equation
+
+A planet goes faster when it's closer to the Sun, and slower when it's further away. Johannes Kepler worked out the rule in 1609: a line from the Sun to the planet sweeps across equal areas in equal times. Close in, the line is short, so it has to swing through a bigger angle to sweep the same area.
+
+His equation turns the steady-speed angle `M` into the real place. It's written with a second angle, `E`, the **eccentric anomaly**:
+
+**M = E − e sin E**
+
+`E` is easiest to see on a picture. Draw a circle round the ellipse, touching it at both ends of its long side. `E` is an angle on that circle, measured from the middle. Go straight down (or up) from that point on the circle until you meet the ellipse, and that's where the planet is. The ellipse is just the circle squashed flat, so every point on the circle has a matching point on the ellipse.
+
+Given `E`, working out `M` is easy: put it in the equation. But we have `M` (from the date) and need `E`, and there's no way to rearrange the equation to give `E` directly. So `solveKepler()` finds it by trying, with **Newton's method**:
+
+<Code file="experiments/SolarSystem/kepler.ts" name="solveKepler" />
+
+1. **Guess.** `E = M + e sin M` is close already, because `e` is small for every planet.
+2. **See how far off it is.** Put the guess in: `E − e sin E − M` is 0 for the right answer, so whatever it comes to is the error.
+3. **Correct it.** The slope, `1 − e cos E`, is how much the error changes when `E` changes a little. Dividing the error by the slope says how far to move `E` to make the error 0, if the curve were a straight line. It isn't quite, so the new guess is better but not perfect.
+4. **Repeat** until a correction changes `E` by less than a trillionth (`1e-12`). Each round roughly doubles the number of correct digits, so for the planets it takes three or four rounds. The limit of 50 is only a safety net.
+
+Worked through for Pluto, with `e` = 0.249 and `M` = 1 radian (57.3°):
+
+- Guess: `E` = 1 + 0.249 × sin 1 = 1 + 0.249 × 0.8415 = 1.2095.
+- Round 1: the error is 1.2095 − 0.249 × sin 1.2095 − 1 = −0.0234, and the slope is 1 − 0.249 × cos 1.2095 = 0.9120. So `E` = 1.2095 − (−0.0234 ÷ 0.9120) = 1.2352.
+- Round 2: the error is now 0.000077, so `E` = 1.235101.
+- Round 3: the error is 0.0000000008, and `E` = 1.2351012052. Round 4 changes nothing.
+
+For a very long, thin orbit (`e` of 0.8 or more, such as a comet's), the first guess can send Newton's method the wrong way, so it starts from π (the far end of the orbit) instead, a starting point known to be safe. No planet needs it, but it means the function is right for any orbit.
+
+### Try it
+
+Change the shape of the orbit and how far round it is, and watch each round of Newton's method. The hollow circle marked M is where the planet would be at a steady speed, on the circle round the ellipse; E is where it really is on that circle; and the planet is straight below or above E.
+
+<Unstyled>
+  <SolveKepler />
+</Unstyled>
+
+Things to try:
+
+- Eccentricity 0: the ellipse is the circle, `E` is `M`, and one round is enough.
+- Eccentricity 0.4 and M from 0° to 180°: E is ahead of M the whole way, because the planet has just come past the Sun fast. From −180° to 0° it's behind.
+- Eccentricity 0.95 and M near 0°: the planet whips round the Sun, and Newton's method takes more rounds.
+
+## 5. From an angle to a place in space
+
+With `E`, `placeOnOrbit()` works out where the planet is, in AU, in three dimensions:
+
+<Code file="experiments/SolarSystem/kepler.ts" name="placeOnOrbit" />
+
+**First, flat, in the orbit's own plane.** Picture the orbit lying flat, with the Sun at (0, 0) and the closest point straight to the right.
+
+- `a × cos E` and `a × sin E` would be the point at angle `E` on the circle round the ellipse, measured from the ellipse's middle.
+- The ellipse is that circle squashed top to bottom by `√(1 − e²)`, which is its short half divided by its long half. So `py` is `a × √(1 − e²) × sin E`.
+- The Sun is `a × e` to the right of the middle, so `px` subtracts that: `a × (cos E − e)`.
+
+**Then turned to face the right way.** The flat orbit is turned three times: round in its own plane by `w` (from where it crosses Earth's orbit to its closest point), tilted by the `inclination` along the line where the two orbits cross, and turned round by `node` so that line points the right way. Each turn is a rotation, and the nine sums of `cw`, `sw`, `cn`, and so on are the three rotations multiplied together into one, so they're done in one go.
+
+The result is a `Position`: `x` towards the March equinox direction, `y` a quarter turn round from it, and `z` north, out of Earth's orbit.
+
+<Code file="experiments/SolarSystem/kepler.ts" name="Position" />
+
+For Earth on 27 October 2026, `M` = −68.0° becomes `E` = −68.9°, and the place is `x` = 0.832, `y` = 0.544, and `z` = −0.00003 AU: 0.994 AU from the Sun, at 33.2° round. Seen from Earth, the Sun is the opposite way, at 213°, which is where almanacs put it in late October.
+
+### See a whole orbit
+
+This runs `solveKepler()` and `placeOnOrbit()` at 240 evenly spaced moments through one orbit, for an orbit 1 AU across its long half. The dashed line on the second chart is where a planet going at a steady speed would be.
+
+<Unstyled>
+  <OneOrbit />
+</Unstyled>
+
+Things to try:
+
+- Eccentricity 0: the distance is a flat line at 1 AU, and the angle follows the dashed line exactly.
+- Pluto's 0.25: it's round the near side of the Sun in about a third of its year, and spends the other two thirds on the far side.
+- 0.9, like a comet: it's close to the Sun for a moment, and far away almost all the time.
+
+## 6. Drawing the orbits
+
+To draw an orbit's dashed path, `orbitPath()` takes 180 places round it. It spaces them evenly in `E` rather than in time, so they're spread evenly round the shape, instead of bunching up at the far end where the planet is slow.
+
+<Code file="experiments/SolarSystem/kepler.ts" name="orbitPath" />
+
+## 7. Fitting it on a screen
+
+### Squeezing the distances
+
+If Pluto's furthest point is at the edge of the picture, Earth at true scale is only 2% of the way out, and the four inner planets crowd together round the burger. So the distances are squeezed. `scaleDistance()` makes a function that takes a real distance in AU and gives back how far out to draw it, from 0 (the Sun) to 1 (`outermost`). Every scale keeps the order, so nearer the Sun always stays nearer.
+
+<Code file="experiments/SolarSystem/scale.ts" name="scaleDistance" />
+
+- **`linear`** divides by the outermost distance: true to scale.
+- **`sqrt`** takes the square root of that. Four times as far is drawn twice as far.
+- **`log`**, the default, uses the logarithm, which grows by the same amount each time the number doubles. So every doubling of the distance gets about the same room on screen. `unit` is half Mercury's distance, 0.19 AU, and `Math.log1p(x)` is the logarithm of 1 + `x`, so 0 AU comes out as exactly 0. For Earth: log(1 + 1 ÷ 0.19) ÷ log(1 + 49.31 ÷ 0.19) = 1.82 ÷ 5.54 = 0.33.
+- **`even`** puts each planet's average orbit one step further out, like a textbook diagram, and anything between two orbits in proportion between their steps. Pluto's average distance is step 9, and its furthest point is past that, at 10.04, so everything is divided by 10.04.
+
+The component calls it with `RINGS`, every planet's average distance, and `OUTERMOST`, the furthest anything gets: Pluto's far end, 39.48 × (1 + 0.249) = 49.31 AU.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="RINGS" />
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="OUTERMOST" />
+
+Here's where each planet's average orbit lands under each scale, from the real `scaleDistance()`:
+
+<ScaleTable />
+
+The DistanceScales story draws all four side by side, each with a ruler in AU.
+
+### Where to draw a planet
+
+The picture is an SVG whose middle is the Sun. Its `viewBox` runs from −1.12 to 1.12 both ways, so 1 is as far out as anything gets, and the extra 0.12 is room for labels. Whatever size the layout makes it, these units scale with it.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="EDGE" />
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="INNER" />
+
+Inside the component, `project()` turns a place in AU into a place in the picture. It's declared inside the component, so it can't be shown on its own here, but it's in the component's code in section 9. It:
+
+1. Measures the distance from the Sun across Earth's plane, `Math.hypot(x, y)`, leaving out `z`. The picture is the solar system seen from above, from the north.
+2. Squeezes that distance with the scale, then moves it out past the burger: `INNER + (1 − INNER) × scale`. `INNER` is 0.17, so the nearest orbit clears the burger, which is 0.26 across.
+3. Keeps the direction: `x ÷ distance` and `y ÷ distance` say which way the planet is, and multiplying them by the drawn distance puts it that far out that way. `y` is flipped, because an SVG's `y` points down the screen, and north should be up.
+
+For Earth today, with `log`: 0.17 + 0.83 × 0.327 = 0.442 out, at 33.2°, so it's drawn at (0.369, −0.242).
+
+### How big to draw them
+
+Jupiter's radius is 59 times Pluto's. Drawn true to scale, Pluto would be a speck next to Jupiter, and both would be specks next to the Sun. So sizes are squeezed too, by raising the radius to the power 0.3, which is close to a cube root:
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="sizeOf" />
+
+Earth is drawn 0.065 across. Jupiter, (69,911 ÷ 6,371)<sup>0.3</sup> = 2.05 times that, is 0.133, and Pluto is 0.039. Jupiter is still the biggest, but only 3.4 times Pluto's size.
+
+## 8. Moons
+
+### Earth's Moon, where it really is
+
+The Moon's path is messy: the Sun pulls on it nearly as hard as Earth does. `moonLongitude()` uses the main terms of a short lunar theory from Jean Meeus's *Astronomical Algorithms*, good to about half a degree. That's enough to put the Moon between Earth and the burger on the date of a solar eclipse, which the SolarEclipse story checks.
+
+<Code file="experiments/SolarSystem/moons.ts" name="moonLongitude" />
+
+- `L` is where the Moon would be at a steady speed: it grows by 481,267.88° a century, 13.18° a day, so once round in 27.32 days.
+- The sines are corrections, each one a known wobble. The biggest, 6.289° × sin `Mm`, is the same thing Kepler's equation handles for planets: the Moon's orbit is an ellipse, so it runs ahead and falls behind. The next two (1.274° and 0.658°) come from the Sun's pull stretching the Moon's orbit.
+- The last line wraps the answer into 0° to 360°.
+
+### The other moons, slowed down
+
+The other moons go round too fast to watch. Phobos goes round Mars three times a day: at a month a second, it would be a blur. So `shownPeriod()` slows down each planet's moons together, until the fastest takes `MIN_PERIOD`, 15 days, which is half a second at the default speed.
+
+<Code file="experiments/SolarSystem/moons.ts" name="MIN_PERIOD" />
+
+<Code file="experiments/SolarSystem/moons.ts" name="shownPeriod" />
+
+The others are slowed by the square root of how much longer they really take, which keeps inner moons faster than outer ones without the outer ones taking forever. Some worked numbers:
+
+<table>
+  <thead>
+    <tr><th>Moon</th><th>Really takes</th><th>Times its planet's fastest</th><th>Shown taking</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Earth's Moon</td><td>27.3 days</td><td>1 (Earth's only moon, and slower than 15 days)</td><td>27.3 days, its real period</td></tr>
+    <tr><td>Phobos</td><td>0.32 days</td><td>1</td><td>15 days</td></tr>
+    <tr><td>Deimos</td><td>1.26 days</td><td>3.96</td><td>15 × √3.96 = 29.9 days</td></tr>
+    <tr><td>Io</td><td>1.76 days</td><td>1</td><td>15 days</td></tr>
+    <tr><td>Callisto</td><td>16.7 days</td><td>9.47</td><td>15 × √9.47 = 46.2 days</td></tr>
+  </tbody>
+</table>
+
+`moonAngle()` then says which way each moon is from its planet. Earth's Moon uses `moonLongitude()`. The others start spread round their planet, each 137.5° on from the one before it in the list (the golden angle, which spreads any number of things out evenly without lining them up), and turn once every shown period. Triton goes round Neptune the other way from the planets, so its angle runs backwards.
+
+<Code file="experiments/SolarSystem/moons.ts" name="moonAngle" />
+
+### How far out to draw them
+
+Moon distances are squeezed like planet sizes. Each planet's nearest moon is drawn just clear of the planet, and the others further out by the cube root of how much further they really are. Jupiter's furthest big moon, Callisto, is 4.46 times as far out as Io, so it's drawn ∛4.46 = 1.65 times as far. But Saturn's Iapetus is 19.1 times as far as Mimas, and a cube root would still put it 2.68 times as far, crowding the next planet. So no moon goes past `MOON_REACH`, twice the nearest one's distance: Saturn's moons use a smaller power, 0.235, chosen so Iapetus lands at exactly 2.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="MOON_REACH" />
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="MOON_LAYOUT" />
+
+A moon is drawn round its planet's middle by turning its angle into an offset, `(orbit × cos angle, −orbit × sin angle)`, inside the planet's own group. So when the planet moves, its moons move with it.
+
+### Too fast to follow
+
+When the speed is turned up, a moon can go round many times a second. Its turns per second are the days per second divided by its shown period: at the default 30 days a second, Io (15 days) goes round twice a second. Past `FAST_TURNS`, the moon gets `data-fast`, and the CSS hides its hot dog and shows a faint ring all round its orbit instead, as a fast-moving thing looks to the eye.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="FAST_TURNS" />
+
+## 9. The clock and the component
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="SolarSystem" />
+
+**The clock.** `time` holds the date being shown, in milliseconds. A `requestAnimationFrame` loop, which the browser calls before it draws each frame, moves it on: `time += seconds × speed × DAY`, where `seconds` is the time since the last frame. At the default speed of 30, one second of real time adds 30 days. A frame more than a quarter of a second late, after the tab has been in the background, counts as only a quarter of a second, so nothing leaps. A negative speed runs the clock backwards, and nothing else needs to change, because every position comes straight from the date.
+
+**Drawing without React.** `draw()` doesn't set React state. It writes each planet's `transform` and each moon's position straight onto the SVG elements, through refs. Re-rendering the whole SVG 60 times a second through React would be much more work for the same picture. React draws the elements once; the loop only moves them.
+
+**Settings in a ref.** The loop starts once and never restarts, so it reads the current `speed` and whether it's running from `settings.current`, which every render updates.
+
+**Orbits redrawn now and then.** The orbits change so slowly that redrawing their paths every frame would be wasted work. `draw()` only redraws them when the date has moved more than `REDRAW_ORBITS`, ten years, from when they were last drawn, or when the scale changes. In ten years, Earth's perihelion turns 0.03°.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="REDRAW_ORBITS" />
+
+**Changing props.** Three layout effects (`useLayoutEffect`, which runs before the browser paints, so nothing is seen in the wrong place) redraw when something changes: a new `date` resets the clock, a new `scale` (or turning `orbits` or `moons` on) makes a new squeezing function and redraws everything, and a change of `speed` or running redraws the moons, to blur or unblur them.
+
+**Reduced motion and pausing.** Anything that moves for more than five seconds needs a way to pause it (WCAG 2.2.2), which the Pause button is. People who've asked their system for reduced motion get it paused on its date to start with: the component reads `--experiment-decoration` from `decoration.css`, which is 0 for them.
+
+**A caption that keeps still.** The date changes width as it runs ("May 1" is narrower than "September 30"), which would push the Pause button about. So behind the date are twelve invisible dates, the widest in each month, all in the same grid cell: the cell is as wide as the widest, whatever the date shows. The button does the same with the words Pause and Play.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="formatDate" />
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="MONTHS" />
+
+### The ruler
+
+With `ruler`, a ruler under the picture is marked at 1, 2, 5, 10, 20, 30, 40, and 50 AU, each placed exactly where a planet that far out would be drawn, with the same scale function. On any scale but `linear`, the marks get closer together further out, which shows how much the picture is squeezed. Marks too close together for both numbers to fit are numbered from the outside in, so the furthest always gets its number.
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" name="Ruler" />
+
+## The whole files
+
+<details>
+<summary><code>bodies.ts</code></summary>
+
+<Code file="experiments/SolarSystem/bodies.ts" />
+
+</details>
+
+<details>
+<summary><code>kepler.ts</code></summary>
+
+<Code file="experiments/SolarSystem/kepler.ts" />
+
+</details>
+
+<details>
+<summary><code>moons.ts</code></summary>
+
+<Code file="experiments/SolarSystem/moons.ts" />
+
+</details>
+
+<details>
+<summary><code>scale.ts</code></summary>
+
+<Code file="experiments/SolarSystem/scale.ts" />
+
+</details>
+
+<details>
+<summary><code>SolarSystem.tsx</code></summary>
+
+<Code file="experiments/SolarSystem/SolarSystem.tsx" />
+
+</details>
+
+<details>
+<summary><code>solar-system.css</code></summary>
+
+<Code file="experiments/SolarSystem/solar-system.css" />
+
+</details>

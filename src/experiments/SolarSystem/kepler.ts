@@ -66,7 +66,7 @@ export function solveKepler(meanAnomaly: number, e: number) {
 }
 
 /** The place on an orbit `eccentric` radians round its ellipse from perihelion, turned to face the right way */
-function placeOnOrbit({ a, e, inclination, perihelion, node }: Elements, eccentric: number): Position {
+export function placeOnOrbit({ a, e, inclination, perihelion, node }: Elements, eccentric: number): Position {
   // In the orbit's own plane, with the Sun at the origin and perihelion along x
   const px = a * (Math.cos(eccentric) - e);
   const py = a * Math.sqrt(1 - e * e) * Math.sin(eccentric);
