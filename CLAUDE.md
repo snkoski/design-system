@@ -44,6 +44,7 @@ pnpm test:coverage
 pnpm check            # contrast of every color pair in all themes, and the rules in this file (CSS, structure)
 pnpm check:tests      # fails if tests were deleted, skipped, or weakened compared with HEAD (or --base <ref>)
 pnpm tokens           # regenerate CSS from tokens/tokens.json (the other scripts do this first)
+pnpm reading-list     # regenerate docs/reading-list.md and .html from docs/reading-list.json
 ```
 
 Before saying any change is done, run `pnpm typecheck`, `pnpm check`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`, and fix anything they report. `pnpm typecheck` also checks the type-level assertions (`expectTypeOf`) in test files.
@@ -66,7 +67,8 @@ scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 docs/revisit.md              decisions to come back to, and open questions
-docs/reading-list.md         articles and references to read later, by topic
+docs/reading-list.json       articles and design system pages to read later: the only place links are added
+docs/reading-list.md, .html  generated from the JSON by scripts/build-reading-list.mjs (pnpm reading-list); never edit
 src/experiments/             ideas being tried out; relaxed rules, never published (see Experiments)
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).
@@ -327,6 +329,7 @@ Every component and experiment has a "How it works" page, `HowItWorks.mdx` besid
 - Wrap blocks in `<Unstyled>` so Storybook's docs styles don't override them. Each block has its own Light / Dark / Hot dog switch.
 - To add a page: write `docs/brand/<topic>.md`, add `src/foundations/NN-<topic>.mdx`, and add its title to `storySort` in `.storybook/preview.tsx`.
 - Guidance for one component goes in `docs/brand/<topic>.md` too, rendered by an MDX page attached to the component (`src/components/Button/Button.mdx` renders `buttons.md` as Button's "Choosing a button" page).
+- `Resources/Reading list` (`13-reading-list.mdx`, `ReadingList.tsx`) is a searchable page of `docs/reading-list.json`. Add a link once, in the JSON, with its topics and system; then run `pnpm reading-list`. `pnpm check` fails when the generated Markdown or HTML is out of date, which includes after a token change, since the standalone page inlines `tokens.css`. The standalone page's script (`scripts/reading-list-page.js`) and `ReadingList.tsx` filter the same way; change both together.
 - `docs/brand/industry.md` compares the system with Apple, Material, Primer, Atlassian, Carbon, Fluent, Polaris, GOV.UK, USWDS, and WCAG. When a choice on a compared topic changes, update its row there.
 
 ## Writing style

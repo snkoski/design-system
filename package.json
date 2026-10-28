@@ -30,6 +30,7 @@
   ],
   "scripts": {
     "tokens": "node scripts/build-tokens.mjs",
+    "reading-list": "node scripts/build-tokens.mjs && node scripts/build-reading-list.mjs",
     "dev": "node scripts/build-tokens.mjs && storybook dev -p 6006",
     "storybook": "node scripts/build-tokens.mjs && storybook dev -p 6006",
     "build-storybook": "node scripts/build-tokens.mjs && storybook build",
@@ -42,7 +43,7 @@
     "test:stories": "node scripts/build-tokens.mjs && vitest run --project storybook",
     "test:watch": "node scripts/build-tokens.mjs && vitest --project unit",
     "test:coverage": "node scripts/build-tokens.mjs && vitest run --coverage",
-    "check": "node scripts/check-contrast.mjs && node scripts/check-rules.mjs",
+    "check": "node scripts/check-contrast.mjs && node scripts/check-rules.mjs && node scripts/build-reading-list.mjs --check",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:rules": "node scripts/check-rules.mjs",
     "check:tests": "node scripts/check-tests-kept.mjs"

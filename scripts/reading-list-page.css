@@ -1,0 +1,164 @@
+/* Styles for the standalone reading list page (docs/reading-list.html). build-reading-list.mjs inlines this file
+   after the generated tokens, so everything here reads the design system's tokens and follows all three themes. */
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    color-scheme: light dark;
+    scroll-padding-top: var(--space-6);
+  }
+  body {
+    margin: 0;
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  :focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  a {
+    color: var(--link);
+    text-underline-offset: 0.2em;
+  }
+  h1, h2, h3, h4 {
+    margin: 0;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+}
+
+@layer page {
+  .rl-skip {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    inset-block-start: calc(-1 * var(--space-16));
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+  .rl-skip:focus {
+    inset-block-start: var(--space-4);
+  }
+
+  .rl-header,
+  .rl-main {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+  @media (min-width: 48em) {
+    .rl-header,
+    .rl-main {
+      padding-inline: var(--space-8);
+    }
+  }
+
+  .rl-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4) var(--space-8);
+    padding-block: var(--space-12) var(--space-8);
+  }
+  .rl-header h1 {
+    font-size: var(--text-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .rl-header p {
+    max-width: var(--measure);
+    margin: var(--space-3) 0 0;
+    color: var(--ink-muted);
+    font-size: var(--text-body-lg);
+  }
+
+  /* Theme switch: a row of pill buttons, pressed state from aria-pressed */
+  .rl-themes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .rl-themes button {
+    min-height: var(--target-min);
+    padding: var(--space-1) var(--space-4);
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .rl-themes button[aria-pressed="true"] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  /* The standalone page's own checkboxes in the systems list. The Storybook page uses the Checkbox component. */
+  .rl-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--choice-row);
+    cursor: pointer;
+  }
+  .rl-check input {
+    flex: none;
+    width: var(--choice);
+    height: var(--choice);
+    margin: 0;
+    accent-color: var(--action);
+    cursor: pointer;
+  }
+  .rl-check--all {
+    font-weight: 600;
+  }
+  /* Systems line up under the "All systems" label text, as in CheckboxGroup */
+  .rl-check:not(.rl-check--all) {
+    padding-inline-start: calc(var(--choice) + var(--space-3));
+  }
+
+  /* Group by: radios drawn as connected segments, chosen one filled */
+  .rl-segments {
+    display: flex;
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .rl-segments label {
+    position: relative;
+    display: grid;
+  }
+  .rl-segments label + label {
+    border-inline-start: var(--border-thin) solid var(--border-strong);
+  }
+  .rl-segments input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .rl-segments span {
+    display: grid;
+    place-items: center;
+    min-height: calc(var(--control-md) - 2 * var(--border-thin));
+    padding: 0 var(--space-4);
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+  .rl-segments input:checked + span {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .rl-segments input:focus-visible + span {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: calc(-1 * var(--focus-width) - var(--focus-offset));
+  }
+
+}
