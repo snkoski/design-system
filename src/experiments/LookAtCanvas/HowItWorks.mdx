@@ -1,0 +1,222 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as LookAtCanvasStories from "./LookAtCanvas.stories";
+import { Code } from "../../how-it-works/Code";
+import { CatchUp, Steps } from "./explain";
+
+<Meta of={LookAtCanvasStories} name="How it works" />
+
+# How Look at canvas works
+
+Look at canvas draws [Look at](?path=/docs/experiments-look-at--how-it-works)'s field of bars on one `<canvas>`, rather than as an element per bar, and borrows [Proximity](?path=/docs/experiments-proximity--how-it-works)'s colors and fading. It's five files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>field.ts</code></td><td>The math. Which way each bar should face, how far it turns each frame, and how close the pointer is to it. Plain functions on arrays of numbers, with no canvas and no DOM, so they're easy to test.</td></tr>
+    <tr><td><code>LookAtCanvas.tsx</code></td><td>The component and its drawing loop. It follows the pointer, asks <code>field.ts</code> to move every bar, and draws them all, only while something is still moving.</td></tr>
+    <tr><td><code>look-at-canvas.css</code></td><td>One rule: the bars' color, as a CSS <code>color</code>, so a theme can set it the way it would for an element.</td></tr>
+    <tr><td><code>sweep.ts</code></td><td>For the Canvas versus elements story: a pretend mouse that moves in a figure eight, so both versions get exactly the same work.</td></tr>
+    <tr><td><code>FrameMeter.tsx</code></td><td>Also for that story: counts frames per second, to show which version keeps up.</td></tr>
+  </tbody>
+</table>
+
+It also uses `closeness()` and `colorAt()` from Proximity's `tracker.ts`. They're explained on [Proximity's page](?path=/docs/experiments-proximity--how-it-works), and this page doesn't repeat them.
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. Why a canvas
+
+Look at's dense grid is 792 elements. On every pointer move, its tracker measures each one with `getBoundingClientRect()` and writes a new `--look-angle` on each one. Then the browser works out the style of 792 elements again, and paints them. At 9,600 bars, that's more than many devices can do in a frame, and the movement stutters.
+
+A canvas is one element with a grid of pixels that JavaScript draws on. Look at canvas changes three things:
+
+- **One thing to measure.** The bars aren't elements, so there's nothing to measure but the canvas. Every bar's center comes from arithmetic: the bar in column `c` and row `r` sits at `(c + 0.5) × pitch` across and `(r + 0.5) × pitch` down.
+- **Drawn together.** Bars that share a color and opacity are drawn as one path, in one stroke. A frame is at most 32 strokes, however many bars there are (section 6).
+- **Only while moving.** When every bar has arrived, the loop stops and the page does nothing until the pointer moves again.
+
+The cost is that the bars can't be anything an element can be: no focus, no CSS, no text a screen reader can find. That's fine here, because the whole field is decoration and is hidden from screen readers.
+
+## 2. Which way each bar faces: `barAngle()`
+
+<Code file="experiments/LookAtCanvas/field.ts" name="barAngle" />
+
+This is the same math as Look at's `targetAngle()`, so its [page](?path=/docs/experiments-look-at--how-it-works) explains it with a demo. In short: `Math.atan2(dy, dx)` gives the angle of the line from the bar's center to the pointer, measured clockwise from pointing right, in radians. `× 180 / Math.PI` turns that into degrees, and `+ 90` measures it from pointing up instead, the way the bar is drawn. A pointer straight to the right gives 0° + 90° = 90°: lying flat.
+
+There's no `away` here. A bar looks the same turned half way round, so facing toward the pointer and away from it look identical.
+
+## 3. The short way round: `nearestHalfTurn()`
+
+<Code file="experiments/LookAtCanvas/field.ts" name="nearestHalfTurn" />
+
+Like Look at's `nearest()`, this keeps each bar's angle as one running number, and moves it by the smallest turn that faces the new target. Look at's version works in whole turns (360°). A bar looks the same every half turn, so this one works in half turns (180°), and no bar ever turns more than 90°.
+
+It's the same pattern with 180 in place of 360: `% 180` takes off half turns, `+ 270` and `% 180` again move the difference into 0 to 180 (270 is a half turn and a half), and `- 90` brings it into −90 to 90. Some worked numbers, from the tests:
+
+<table>
+  <thead>
+    <tr><th>Previous</th><th>Target</th><th>Result</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0°</td><td>270°</td><td>−90°</td><td>Lying flat either way, so a quarter turn anticlockwise, not three quarters clockwise.</td></tr>
+    <tr><td>0°</td><td>180°</td><td>0°</td><td>Upside down looks the same as upright: no turn at all.</td></tr>
+    <tr><td>170°</td><td>−170°</td><td>190°</td><td>A 20° turn clockwise, across the point where the numbers wrap.</td></tr>
+  </tbody>
+</table>
+
+## 4. How far to turn each frame: `catchUp()`
+
+Look at hands each turn to a CSS transition. A canvas has no transitions: each frame, the code decides where every bar is. So Look at canvas eases the turns itself, with one small function.
+
+<Code file="experiments/LookAtCanvas/field.ts" name="catchUp" />
+
+Each frame, every bar turns `amount` of the way it has left to go. If `amount` is 0.34, a bar with 80° to go turns 27°. The next frame it has 53° to go and turns 18°, then 12°, and so on. It moves fast at first and slows as it arrives, which is an ease-out, with no easing curve written anywhere. And if the pointer moves mid-turn, the bar just heads for the new target from wherever it is, with nothing to cancel.
+
+**Why `Math.exp`.** A fixed share per frame would depend on the frame rate: a 120 Hz screen runs twice as many frames as a 60 Hz one, so the same bars would turn twice as fast. `catchUp()` works from the time since the last frame, `elapsed`, in milliseconds. What's left after a frame is `1 - amount`, which is `Math.exp(-3 × elapsed / turnDuration)`. Multiplying powers of e adds their exponents, so however the time is split into frames, what's left after the same time comes out the same. Two 120 Hz frames of 8.3 ms leave e^(−3 × 8.3 / 120) twice over, which is e^(−3 × 16.7 / 120): exactly what one 60 Hz frame leaves. Bounce's friction works the same way, and [its page](?path=/docs/experiments-bounce--how-it-works) explains it at more length.
+
+**Why `3`.** After `turnDuration` milliseconds, what's left is e^(−3), about 0.05, so the bar is 95% of the way there. That's what lets the prop be read as "roughly how long a turn takes". A `turnDuration` of 0 returns 1: the whole way in one frame.
+
+### See it frame by frame
+
+This runs the real `catchUp()` and `step()` on a field of one bar. It starts upright, and the pointer has just moved to one side. Change the frame rate to see that the curve hardly changes, only how many frames draw it. Each dot is a frame.
+
+<Unstyled>
+  <CatchUp />
+</Unstyled>
+
+## 5. Moving every bar: `step()` and `approach()`
+
+The bars' angles live in a `Float32Array`: a plain list of numbers, one per bar, packed tightly in memory. Bar `index` is at `row × columns + column`. There are no objects per bar, so thousands of them cost almost nothing to keep or to loop through.
+
+<Code file="experiments/LookAtCanvas/field.ts" name="Layout" />
+
+<Code file="experiments/LookAtCanvas/field.ts" name="step" />
+
+For each bar, `step()` finds its center from the layout, asks `barAngle()` which way to face, asks `nearestHalfTurn()` for the short way there, and turns it `amount` of the way. A bar the pointer is right on has no direction, so it stays as it is.
+
+It returns whether every bar has arrived. A bar less than `SETTLED`, 0.05°, from its target is put right on it and counts as arrived: otherwise the shares of what's left would get smaller forever, each frame turning a bar by an amount nobody could see, and the loop would never rest.
+
+<Code file="experiments/LookAtCanvas/field.ts" name="SETTLED" />
+
+With `colors` or `fade`, each bar also has a closeness to the pointer, from 0 to 1, in a second `Float32Array`. `approach()` is the same idea for closeness: the target is Proximity's `closeness()`, measured from the edge of the bar's cell (its square of the grid), and each frame moves it the same `amount` of the way. So colors and fading follow at the same pace as the turning. With no pointer, every target is 0, and the colors and fading drift back to how they are far away.
+
+<Code file="experiments/LookAtCanvas/field.ts" name="approach" />
+
+How see-through a bar is follows Proximity's CSS exactly, as numbers: `1 - level × (1 - faintest)` to fade out, and `faintest + level × (1 - faintest)` to fade in.
+
+<Code file="experiments/LookAtCanvas/field.ts" name="fadeAlpha" />
+
+## 6. Drawn in steps of closeness
+
+A canvas can set one stroke color and opacity at a time. Drawing each bar with its own color would mean 792 changes of color and 792 strokes a frame. Instead, closeness is rounded to one of `LEVELS` steps, and every bar at the same step goes into the same path (a `Path2D`: a shape built from many lines, drawn in one go). Each step's path is drawn with one stroke, so a frame is at most 32 strokes, however many bars there are. Without colors or fading, every bar is at step 0: one path, one stroke.
+
+<Code file="experiments/LookAtCanvas/LookAtCanvas.tsx" name="LEVELS" />
+
+Each step's color is worked out once, from `colorAt()`, and kept until the colors, the theme, or the color space change. A step is 1/31 of the way, about 3%, which is too small a change of color for the eye to see.
+
+<Code file="experiments/LookAtCanvas/LookAtCanvas.tsx" name="INVISIBLE" />
+
+A step so faint that it would round to fully see-through on screen (opacity has 256 levels) isn't drawn at all, which saves the most work when fading in: most of the field is invisible.
+
+### Try it
+
+<Unstyled>
+  <Steps />
+</Unstyled>
+
+## 7. The drawing loop: `LookAtCanvas.tsx`
+
+Here's the whole component. The rest of this section walks through it.
+
+<Code file="experiments/LookAtCanvas/LookAtCanvas.tsx" name="LookAtCanvas" />
+
+### Setting up once
+
+The `useLayoutEffect` runs once, when the canvas appears (its dependency list is `[]`). Everything the loop remembers between frames is a plain variable inside it: the two `Float32Array`s, the last pointer position, the time of the last frame, and the cached colors and emoji. None of it is React state, so drawing a frame never re-renders anything.
+
+Props can change without starting over. Every render copies the current props into `settings`, a ref the loop reads at the start of each frame, and calls `wake()`. A new color or turn speed takes effect on the next frame, and every bar carries on from where it is.
+
+### Reading first
+
+`draw()` starts by reading everything it needs from the page: the canvas's position and size (one `getBoundingClientRect()`, however many bars), its CSS `color`, `--experiment-decoration`, the size of a rem in pixels, and the screen's pixel density. The pointer is in screen coordinates, so subtracting the canvas's left and top turns it into the canvas's own.
+
+**Colors from CSS.** A canvas's `strokeStyle` can't read `var(--brand)` or a `color-mix()` with tokens in it. `resolve()` lets the browser work it out: it sets the color on the canvas's own style, reads back the computed color as plain numbers, and puts the old style back. That's how the bars take on a theme's `--brand`.
+
+**Emoji.** Drawing an emoji is slow, because the browser has to lay out text. `stamp()` draws it once, already turned by `emojiTurn`, onto a small canvas that's never shown, and every bar then copies that image. The small canvas is 1.5 times the emoji's size, so a turned emoji's corners aren't cut off (a square's diagonal is about 1.41 times its side).
+
+<Code file="experiments/LookAtCanvas/LookAtCanvas.tsx" name="stamp" />
+
+### Moving
+
+`elapsed` is the time since the last frame, or a 60 Hz frame's 16.7 ms for the first frame after a rest. `catchUp()` turns it into an `amount`, and `step()` and `approach()` move every bar. Closeness is only worked out when colors or fading need it.
+
+### Drawing
+
+**Sharp on every screen.** A canvas has its own grid of pixels, separate from its size on the page. On a screen with a pixel density of 2, a canvas 792 CSS pixels wide needs 1,584 real pixels across, or the bars come out blurred. So the canvas's `width` and `height` are its size times the density, and `setTransform(density, 0, 0, density, 0, 0)` scales everything drawn by the density, so the rest of the code can work in CSS pixels.
+
+**Each bar is a line.** A bar at angle θ (clockwise from up) points along `(sin θ, −cos θ)`: at 0° that's `(0, −1)`, straight up, and at 90° it's `(1, 0)`, to the right. The line runs from the center back `half` along that direction to the center forward `half`. Round caps add half the bar's width at each end, so `half` is half of the length minus the width: a 16 px bar 3 px thick is a 13 px line plus two 1.5 px caps.
+
+**Reduced motion.** Every angle is multiplied by `--experiment-decoration` as it's drawn, the way Look at's CSS does, so with reduced motion the bars stand upright. The angles are still worked out, and colors and fading still follow the pointer: they change color, not position.
+
+**Emoji turned.** For emoji, `setTransform(cos, sin, −sin, cos, x, y)` turns and moves the canvas's drawing grid to each cell, and `drawImage()` copies the stamp there. Those four numbers are a rotation, the same one the bar's line uses.
+
+### Resting
+
+If every bar has turned and every closeness has arrived, the loop stops asking for frames. Otherwise it asks for the next one with `requestAnimationFrame`, which the browser calls just before it draws the screen. `wake()` starts it again, but only if it isn't already running and the canvas is on screen, so a burst of pointer moves still draws once a frame. These call `wake()`:
+
+- **The pointer moving**, or leaving the window.
+- **Scrolling and resizing**, which move the canvas under a still pointer.
+- **A theme or motion switch.** A `MutationObserver` watches every `data-theme` and `data-motion` attribute on the page, and `matchMedia` listens for the system's dark mode and reduced motion. Either one counts up `theme`, which is part of the colors' cache key, so the colors are worked out again.
+- **The canvas changing size**, through a `ResizeObserver`.
+
+An `IntersectionObserver` reports whether the canvas is on screen. Off screen, the loop stops completely and doesn't start until it's back.
+
+## 8. The comparison story: `sweep.ts` and `FrameMeter.tsx`
+
+The Canvas versus elements story puts this canvas next to Look at's element per bar. To compare them fairly, both need exactly the same pointer movement, so `useSweep()` sends a pretend `pointermove` every frame, moving in a figure eight:
+
+<Code file="experiments/LookAtCanvas/sweep.ts" name="useSweep" />
+
+`phase` goes once round a circle (2π radians) every `PERIOD`, 6 seconds. Across follows `sin(phase)` and down follows `sin(phase × 2)`, so it goes up and down twice for each time across and back, which traces a figure eight. Both swing 40% of the visible area either side of its middle.
+
+<Code file="experiments/LookAtCanvas/FrameMeter.tsx" name="FrameMeter" />
+
+`FrameMeter` asks for every frame and counts them. Every half second it shows how many there were per second, and the longest gap between two. Anything that keeps the browser busy, such as measuring thousands of elements, shows up as fewer frames and a longer gap. It writes its reading straight into the text rather than through React state, so it doesn't add renders of its own to what it measures.
+
+## The whole files
+
+<details>
+<summary><code>field.ts</code></summary>
+
+<Code file="experiments/LookAtCanvas/field.ts" />
+
+</details>
+
+<details>
+<summary><code>LookAtCanvas.tsx</code></summary>
+
+<Code file="experiments/LookAtCanvas/LookAtCanvas.tsx" />
+
+</details>
+
+<details>
+<summary><code>look-at-canvas.css</code></summary>
+
+<Code file="experiments/LookAtCanvas/look-at-canvas.css" />
+
+</details>
+
+<details>
+<summary><code>sweep.ts</code></summary>
+
+<Code file="experiments/LookAtCanvas/sweep.ts" />
+
+</details>
+
+<details>
+<summary><code>FrameMeter.tsx</code></summary>
+
+<Code file="experiments/LookAtCanvas/FrameMeter.tsx" />
+
+</details>

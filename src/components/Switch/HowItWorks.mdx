@@ -1,0 +1,323 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SwitchStories from "./Switch.stories";
+import { Switch } from "./Switch";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { SettingsForm, ThumbTravel } from "../../how-it-works/components/Switch";
+
+<Meta of={SwitchStories} name="How it works" />
+
+# How Switch works
+
+A switch turns one setting on or off, such as "Email me about new projects". This page walks through the real code underneath it: what HTML it renders, how each prop gets there, and how the CSS draws it. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+Switch is a thin layer over [Base UI](https://base-ui.com), an unstyled React library that handles behavior and accessibility: keyboard use, focus, ARIA attributes, and taking part in forms. Our code chooses the parts, connects the props to them, and adds the look.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Switch.tsx</code></td><td>The component. It puts Base UI's parts together, decides which prop goes to which part, and types the props so a switch can't be built without a name.</td></tr>
+    <tr><td><code>switch.css</code></td><td>The look: track, thumb, colors, sizes, every state, hot dog mode, and Windows high contrast. It only uses design tokens.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Switch</code> and the <code>SwitchProps</code> type.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code> and <code>field-error.css</code></td><td>The error message every form control shares: an icon and words. Not exported.</td></tr>
+    <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for a switch with no name, and a helper that joins class names. Not exported.</td></tr>
+    <tr><td><code>Switch.test.tsx</code> and <code>Switch.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts, and what each one brings:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>Renders</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Field.Root</code></td><td><code>&lt;div&gt;</code></td><td>The field's shared state. It links the label, description, and error to the switch, and passes <code>name</code>, <code>disabled</code>, and <code>invalid</code> down to it.</td></tr>
+    <tr><td><code>Field.Label</code></td><td><code>&lt;label&gt;</code></td><td>The label, with the ids that name the switch for screen readers.</td></tr>
+    <tr><td><code>Field.Description</code></td><td><code>&lt;p&gt;</code></td><td>Help text, linked to the switch with <code>aria-describedby</code>.</td></tr>
+    <tr><td><code>Field.Error</code> (inside our <code>FieldError</code>)</td><td><code>&lt;div&gt;</code></td><td>The error message, linked the same way, and only shown when the field is invalid.</td></tr>
+    <tr><td><code>Switch.Root</code></td><td><code>&lt;span role="switch"&gt;</code> and a hidden <code>&lt;input&gt;</code></td><td>The control: focus, Space and Enter, the on and off state, its ARIA attributes, and a hidden checkbox that takes part in forms.</td></tr>
+    <tr><td><code>Switch.Thumb</code></td><td><code>&lt;span&gt;</code></td><td>The moving dot inside the track. It only carries the switch's state as <code>data-*</code> attributes, for styling.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real switch with a description, and under it the HTML it has rendered right now. Use it, and watch the attributes change. The list leaves out inline `style` attributes.
+
+<Unstyled>
+  <Inspect hint="Click the switch or its label. Or press Tab to reach it, then Space or Enter.">
+    <Switch description="About once a month. You can turn this off at any time.">Email me about new projects</Switch>
+  </Inspect>
+</Unstyled>
+
+Each element, who puts it there, and why:
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="switch"&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our class</td><td>Holds the whole field. Base UI marks it with the field's state: <code>data-filled</code> while it's on, <code>data-dirty</code> once it differs from how it started, <code>data-focused</code>, and <code>data-touched</code> once focus has left it. Our CSS doesn't use these, but they're there for a page that wants them.</td></tr>
+    <tr><td><code>&lt;label class="switch__row" id for&gt;</code></td><td>Base UI's <code>Field.Label</code>, with our class</td><td>The label wraps the switch and its text, so the whole row is one click target. Its <code>for</code> points at the hidden input, and its <code>id</code> is what the switch's <code>aria-labelledby</code> names.</td></tr>
+    <tr><td><code>&lt;span role="switch" tabindex="0" aria-checked&gt;</code></td><td>Base UI's <code>Switch.Root</code>, with our class <code>switch__track</code></td><td>The control itself. <code>role="switch"</code> tells screen readers what it is, and <code>aria-checked</code> whether it's on. A <code>&lt;span&gt;</code> can't take focus by default, so <code>tabindex="0"</code> puts it in the Tab order. <code>aria-labelledby</code> and <code>aria-describedby</code> come from the field. <code>data-checked</code> or <code>data-unchecked</code> say the same as <code>aria-checked</code>, for styling.</td></tr>
+    <tr><td><code>&lt;span class="switch__thumb"&gt;</code></td><td>Base UI's <code>Switch.Thumb</code></td><td>Only a drawing. It copies the switch's state as <code>data-*</code> attributes and has no role, so screen readers ignore it.</td></tr>
+    <tr><td><code>&lt;input type="checkbox" tabindex="-1" aria-hidden="true"&gt;</code></td><td>Base UI's <code>Switch.Root</code></td><td>A <code>&lt;span&gt;</code> can't be part of a form, so Base UI renders a real checkbox beside it, hidden from view by an inline style. It carries <code>name</code>, <code>value</code>, <code>checked</code>, <code>required</code>, and <code>disabled</code>, so the form submits it and the browser's own validation checks it. <code>aria-hidden</code> and <code>tabindex="-1"</code> keep it away from screen readers and the Tab key, so the switch is only announced and reached once.</td></tr>
+    <tr><td><code>&lt;span class="switch__label"&gt;</code></td><td>Our code</td><td>Wraps the label text, so the CSS can line it up with the track.</td></tr>
+    <tr><td><code>&lt;p class="switch__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code>, with our class</td><td>Its <code>id</code> goes into <code>aria-describedby</code> on the switch and on the hidden input, so a screen reader reads it after the name and state.</td></tr>
+  </tbody>
+</table>
+
+A choice control (a checkbox, radio, or switch) puts its description under the label, next to what it describes. A text field puts it between the label and the field instead, so it's read before typing: see [How Input works](?path=/docs/components-input--how-it-works).
+
+### Invalid, with an error
+
+This switch is `required`, `invalid`, and has a description and an `error`.
+
+<Unstyled>
+  <Inspect hint="Turn it on: the error stays, because invalid is a prop. Only the page using the switch decides when it's valid.">
+    <Switch required invalid description="Anyone with the link can see it." error="Turn this on to publish your portfolio.">
+      Share my portfolio publicly (required)
+    </Switch>
+  </Inspect>
+</Unstyled>
+
+- `aria-invalid="true"` is on the switch and on the hidden input. Our code never writes it: we pass `invalid` to `Field.Root`, and Base UI passes it on.
+- `aria-describedby` now holds two ids, the description's and the error's, so both are read.
+- `required` sets `aria-required="true"` on the switch, for screen readers, and the native `required` on the hidden checkbox, for the form's validation.
+- The error is a `<div class="field-error switch__error">` with an icon and words, so the problem is never only a red edge. It's drawn by the shared `FieldError`, which [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains in full, along with the development warnings.
+
+### Disabled and read-only
+
+<Unstyled>
+  <Inspect hint="Try clicking each one, and pressing Tab: only the read-only switch takes focus, and none of them change.">
+    <div className="grid gap-1">
+      <Switch disabled>Off and disabled</Switch>
+      <Switch disabled defaultChecked>On and disabled</Switch>
+      <Switch readOnly defaultChecked>Two-step sign-in</Switch>
+    </div>
+  </Inspect>
+</Unstyled>
+
+- **Disabled.** A `<span>` has no `disabled` attribute, so Base UI uses `aria-disabled="true"` to tell screen readers, and `tabindex="-1"` to take it out of the Tab order. The hidden checkbox gets a real `disabled`, so the form leaves it out. Every part, from the wrapper to the thumb, gets `data-disabled`.
+- **Read-only.** Base UI sets `aria-readonly="true"` and `data-readonly`, keeps `tabindex="0"`, and ignores clicks and keys itself. The switch stays in the Tab order, so someone using a screen reader can still find it and hear whether it's on.
+
+### In a form
+
+The first switch here has `uncheckedValue="no"`, and the second doesn't.
+
+<Unstyled>
+  <Inspect hint="Turn Newsletter on and off, and watch a second hidden input come and go. Then select Save settings.">
+    <SettingsForm />
+  </Inspect>
+</Unstyled>
+
+While Newsletter is off, Base UI adds `<input type="hidden" value="no">` with the same `name`. A checkbox that's off submits nothing, so this extra input is how an off switch can still send a value. When it's on, the extra input goes, and the checkbox sends `value`. Project alerts has no `uncheckedValue`, so turning it off makes it disappear from what the form sends, as a native checkbox would.
+
+The checkbox's `checked` attribute only shows how it started. Turn Newsletter on and the attribute doesn't appear: React sets the live state as the input's `checked` property, which isn't part of the HTML, and the property is what the form reads.
+
+## From props to HTML
+
+### The props
+
+A switch must have a name a screen reader can announce. The props type makes that a compile error rather than something to remember:
+
+<Code file="components/Switch/Switch.tsx" name="Labelled" />
+
+It's a union, which TypeScript reads as "one of these": either `children` (the visible label), or an `aria-label`. Leave out both and the code doesn't compile. The label's type is `Exclude<ReactNode, undefined | null | boolean>`, all of React's renderable content except the values that render nothing. Plain `ReactNode` would accept `undefined`, and a nameless switch would compile.
+
+An empty string still gets through, such as a label from a content system that came back blank. That's what `warnIfUnnamed()` is for. It prints a warning in development when the label renders nothing and there's no `aria-label`. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains when the system warns and when it doesn't.
+
+<Code file="components/Switch/Switch.tsx" name="OwnProps" />
+
+Most of these are Base UI's own props, declared again here with our JSDoc. Storybook builds the docs table from the component's own types and doesn't read types inherited from `node_modules`, so a prop that isn't declared here wouldn't appear in it.
+
+<Code file="components/Switch/Switch.tsx" name="SwitchProps" />
+
+The full props type is the label union, our props, and whatever else Base UI's `Switch.Root` takes, less a few things we want to control ourselves:
+
+- `className` goes on the outer wrapper, not the track, so a layout class such as a margin lands on the whole field.
+- `render` and `nativeButton` would let someone swap the `<span>` for another element. Base UI renders a `<span>` by default so the switch can sit inside its `<label>`, so they're kept out.
+- `children` and `aria-label` are left out because `Labelled` declares them.
+
+### The component
+
+<Code file="components/Switch/Switch.tsx" name="Switch" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart.** `children`, `description`, `error`, `invalid`, `className`, `disabled`, and `name` are taken out, because they go somewhere specific. Everything else (`checked`, `defaultChecked`, `onCheckedChange`, `readOnly`, `required`, `value`, `uncheckedValue`, `id`, `form`, `ref`, `inputRef`, and `aria-label`) stays in `rest` and goes straight to `Switch.Root`, which turns them into the attributes you saw above.
+2. **The warning.** `warnIfUnnamed()` runs during render, so it also works when a page is rendered on a server.
+3. **The control.** `Switch.Root` gets the class `switch__track`, and `Switch.Thumb` sits inside it. `disabled` and `name` go to both `Field.Root` and `Switch.Root`, so the field and the control always agree.
+4. **The label.** With `children`, the control and the label text go inside `Field.Label`, which makes the whole row clickable. With only an `aria-label`, the control is rendered on its own, with no `<label>` element at all.
+5. **The description and error** render only when they're given. `invalid` goes to `Field.Root`, which sets `aria-invalid` and links the error. `FieldError` gets `match={invalid}`, so the message only shows while the switch is invalid.
+
+`cx()` joins our class with the consumer's, skipping any that are empty:
+
+<Code file="internal/cx.ts" name="cx" />
+
+## How it looks
+
+All of the switch's look is in `switch.css`, inside `@layer components`. Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
+
+The switch only uses **semantic tokens**, named for their job rather than their color: `surface`, `surface-hover`, `border-strong`, `action`, `action-hover`, `on-action`, `ink`, `ink-muted`, `focus`, and `danger`. Each theme gives them its own values. All but `danger` point at the gray scale, so components stay neutral and the brand colors live in the layout around them. `danger` is a status color, used where it carries meaning.
+
+### Sizes from tokens
+
+<Code file="components/Switch/switch.css" name=".switch" />
+
+The track is `--choice` tall (24px) and 1.75 times as wide (42px). The width is stored in `--switch-track-width` because the thumb's travel and the description's indent are worked out from it.
+
+<Code file="components/Switch/switch.css" name=".switch__row" />
+
+<Code file="components/Switch/switch.css" name=".switch__label" />
+
+The row is the label, and it's `--choice-row` tall: 32px with a mouse, and 44px when the device has a touch screen. The padding above and below is half of what's left after the 24px track, so the track sits on the label's first line, which is also 24px tall. If the label wraps onto more lines, the track stays beside the first one.
+
+<Code file="components/Switch/switch.css" name=".switch__track" />
+
+The track has a `border-thick` edge in `border-strong`, which meets 3:1 contrast in every theme on its own, whatever the fill is. So the switch shows clearly when it's off, and the edge never relies on the fill. `box-sizing: border-box` keeps the edge inside the 24 × 42px box.
+
+<Code file="components/Switch/switch.css" name=".switch__track::after" />
+
+Every interactive target is at least `--target-min` in both directions: 24px with a mouse, 44px on touch. When there's a label, the row already meets it. Without one, this invisible pseudo-element stretches the track's hit area. An absolutely positioned child is placed from inside its parent's border, so the inset is half of `--choice - --target-min`, less the 2px edge. With a mouse that's -2px, exactly the track's own 24px. On touch it's -12px, giving 44px.
+
+<Code file="components/Switch/switch.css" name=".switch:not(:has(> .switch__row))" />
+
+On touch, that 44px area is taller than the 24px track, and would spill into a control above or below. So a switch without a label pads its own wrapper to `--choice-row`, which keeps neighbors' hit areas apart.
+
+Text never changes size with the pointer. And compact density (`data-density="compact"`) changes only `--control-md` and `--control-lg`, which a switch doesn't use: `--choice` and `--choice-row` stay the same.
+
+### On and off
+
+<Code file="components/Switch/switch.css" name=".switch__thumb" />
+
+<Code file="components/Switch/switch.css" name='.switch__track[aria-checked="true"]' />
+
+<Code file="components/Switch/switch.css" name='.switch__track[aria-checked="true"] .switch__thumb' />
+
+On fills the track with `action` and turns the thumb `on-action`. The state is styled from `aria-checked`, the attribute screen readers read, so the look and what's announced can't disagree. Base UI's `data-checked` says the same thing, but the system styles from the ARIA attribute whenever one exists.
+
+The fill isn't the only sign. The thumb also moves to the other end, so the state never relies on color alone. The distance is the track's width less `--choice`: 42 − 24 = 18px. That's the inside of the track (42px, less two 2px edges and two 2px paddings, is 34px) less the 16px thumb.
+
+### Motion that shows state
+
+The slide uses `--duration-fast` (120ms) and `--ease-bounce`, a curve that goes past the end and springs back. That bounce is one of the few places the system allows it: chips, toggles, and success states.
+
+Most movement in the system is decoration, and slides use `--motion-distance`, which becomes 0 when someone has asked their device for reduced motion. A switch's slide isn't decoration: it's how the switch shows on and off. So the distance is fixed, and it still moves under reduced motion. What changes there is the curve: `--ease-bounce` becomes a plain ease-out, so it slides into place without overshooting. `--duration-fast` stays the same, because it's already short.
+
+You can test this without changing your device's setting: `data-motion="full"` or `data-motion="reduced"` on any element sets motion for everything inside it. The demo below puts the same switch in each, and reads the thumb's position from the page every frame.
+
+<Unstyled>
+  <ThumbTravel />
+</Unstyled>
+
+### Hover, focus, and invalid
+
+<Code file="components/Switch/switch.css" name='.switch__row:hover .switch__track:not([data-disabled], [aria-readonly="true"])' />
+
+<Code file="components/Switch/switch.css" name='.switch__row:hover .switch__track[aria-checked="true"]:not([data-disabled], [aria-readonly="true"])' />
+
+Hovering anywhere on the row changes the track's fill: `surface-hover` when off, `action-hover` when on. The `:not()` leaves out disabled and read-only switches, which can't change, so they shouldn't look as if they will.
+
+<Code file="components/Switch/switch.css" name=".switch__track:focus-visible" />
+
+Focus is an **outline**, never only a shadow, so it survives Windows high contrast. `:focus-visible` shows it when the browser judges that focus should be visible, such as after the Tab key, and not after a mouse click.
+
+<Code file="components/Switch/switch.css" name='.switch__track[aria-invalid="true"]' />
+
+Invalid changes the edge to `danger`. Hover only changes the fill, so a hovered invalid switch keeps its red edge. (A text field's hover changes its edge, so it has to leave invalid out: see [How Input works](?path=/docs/components-input--how-it-works).)
+
+### Disabled and read-only
+
+<Code file="components/Switch/switch.css" name='.switch__track[aria-readonly="true"]' />
+
+<Code file="components/Switch/switch.css" name=".switch__row[data-disabled]" />
+
+The cursor says what will happen: `default` for read-only, because nothing will, and `not-allowed` for disabled. The rules after these dim them:
+
+- **Disabled** sets `opacity: 0.5` on the track and on the label text.
+- **Read-only** sets `opacity: 0.75` on the track only. The label stays at full strength, because read-only content must stay readable. At 75%, the edge and the thumb still meet 3:1.
+
+Disabled is styled from Base UI's `data-disabled` rather than `aria-disabled`. Base UI puts `data-disabled` on every part (the wrapper, the label, the track, and the thumb), so one attribute reaches the label too. ARIA's read-only state, `aria-readonly`, is on the track, so read-only is styled from that.
+
+The description and the error are indented by the track's width plus the gap, so they line up with the label text rather than the track.
+
+### Hot dog mode
+
+<Code file="components/Switch/switch.css" name='[data-theme="hotdog"] .switch__track' />
+
+<Code file="components/Switch/switch.css" name='[data-theme="hotdog"] .switch__row:active .switch__track:not([data-disabled], [aria-readonly="true"])' />
+
+Hot dog mode, the system's ketchup-and-mustard joke theme, gives controls a hard offset shadow. In hot dog, `--shadow-sm` is a 2px solid shadow down and to the right. Pressing a switch (`:active`) moves it 2px into its shadow and drops the shadow, like a button. Text fields keep their shadow: you type in them rather than press them.
+
+### Windows high contrast
+
+<Code file="components/Switch/switch.css" name="@media (forced-colors: active)" />
+
+In forced colors mode (Windows Contrast themes), the browser replaces the page's colors with a few system colors, and drops shadows and most fills. The track's border is what keeps it visible, which is why every control has one. These rules choose the system colors on purpose:
+
+- The track is `Canvas` with a `ButtonText` edge, and the thumb is `ButtonText`.
+- On fills the track with `Highlight` and turns the thumb `HighlightText`, so on and off still differ.
+- The hover selectors are repeated for the on state. A hover rule is more specific than `.switch__track[aria-checked="true"]`, so without them, hovering an "on" switch would win, turn the track back to `Canvas`, and hide the thumb.
+- Opacity is reset to 1, and disabled uses `GrayText` instead.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** Tab moves focus to the switch: the `<span>` with `tabindex="0"`, never the hidden input. Space or Enter turns it on or off. A disabled switch is skipped. A read-only switch takes focus, but Space and Enter do nothing.
+
+**Screen readers** announce it as a switch, with its label as its name, whether it's on or off, and then its description and error. If it's `required` or `invalid`, they say so too.
+
+**Pointer.** The whole label row is the click target. Base UI makes sure a click on the switch inside its label changes it once, not twice: a test checks it.
+
+**Forms.** What `FormData` gets, from the hidden inputs:
+
+<table>
+  <thead>
+    <tr><th>The switch is</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>On, with <code>name="alerts"</code></td><td><code>alerts=on</code>, the browser's default for a checkbox</td></tr>
+    <tr><td>On, with <code>value="yes"</code></td><td><code>alerts=yes</code></td></tr>
+    <tr><td>Off</td><td>Nothing</td></tr>
+    <tr><td>Off, with <code>uncheckedValue="no"</code></td><td><code>alerts=no</code></td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required and off</td><td>The form doesn't submit: the browser's own validation stops it</td></tr>
+  </tbody>
+</table>
+
+`form` names a `<form>` by its id, for a switch that sits outside it. `id` goes on the hidden input, not on the visible switch. A `<label htmlFor>` pointing at it would turn the switch on, but wouldn't name it for screen readers, so name it with `children` or `aria-label`.
+
+## The whole files
+
+<details>
+<summary><code>Switch.tsx</code></summary>
+
+<Code file="components/Switch/Switch.tsx" />
+
+</details>
+
+<details>
+<summary><code>switch.css</code></summary>
+
+<Code file="components/Switch/switch.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/Switch/index.ts" />
+
+</details>
+
+<details>
+<summary><code>src/internal/FieldError.tsx</code></summary>
+
+<Code file="internal/FieldError.tsx" />
+
+</details>

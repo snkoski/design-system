@@ -1,0 +1,269 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as ConnectionsStories from "./Connections.stories";
+import { Code } from "../../how-it-works/Code";
+import { Gap, PaintMix } from "./explain";
+
+<Meta of={ConnectionsStories} name="How it works" />
+
+# How Connections works
+
+Connections draws a line between any two things inside it that come close together. It never moves anything itself. In the stories, Bounce moves the dots, and Connections only watches: once a frame, it looks at where everything is, works out which pairs are close enough, and draws a line between each of them.
+
+It's four files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Connections.tsx</code></td><td>The component, and the loop. Once per screen refresh, it measures everything inside it, asks <code>lines.ts</code> which pairs to join, and draws those lines on a canvas.</td></tr>
+    <tr><td><code>lines.ts</code></td><td>The geometry. How far "15vw" is in pixels, how far apart two boxes are, and which pairs are close enough for a line. Plain functions, with no React and no DOM, so they're easy to test.</td></tr>
+    <tr><td><code>paint.ts</code></td><td>The color mixing, for <code>blend="paint"</code>. It mixes two colors the way paint does, so blue and yellow make green.</td></tr>
+    <tr><td><code>connections.css</code></td><td>Puts the canvas behind everything else in the box, and gives it the line color.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. A box with a canvas behind its children
+
+Here's what Connections renders: a `div`, and inside it a `canvas` first, then whatever you put inside.
+
+<Code file="experiments/Connections/connections.css" />
+
+- **The canvas covers the box.** It's `position: absolute` with `inset: 0`, so it's exactly the size of the box. It comes first in the markup, so everything after it is drawn on top: the lines sit behind the dots.
+- **It's out of the way.** `pointer-events: none` lets clicks and drags pass through it to the dots underneath, and `aria-hidden="true"` hides it from screen readers, because the lines are decoration.
+- **The line color is the canvas's CSS `color`.** A canvas can't use CSS variables when it draws, but the component can read the canvas's computed color and draw with that. So the color comes from CSS, as `--border-strong` by default, and it follows the theme. The `color` prop sets `--connections-color` on the box, which overrides it.
+
+A canvas is a grid of pixels you draw on with JavaScript. It suits this because the lines change every frame: wiping a canvas and drawing a few lines again is cheap, while adding and removing an SVG element for every line that appears or disappears is much more work for the browser.
+
+## 2. Once a frame: the drawing loop
+
+All the work happens in one function, `draw`, inside the component. It runs once per screen refresh, using `requestAnimationFrame`: the browser calls it just before it draws each frame, about 60 times a second, or 120 on a faster screen. Its first line asks for the next frame, so it keeps going until the component goes away, when the effect's cleanup cancels it.
+
+<Code file="experiments/Connections/Connections.tsx" name="Connections" />
+
+Each frame does the same things in the same order:
+
+1. **Read where everything is.** The box's own position, every element matching `selector` (`.bounce` by default), and each one's position relative to the box. With `blend`, each one's `--connection-color` too. Section 3.
+2. **Turn the distance into pixels.** `"15vw"` means something different in a different-sized window, so it's worked out again each frame. Section 4.
+3. **Find the pairs that are close.** `lines()` checks every pair and returns a line for each one close enough. Sections 5 and 6.
+4. **Draw.** Clear the canvas, then draw each line in the right color and opacity. Sections 7 and 8.
+
+Reading comes before drawing on purpose. Measuring an element (`getBoundingClientRect`) can force the browser to work out the layout of the page again if anything has changed since the last measurement. Doing all the measuring together means it does that at most once a frame.
+
+**The settings live in a ref.** The loop starts once, in a `useEffect` with an empty dependency list (`[]`), so it never restarts. To let it see new props anyway, every render copies the current `distance`, `lineWidth`, `fade`, `blend`, and `selector` into `settings.current`, and the loop reads them from there each frame. Changing the distance in the Controls panel takes effect on the next frame, without stopping anything.
+
+## 3. Where everything is
+
+Each thing is described by a box: its left and top edges, its width, and its height, in pixels from the top left corner of the Connections box.
+
+<Code file="experiments/Connections/lines.ts" name="Box" />
+
+The loop gets it from `getBoundingClientRect()`, which gives an element's position in the window, and subtracts the Connections box's own position. That makes it relative to the box, which is also where the canvas starts drawing.
+
+`getBoundingClientRect()` matters here because Bounce moves its dots with a CSS `transform`. A transform doesn't change where the page's layout thinks an element is, so `offsetLeft` and `offsetTop` would say a dot never moved. `getBoundingClientRect()` includes transforms: it reports where the element is actually drawn.
+
+Bounce and Connections each run their own loop, and Bounce's starts first: a child's `useLayoutEffect` runs before its parent's `useEffect`. The browser calls the frame callbacks in the order they asked, so in every frame the dots move first and Connections measures them after. The lines never lag a frame behind the dots.
+
+## 4. How close is close
+
+`distance` can be a number of pixels, or a length relative to the window or the text:
+
+<Code file="experiments/Connections/lines.ts" name="Distance" />
+
+<Code file="experiments/Connections/lines.ts" name="toPixels" />
+
+A number is already pixels. A string is read with a regular expression (a pattern that text is matched against): an optional minus sign, digits and a decimal point, then one of the units, or no unit at all. Then the number is multiplied by what one unit is worth. In a window 1000 px wide and 500 px tall, with the usual 16 px text:
+
+<table>
+  <thead>
+    <tr><th><code>distance</code></th><th>One unit is</th><th>In pixels</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>120</code></td><td>1 px</td><td>120</td></tr>
+    <tr><td><code>"10vw"</code></td><td>1% of the window's width: 10 px</td><td>100</td></tr>
+    <tr><td><code>"10vh"</code></td><td>1% of the window's height: 5 px</td><td>50</td></tr>
+    <tr><td><code>"10vmin"</code></td><td>1% of whichever is smaller: 5 px</td><td>50</td></tr>
+    <tr><td><code>"10vmax"</code></td><td>1% of whichever is larger: 10 px</td><td>100</td></tr>
+    <tr><td><code>"2rem"</code></td><td>the root font size: 16 px</td><td>32</td></tr>
+  </tbody>
+</table>
+
+Anything it can't read, and anything negative, comes out as 0, and a distance of 0 draws no lines at all. That's safer than throwing an error from inside an animation loop, which would stop it for good. The loop reads the root font size from the `html` element each frame, so `"8rem"` follows the reader's browser text size.
+
+## 5. The gap between two boxes
+
+This is the heart of it. The question is how far apart two things are, and Connections measures between their **nearest edges**, not their middles. Measuring between middles would treat a big emoji and a tiny dot unfairly: two big things whose edges were touching could still be "far apart" because their middles are. With nearest edges, things that touch are always 0 apart, whatever their size.
+
+<Code file="experiments/Connections/lines.ts" name="gap" />
+
+It works on each direction separately, then puts them together:
+
+1. **Across.** How far apart the two middles are across (`Math.abs` makes it positive, whichever is on the left), minus half of each width. Half of each width is how far each middle is from its own edge, so what's left is the empty space between the edges. If that's negative, the boxes overlap across, so it's 0 (`Math.max(0, …)`).
+2. **Down.** The same, with heights.
+3. **Together.** `Math.hypot(dx, dy)` is the square root of `dx² + dy²`: Pythagoras's theorem, the length of the slanted side of a right-angled triangle whose other sides are `dx` and `dy`.
+
+Some worked numbers, with two boxes 10 px square:
+
+- Side by side, A at left 0 and B at left 30. Their middles are at 5 and 35, so 30 apart. Half of each width is 5 + 5 = 10, so `dx` is 30 − 10 = 20. They're level, so `dy` is 0, and the gap is 20.
+- Diagonal, A at (0, 0) and B at (13, 14). `dx` is 13 − 10 = 3 and `dy` is 14 − 10 = 4, so the gap is √(9 + 16) = 5, the distance between A's bottom right corner and B's top left one.
+- Overlapping, A at (0, 0) and B at (5, 5). Both `dx` and `dy` would be negative, so both are 0, and the gap is 0.
+
+When the boxes overlap one way, only the other way counts: a box directly above another is as far away as the space between them, however far its corner is. When they don't overlap either way, the gap runs corner to corner. So everywhere within `distance` of a box makes a rounded rectangle: straight along its sides, and curved round its corners. In the demo below, that's the dashed outline.
+
+### Try it
+
+Move the second box and watch each step change. It gets a line as soon as any part of it is inside the dashed outline.
+
+<Unstyled>
+  <Gap />
+</Unstyled>
+
+Things to try:
+
+- Put B directly below A, then slide it sideways. Until its edge passes A's, only `dy` counts, and the gap doesn't change.
+- Make A large and B small, then put B near one of A's corners. The middles are far apart, but the gap is small, so they're joined.
+- Push B into A. The gap is 0 and the strength is 1, the strongest a line gets.
+
+## 6. Which pairs get a line
+
+`lines()` checks every pair of boxes once, and makes a line for each pair whose gap is less than the distance.
+
+<Code file="experiments/Connections/lines.ts" name="Line" />
+
+<Code file="experiments/Connections/lines.ts" name="lines" />
+
+- **Every pair, once.** For each box `a`, it only looks at the boxes after it in the list (`boxes.slice(index + 1)`). So it checks A with B but never B with A again, and never a box with itself. With 16 dots that's 16 × 15 ÷ 2 = 120 pairs; with the 60 in Constellation, 1,770. Each check is a few subtractions, so even that is quick enough to do every frame.
+- **The line joins the middles.** The distance is measured between edges, but the line is drawn between the two centers, so it points into the middle of each thing and its ends are hidden behind them.
+- **Strength.** `1 − gap ÷ distance`. Touching is 1, halfway to the distance is 0.5, and it reaches 0 exactly at the distance, which is why a gap equal to the distance gets no line. With `distance` 50 and a gap of 20, the strength is 1 − 20 ÷ 50 = 0.6.
+- **Which two.** `between` holds the two boxes' places in the list. The loop uses them to look up each end's color.
+
+## 7. Drawing the lines
+
+With the list of lines, `draw` paints them on the canvas.
+
+**Sharp on every screen.** A canvas has its own grid of pixels, separate from its size on the page. Many screens have two or three physical pixels for every CSS pixel (`window.devicePixelRatio`), and a canvas with only one per CSS pixel would look blurry on them. So the loop makes the canvas `density` times as many pixels across and down as its size on the page, then calls `setTransform(density, 0, 0, density, 0, 0)`, which scales everything it draws by `density`. Everything after that can be in CSS pixels, the same units as the boxes. It only resizes the canvas when the size actually changed, because setting a canvas's width wipes it and is slow.
+
+**Each frame from scratch.** `clearRect` wipes the whole canvas, then every line is drawn again where it is now. Nothing is remembered between frames, so there's nothing to keep in sync: a line that's no longer close simply isn't drawn.
+
+**Fading.** `context.globalAlpha` is the opacity of whatever's drawn next. With `fade` on, it's the line's strength, so a line appears faint at the edge of the distance and gets stronger as the two get closer. With `fade={false}`, it's always 1.
+
+**Round ends.** `lineCap = "round"` gives each line rounded ends, so a thick line, such as ColorMixing's, ends neatly.
+
+## 8. Colors
+
+Without `blend`, every line is drawn in the canvas's CSS color. With `blend`, each line is a gradient from one thing's `--connection-color` to the other's, and a thing without one uses the line color.
+
+A canvas gradient needs colors it can use, and the custom property is just whatever text was written, such as `hsl(211 57% 38%)` or `var(--brand)`. The CSS `var()` has already been worked out by `getComputedStyle`, but the color could still be in any format. `rgb()` turns any CSS color into red, green, and blue numbers with a trick: it sets the canvas's `fillStyle` to the color, then reads it back. A canvas always gives a color back as `#rrggbb` or `rgba(…)`, whatever format it was given, and `parseRgb()` reads those two forms. A color the canvas doesn't understand is ignored, leaving the black it set first.
+
+<Code file="experiments/Connections/Connections.tsx" name="rgb" />
+
+<Code file="experiments/Connections/paint.ts" name="parseRgb" />
+
+<Code file="experiments/Connections/paint.ts" name="toCss" />
+
+With `blend="light"`, the gradient has two color stops, one at each end, and the browser fills in between. A screen makes colors by adding light, so halfway between pure blue `rgb(0 0 255)` and yellow `rgb(255 255 0)` is `rgb(128 128 128)`: gray. That's right for light, but not what most people expect, because paint doesn't work that way. That's what `blend="paint"` is for.
+
+With `blend="paint"`, the gradient gets 13 stops (`PAINT_STOPS` + 1), at 0, 1/12, 2/12, and so on to 1, and each stop's color comes from `mixPaint()`. The browser blends in a straight line between neighbouring stops, so with enough of them, the gradient follows the paint mix's curve.
+
+<Code file="experiments/Connections/Connections.tsx" name="PAINT_STOPS" />
+
+## 9. Mixing like paint
+
+Paint works the opposite way to light. Each paint absorbs some colors and reflects the rest, so mixing paints takes colors away. Blue paint and yellow paint both reflect some green, and green is all that survives the mix. Painters describe colors with three primaries, red, yellow, and blue (RYB), instead of the screen's red, green, and blue (RGB).
+
+`paint.ts` turns each color into amounts of red, yellow, and blue paint, mixes the amounts, and turns the result back into a screen color.
+
+<Code file="experiments/Connections/paint.ts" name="Ryb" />
+
+### From paint to a color: the cube
+
+Imagine a cube. One corner is no paint at all, which is white paper. Going one way along an edge adds red, another adds yellow, and the third adds blue. Each corner is a known color: red and yellow together are orange, all three are a muddy near-black. Gossett and Chen picked these colors in 2004 by looking at real paint.
+
+<Code file="experiments/Connections/paint.ts" name="CORNERS" />
+
+Any amount of paint is a point inside the cube, and its color is a blend of all eight corners, weighted by how near the point is to each. This is called trilinear interpolation: blending in a straight line along each of the three directions in turn.
+
+<Code file="experiments/Connections/paint.ts" name="rgbFromRyb" />
+
+Each corner's weight is three numbers multiplied together, one per paint: the amount of that paint if the corner has it, or 1 minus the amount if it doesn't. The corner index is written in binary (red is 4, yellow 2, blue 1), so `index & 4` asks "does this corner have red?".
+
+Worked through for half red and half blue, `[0.5, 0, 0.5]`:
+
+- The white corner (no paint) gets (1 − 0.5) × (1 − 0) × (1 − 0.5) = 0.25.
+- The red, blue, and purple corners each get 0.25 the same way.
+- The four corners with yellow get 0, because there's no yellow.
+
+So the color is a quarter each of white, red, blue, and purple: `rgb(170 88 134)`, a dusty pink. Half the paint left half the paper showing, so it's pale. That's why mixing needs one more step, below.
+
+### From a color to paint: a search
+
+Going the other way, from a screen color to amounts of paint, has no formula. So `rybFromRgb()` searches, like guessing a number with "warmer" and "colder":
+
+1. **A coarse grid.** It tries every combination of 0, 1/8, 2/8, and so on to 1 of each paint: 9 × 9 × 9 = 729 guesses. It keeps the one whose color is closest to the target, measured as the sum of the squared differences in red, green, and blue.
+2. **Smaller and smaller steps.** From the best guess, it tries a little more and a little less of each paint. If any is closer, it moves there. If none is, it halves the step size and tries again, until the step is smaller than 0.0001.
+
+<Code file="experiments/Connections/paint.ts" name="rybFromRgb" />
+
+The cube's corners come back exactly. A color no paint can make, such as the screen's pure green, gets the nearest paint there is. The search is a few thousand calculations, which is too slow to repeat for every line every frame, so each answer is remembered in a `Map`. A page only has a few colors, so after the first frame it's almost free.
+
+### Mixing
+
+<Code file="experiments/Connections/paint.ts" name="mixPaint" />
+
+1. **Grays mix as grays.** If both colors are grays (red, green, and blue within 0.03 of each other), they're mixed straight in RGB. In the cube, black and white would mix through its muddy middle and come out brown, which is right for mixing opposite colors but wrong for black and white.
+
+   <Code file="experiments/Connections/paint.ts" name="gray" />
+
+2. **Into paint.** Both colors become amounts of red, yellow, and blue paint.
+3. **Mix the paint.** Each amount goes `t` of the way from the first color's to the second's: at `t` = 0.5, the average.
+4. **Keep it strong.** Averaging full-strength red `[1, 0, 0]` and full-strength blue `[0, 0, 1]` gives `[0.5, 0, 0.5]`, the dusty pink above, because half of each paint is missing. Real paint doesn't work like that: a full brush of red and a full brush of blue make a full-strength purple. So the strongest channel of the mix is scaled up to match the strength of the colors going in: here both are 1, the mix's strongest channel is 0.5, so every channel doubles, to `[1, 0, 1]`. That's the purple corner, `rgb(128 0 128)`. White has no paint, so its strength is 0, and mixing red with white really does give less paint: pink, `rgb(255 128 128)`.
+5. **Back to a color**, with `rgbFromRyb()`.
+
+The same steps give red and yellow → orange, `rgb(255 128 0)`, and blue and yellow → green, `rgb(0 168 51)`. The MixedPairs story checks those three hues on a real canvas.
+
+### Try it
+
+Pick two colors and slide `t` along the line. The top strip is the gradient Connections draws with `blend="paint"`, made of 13 calls to the real `mixPaint()`. The bottom one is `blend="light"`.
+
+<Unstyled>
+  <PaintMix />
+</Unstyled>
+
+Things to try:
+
+- Blue and yellow: a strong green in the paint strip, an olive in the light one. (Pure screen blue and yellow would mix to gray as light; the paint cube's blue is a little muted.)
+- Red and white: both strips go through pink, because white has no paint to add.
+- Black and white: both are grays, so both strips are the same plain gray ramp.
+- Orange and blue, which are opposite on the painter's color wheel: the paint strip goes through brown to a near-black in the middle, as real paint does. The light strip just goes through gray.
+
+## The whole files
+
+<details>
+<summary><code>Connections.tsx</code></summary>
+
+<Code file="experiments/Connections/Connections.tsx" />
+
+</details>
+
+<details>
+<summary><code>lines.ts</code></summary>
+
+<Code file="experiments/Connections/lines.ts" />
+
+</details>
+
+<details>
+<summary><code>paint.ts</code></summary>
+
+<Code file="experiments/Connections/paint.ts" />
+
+</details>
+
+<details>
+<summary><code>connections.css</code></summary>
+
+<Code file="experiments/Connections/connections.css" />
+
+</details>

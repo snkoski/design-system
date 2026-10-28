@@ -1,0 +1,85 @@
+/* Proximity's "How it works" demos, beyond the shared panel in src/how-it-works/demo.css */
+
+/* The area the pointer moves over, with the box, the rings of equal closeness, and the distance */
+.proximity-area {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  height: auto;
+  overflow: hidden;
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: crosshair;
+  touch-action: none;
+}
+.proximity-area__ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.proximity-area__box {
+  fill: var(--track);
+  stroke: var(--border-strong);
+  stroke-width: 2;
+}
+.proximity-area__leg {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.proximity-area__distance {
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.proximity-area__pointer {
+  fill: var(--ink);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+/* Strips of mixed color, one per color space */
+.mix-rows {
+  display: grid;
+  gap: var(--space-3);
+}
+.mix-row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr 2.5rem;
+  gap: var(--space-3);
+  align-items: center;
+}
+.mix-row__name {
+  font-family: var(--font-mono);
+  color: var(--ink-muted);
+}
+.mix-row[data-current] .mix-row__name {
+  font-weight: 600;
+  color: var(--ink);
+}
+.mix-row__strip {
+  position: relative;
+  display: flex;
+  height: 2.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  cursor: crosshair;
+  touch-action: none;
+}
+.mix-row__strip > span:not(.mix-row__marker) {
+  flex: 1;
+}
+.mix-row__marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--border-thick);
+  margin-left: calc(var(--border-thick) / -2);
+  background: var(--ink);
+  box-shadow: 0 0 0 var(--border-thin) var(--bg);
+}
+.mix-row__now {
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+}

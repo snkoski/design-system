@@ -1,0 +1,29 @@
+/* "How it works" pages: code blocks with a caption naming where the code lives */
+.how-code {
+  margin: var(--space-4) 0;
+}
+.how-code__caption {
+  margin-bottom: calc(-1 * var(--space-2)); /* Storybook's Source block brings its own top margin */
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+/* Tailwind's reset takes the numbers and bullets off every list in the docs. Put them back for the prose of the pages
+   that show code (the demos' own lists have classes). */
+.sbdocs-content:has(.how-code) :is(ol, ul):not([class]) {
+  list-style: revert;
+}
+
+/* On a phone, long file paths and inline code wrap, and a wide table scrolls on its own, so the page never scrolls
+   sideways */
+.sbdocs-content:has(.how-code) :is(p, li, td, th, figcaption) :is(code, strong) {
+  /* break-word, not anywhere: a word only breaks when it can't fit on a line of its own, so table columns keep
+     attribute names whole */
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+.sbdocs-content:has(.how-code) table:not([class]) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}

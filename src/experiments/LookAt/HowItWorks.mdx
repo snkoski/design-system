@@ -1,0 +1,165 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as LookAtStories from "./LookAt.stories";
+import { Code } from "../../how-it-works/Code";
+import { Aim, ShortWay } from "./explain";
+
+<Meta of={LookAtStories} name="How it works" />
+
+# How Look at works
+
+Look at is three files, each with one job, and borrows a fourth that experiments share:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>tracker.ts</code></td><td>The math and the listening. It works out which way each LookAt should face, makes sure every turn takes the short way round, and writes the result. One shared listener follows the pointer for every LookAt on the page.</td></tr>
+    <tr><td><code>LookAt.tsx</code></td><td>The component. It renders two <code>span</code>s, one to measure and one to turn, signs the outer one up with the tracker, and passes the turn speed and easing to the CSS.</td></tr>
+    <tr><td><code>look-at.css</code></td><td>The turning. It rotates the content by the angle the tracker wrote, and eases each turn.</td></tr>
+    <tr><td><code>decoration.css</code></td><td>Shared by the experiments. It switches decorative motion off for people who've asked for reduced motion.</td></tr>
+  </tbody>
+</table>
+
+As in Proximity, JavaScript works out one number, `--look-angle`, and CSS decides what to do with it. JavaScript never sets a `transform` itself.
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. Which way to face: `targetAngle()`
+
+Everything starts with one question: which way is the pointer from the middle of this element?
+
+<Code file="experiments/LookAt/tracker.ts" name="targetAngle" />
+
+**From the center to the pointer.** `dx` is how far right of the element's center the pointer is, and `dy` how far below it. The center is the element's left edge plus half its width, and its top plus half its height. On screens, `y` grows downwards, so a pointer above the center has a negative `dy`.
+
+**The angle of that line: `Math.atan2(dy, dx)`.** `atan2` takes a distance down and a distance across, and gives the angle of the line between them, measured from pointing right. On a screen, where `y` grows downwards, positive angles go clockwise. The answer is in radians, the unit JavaScript's math uses: a whole turn is 2π radians (about 6.28), so half a turn is π (about 3.14). It covers every direction, from −π to π:
+
+<table>
+  <thead>
+    <tr><th>The pointer is</th><th><code>dx</code>, <code>dy</code></th><th><code>atan2</code></th><th>In degrees</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Right</td><td>100, 0</td><td>0</td><td>0°</td></tr>
+    <tr><td>Below and right</td><td>100, 100</td><td>0.785</td><td>45°</td></tr>
+    <tr><td>Below</td><td>0, 100</td><td>1.571</td><td>90°</td></tr>
+    <tr><td>Left</td><td>−100, 0</td><td>3.142</td><td>180°</td></tr>
+    <tr><td>Above</td><td>0, −100</td><td>−1.571</td><td>−90°</td></tr>
+  </tbody>
+</table>
+
+The plain `Math.atan(dy / dx)` can't tell "below and right" from "above and left", because dividing loses the signs: 100 / 100 and −100 / −100 are both 1. `atan2` takes the two numbers separately, so it knows which quarter the pointer is in.
+
+**Degrees.** `× 180 / Math.PI` turns radians into degrees, because CSS's `rotate()` is easiest to read in degrees. π radians is 180°.
+
+**From pointing up.** The content is drawn pointing up, and `rotate(0deg)` leaves it that way. Pointing up is 90° anticlockwise of pointing right, where `atan2` starts counting, so `+ 90` turns one into the other. A pointer to the right gives 0° + 90° = `rotate(90deg)`: a quarter turn clockwise from up, which points right.
+
+**Away.** Facing away is facing toward, plus half a turn: `+ 180`.
+
+When the pointer is exactly on the center, there's no direction to face, and it returns `null`. The LookAt keeps facing the way it was.
+
+### Try it
+
+<Unstyled>
+  <Aim />
+</Unstyled>
+
+## 2. The short way round: `nearest()`
+
+`atan2` gives angles from −180° to 180°, so `targetAngle()` gives angles from −90° to 270°. Somewhere they have to jump, and it's when the pointer passes the left of the element. Just below the left, the target is 269°. Just above it, it's −89°. Both face almost the same way, but they're 358 apart as numbers.
+
+That matters because of how CSS eases a turn. A `transition` on `transform` moves the number in a straight line from the old value to the new one. From `rotate(269deg)` to `rotate(-89deg)`, it turns 358° anticlockwise, a whole spin the wrong way, to move 2°.
+
+`nearest()` fixes that. It keeps the angle as one running number that never wraps, and moves it by the smallest turn that faces the new target:
+
+<Code file="experiments/LookAt/tracker.ts" name="nearest" />
+
+Reading it from the inside out, for a previous angle of 269° and a target of −89°:
+
+1. `target - previous` is the whole difference: −89 − 269 = −358.
+2. `% 360` takes off whole turns, which don't change which way it faces. In JavaScript, `%` keeps the sign of the number on its left, so −358 % 360 is still −358.
+3. `+ 540` and `% 360` again: 540 is a turn and a half. Adding it makes the number positive whatever it was (−358 + 540 = 182), and the second `% 360` brings it into 0 to 360: 182.
+4. `- 180` takes the half turn back off: 2. Steps 3 and 4 together move the difference into −180 to 180 without changing which way it faces.
+
+So `nearest(269, -89)` is 269 + 2 = 271: a 2° turn clockwise, which faces the same way as −89°. As the pointer keeps circling clockwise, the angle keeps growing, past 360, 720, and on. The number gets large, but `rotate(631deg)` faces exactly as `rotate(271deg)` does, and every turn between neighboring numbers is short.
+
+### Try it
+
+Both arrows ease every turn, as the CSS does. Circle the pointer and the first one spins back the long way when the pointer passes the left. The second is the one LookAt uses.
+
+<Unstyled>
+  <ShortWay />
+</Unstyled>
+
+## 3. Aiming every LookAt: `aim()`
+
+A watcher is everything the tracker needs to know about one LookAt. It keeps its last `angle`, because `nearest()` needs it to find the next one.
+
+<Code file="experiments/LookAt/tracker.ts" name="Watcher" />
+
+`aim()` runs on every pointer move, for every watcher:
+
+<Code file="experiments/LookAt/tracker.ts" name="aim" />
+
+- **No pointer yet, no aiming.** Until the pointer has moved, nothing turns, so everything starts pointing up.
+- **Read everything, then write everything.** Measuring an element with `getBoundingClientRect()` right after changing another one's style forces the browser to work out the layout of the page again before it can answer. With a grid of hundreds, doing that once per element on every move is slow. So `aim()` measures every element first, then works out and writes every angle.
+- **Its own center.** Each LookAt aims from where it is, so in a grid every one points its own way, and with the pointer in the middle they all point in toward it.
+- **Only the custom property.** It sets `--look-angle`, such as `135deg`, and leaves the rest to the CSS.
+
+## 4. One listener for every LookAt
+
+`watch()` adds a watcher to the set, and the first one in adds the listeners on `window`. It returns the function that takes the watcher back out, and the last one out removes the listeners again. A page with 792 bars has one `pointermove` listener, not 792.
+
+<Code file="experiments/LookAt/tracker.ts" name="watch" />
+
+<Code file="experiments/LookAt/tracker.ts" name="onPointerMove" />
+
+The pointer standing still doesn't mean the angles can't change: scrolling or resizing moves the elements under it. So `scroll` and `resize` aim everything again too. Scroll events don't bubble up from a scrolling box to the window, so that listener uses `capture: true`, which hears them on the way down instead and catches scrolling anywhere on the page.
+
+<Code file="experiments/LookAt/tracker.ts" name="onLayoutChange" />
+
+## 5. The turning: `look-at.css`
+
+<Code file="experiments/LookAt/look-at.css" />
+
+- **Two elements.** The outer `.look-at` is the cell: the layout sizes it with `className`, and the tracker measures it. The inner `.look-at__pointer` is what turns, centered in the cell by `place-items: center`, so it turns about the cell's center. The cell itself never turns, so its box stays the same size. A turned element's box, as `getBoundingClientRect()` reports it, grows and shrinks as it turns.
+- **The turn.** `rotate(calc(var(--look-angle, 0deg) * var(--experiment-decoration)))`. `--experiment-decoration` is 1 normally and 0 for people who've asked for reduced motion, so for them every angle times 0 is 0, and the content stays pointing up. The tracker still writes `--look-angle`, so nothing in the JavaScript needs to know.
+- **The ease.** The `transition` eases each turn over `--look-at-duration`, which is `--duration-fast` (120 ms) unless the `turnDuration` prop sets it, with the `turnEasing` prop's curve. A long, linear turn makes the arrows trail lazily behind the pointer. The pointer reports its position many times a second, and each report starts a new transition from wherever the content has got to, so it chases the pointer smoothly rather than snapping.
+
+<Code file="experiments/decoration.css" />
+
+## 6. The component: `LookAt.tsx`
+
+<Code file="experiments/LookAt/LookAt.tsx" name="LookAt" />
+
+- **Joining once.** The `useLayoutEffect` has an empty dependency list (`[]`), so it creates the watcher, starting at an angle of 0, and calls `watch()` once, when the component appears. It's a layout effect, so it runs before the browser paints: a pointer move in the same moment isn't lost.
+- **Changing direction without losing the angle.** The `useEffect` copies a new `direction` into the same watcher and calls `reaim()`, so it turns round from wherever it was, the short way.
+- **Props to custom properties.** `turnDuration` becomes `--look-at-duration` in milliseconds (never below 0), and `turnEasing` becomes `--look-at-ease`. Without them, the CSS's defaults apply.
+- **Hidden from screen readers.** The turning is decoration, so the whole thing has `aria-hidden="true"`.
+
+<Code file="experiments/LookAt/tracker.ts" name="reaim" />
+
+LookAt measures and restyles every element on every pointer move, which gets slow with thousands of them. [Look at canvas](?path=/docs/experiments-look-at-canvas--how-it-works) draws the same bars on one canvas instead, and its page explains how.
+
+## The whole files
+
+<details>
+<summary><code>tracker.ts</code></summary>
+
+<Code file="experiments/LookAt/tracker.ts" />
+
+</details>
+
+<details>
+<summary><code>LookAt.tsx</code></summary>
+
+<Code file="experiments/LookAt/LookAt.tsx" />
+
+</details>
+
+<details>
+<summary><code>look-at.css</code></summary>
+
+<Code file="experiments/LookAt/look-at.css" />
+
+</details>

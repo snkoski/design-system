@@ -1,0 +1,45 @@
+/* RadioGroup's and SegmentedControl's "How it works" demos: a state switch above Inspect, a form readout, and hit
+   areas drawn over the real components from outside */
+/* The state switch and Inspect share one panel: Inspect's own panel drops its frame inside it */
+.how-states > .explain {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* The state switch's radios in a row, wrapping on a narrow screen */
+.how-state-switch .radio-group__options {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-6);
+}
+
+.how-form-switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-6);
+}
+
+.how-form-readout {
+  display: grid;
+  gap: var(--space-2);
+}
+.how-form-readout p {
+  margin: 0;
+}
+.how-form-readout code + code {
+  margin-inline-start: var(--space-2);
+}
+
+.how-hit-areas__pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) var(--space-8);
+}
+
+/* Every place a click or tap counts, drawn as a dashed line. Outlines take no room, so nothing moves. */
+.how-hit-areas .radio__row,
+.how-hit-areas .radio__circle::after,
+.how-hit-areas .segment__button::after {
+  outline: var(--border-thin) dashed var(--ink-muted);
+  outline-offset: calc(-1 * var(--border-thin));
+}

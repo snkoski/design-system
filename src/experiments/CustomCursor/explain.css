@@ -1,0 +1,38 @@
+/* The "How it works" page's demo for Custom cursor. The panel and steps come from src/how-it-works/demo.css. */
+.cursor-explain__figure {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+/* The cursor image, enlarged with its pixels kept square, on a dashed outline the size of the image */
+.cursor-explain__image {
+  position: relative;
+  display: block;
+  outline: var(--border-thin) dashed var(--border-strong);
+}
+.cursor-explain__image img {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.cursor-explain__spot {
+  position: absolute;
+  width: var(--space-2);
+  height: var(--space-2);
+  border: var(--border-thin) solid var(--surface);
+  border-radius: var(--radius-full);
+  background: var(--danger);
+  transform: translate(-50%, -50%);
+}
+
+.cursor-explain__try {
+  display: grid;
+  place-items: center;
+  min-height: var(--space-32);
+  border: var(--border-thin) dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+}

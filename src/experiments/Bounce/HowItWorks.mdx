@@ -1,0 +1,209 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as BounceStories from "./Bounce.stories";
+import { Code } from "../../how-it-works/Code";
+import { OneFrame, Trace } from "./explain";
+
+<Meta of={BounceStories} name="How it works" />
+
+# How Bounce works
+
+Bounce is three files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>physics.ts</code></td><td>The math. Given where something is and how fast it's going, where is it a moment later? Plain functions, with no React and no DOM, so they're easy to test and to reason about.</td></tr>
+    <tr><td><code>mover.ts</code></td><td>The loop. Once per screen refresh, it measures every Bounce on the page, asks <code>physics.ts</code> to move each one, and writes the new positions.</td></tr>
+    <tr><td><code>Bounce.tsx</code></td><td>The component. It turns props into a "mover" the loop understands, and adds dragging, throwing, and the squash.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. Where it is and how fast it's going
+
+Everything about a moving Bounce is four numbers. `x` and `y` are its position in pixels from the top left corner of its box, and `vx` and `vy` are its velocity: how many pixels it moves per second, across and down. On screens, `y` grows downwards, so a positive `vy` means moving down.
+
+<Code file="experiments/Bounce/physics.ts" name="Body" />
+
+You don't give Bounce a velocity directly. You give it a `speed` and an `angle`, and `velocity()` splits the speed into its across and down parts with trigonometry: cosine gives the share across, sine the share down. At 45°, both shares are about 0.71, so the default speed of 240 px/s becomes about 170 px/s right and 170 px/s down.
+
+<Code file="experiments/Bounce/physics.ts" name="velocity" />
+
+The physics settings travel together:
+
+<Code file="experiments/Bounce/physics.ts" name="Physics" />
+
+## 2. One frame: `step()`
+
+The whole physics engine is one function. Each frame, the loop calls it with the time since the last frame, in seconds: about 0.0167 on a 60 Hz screen, or 0.0083 on a 120 Hz one. Everything is measured per second and multiplied by `seconds`, so it moves at the same speed whatever the screen's refresh rate.
+
+<Code file="experiments/Bounce/physics.ts" name="step" />
+
+It does five things, in this order:
+
+1. **Friction slows it down.** `slow = Math.exp(-friction * seconds)` is a number just under 1, and both velocities are multiplied by it. Section 3 explains why it's `Math.exp`.
+2. **Gravity speeds it up downwards.** `vy += gravity * seconds`. Gravity is an acceleration, in pixels per second per second: after one second of falling, `vy` has grown by `gravity`.
+3. **It moves.** `x += vx * seconds` and `y += vy * seconds`. The velocity changes before the position does (this is called semi-implicit Euler), which keeps a ball bouncing at a steady height. Doing it the other way round slowly adds energy, and the bounces creep higher.
+4. **It bounces off any edge it went past.** If it's beyond an edge and still moving towards it, it's put back on the edge and its velocity is flipped and scaled: `vx = -vx * keep`, where `keep` is `bounciness` held between 0 and 1. The "still moving towards it" check (`vx < 0` at the left edge, for example) matters: without it, something that's just bounced but hasn't left the edge yet would flip again on the next frame and get stuck.
+5. **A gentle landing rests.** With gravity, a landing slower than `gravity × REST` stops dead instead of bouncing. Otherwise a ball would make smaller and smaller bounces forever, each one too small to see. `REST` is 0.05 seconds' worth of gravity, so with a gravity of 2000 anything landing slower than 100 px/s rests.
+
+It returns the new body and `edges`, the list of edges it hit this frame, which Bounce uses for the squash and the `onBounce` callback. A box with no room in one direction (`maxX === 0`) holds it still that way, rather than bouncing every frame.
+
+<Code file="experiments/Bounce/physics.ts" name="REST" />
+
+### Try one frame
+
+Here's one call to `step()`, worked out with your numbers, for a ball moving straight up or down near the floor. The last line is what the real `step()` returned for the same numbers, so you can check the working.
+
+<Unstyled>
+  <OneFrame />
+</Unstyled>
+
+## 3. Friction
+
+Friction takes away a share of the speed over time, the way air and rolling resistance slow a real ball.
+
+The obvious way to write it is `vx *= 0.98` every frame. But that depends on the frame rate: a 120 Hz screen runs it twice as often as a 60 Hz one, so the same Bounce would slow down twice as fast. `step()` instead multiplies by `Math.exp(-friction * seconds)`. Multiplying powers of e adds their exponents, so however a second is split into frames, the total comes to `Math.exp(-friction)`:
+
+- 60 frames: `e^(−f × 1/60)` multiplied 60 times is `e^(−f)`.
+- 120 frames: `e^(−f × 1/120)` multiplied 120 times is also `e^(−f)`.
+
+So one second always leaves the same share of the speed:
+
+<table>
+  <thead>
+    <tr><th><code>friction</code></th><th>Speed left after one second</th><th>After three seconds</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>100%</td><td>100%</td></tr>
+    <tr><td>0.25</td><td>78%</td><td>47%</td></tr>
+    <tr><td>0.5</td><td>61%</td><td>22%</td></tr>
+    <tr><td>1</td><td>37%</td><td>5%</td></tr>
+    <tr><td>2</td><td>14%</td><td>0.2%</td></tr>
+  </tbody>
+</table>
+
+That's why the prop's description says friction 1 "loses about two thirds of its speed a second". Friction never quite reaches zero on its own: with no gravity, a Bounce with friction drifts slower and slower without stopping.
+
+## 4. Bounciness
+
+At each bounce, the speed into the edge is multiplied by `bounciness`: 1 keeps all of it, 0.5 keeps half, and 0 stops it dead against the edge.
+
+With gravity, how high a ball rises depends on the square of its speed (height = speed² ÷ (2 × gravity)), so each bounce reaches `bounciness²` of the height before. With bounciness 0.8, each bounce is 64% as high as the last. Bounciness and friction both take speed away, but differently: bounciness only at the moment of a bounce, friction all the time.
+
+### See it over time
+
+This runs the real `step()` for five seconds on a ball dropped from the top of a 300 px room, and plots its height and speed frame by frame. Dots mark each bounce. Change the frame rate to see that the curves hardly change: `step()` works in seconds, not frames.
+
+<Unstyled>
+  <Trace />
+</Unstyled>
+
+Things to try:
+
+- Bounciness 1 and friction 0: it bounces back up to about the height it fell from, every time.
+- Gravity 0, bounciness 1, and a starting speed: it travels between the floor and ceiling at a steady speed. Add friction and the speed curve falls away smoothly, bounce or no bounce.
+- Bounciness 0.5: each bounce is a quarter of the height before, and it comes to rest quickly.
+
+## 5. The loop: `mover.ts`
+
+`physics.ts` only knows numbers. `mover.ts` connects it to the page. A mover is everything the loop needs to know about one Bounce:
+
+<Code file="experiments/Bounce/mover.ts" name="Mover" />
+
+Every Bounce on the page shares one loop, driven by `requestAnimationFrame`, which the browser calls just before it draws each frame. `move()` adds a mover to the loop, and starts the loop if it isn't running. It returns the function that takes the mover back out, and the loop stops when no movers are left.
+
+<Code file="experiments/Bounce/mover.ts" name="move" />
+
+`tick()` is one frame of the loop:
+
+<Code file="experiments/Bounce/mover.ts" name="tick" />
+
+- **How much time passed.** `now` is the time the browser passes in. The first frame moves nothing (`seconds` is 0), and no frame moves more than `MAX_STEP`, 0.05 seconds. After the tab has been in the background, a frame can come seconds later, and without the cap everything would leap across the screen at once.
+- **Read everything, then write everything.** Measuring an element's size (`offsetWidth`) right after moving another one forces the browser to recalculate the layout of the page, and doing that once per Bounce per frame is slow. So `tick()` measures every mover first, then calls `step()` for each, then writes all the new positions.
+- **Interactions.** Bounce on its own has none. Another experiment can add one with `interact()`: Magnets does, to push magnets towards and away from each other (`push`), and stop them overlapping (`settle`).
+- **Bounce callbacks last.** `onBounce` can re-render React components, so it runs after everything has been placed.
+
+These are the small helpers it uses:
+
+<Code file="experiments/Bounce/mover.ts" name="room" />
+
+`room()` is how far the element can travel: its box's size minus its own size, because `x` and `y` are its top left corner.
+
+<Code file="experiments/Bounce/mover.ts" name="place" />
+
+`place()` moves the element with a CSS `transform` rather than `left` and `top`. A transform doesn't change the page's layout, so the browser can move it without recalculating anything else.
+
+<Code file="experiments/Bounce/mover.ts" name="still" />
+
+`still()` holds a mover still when it's paused, or when the visitor has asked for reduced motion. That's set in CSS, by `--experiment-decoration` (section 7).
+
+## 6. The component: `Bounce.tsx`
+
+The component's job is to create a mover, keep it in step with the props, and get out of the way: React never re-renders to move the dot. The loop writes the transform directly.
+
+<Code file="experiments/Bounce/Bounce.tsx" name="Bounce" />
+
+- **Joining the loop once.** The first `useLayoutEffect` has an empty dependency list (`[]`), so it creates the mover and calls `move()` once, when the component appears, and stops it when the component goes away.
+- **Changing props without restarting.** The other effects change that same mover in place: a new `startX` or `startY` moves it, a new `speed` or `angle` gives it a new velocity, and every render copies in the current gravity, bounciness, friction, and `paused`. Changing bounciness mid-flight doesn't reset where it is or how fast it's going.
+- **Why `useLayoutEffect`.** It runs before the browser paints, so the mover is in place before anything can see it, or send it a pointer event.
+- **Two elements.** The outer `span` is moved by the loop's `transform`. The inner `bounce__content` is the one that squashes. If both used the same element, the squash animation and the loop would overwrite each other's transform.
+
+### The squash
+
+When `step()` reports an edge, Bounce briefly squashes the content flat against that edge and lets it spring back, with the Web Animations API (`element.animate`). `transformOrigin` pins the squash to the edge it hit, so it flattens against the wall instead of shrinking towards its middle.
+
+<Code file="experiments/Bounce/Bounce.tsx" name="SQUASH" />
+
+<Code file="experiments/Bounce/Bounce.tsx" name="squashAgainst" />
+
+### Dragging and throwing
+
+With `grabbable`, pressing on it sets `held`, so the loop leaves it alone, and the pointer moves it instead. While it's held, Bounce keeps the positions from the last tenth of a second. On release, the throw velocity is how far it moved in that time, divided by the time:
+
+<Code file="experiments/Bounce/Bounce.tsx" name="throwVelocity" />
+
+<Code file="experiments/Bounce/Bounce.tsx" name="THROW_WINDOW" />
+
+<Code file="experiments/Bounce/Bounce.tsx" name="CLICK_SLOP" />
+
+Only the last moments count, so if you hold it still before letting go, it drops instead of flying off. `CLICK_SLOP` is how far a press can wander and still count as a click rather than a drag.
+
+## 7. Reduced motion and pausing
+
+Anything that moves for more than five seconds needs a way to pause it (WCAG 2.2.2), so Bounce has a `paused` prop. People who've asked their system for reduced motion get a still Bounce automatically: `decoration.css` sets `--experiment-decoration` to 0 for them, and `still()` in the loop reads it.
+
+<Code file="experiments/decoration.css" />
+
+## The whole files
+
+<details>
+<summary><code>physics.ts</code></summary>
+
+<Code file="experiments/Bounce/physics.ts" />
+
+</details>
+
+<details>
+<summary><code>mover.ts</code></summary>
+
+<Code file="experiments/Bounce/mover.ts" />
+
+</details>
+
+<details>
+<summary><code>Bounce.tsx</code></summary>
+
+<Code file="experiments/Bounce/Bounce.tsx" />
+
+</details>
+
+<details>
+<summary><code>bounce.css</code></summary>
+
+<Code file="experiments/Bounce/bounce.css" />
+
+</details>

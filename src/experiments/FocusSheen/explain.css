@@ -1,0 +1,45 @@
+/* The "How it works" page's demo for Focus sheen. The panel and facts come from src/how-it-works/demo.css. */
+
+/* The real `sheen` animation on the real ::before, held still: a negative delay starts it that far through, and
+   `paused` keeps it there. It runs without focus here, and fills both ways so the very end still shows its last
+   frame. Nothing else is changed. */
+.sheen-explain__stage .sheen-explain__button::before {
+  animation: sheen var(--sheen-duration, var(--duration-slow)) var(--sheen-ease, var(--ease-in-out)) both paused;
+  animation-delay: calc(var(--sheen-duration, var(--duration-slow)) * var(--sheen-explain-progress, 0) * -1);
+}
+
+.sheen-explain__button {
+  width: 100%;
+  max-width: 24rem;
+  cursor: default;
+}
+
+.sheen-explain__strip {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+  overflow: visible;
+}
+.sheen-explain__image {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-dasharray: 4 3;
+}
+.sheen-explain__band {
+  fill: var(--track);
+  stroke: var(--ink-muted);
+}
+.sheen-explain__middle {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+}
+.sheen-explain__box {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.sheen-explain__label {
+  fill: var(--ink-muted);
+  font-size: 0.6875rem;
+}

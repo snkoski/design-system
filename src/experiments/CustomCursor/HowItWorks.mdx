@@ -1,0 +1,169 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as CustomCursorStories from "./CustomCursor.stories";
+import { Code } from "../../how-it-works/Code";
+import { MakeCursor } from "./explain";
+
+<Meta of={CustomCursorStories} name="How it works" />
+
+# How Custom cursor works
+
+Custom cursor changes what the mouse pointer looks like, over part of the page or all of it. It doesn't draw a picture that follows the mouse around. It makes an image and hands it to the browser's own CSS `cursor` property, so the browser keeps drawing the cursor itself. Three files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>cursorImage.ts</code></td><td>The images. Plain functions that turn an emoji, an icon, or an image address into the text of a CSS <code>cursor</code> value.</td></tr>
+    <tr><td><code>CustomCursor.tsx</code></td><td>The component. It picks the right function for what you passed, and puts the value on its own element or on the whole page.</td></tr>
+    <tr><td><code>custom-cursor.css</code></td><td>Three rules: use the value, optionally force it over buttons and links too, and hide the icon it copies from.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demo calls the real functions too.
+
+## 1. Why the real cursor
+
+The other way to make a custom cursor is to hide the real one and move an element to wherever the mouse is, on every pointer move. That element is always a frame behind: the page hears about the move, then updates the element, then draws it. The real cursor is drawn by the operating system as the mouse moves, so it never lags.
+
+The CSS `cursor` property takes an image, the hotspot, and a fallback, as in `cursor: url("hotdog.png") 16 16, auto`:
+
+- **The image**, by its address. Here it's always a data URL: the whole image written into the address as text (`data:image/png;base64,iVBOR…`), so there's no file to load.
+- **The hotspot**: two numbers, in pixels from the image's top left corner. It's the one point of the cursor that clicks. For an arrow it's the tip; for a round emoji, the middle.
+- **A fallback**, here `auto`, the normal cursor. CSS requires one. If the image can't be used (too big, or broken), the browser quietly shows the fallback instead.
+
+The rest of this page is how Custom cursor builds that line.
+
+## 2. Size and hotspot
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="MAX_SIZE" />
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="clampSize" />
+
+Browsers ignore a cursor image bigger than 128 pixels, and show the fallback instead. `clampSize()` rounds the size and holds it between 8 and 128, so `size={400}` makes a 128 px cursor rather than none at all.
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="hotspotFor" />
+
+`hotspotFor()` turns the `hotspot` prop into pixels. `center` is half the size, rounded down: 16, 16 for the default 32 px cursor. `top-left` is 0, 0. Exact pixels are rounded and held inside the image, from 0 to `size − 1`: on a 32 px cursor, `{ x: 500, y: -3 }` becomes 31, 0.
+
+## 3. Making the image
+
+There are three kinds of cursor, and each takes a different path to an image.
+
+### An image address
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="isImageUrl" />
+
+A string that starts like an address is used as it is: `http:` or `https:`, `data:image/`, `blob:` (a file made in the browser), or a path starting `/`, `./`, or `../`. The regular expression checks only the start, so "🌭" or "hi" isn't mistaken for one. The image is used at whatever size it is; `size` doesn't resize it.
+
+### An emoji or text
+
+Anything else that's a string is drawn onto a canvas, an element JavaScript can draw on pixel by pixel:
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="drawText" />
+
+- **The canvas is `size × scale` pixels.** `context.scale(scale, scale)` then makes every drawing measurement count `scale` pixels, so the same code draws a 32 px emoji on a 32 × 32 canvas at scale 1, and on a 64 × 64 canvas at scale 2.
+- **Centered.** `textAlign = "center"` and `textBaseline = "middle"` make the point it's drawn at the middle of the text, and that point is the middle of the square.
+- **A little smaller than the square.** The font is 85% of the size, and moved down 5%, because emoji drawn at full size clip at their edges and sit a little high.
+- **The fallback fonts** list the emoji fonts of Apple, Windows, and Android, so each draws in its own style.
+- **`toDataURL("image/png")`** turns what's drawn into a data URL.
+
+The color is the text color where the cursor is used, unless you pass `color`. It only shows on text and one-color emoji; color emoji keep their own colors.
+
+### An SVG icon
+
+An icon such as `<Star />` is a React element, not an image. Custom cursor renders it on the page, hidden, so it becomes a real `<svg>`. Then it copies that `<svg>` into an image:
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="svgToDataUrl" />
+
+- **A copy**, so the icon on the page isn't changed.
+- **Width and height** set to the cursor's size. An SVG is drawn from shapes, not pixels, so it's sharp at any size and doesn't need a second, bigger image.
+- **The color written in.** Icons draw in `currentColor`, the text color around them. An image is drawn on its own, with nothing around it, so `currentColor` would fall back to black. Setting `color` on the copy fixes it.
+- **`XMLSerializer`** turns the copy back into text, and adds the `xmlns` attribute an SVG file needs. `encodeURIComponent` makes it safe to put in an address.
+
+## 4. Sharp on high-density screens
+
+A high-density screen, such as a Retina display, has 2 or more device pixels for each CSS pixel. A 32 × 32 pixel image stretched over 64 × 64 device pixels looks soft. So an emoji is drawn twice, at scale 1 and scale 2, and `cursorValue()` offers both:
+
+<Code file="experiments/CustomCursor/cursorImage.ts" name="cursorValue" />
+
+`image-set()` lists images with the density each is for, and the browser picks the one that matches the screen. Not every browser takes `image-set()` in a cursor, and a cursor value the browser doesn't understand is thrown away whole. So it asks first, with `CSS.supports()`, and uses the plain `url()` when the answer is no. An image address and an SVG have no second image (`twoX` is `null`), so they always get the plain `url()`. Either way, the line ends with the hotspot and `, auto`.
+
+### Try it
+
+This calls the real `clampSize()`, `hotspotFor()`, `drawText()`, and `cursorValue()`, as Custom cursor does for an emoji. The images are enlarged with their pixels kept square, so you can see the 2x one is sharper. Try a size over 128, or an exact hotspot outside the image.
+
+<Unstyled>
+  <MakeCursor />
+</Unstyled>
+
+## 5. The component
+
+<Code file="experiments/CustomCursor/CustomCursor.tsx" name="CustomCursor" />
+
+### Making the value
+
+The first `useLayoutEffect` makes the cursor value. It runs after React has put the component on the page, because it needs things that only exist there: a canvas to draw on, the text color around it, and the rendered `<svg>` of an icon.
+
+- No `cursor`, or an empty one: the value is `null`, the normal cursor.
+- An image address: `cursorValue(cursor, null, spot)`.
+- Other text: drawn at scale 1 and 2, then `cursorValue(oneX, twoX, spot)`.
+- An icon: found as the `<svg>` inside the hidden `custom-cursor__icon` span, then copied with `svgToDataUrl()`.
+
+It runs again only when `cursor`, the size, the hotspot, or `color` changes. A hotspot like `{ x: 4, y: 2 }` is a new object on every render, even when the numbers are the same, which would redraw the image each time. So the effect watches `spotKey`, the hotspot as text (`"4,2"`), which only changes when the numbers do.
+
+The value goes into state, and `onCursorChange` reports it. The Picker story uses that to show the image at its real size, with the hotspot marked.
+
+### Over its children
+
+With `scope="children"`, the default, the component's own `<div>` gets the value in `--custom-cursor`, and `data-custom-cursor` set to `keep` or `replace`. The CSS (section 6) does the rest.
+
+### Over the whole page
+
+With `scope="page"`, the value goes on `<html>` instead. But two Custom cursors could both want the page, and `<html>` can only have one cursor. So the module keeps a list of every page cursor, most recent last:
+
+<Code file="experiments/CustomCursor/CustomCursor.tsx" name="pageCursors" />
+
+<Code file="experiments/CustomCursor/CustomCursor.tsx" name="showTopPageCursor" />
+
+The third `useLayoutEffect` adds this cursor to the end of the list and shows the last one. When the component goes away, or its value changes, the effect's cleanup takes it back out and shows whatever is last now. Say a page has a 🌭 cursor, then opens a panel with a 👀 one:
+
+1. 🌭 mounts. The list is [🌭], and the page shows 🌭.
+2. 👀 mounts. The list is [🌭, 👀], and the page shows 👀.
+3. The panel closes, and 👀 goes. The list is [🌭], and 🌭 comes back, instead of the page losing its cursor.
+
+A cursor whose value changes is taken out and added again, so it moves to the end of the list and shows.
+
+## 6. The CSS
+
+<Code file="experiments/CustomCursor/custom-cursor.css" />
+
+- **`[data-custom-cursor]`** sets `cursor` from `--custom-cursor`. An element without its own `cursor` uses its parent's, so everything inside takes it on.
+- **Keep, the default.** Buttons and links set their own cursor, the pointing hand, and disabled controls show not-allowed. Those still win, so it stays clear what can be clicked.
+- **Replace.** `cursor: inherit !important` on every element inside, and on their `::before` and `::after`, makes each one use its parent's cursor, all the way down from the one with `data-custom-cursor`. `!important` is what lets it win over the components' own rules. `::before` and `::after` are covered too, in case a component ever gives one of them its own cursor. None does today: their pseudo-elements, such as the Button's `::after` that makes it easier to hit, take the cursor from their element.
+- **The hidden icon** is shrunk to 1 pixel and clipped, so it's on the page and has a real `<svg>` to copy, but nobody sees it. It's `aria-hidden` too, so screen readers skip it.
+
+Phones and tablets have no cursor, so nothing changes there.
+
+## The whole files
+
+<details>
+<summary><code>cursorImage.ts</code></summary>
+
+<Code file="experiments/CustomCursor/cursorImage.ts" />
+
+</details>
+
+<details>
+<summary><code>CustomCursor.tsx</code></summary>
+
+<Code file="experiments/CustomCursor/CustomCursor.tsx" />
+
+</details>
+
+<details>
+<summary><code>custom-cursor.css</code></summary>
+
+<Code file="experiments/CustomCursor/custom-cursor.css" />
+
+</details>

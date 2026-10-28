@@ -70,7 +70,7 @@ export function rybFromRgb(rgb: Rgb): Ryb {
 }
 
 /** Whether a color has no hue to speak of */
-const gray = ([r, g, b]: Rgb) => Math.max(r, g, b) - Math.min(r, g, b) < 0.03;
+export const gray = ([r, g, b]: Rgb) => Math.max(r, g, b) - Math.min(r, g, b) < 0.03;
 
 /**
  * `a` and `b` mixed like paint, `t` of the way from `a` (0) to `b` (1). Halfway between red and blue is purple.

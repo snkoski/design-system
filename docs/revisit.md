@@ -210,3 +210,38 @@ Raised while making components neutral (2026-10-27).
 **To decide:** look at hot dog buttons pressed and at rest. If the press doesn't read, try a ketchup shadow under black buttons only (a `shadow` token change in hot dog), and check it on a ketchup `brand` band.
 
 Raised while making components neutral (2026-10-27).
+
+## Color transitions and the "transform and opacity only" rule
+
+**Today:** CLAUDE.md and `docs/brand/motion.md` say to animate only `transform` and `opacity`. But every component fades its state colors over `--duration-fast`: Button, Checkbox, Radio, and Switch transition `background-color`, `border-color`, and `box-shadow` (Button also `color`), Input and TextArea transition `border-color` and `box-shadow`, and SegmentedControl transitions its edge, label color, and highlight. The How it works pages describe what the code does.
+
+**Why it's in question:** the rule and the code disagree, so one of them is wrong. The rule exists because `transform` and `opacity` can run on the compositor without repainting. A 100ms color fade on a small control costs very little, and turning it off would make hover and checked states snap.
+
+**To decide:** whether to change the rule to allow short color, border, and shadow fades on state changes (keeping layout properties like width, height, top, and left banned), or to remove those transitions so the code follows the rule. Either way, update `motion.md` and CLAUDE.md to match.
+
+Raised while writing the components' How it works pages (2026-10-28).
+
+## A field that re-checks on blur can make the submit button miss a click
+
+**Today:** `docs/brand/forms.md` says to validate on submit, and after a failed submit a field may re-check itself when the person leaves it. The demos on the Input and TextArea How it works pages do this.
+
+**Why it's in question:** pressing the submit button is what makes the field lose focus. If the fix made the field valid, its error disappears between pressing and releasing, everything below it moves up by the error's height, and the submit button moves out from under the pointer. A click on its lower part then does nothing, because the press and release land on different elements. It happens in any form that follows the rule, not just the demos.
+
+**To decide:**
+- Re-check while typing instead of on leaving the field, once a field has shown an error. The error then goes away as soon as it's fixed, before anyone reaches for the button.
+- Or keep the space an error took until the next submit, so nothing below moves.
+- Or leave errors in place until the next submit, and drop re-checking on blur.
+
+Then update `forms.md` and the Input and TextArea demos.
+
+Raised while writing the components' How it works pages (2026-10-28).
+
+## Showing whether a hidden input is checked in the live HTML view
+
+**Today:** the How it works pages' live HTML view (`src/how-it-works/Inspect.tsx`) shows the attributes in the page. For a checkbox, radio, or switch, the hidden `<input>` that forms read keeps the `checked` attribute it started with. Whether it's checked now is a property the browser keeps, which never appears in the HTML, so the view can't show it. The Switch and Radio group pages explain this in words.
+
+**Why it's in question:** the hidden input is what a form sends, so watching it change would make the pages clearer. But the view's promise is "the HTML it renders now", and a property isn't HTML.
+
+**To decide:** whether to show live properties (`checked`, and maybe `value` for text fields) next to the attributes, marked so they can't be mistaken for HTML, or to keep the view to real HTML and leave the explanation to the pages.
+
+Raised while writing the components' How it works pages (2026-10-28).

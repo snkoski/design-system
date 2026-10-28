@@ -9,7 +9,7 @@ export interface Charged {
 }
 
 /** How hard two charges of 1 pull or push: the acceleration at 100px apart is PULL / 100², 600px per second per second */
-const PULL = 6_000_000;
+export const PULL = 6_000_000;
 
 /** Roughly the distance between two things' centers when they touch */
 function touching(a: Charged, b: Charged) {

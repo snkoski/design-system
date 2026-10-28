@@ -1,0 +1,6 @@
+/* TextArea's "How it works" demos */
+
+/* What the form sent keeps its \n visible and wraps on a phone */
+.how-text-area__sent {
+  overflow-wrap: anywhere;
+}

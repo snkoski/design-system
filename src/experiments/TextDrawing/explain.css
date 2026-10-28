@@ -1,0 +1,36 @@
+/* The "How it works" page's demos for Text drawing. The panel and steps come from src/how-it-works/demo.css. */
+.text-drawing-explain__editor .text-area__control {
+  font-family: var(--font-mono);
+  white-space: pre;
+}
+
+.text-drawing-explain__scroll {
+  overflow-x: auto;
+}
+
+.text-drawing-explain__table {
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+.text-drawing-explain__table th,
+.text-drawing-explain__table td {
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--border-thin) solid var(--border);
+  text-align: start;
+  vertical-align: top;
+}
+.text-drawing-explain__table th {
+  font-weight: 600;
+}
+
+.text-drawing-explain__swatch {
+  display: block;
+  width: var(--space-10);
+  height: var(--space-10);
+  border: var(--border-thin) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.text-drawing-explain__table code {
+  white-space: nowrap;
+}

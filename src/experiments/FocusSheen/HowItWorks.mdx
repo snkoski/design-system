@@ -1,0 +1,145 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as FocusSheenStories from "./FocusSheen.stories";
+import { Code } from "../../how-it-works/Code";
+import { Scrub } from "./explain";
+
+<Meta of={FocusSheenStories} name="How it works" />
+
+# How Focus sheen works
+
+When a control inside `<FocusSheen>` gets keyboard focus, a band of light sweeps across it once, like light catching a surface. It's almost all CSS. Two files, plus one shared with other experiments:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>FocusSheen.tsx</code></td><td>The wrapper. A <code>div</code> with the class <code>focus-sheen</code>, and nothing else.</td></tr>
+    <tr><td><code>focus-sheen.css</code></td><td>Everything you see: the band, when it plays, how it moves, and when it stays hidden.</td></tr>
+    <tr><td><code>decoration.css</code></td><td>Shared by the experiments. It sets <code>--experiment-decoration</code> to 1 normally and 0 for people who've asked for reduced motion.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demo uses the real CSS.
+
+## 1. The wrapper
+
+<Code file="experiments/FocusSheen/FocusSheen.tsx" name="FocusSheen" />
+
+An experiment may not change a component. So Focus sheen can't add the band to the Button's own CSS. Instead, it reaches into the components from outside: the wrapper gives everything inside it a class to hang rules on, and the CSS finds each control's focusable part by its class name. Take the wrapper away and the components are exactly as they were.
+
+## 2. The CSS
+
+This is the whole of it. The sections below go through it rule by rule.
+
+<Code file="experiments/FocusSheen/focus-sheen.css" />
+
+Everything is inside `@layer components`, the same cascade layer as the components' own CSS. A cascade layer is a named group of rules, and the design system orders them `theme, base, components, utilities`, so a Tailwind utility in the markup can still override these rules.
+
+### The band's color
+
+The first rule, `.focus-sheen`, sets `--focus-sheen-color` to `var(--white)`. It's a custom property, set on the wrapper, so everything inside can read it. The band is white in every theme. To change it for one section, set `--focus-sheen-color` on a wrapper or anything inside it.
+
+### Making the band: `::before`
+
+The second rule draws the band. Its selector is `.focus-sheen :is(.button, .checkbox__box, .switch__track, .radio__circle, .input__box)::before`. Read it in three parts:
+
+- **`.focus-sheen ` with a space after it** means "anywhere inside the wrapper", at any depth.
+- **`:is(…)`** matches any one of the classes in it. It saves writing the rule out five times. These are the parts of each control that are drawn as the control: the Button itself, a Checkbox's box, a Switch's track, a Radio's circle, and the box around an Input.
+- **`::before`** is a pseudo-element: an extra box the browser draws as the first child of the element, without any HTML for it. The band is drawn on it.
+
+Why those parts? Each one already has `position: relative` and leaves its `::before` free, so the band can use both without changing the component. The Input is the odd one: an `<input>` can't have pseudo-elements at all, so the band goes on the `.input__box` around it. A SegmentedControl isn't in the list, because its options draw their fill with `::before` already.
+
+The declarations, in order:
+
+- **`content: ""`** makes the pseudo-element exist. Without `content`, there's no `::before`.
+- **`position: absolute` and `inset: 0`** stretch it over the whole control: 0 from each edge of the nearest positioned ancestor, which is the control itself.
+- **`z-index: 1`** puts it in front of the control's own content, such as a checkbox's tick or a switch's thumb, so the light passes over them too.
+- **`border-radius: inherit`** gives it the control's rounded corners. A background is clipped to its element's corners, so the band never shows outside a round radio or a pill-shaped switch.
+- **`background: linear-gradient(110deg, transparent 40%, var(--focus-sheen-color) 50%, transparent 60%) no-repeat`** is the band. A linear gradient blends colors along a line; at 110° the line runs right and a little down, so the band leans like a reflection. It's see-through up to 40% of the way along, solid white at 50%, and see-through again from 60%: a soft stripe one fifth of the image wide. `no-repeat` draws the image once.
+- **`background-size: 250% 100%`** makes that gradient image two and a half times as wide as the control, and as tall. The extra width is what lets the band start and finish off the control's edges (section 3).
+- **`background-position: 50% 0`** is where it rests. It's hidden at rest, so this never shows.
+- **`opacity: 0`** hides it until focus.
+- **`pointer-events: none`** lets clicks pass through it to the control.
+
+### When it plays
+
+The third rule starts the animation. It has two selectors, separated by a comma: the same four parts with `:focus-visible` added, and the Input's box with `:has(> .input__control:focus-visible)`.
+
+- **`:focus-visible`** matches an element with focus that the browser thinks should show it: after Tab, but usually not after a mouse click. So the sheen plays for keyboard users, the ones who need to see where focus went, and doesn't flash on every click.
+- **The Input** can't use this directly: the input has the focus, but the band is on the box around it. `:has(> .input__control:focus-visible)` matches a box that has, as a direct child (`>`), an input with keyboard focus. `:has()` lets a rule depend on what's inside an element.
+
+Its one declaration, `animation`, is a shorthand. It runs the `sheen` keyframes once, for `--sheen-duration`, with the easing `--sheen-ease`. Neither is set anywhere in the design system, so each falls back to the value after its comma: `--duration-slow`, 320 ms, and `--ease-in-out`. The stories set them to compare speeds and easings.
+
+A CSS animation starts when its rule starts matching. When focus leaves, the rule stops matching and the animation goes away, so the next time the control gets focus, it plays again from the start.
+
+## 3. The sweep: `@keyframes sheen`
+
+Keyframes list values at points through the animation, and the browser fills in the moments between. `sheen` has three: `from` (the start), `50%`, and `to` (the end). Two things change.
+
+### The position
+
+A percentage in `background-position` doesn't move the image by that much. It lines up the point that far across the image with the point that far across the control. At `0%`, their left edges line up. At `100%`, their right edges line up. In between, the image moves `(control width − image width) × percentage`. The image is 2.5 control widths wide, so that's `−1.5 × percentage` control widths.
+
+The band's middle is halfway across the image, 1.25 control widths from its left edge. So, measured in control widths from the control's left edge:
+
+<table>
+  <thead>
+    <tr><th><code>background-position</code></th><th>Image's left edge</th><th>Band's middle</th><th>The band is</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>100% (the start)</td><td>−1.5</td><td>−1.5 + 1.25 = −0.25</td><td>just off the left edge</td></tr>
+    <tr><td>50% (halfway)</td><td>−0.75</td><td>−0.75 + 1.25 = 0.5</td><td>over the middle</td></tr>
+    <tr><td>0% (the end)</td><td>0</td><td>0 + 1.25 = 1.25</td><td>just off the right edge</td></tr>
+  </tbody>
+</table>
+
+So going from `100%` to `0%` carries the band from left to right, which is why the numbers look backwards. Without the extra width, a background the same size as the control can't move at all: every percentage lines up the same.
+
+### The brightness
+
+Opacity goes from 0 up to 0.6 at the halfway point, and back down to 0. The band fades in as it enters, is brightest over the middle, and fades out as it leaves, so it never pops in or out at an edge. Its brightest is 0.6, not 1, so it's a glint rather than a white flash.
+
+### The easing
+
+The easing applies to each stretch between keyframes for each property, not to the whole animation. `background-position` has keyframes only at the start and the end, so the band eases once: slow off the left edge, fast through the middle, slow at the right. `opacity` has three keyframes, so it eases twice: once up to the middle, and once back down.
+
+### Why `background-position` and not `transform`
+
+The design system's motion rules say to animate only `transform` and `opacity`, because the browser can move and fade an element without redrawing it. This breaks that rule on purpose. A band that moved with `transform` would have to be an element inside the control, clipped by the control's shape. The `::before` can't contain anything, so there's nowhere to put one. Moving the background inside the `::before` keeps it clipped to the control's corners. The cost is that the browser repaints the control on each frame of the sweep, which is fine for one small control for 320 ms.
+
+### Try it
+
+This is the real wrapper, the real `::before`, and the real `sheen` keyframes, on a picture of a button, held still at the moment you choose. The facts underneath are what the browser computes for the `::before` at that moment, and the diagram draws the gradient image sliding behind the control. Halfway through the time isn't halfway across: that's the easing.
+
+<Unstyled>
+  <Scrub />
+</Unstyled>
+
+## 4. Reduced motion
+
+The band's brightest opacity is `0.6 × --experiment-decoration`. `decoration.css` sets that to 0 for people who've asked their system for reduced motion, or under any element with `data-motion="reduced"`:
+
+<Code file="experiments/decoration.css" />
+
+With 0, every keyframe's opacity is 0. The animation still runs, but there's nothing to see. A single multiplication switches it off, so there's no separate reduced-motion rule to keep in step. The focus outline is untouched, so focus still shows: the ReducedMotion story checks both.
+
+## 5. Forced colors
+
+The last block, `@media (forced-colors: active)`, gives the band's `::before` `display: none`. Windows forced-colors mode, such as a Contrast theme, replaces the page's colors with a small fixed palette. A band of light means nothing there, so the `::before` isn't drawn at all. The block also sets `--focus-sheen-color` to white again, the same as outside it, so that line changes nothing.
+
+## The whole files
+
+<details>
+<summary><code>FocusSheen.tsx</code></summary>
+
+<Code file="experiments/FocusSheen/FocusSheen.tsx" />
+
+</details>
+
+<details>
+<summary><code>focus-sheen.css</code></summary>
+
+<Code file="experiments/FocusSheen/focus-sheen.css" />
+
+</details>

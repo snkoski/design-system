@@ -1,0 +1,66 @@
+/* Look at's "How it works" demos, beyond the shared panel in src/how-it-works/demo.css */
+
+/* An area with an arrow at its center, which the pointer moves over */
+.aim-pad {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  height: auto;
+  overflow: hidden;
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: crosshair;
+  touch-action: none;
+}
+.aim-pad__axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.aim-pad__reach {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.aim-pad__arc {
+  fill: none;
+  stroke: var(--ink-muted);
+  stroke-width: 2;
+}
+.aim-pad__arrow {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.aim-pad__arrow path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Long enough to see which way round each turn goes */
+.aim-pad__arrow[data-turning] {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+.aim-pad__pointer {
+  fill: var(--ink);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+/* Two arrows side by side */
+.aim-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-4);
+}
+.aim-pair__item {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  text-align: center;
+}
+.aim-pair .aim-pad {
+  max-width: 16rem;
+}

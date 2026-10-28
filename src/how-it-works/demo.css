@@ -1,0 +1,187 @@
+/* Shared look for the live demos on "How it works" pages: a panel, sliders, worked steps, and charts */
+.explain {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  padding: var(--space-5);
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+.explain code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+/* Inline code written in MDX (a hint, say) brings Storybook's own colors, which don't follow the theme */
+.explain p code,
+.explain li code {
+  color: inherit;
+  background: var(--track);
+  border-color: var(--border);
+}
+
+.explain__controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-3) var(--space-6);
+  align-items: end;
+}
+
+.explain-slider {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+}
+.explain-slider__label {
+  font-weight: 600;
+}
+.explain-slider__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.explain-slider input {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: var(--target-min);
+  margin: 0;
+  accent-color: var(--action);
+}
+
+.explain__note,
+.explain__readout,
+.explain__result {
+  margin: 0;
+}
+.explain__note,
+.explain__readout {
+  color: var(--ink-muted);
+}
+.explain__readout {
+  font-variant-numeric: tabular-nums;
+}
+.explain__result {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--track);
+}
+
+.explain__steps,
+.explain__facts {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline-start: var(--space-6);
+}
+
+.explain-chart {
+  margin: 0;
+}
+.explain-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.explain-chart__title {
+  font-weight: 600;
+}
+.explain-chart__unit {
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.explain-chart__grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.explain-chart__tick {
+  fill: var(--ink-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.explain-chart__line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.explain-chart__bounce,
+.explain-chart__point {
+  fill: var(--ink);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.explain-chart__cursor {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+}
+.explain-chart__hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+/* Inspect: a real component, and the HTML it renders now */
+.explain-inspect__stage {
+  padding: var(--space-5);
+  border: var(--border-thin) dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.explain-inspect {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  min-width: 0;
+}
+.explain-inspect__title {
+  font-weight: 600;
+}
+.explain-inspect__key {
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.explain-inspect__code {
+  margin: 0;
+  padding: var(--space-3);
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  background: var(--track);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: 1.6;
+  white-space: pre;
+}
+.explain-inspect__code > div {
+  /* Long tags wrap under themselves, indented a little more than their first line (Inspect sets the padding) */
+  white-space: normal;
+  text-indent: -2ch;
+}
+.explain-inspect__tag {
+  font-weight: 600;
+}
+.explain-inspect__value,
+.explain-inspect__text {
+  color: var(--ink-muted);
+}
+.explain-inspect__attribute {
+  white-space: nowrap;
+}
+.explain-inspect__attribute[data-removed] {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--ink-muted);
+}
+.explain-inspect__attribute[data-changed] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+.explain-inspect__attribute[data-changed] .explain-inspect__value {
+  color: var(--ink);
+}

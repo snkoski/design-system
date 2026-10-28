@@ -1,0 +1,70 @@
+/* Orbits' "How it works" demos: views from above of a star and a planet, beside the worked steps or the charts.
+   The rest comes from src/how-it-works/demo.css. Experiment. */
+/* The Launch demo's steps beside its picture, and the Orbit demo's path beside its charts. Stacked when narrow. */
+.orbit-explain__launch,
+.orbit-explain__trace {
+  display: grid;
+  gap: var(--space-4) var(--space-6);
+  align-items: start;
+}
+@media (min-width: 48em) {
+  .orbit-explain__launch {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+  }
+  .orbit-explain__trace {
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+  }
+}
+/* A control that needs the whole row: "Counterclockwise" doesn't fit in a column */
+.orbit-explain__wide {
+  grid-column: 1 / -1;
+}
+.orbit-explain__charts {
+  display: grid;
+  gap: var(--space-4);
+}
+.orbit-explain__view {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+.orbit-explain__view svg {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  height: auto;
+  overflow: visible;
+}
+.orbit-explain__small svg {
+  max-width: 18rem;
+}
+.orbit-explain__box {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+}
+.orbit-explain__orbit {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+.orbit-explain__radius {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+.orbit-explain__star {
+  fill: var(--ink-muted);
+}
+.orbit-explain__planet {
+  fill: var(--ink);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.orbit-explain__arrow {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.orbit-explain__head {
+  fill: var(--ink);
+}

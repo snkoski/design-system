@@ -16,7 +16,7 @@ const watchers = new Set<Watcher>();
 let pointer: { x: number; y: number } | null = null;
 
 /** The rotation that turns content drawn pointing up to face from `rect`'s center toward (or away from) the pointer */
-function targetAngle(rect: DOMRect, away: boolean, at: { x: number; y: number }) {
+export function targetAngle(rect: DOMRect, away: boolean, at: { x: number; y: number }) {
   const dx = at.x - (rect.left + rect.width / 2);
   const dy = at.y - (rect.top + rect.height / 2);
   if (dx === 0 && dy === 0) return null; // the pointer is on its center: keep facing the same way
@@ -24,7 +24,7 @@ function targetAngle(rect: DOMRect, away: boolean, at: { x: number; y: number })
 }
 
 /** `target`, moved by whole turns to be as close as possible to `previous` */
-function nearest(previous: number, target: number) {
+export function nearest(previous: number, target: number) {
   const delta = ((((target - previous) % 360) + 540) % 360) - 180;
   return previous + delta;
 }

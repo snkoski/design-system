@@ -15,9 +15,9 @@ import StarterKit from "@tiptap/starter-kit";
    email links are kept, and the formats the field doesn't offer (headings, rules, tables) load as plain text
    instead of failing. */
 
-const SCHEME = /^([a-z][a-z\d+.-]*):/i;
-const ALLOWED_SCHEMES = new Set(["http", "https", "mailto"]);
-const EMAIL = /^[^\s@/:]+@[^\s@/:]+\.[^\s@/:]+$/;
+export const SCHEME = /^([a-z][a-z\d+.-]*):/i;
+export const ALLOWED_SCHEMES = new Set(["http", "https", "mailto"]);
+export const EMAIL = /^[^\s@/:]+@[^\s@/:]+\.[^\s@/:]+$/;
 
 /** Whether a link address may be kept: absolute web (`http:`, `https:`) and email (`mailto:`) addresses only. */
 export function isAllowedHref(href: string): boolean {

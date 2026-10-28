@@ -1,0 +1,25 @@
+/* Switch's "How it works" demos: the two columns of the motion demo, and its two lines */
+.how-switch__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-4);
+}
+
+.how-switch__column {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.how-switch__heading {
+  margin: 0;
+  font-weight: 600;
+}
+
+.how-switch__line[data-motion-line="reduced"] {
+  stroke-dasharray: 6 5;
+}

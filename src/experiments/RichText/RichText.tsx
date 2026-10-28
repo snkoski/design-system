@@ -180,7 +180,7 @@ const BLOCKS: Tool[] = [
   { label: "Code block", icon: SquareCode, keys: ["Alt", "C"], isActive: (e) => inBlock(e, "codeBlock"), run: (c) => c.toggleCodeBlock() },
 ];
 
-const TOOLS = [...TEXT_STYLE, INLINE_CODE, ...BLOCKS];
+export const TOOLS = [...TEXT_STYLE, INLINE_CODE, ...BLOCKS];
 const LINK_KEYS: Tool["keys"] = ["K"];
 
 /** Mod is Cmd on a Mac and Ctrl elsewhere. Read after mounting, so the server and the first render agree. */

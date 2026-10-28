@@ -1,0 +1,397 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as Stories from "./RichText.stories";
+import { Code } from "../../how-it-works/Code";
+import { LinkCheck, Positions, RoundTrip } from "./explain";
+
+<Meta of={Stories} name="How it works" />
+
+# How Rich text works
+
+Rich text is a text field where formatting shows as you type: bold, italic, underline, strikethrough, inline code, links, quotes, lists, and code blocks. Its value is Markdown, the plain-text format where `**bold**` means bold and `- ` starts a list item. You see formatting; the form gets Markdown.
+
+It's built from four outside pieces. You'll meet each one below:
+
+- **ProseMirror** is the editing engine. It keeps the content as a tree of nodes, draws it into a `contenteditable` element (one the browser lets you type into), and turns everything you do into changes to that tree.
+- **Tiptap** is a friendlier layer over ProseMirror, with React bindings. Its features come as **extensions**: packages that each add a kind of content, commands, keyboard shortcuts, or behavior. Bold is one extension, and so are lists.
+- **marked** is a Markdown reader. Tiptap's `@tiptap/markdown` package uses it to turn Markdown into the editor's tree, and writes the tree back out as Markdown.
+- **Base UI** provides everything around the editing: the label and its links, the toolbar, the toggle buttons, the tooltips, and the link popover.
+
+The experiment's own code is three files, each with one job:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>markdown.ts</code></td><td>The editor's setup. Which extensions it has, the changes this field makes to them (underline as a tag, safe links only, no headings), how a link address is checked, and how the content is written out as Markdown. No React, so it can be tested without a browser.</td></tr>
+    <tr><td><code>RichText.tsx</code></td><td>The component. It creates the editor, draws the toolbar and the link editor, keeps the value in sync with React and with forms, and puts the label, description, and error on the editable area.</td></tr>
+    <tr><td><code>rich-text.css</code></td><td>How it looks: the box, the toolbar, each format inside the field, the growing height, the states, and the three themes.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too. Some of what runs, such as Bold's own rules, lives in Tiptap's packages; the page says where, and explains it, but can't show it.
+
+## 1. What the editor holds
+
+The editor doesn't hold Markdown, and it doesn't hold HTML. It holds a **document**: a tree of nodes. Block nodes are lines and containers (`doc`, `paragraph`, `blockquote`, `bulletList`, `listItem`, `codeBlock`). Inside them are text nodes. Formatting on text is a **mark**: a label on a run of text, such as `bold`, `italic`, or `link` (which also carries its address).
+
+So `Hi **Ada**` is held as:
+
+```text
+doc
+  paragraph
+    text "Hi "
+    text "Ada"   marks: bold
+```
+
+And a list item is a paragraph inside a `listItem` inside a `bulletList`. Marks are flat, not nested: bold italic text is one text node with two marks.
+
+The document and the selection together are the editor's **state**. Nothing changes the state directly. Every change, whether a typed letter, a toolbar button, or loading a new value, is a **transaction**: a description of the change (insert this, delete that, add this mark there) that ProseMirror applies to the old state to make a new one. The undo history is a list of transactions, which is how undo knows what to take back. Section 4 listens for transactions to keep the toolbar up to date.
+
+### Positions
+
+A selection is two numbers, `from` and `to`. ProseMirror counts through the document: each character is one position, and so is each step into or out of a node. In `Hi **Ada**`, position 0 is before the paragraph, 1 is just inside it, before the `H`, and the text runs to 7, after `Ada`. Leaving the paragraph makes 8, which is the end if that's all there is. With nothing selected, `from` and `to` are the same: that's the caret.
+
+This is an editor with the field's real extensions. Click in it, select some text, or press a button to see the positions, the path from the document down to the caret, and which formats are on there. The buttons run the real toolbar's commands (section 4).
+
+<Unstyled>
+  <Positions />
+</Unstyled>
+
+Things to try:
+
+- Put the caret in "one": it's inside `doc › bulletList › listItem › paragraph`, four levels deep, so it takes three steps in before the first letter.
+- Select everything with Cmd+A (Ctrl+A on Windows and Linux): the selection runs from 0 to the end, past every node.
+- Select "Ad" and toggle bold: the text splits into "Ad" without bold and "a" with it, but the positions don't move. Marks take no positions.
+- Toggle quote with the caret in "Hi": a `blockquote` wraps the paragraph. Its letters move up by one, since there's one more step in before them, and everything after the quote moves up by two.
+
+## 2. The setup: `richTextExtensions()`
+
+Everything the editor can do comes from this list. The field and its tests both use it, so the tests check exactly what the field runs.
+
+<Code file="experiments/RichText/markdown.ts" name="richTextExtensions" />
+
+- **StarterKit** is Tiptap's bundle of the usual extensions: paragraphs, bold, italic, strikethrough, inline code, quotes, lists, code blocks, line breaks, and undo. Some are switched off. Headings and horizontal rules aren't offered in a message field. Underline, links, and list items are switched off so this file can add its own versions of them. `trailingNode` would add an empty line after a final quote or list, which would make the field a line taller than its text.
+- **UnderlineTag**, **SafeLink**, **ListItemNoTab**, and the three `...As...` extensions change how things are read and written. They're in sections 5 and 6.
+- **PasteMarkdown** reads pasted text as Markdown (section 6), and **MarkedSelection** keeps text looking selected while the link editor is open (section 5).
+- **Markdown** is `@tiptap/markdown`. It gives the editor `editor.markdown`, which reads and writes Markdown.
+- **Placeholder** and the **link shortcut** are only added when they're used.
+
+`RichText.tsx` creates the editor once, with `useEditor`, passing `contentType: "markdown"` so its starting content is read as Markdown. `immediatelyRender: false` makes Tiptap wait until the component is in the browser, so a page rendered on a server draws the same thing first. The extensions are made once, in a `useMemo` with no dependencies. Anything they need from the latest props, such as the placeholder text or `onValueChange`, they read from a ref (`latest`), so a new prop never rebuilds the editor and loses what you typed.
+
+## 3. Typing
+
+When you type, the browser changes the `contenteditable` element, and ProseMirror notices. It reads what changed, turns it into a transaction, and redraws only the parts of the page that changed. React doesn't redraw the text: the component's render never touches the document.
+
+### Typed Markdown becomes formatting
+
+Typing Markdown formats it straight away. That's Tiptap's **input rules**, which come with each StarterKit extension. An input rule is a regular expression (a text pattern) checked against the text just before the caret each time you type a character. When it matches, its handler changes the document.
+
+Say you've typed `A **bold*` and type the last `*`. The text before the caret is now `A **bold**`, and Bold's rule matches it. In `@tiptap/extension-bold`, the pattern is `/(?:^|\s)(\*\*(?!\s+\*\*)((?:[^*]+))\*\*(?!\s+\*\*))$/`: a start of line or a space, then two stars, some text with no stars, and two stars, right at the caret. The handler deletes the four stars, adds the `bold` mark to "bold", and removes the "stored mark", so the next letter you type isn't bold. Press Backspace straight away and the rule is undone: the stars come back.
+
+<table>
+  <thead>
+    <tr><th>Type</th><th>And you get</th><th>From</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"**text**"}</code> or <code>{"__text__"}</code></td><td>Bold</td><td><code>extension-bold</code></td></tr>
+    <tr><td><code>{"*text*"}</code> or <code>{"_text_"}</code></td><td>Italic</td><td><code>extension-italic</code></td></tr>
+    <tr><td><code>{"~~text~~"}</code></td><td>Strikethrough</td><td><code>extension-strike</code></td></tr>
+    <tr><td><code>{"`text`"}</code></td><td>Inline code</td><td><code>extension-code</code></td></tr>
+    <tr><td><code>{"- "}</code>, <code>{"+ "}</code>, or <code>{"* "}</code> at the start of a line</td><td>Bulleted list</td><td><code>extension-list</code></td></tr>
+    <tr><td><code>{"1. "}</code> at the start of a line</td><td>Numbered list, starting at that number</td><td><code>extension-list</code></td></tr>
+    <tr><td><code>{"> "}</code> at the start of a line</td><td>Quote</td><td><code>extension-blockquote</code></td></tr>
+    <tr><td><code>{"```"}</code> then a space or Enter, at the start of a line</td><td>Code block</td><td><code>extension-code-block</code></td></tr>
+  </tbody>
+</table>
+
+Underline has no rule: standard Markdown has no underline, so there's nothing to type. Use the button or Cmd+U.
+
+### Keys
+
+Each StarterKit extension also brings its keyboard shortcuts. Tiptap writes them with `Mod`, which means Cmd on a Mac and Ctrl everywhere else: `Mod-b` is bold, `Mod-Shift-8` a bulleted list. The toolbar's tooltips show the same shortcuts (section 4).
+
+Two shortcuts belong to this file. Mod-K opens the link editor, but only while the field can be edited:
+
+<Code file="experiments/RichText/markdown.ts" name="linkShortcut" />
+
+And Tab always leaves the field. Tiptap's list items use Tab and Shift-Tab to indent and outdent, which would trap a keyboard user inside a list: Tab would never reach the next control. This version keeps only Enter, which splits the item in two (or, on an empty item, leaves the list):
+
+<Code file="experiments/RichText/markdown.ts" name="ListItemNoTab" />
+
+Enter never submits a form the field sits in. The editable area is a `div`, not an `<input>`, so the browser has no "press Enter to submit" for it. Enter adds a line, as in a text area.
+
+### After every change
+
+Tiptap calls the editor's `onUpdate` after every transaction that changes the document (not when only the caret moves). `RichText` writes the document out with `toMarkdown()`, keeps that in state for the form, and calls `onValueChange` if it's different from what it last reported. Section 7 explains why it checks.
+
+<Code file="experiments/RichText/markdown.ts" name="toMarkdown" />
+
+`toMarkdown()` fixes two things about Tiptap's own `getMarkdown()`. A field with no text at all is always `""`, even when it holds an empty list item or quote. And there's never trailing whitespace: `getMarkdown()` can end with blank lines after a list or code block, and a value of `"- one\n- two\n\n"` would make "is it empty?" and "has it changed?" checks wrong.
+
+## 4. Formatting with the toolbar
+
+Each toolbar button is described once, as a `Tool`:
+
+<Code file="experiments/RichText/RichText.tsx" name="Tool" />
+
+- `keys` is its shortcut, always with Mod. `["Shift", "S"]` means Mod-Shift-S.
+- `isActive` answers "is this format on where the caret is?", for the button's pressed state.
+- `run` adds the button's command to a **chain**. A chain collects several commands and runs them as one transaction, so one undo takes them all back.
+
+Inline code is a typical one:
+
+<Code file="experiments/RichText/RichText.tsx" name="INLINE_CODE" />
+
+The text styles (bold, italic, underline, and strikethrough) and the blocks (quote, bulleted list, numbered list, and code block) are lists of tools like it, and every button the toolbar draws comes from them:
+
+<Code file="experiments/RichText/RichText.tsx" name="TOOLS" />
+
+### Running a tool
+
+Pressing a button runs `tool.run(editor.chain().focus()).run()`. For Bold, that's `editor.chain().focus().toggleBold().run()`:
+
+1. `focus()` puts focus back in the field. With a mouse, focus never left: the button cancels `mousedown`, which is what would move focus to it. With the keyboard, focus is on the button, and this sends you back to the text so you can carry on typing.
+2. `toggleBold()` looks at the selection. If all of it is bold, it takes bold off; otherwise it puts bold on all of it. With nothing selected, it sets a **stored mark** instead: nothing changes yet, but the next letters you type are bold.
+3. `run()` sends the transaction.
+
+The block tools work on whole lines. `toggleBlockquote()` wraps every line in the selection in a `blockquote`, or lifts them out of one. The list tools do the same with a list and its items, and `toggleCodeBlock()` turns the lines into a code block, or back into paragraphs.
+
+### Which buttons are on
+
+Each button shows whether its format is on where the caret is, as a pressed state. `useActiveFormats()` asks every tool's `isActive` after every transaction:
+
+<Code file="experiments/RichText/RichText.tsx" name="useActiveFormats" />
+
+Moving the caret is a transaction too, so the buttons follow the caret. It only stores a new object when something changed, so React doesn't redraw the toolbar for every letter you type.
+
+Bold, italic, and the other marks use Tiptap's `editor.isActive("bold")`. The block tools use `inBlock()` instead, because Tiptap's check gets one case wrong. Select everything with Mod-A in a field that's all quote, and Tiptap says the quote isn't on: with everything selected, the selection's ends sit at the very edges of the document, outside every node. So pressing Quote would quote it again instead of taking the quote off.
+
+<Code file="experiments/RichText/RichText.tsx" name="inBlock" />
+
+`inBlock()` asks about every line instead. `nodesBetween` visits each node the selection touches. For each **textblock** (a node that holds text directly: a paragraph or a code block) it counts a line, then walks up from that line to the document, looking for the block type. `doc.resolve(pos + 1)` is the position just inside the line, and `$line.node(depth)` is each node around it, from the innermost out. It's on only when every line is inside one.
+
+### The buttons themselves
+
+Each button is three Base UI parts on one element, combined with Base UI's `render` prop, which merges one component's behavior into another's element:
+
+- `Toggle` makes it a toggle button, with `aria-pressed` saying whether it's on.
+- `Toolbar.Button` makes it part of the toolbar's keyboard navigation (section 8).
+- `Tooltip.Trigger` shows its name and shortcut when you hover or focus it.
+
+<Code file="experiments/RichText/RichText.tsx" name="ToolButton" />
+
+The shortcut is written two ways: for `aria-keyshortcuts`, which tells screen readers about it, and for people to read in the tooltip.
+
+<Code file="experiments/RichText/RichText.tsx" name="shortcut" />
+
+So `["Shift", "S"]` becomes `Control+Shift+S` and `Ctrl+Shift+S` on Windows, and `Meta+Shift+S` and `⌘⇧S` on a Mac. Which one is decided after the component is in the browser, by `useIsMac()`. A server can't know, so the first render always says Ctrl, and the two agree:
+
+<Code file="experiments/RichText/RichText.tsx" name="useIsMac" />
+
+## 5. Links
+
+The link button, or Mod-K, sets `linkOpen`, which opens a Base UI popover under the button. The popover moves focus into it when it opens and back to the field when it closes. When nothing is selected, it asks for the link's text as well as its address.
+
+### Keeping the selection visible
+
+When focus moves into the popover, the browser stops showing the field's selection, so you can't see which text the link will go on. `MarkedSelection` draws it instead, with a ProseMirror **decoration**: styling drawn over the document without changing it. It's a plugin that holds a set of decorations in the editor's state.
+
+<Code file="experiments/RichText/markdown.ts" name="MarkedSelection" />
+
+`apply` runs for every transaction. A transaction carrying a range (as "meta", extra information attached to it) replaces the decoration with one covering that range, with the class `rich-text__selection`. One carrying `null` clears it. Any other transaction **maps** the decoration: if you type before it, the mapping moves it along, so it still covers the same text.
+
+`RichText` calls these when the popover opens and closes. `addToHistory: false` keeps them out of the undo history, since they don't change the content.
+
+<Code file="experiments/RichText/markdown.ts" name="markSelection" />
+
+<Code file="experiments/RichText/markdown.ts" name="unmarkSelection" />
+
+### Saving a link
+
+<Code file="experiments/RichText/RichText.tsx" name="LinkForm" />
+
+Say you selected "the brief", typed `example.com`, and pressed Enter:
+
+1. `normalizeHref("example.com")` returns `"https://example.com"` (below).
+2. `extendMarkRange("link")` widens the selection to the whole of any link the caret is in. It's how editing an existing link changes all of it, even with only the caret inside it.
+3. `setLink({ href })` puts the `link` mark, with that address, on the selection.
+
+With nothing selected, there's no text to put the mark on, so `insertContent` adds a new text node that already has the mark, using the address as its text if you left Text empty. Then `unsetMark("link")` clears the stored mark, or the next thing you type would be part of the link. Saving an existing link with an empty address removes it.
+
+The form is in a portal, rendered at the end of the page, but React passes its events up through the component tree. `event.stopPropagation()` stops its submit from also submitting a form the field sits in.
+
+### Checking an address
+
+The link editor accepts what people really type, such as `example.com` or `me@example.com`, but only ever saves web and email addresses. `normalizeHref()` fills in what's missing, then `isAllowedHref()` decides:
+
+<Code file="experiments/RichText/markdown.ts" name="normalizeHref" />
+
+<Code file="experiments/RichText/markdown.ts" name="isAllowedHref" />
+
+They use three patterns. A **scheme** is the part of an address before its first colon, such as `https` or `mailto`, and it says what kind of address it is. `javascript:` is a scheme too, and a link with it runs code when clicked, which is why only three are allowed.
+
+<Code file="experiments/RichText/markdown.ts" name="SCHEME" />
+
+<Code file="experiments/RichText/markdown.ts" name="ALLOWED_SCHEMES" />
+
+<Code file="experiments/RichText/markdown.ts" name="EMAIL" />
+
+`isAllowedHref()` then asks the browser to read the address with `new URL()`, and checks that a web address has a host and an email address has someone to write to. `https://` alone fails: the browser can't read it as an address at all.
+
+Try an address. Each step is one part of `normalizeHref()` and `isAllowedHref()`, in order, and the last line is what the real functions returned.
+
+<Unstyled>
+  <LinkCheck />
+</Unstyled>
+
+Things to try:
+
+- `example.com:8080/path`. The scheme pattern matches `example.com`, but a scheme never has a dot, so it's treated as a host and port and gets `https://`.
+- `/settings` or `#top`. Addresses inside the same site are refused: the field's Markdown might be shown on another site, where they'd point somewhere else.
+- `example.com` again, and look at the last line. In the link editor it becomes a link, but loaded as Markdown, `[text](example.com)` keeps only its text: Markdown is checked as it is, with nothing filled in.
+
+### Safe links, wherever they come from
+
+Links reach the editor three ways: typed in the link editor, pasted, or loaded as Markdown. `SafeLink` checks all three.
+
+<Code file="experiments/RichText/markdown.ts" name="SafeLink" />
+
+- `isAllowedUri` is Tiptap's own check, used for links that are pasted, typed, or found by **autolink** (which turns a typed web address into a link when you type the space after it).
+- `parseMarkdown` checks links loaded from Markdown, because Tiptap's Markdown reader skips `isAllowedUri`. A link that fails keeps its text and loses the mark: `[click](javascript:alert(1))` loads as "click".
+- `openOnClick: false` means clicking a link while editing puts the caret in it rather than following it. A read-only field isn't editable, so the browser follows its links itself, in a new tab (`target: "_blank"`).
+
+## 6. Markdown in and out
+
+### Reading Markdown
+
+Loading Markdown (the starting value, a new `value`, or a paste) goes through `editor.markdown.parse()` in three stages:
+
+1. **Tokens.** marked's **lexer** splits the text into tokens: a `paragraph` token, a `list` token, and inside them inline tokens such as `text`, `strong`, `em`, and `link`. Each token records the text it matched (`raw`).
+2. **Nodes.** Each token type is handed to the extension that registered for it. Its `parseMarkdown` returns the matching nodes and marks: `strong` becomes text with a `bold` mark.
+3. **The document.** ProseMirror builds a document from those nodes. Its **schema**, the rules for which nodes can go where, which StarterKit and the other extensions define, keeps anything that doesn't fit out.
+
+So `Hi __Ada__` becomes a `paragraph` token holding `text "Hi "` and `strong "__Ada__"`, then a paragraph holding "Hi " and "Ada" with a bold mark.
+
+### Writing Markdown
+
+`getMarkdown()` goes the other way. It walks the document, and each node and mark writes itself with its `renderMarkdown`: bold as `**`, italic as `*`, and list items with `- `. There's one way to write each thing, so Markdown that went in written another way comes out rewritten: `__bold__` comes back as `**bold**`, and `* item` as `- item`. The text and formatting are the same; only the spelling changes.
+
+### What this field changes
+
+**Underline** isn't in standard Markdown. This field stores it as the HTML tag `<u>`, which Markdown allows and which renders anywhere HTML does. `UnderlineTag` teaches marked to read it and Tiptap to write it:
+
+<Code file="experiments/RichText/markdown.ts" name="UnderlineTag" />
+
+`start` tells marked where an underline might begin, so it can stop a plain text token there. `tokenize` gets the rest of the text from that point. If it starts with `<u>…</u>`, it returns an `underline` token. `raw` is the text it used up, and `tokens` reads what's inside as Markdown too, so `<u>**both**</u>` is underlined and bold. Writing puts the tags back around the content. Marks come out in a fixed order, with bold outside underline, so `<u>**b**</u>` comes back as `**<u>b</u>**`.
+
+**Formats the field doesn't offer** still load, as something it does, instead of failing. `loadAs()` makes an extension that only reads one token type:
+
+<Code file="experiments/RichText/markdown.ts" name="loadAs" />
+
+A heading becomes a plain paragraph with its text and formatting (`HeadingAsParagraph`, so `# Title` becomes `Title`). A horizontal rule becomes an empty line, and a table becomes a paragraph per row, with two spaces between cells:
+
+<Code file="experiments/RichText/markdown.ts" name="RuleAsEmptyLine" />
+
+<Code file="experiments/RichText/markdown.ts" name="TableAsText" />
+
+**HTML** in the Markdown is read through the schema's rules for HTML, the same ones a paste uses. Tags for formats the field has become those formats (`<b>hi</b>` becomes `**hi**`), other tags are dropped but keep their text, and a `<script>` is dropped, text and all. An image keeps its description as text.
+
+### Try a round trip
+
+Type Markdown, or load an example. You'll see each stage: marked's tokens, the document the editor builds, what `toMarkdown()` writes back, and the real field drawing it.
+
+<Unstyled>
+  <RoundTrip />
+</Unstyled>
+
+Things to try:
+
+- **Load rewrites.** The tokens say `strong "__Bold__"`, but it's written back as `**Bold**`.
+- **Load what's left out.** The `heading`, `hr`, and `table` tokens all become paragraphs in the document.
+- **Load unsafe parts.** The `link` token is there, but the document has only its text, and the `span` and `script` are gone.
+- Type `-` alone. The document has an empty list item, and the written value is an empty string.
+
+### Pasting
+
+When you paste, the browser hands over the clipboard as plain text, HTML, or both. ProseMirror decides what to use:
+
+1. Into a code block, the plain text goes in exactly as it is.
+2. With HTML on the clipboard (copied from a web page or a document), it reads the HTML through the schema, keeping only the formats this field has.
+3. With only plain text, or when you paste as plain text with Cmd+Shift+V, it calls `clipboardTextParser`. `PasteMarkdown` reads the text as Markdown there, so text copied from somewhere that stores Markdown keeps its look. Pasting as plain text tells it `plain`, and it hands back to ProseMirror, which pastes the characters as they are.
+
+<Code file="experiments/RichText/markdown.ts" name="PasteMarkdown" />
+
+`Slice.maxOpen` lets the pasted content join the line you paste into, rather than always starting a new paragraph.
+
+## 7. The value
+
+The field works both ways React fields do: uncontrolled, where you give it a `defaultValue` and it keeps its own content, and controlled, where you pass `value` and update it from `onValueChange`. In both cases the editor's document is the real content, and Markdown is how it goes in and out.
+
+- **For forms**, `RichText` keeps the latest Markdown in state and renders it in a hidden `<input>` with the field's `name`, so a form submits the Markdown.
+- **From the start**, a layout effect writes the field's own Markdown into that state, so a `defaultValue` of `__b__` submits `**b**`, as `onValueChange` would report it.
+- **A form reset** puts an uncontrolled field back to its `defaultValue`, as it does a native field. A reset doesn't change a hidden input, so the component listens for the form's `reset` event and reloads the editor itself.
+
+### Controlled, without moving the caret
+
+Replacing the editor's content moves the caret, so the field must not do it every time `value` changes. It keeps `lastReported`, the last Markdown it sent to `onValueChange` or was given. Say a parent stores the value in state:
+
+1. You type "a". The field reports `"a"`, and sets `lastReported` to `"a"`.
+2. The parent's state changes, and it passes `value="a"` back.
+3. The field sees that `value` is `lastReported`. It's what the editor already holds, so it does nothing, and the caret stays where you are.
+
+When the parent passes something new, such as `""` after sending a message, it's different from `lastReported`. The field replaces the content with `setContent`, without reporting it back (`emitUpdate: false`) and without an undo step (`addToHistory: false`), so undo can't bring back a sent message. It puts the caret at the end.
+
+When `disabled` or `readOnly` changes, an effect calls `editor.setEditable()`, so the editor isn't rebuilt.
+
+## 8. Accessibility
+
+### Its name, description, and error
+
+Base UI's `Field` links a label, description, and error to a control, but it expects an `<input>`. `Field.Control` has a `render` function, which hands over the linking attributes (`aria-labelledby` and `aria-describedby`). `RichText` adds the field's own (`role="textbox"`, `aria-multiline`, `aria-invalid`, `aria-required`, `aria-readonly`, `aria-disabled`, `aria-placeholder`, and `id`) and passes them to `EditorSurface`:
+
+<Code file="experiments/RichText/RichText.tsx" name="EditorSurface" />
+
+ProseMirror draws the editable `div` itself, so React can't set its attributes. Instead, the editor's `attributes` option is a function that returns whatever `attributesRef` holds, and ProseMirror calls it each time it draws. When the attributes change, `EditorSurface` stores the new ones and calls `updateState`, which makes ProseMirror draw, and read them, straight away.
+
+The label is a `span`, not a `<label>`, because a `<label>` only works for form elements, not a `div`. Base UI's label focuses the field by its `id` when you click it. A screen reader gets the name from `aria-labelledby`.
+
+### The keyboard
+
+- **The toolbar is one Tab stop.** Tab reaches it before the field, on its first button. The arrow keys move between buttons, wrapping at the ends, and Tab moves on to the field. Base UI's `Toolbar` handles this (it's called a **roving tab stop**). The toolbar is named "Formatting", its groups are named "Text style", "Insert", and "Blocks", and `aria-controls` says which field it formats.
+- **Shortcuts work in the field**, so you don't have to go back to the toolbar. Each button's `aria-keyshortcuts` tells screen readers its shortcut, and its tooltip shows it.
+- **Tab leaves the field**, even in a list (`ListItemNoTab`, section 3). Enter adds a line.
+- **Read-only** has no toolbar, since none of it could be used, and its absence shows that the field can't be changed. It stays in the tab order (`tabindex="0"`), so you can reach, read, and copy its text and follow its links. It's still submitted.
+- **Disabled** is skipped by Tab, toolbar and field alike, and isn't submitted.
+
+### How it looks
+
+`rich-text.css` (in full below) handles the visual side:
+
+- **Focus** inside the editable area draws the focus outline round the whole box, toolbar included, with `:has(.rich-text__editor:focus-visible)`. Toolbar buttons draw their own.
+- **A pressed button** has a fill, an ink edge, and thicker icon lines, so "on" never relies on color alone. In Windows' high contrast modes (forced colors), it uses the system's highlight color, for hover too.
+- **Every toolbar button** is a full `--target-min` square: 24px with a mouse and 44px on a touch screen. Each one is a whole target, so neighbors never take each other's clicks.
+- **The height** grows with the text. CSS's `lh` unit is one line's height. The editable area is at least `rows` lines plus padding, and at most `maxRows` lines, then it scrolls. The padding is `(--control-md − 1lh) / 2` above and below, so one line is exactly as tall as an Input, and the two line up in a form. `rows` and `maxRows` reach the CSS as the custom properties `--rich-text-rows` and `--rich-text-max-rows`.
+
+## The whole files
+
+<details>
+<summary><code>markdown.ts</code></summary>
+
+<Code file="experiments/RichText/markdown.ts" />
+
+</details>
+
+<details>
+<summary><code>RichText.tsx</code></summary>
+
+<Code file="experiments/RichText/RichText.tsx" />
+
+</details>
+
+<details>
+<summary><code>rich-text.css</code></summary>
+
+<Code file="experiments/RichText/rich-text.css" />
+
+</details>

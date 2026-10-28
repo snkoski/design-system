@@ -1,0 +1,149 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as TextDrawingStories from "./TextDrawing.stories";
+import { Code } from "../../how-it-works/Code";
+import { Cells, Nearness } from "./explain";
+
+<Meta of={TextDrawingStories} name="How it works" />
+
+# How Text drawing works
+
+Text drawing turns typed characters into a picture. Each character becomes one square cell, in the same row and column it was typed in: `=` changes color as the mouse comes near, `-` stays still, and `.` leaves a gap. Three files, plus one it borrows from another experiment:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>drawing.ts</code></td><td>The reading. It turns the text into a list of cells, each with its character, its kind, and its row and column. A plain function, with no React and no DOM.</td></tr>
+    <tr><td><code>TextDrawing.tsx</code></td><td>The component. A text area, and a CSS grid that draws one element per cell.</td></tr>
+    <tr><td><code>text-drawing.css</code></td><td>The look: monospace text, the grid, and how each kind of cell is filled.</td></tr>
+    <tr><td><code>Proximity/</code></td><td>Another experiment. It colors each <code>=</code> cell by how close the mouse is.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos call the real functions too.
+
+## 1. Which character draws what
+
+The kinds of cell are one small table:
+
+<Code file="experiments/TextDrawing/drawing.ts" name="KINDS" />
+
+`glow` changes color near the mouse, `still` never changes, and `gap` leaves its place empty. A new kind of cell is one more line here, and a rule for it in the CSS.
+
+Each character becomes a `Cell`, and the whole text becomes a `Drawing`:
+
+<Code file="experiments/TextDrawing/drawing.ts" name="Cell" />
+
+<Code file="experiments/TextDrawing/drawing.ts" name="Drawing" />
+
+## 2. Reading the text: `parseDrawing()`
+
+<Code file="experiments/TextDrawing/drawing.ts" name="parseDrawing" />
+
+It does three things:
+
+1. **Split into lines.** `text.split(/\r?\n/)` cuts the text at each line break. The `\r?` also takes Windows line endings (`\r\n`), so pasted text works. The line's position in the list is its `row`, counted from 0.
+2. **Split each line into characters.** `[...line]` splits by character, not by the units JavaScript stores text in. `"🌭".length` is 2, because an emoji takes two of those units, but `[..."🌭"]` is one character, so an emoji takes one cell, not two. Its position in the line is its `column`. `KINDS[character] ?? "unknown"` looks up its kind: `??` gives `"unknown"` for anything not in the table, a space included.
+3. **Measure.** `rows` is the number of lines. `columns` is the longest line's length, so a short line leaves the end of its row empty. The `0` in `Math.max(0, …)` makes an empty text 0 wide.
+
+`flatMap` joins every line's cells into one list, in reading order. With the heart the stories start with, that's 11 lines of 13 characters: 143 cells, of which 59 are `=`, 44 are `-`, and 40 are `.`.
+
+### Try it
+
+Type a small drawing and see what the real `parseDrawing()` returns. Try a space, which is `unknown`, not a gap, and a line shorter than the others.
+
+<Unstyled>
+  <Cells />
+</Unstyled>
+
+## 3. Drawing the cells
+
+`TextDrawing.tsx` keeps the text in React state and calls `parseDrawing()` again on every keystroke. Reading a few hundred characters is quick, so it doesn't need to remember the last result.
+
+<Code file="experiments/TextDrawing/TextDrawing.tsx" name="TextDrawing" />
+
+- **The picture is a CSS grid.** `grid-template-columns: repeat(columns, var(--text-drawing-cell))` makes one column per character of the longest line, each `cellSize` rem wide, and the same for rows. `--text-drawing-cell` is set on the outer element from the `cellSize` prop, 1.25 rem by default.
+- **Each cell says where it goes.** CSS grid counts its lines from 1, and `parseDrawing()` counts from 0, so a cell at row 0, column 2 gets `grid-row: 1; grid-column: 3`. Because every cell is placed by number, a gap can render nothing at all, and the cells after it still land in the right place.
+- **`data-kind`** carries the kind to the CSS, which fills each kind differently (section 4).
+- **An `=` is a `Proximity`.** It's given `reach`, how far away the mouse starts to count, and `colors`, from far to near. Every other kind is a plain `span`. An unknown character gets a `title`, so hovering a stray one says what it is.
+- **Keys by position.** Each cell's React key is its row and column (`"3-7"`), so React matches cells by where they are. Typing at the end of a line adds one cell and leaves the rest alone.
+- **A name for the picture.** The grid is `role="img"`, with an `aria-label` that counts the cells: "A drawing 13 cells wide and 11 tall: 59 that change color near the mouse, and 44 that stay still". A screen reader can't see the shape, but it learns what's there.
+
+This is the heart it starts with:
+
+<Code file="experiments/TextDrawing/TextDrawing.tsx" name="HEART" />
+
+## 4. The CSS
+
+<Code file="experiments/TextDrawing/text-drawing.css" />
+
+- **The text area is monospace, and never wraps.** In a monospace font every character is the same width, so the columns in the text area line up the way the picture's do. `white-space: pre` stops a long line wrapping onto the next, which would make the text look like a different drawing from the one it makes. A long line scrolls sideways instead.
+- **Side by side from 48em.** On a narrow screen the text area sits above the picture. From 48em wide (768px at the default text size), they sit side by side.
+- **`still` cells** are filled with muted ink. An `=` far from the mouse is the border color, and in hot dog the border color is as dark as muted ink, so a far `=` and a `-` would look the same. There, a `-` is a surface-colored cell with an ink outline instead.
+- **`glow` cells** are filled with `currentColor`, the element's text color. Proximity sets the text color as the mouse moves, so the fill follows it.
+- **`unknown` cells** get a dashed outline and no fill.
+- **Forced colors.** Windows forced-colors mode replaces colors with a small fixed palette. `still` cells use `CanvasText`, the palette's text color, so they still show. `forced-color-adjust: none` lets a `glow` cell keep its color, which would otherwise be replaced.
+
+## 5. How an `=` changes color
+
+Proximity is its own experiment, with its own How it works page, so this is the short version. One listener on the window hears every pointer move. On each move, it measures every Proximity on the page, works out how close the pointer is to each, and sets two custom properties on it: `--proximity`, from 0 to 1, and `--proximity-color`.
+
+How close is a straight-line distance from the cell's nearest edge, turned into a number from 0 to 1:
+
+<Code file="experiments/Proximity/tracker.ts" name="closeness" />
+
+`dx` and `dy` are how far the pointer is outside the cell across and down, 0 when it's level with the cell that way. `Math.hypot(dx, dy)` is the straight-line distance between them, by Pythagoras. Then `1 − distance ÷ reach`, held between 0 and 1. With Text drawing's default reach of 120 px:
+
+<table>
+  <thead>
+    <tr><th>Mouse to the nearest edge</th><th>Closeness</th><th>Color</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Over the cell (0 px)</td><td>1 − 0 ÷ 120 = 1</td><td>All brand</td></tr>
+    <tr><td>30 px</td><td>1 − 30 ÷ 120 = 0.75</td><td>75% of the way to brand</td></tr>
+    <tr><td>90 px</td><td>1 − 90 ÷ 120 = 0.25</td><td>25% of the way to brand</td></tr>
+    <tr><td>120 px or more</td><td>0</td><td>All border color</td></tr>
+  </tbody>
+</table>
+
+Then `colorAt()` turns that into a color. Text drawing's default colors are the border color and the brand color, so a closeness of 0.75 becomes `color-mix(in srgb, var(--border), var(--brand) 75%)`. `color-mix()` is CSS that mixes two colors, with the percentage saying how much of the second. With more than two colors, it picks the pair the amount falls between.
+
+<Code file="experiments/Proximity/tracker.ts" name="colorAt" />
+
+Proximity's CSS turns `--proximity-color` into the element's `color`, and eases between updates over `--duration-fast`, 120 ms, so a quick move doesn't jump:
+
+<Code file="experiments/Proximity/proximity.css" />
+
+### Try it
+
+Move the mouse further from an `=` cell, or change the reach, and see the real `closeness()` and `colorAt()` at work.
+
+<Unstyled>
+  <Nearness />
+</Unstyled>
+
+A grid of hundreds of `=` cells still adds only one listener, and each move measures every cell before changing any. Measuring an element right after changing another forces the browser to recalculate the page's layout, so reading everything first, then writing everything, keeps it to once per move.
+
+## The whole files
+
+<details>
+<summary><code>drawing.ts</code></summary>
+
+<Code file="experiments/TextDrawing/drawing.ts" />
+
+</details>
+
+<details>
+<summary><code>TextDrawing.tsx</code></summary>
+
+<Code file="experiments/TextDrawing/TextDrawing.tsx" />
+
+</details>
+
+<details>
+<summary><code>text-drawing.css</code></summary>
+
+<Code file="experiments/TextDrawing/text-drawing.css" />
+
+</details>

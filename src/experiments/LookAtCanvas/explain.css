@@ -1,0 +1,31 @@
+/* Look at canvas's "How it works" demos, beyond the shared panel in src/how-it-works/demo.css */
+
+/* The catch-up chart: where the turn duration falls, and a dot for each frame */
+.catch-up__mark {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.catch-up__frame {
+  fill: var(--ink);
+}
+
+/* The steps of closeness a frame is drawn in, each in its color and opacity */
+.level-strip {
+  display: flex;
+  gap: var(--space-0);
+}
+.level-strip__step {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  height: 2.5rem;
+  border: var(--border-thick) solid transparent;
+  border-radius: var(--radius-xs);
+}
+.level-strip__step[data-current] {
+  border-color: var(--ink);
+}
+.level-strip__step > span {
+  border-radius: var(--radius-xs);
+}

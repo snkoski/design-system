@@ -11,7 +11,7 @@ export type { Distance };
 export type ConnectionsBlend = "paint" | "light";
 
 /** How many color stops a paint gradient gets: enough that it curves through the mixed colors smoothly */
-const PAINT_STOPS = 12;
+export const PAINT_STOPS = 12;
 
 interface OwnProps {
   /** The things to connect, such as Bounce elements, and anything else on the page. */

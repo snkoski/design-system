@@ -26,7 +26,7 @@ export const G = 45_000;
 /** How much of their speed towards each other two things keep when they collide: 1 keeps it all, 0 none */
 const RESTITUTION = 0.5;
 /** Colliding slower than this, in px per second, they don't bounce: resting on a star, rather than jittering on it */
-const REST = 100;
+export const REST = 100;
 
 /** Roughly the distance between two things' centers when they touch */
 function touching(a: Massive, b: Massive) {
