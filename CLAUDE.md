@@ -71,6 +71,8 @@ src/experiments/             ideas being tried out; relaxed rules, never publish
 src/foundations/             Storybook docs pages (MDX) that render docs/brand, plus token-driven
                              blocks (colors, type, spacing, radii, shadows, sizing, motion demo).
                              Not part of the published package.
+src/how-it-works/            the pieces of every "How it works" page: <Code> (real source, read when the page loads),
+                             <Inspect> (a component's live HTML), and the demos components' pages use. Not published.
 .storybook/                  config and the Light / Dark / Hot dog theme switch
 ```
 
@@ -182,6 +184,7 @@ Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
 7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
 8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye. Also look at it with `data-pointer="coarse"` and inside `data-density="compact"`.
 9. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, write a guidance page, `docs/brand/<topic>.md`, rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, add a section or row to `docs/brand/industry.md` with what Sherbet chose.
+10. Write its "How it works" page, `HowItWorks.mdx` beside the stories (see "How it works pages").
 
 ### Looking at a component
 
@@ -306,6 +309,16 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 - Work that stays inside `src/experiments/` can go straight to `main`, including experiments that use or affect each other. Anything that would change code outside the folder (a component, `src/internal/`, the styles, or the tokens) goes on its own branch.
 - To graduate, an experiment leaves the folder and is rebuilt to follow every rule here, like a new component (`/new-component`).
 - `src/experiments/Revisit/` holds comparison stories for open questions in `docs/revisit.md`, shown under Revisit in Storybook: the options side by side in all three themes, drawn by restyling the real components from outside (`Compare.tsx` lays them out). They must still pass axe. When the question is decided, delete its story with its entry.
+
+## How it works pages
+
+Every component and experiment has a "How it works" page, `HowItWorks.mdx` beside its stories (`<Meta of={Stories} name="How it works" />`), that walks through its real code in the order it runs, for people who use the system and want to know what's underneath.
+
+- Show code with `<Code file="components/Switch/Switch.tsx" name="Switch" />` from `src/how-it-works/Code.tsx`. The path is from `src`. `name` is a top-level declaration (function, constant, interface, type, or class), or in a CSS file a rule by how its selector list or at-rule starts (`name=".switch__thumb"`, `name="@media (forced-colors: active)"`). The first rule that starts that way wins, so name more of the list (`name=".a, .b"`) to pick a later one, and use single quotes around a selector with double quotes in it. Leave `name` out for the whole file. The code is read from the file when the page loads, so it can't go out of date, and `src/how-it-works/sources.test.ts` fails if any `<Code>` on any page stops finding its code. Write each `<Code … />` on one line.
+- Show what a component renders with `<Inspect>`: the real component, and under it its live HTML, marking each attribute as it changes.
+- Demos call the real code. Shared pieces (`Slider`, the `.explain` panel, chart styles) are in `src/how-it-works/demo.tsx` and `demo.css`. A component's own demos go in `src/how-it-works/components/<Name>.tsx`, never in the component's folder, which is published and checked by `pnpm check`. An experiment's go in its folder as `explain.tsx`.
+- MDX: Markdown tables don't render, so use HTML `<table>`. Wrap demos in `<Unstyled>`.
+- Follow the writing style below, and explain every term the first time it's used.
 
 ## Foundations pages
 

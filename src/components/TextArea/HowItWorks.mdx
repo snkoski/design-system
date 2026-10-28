@@ -1,0 +1,225 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as TextAreaStories from "./TextArea.stories";
+import { TextArea } from "./TextArea";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { Growing, MessageForm } from "../../how-it-works/components/TextArea";
+
+<Meta of={TextAreaStories} name="How it works" />
+
+# How Text area works
+
+A text area is a text field for more than one line: messages, comments, and notes. It follows [Input](?path=/docs/components-input--how-it-works), the pattern for every text field, almost exactly: the same label, help text, error, edge, states, and themes. This page covers what's different, and links to the Input page for the rest. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>TextArea.tsx</code></td><td>The component. It renders Base UI's field control as a <code>&lt;textarea&gt;</code>, decides which prop goes where, and types the props from the textarea's own attributes.</td></tr>
+    <tr><td><code>text-area.css</code></td><td>The look. Much of it repeats Input's CSS on purpose for now (see "Shared CSS for form controls" in <code>docs/revisit.md</code>). What's its own: the padding that lines it up with an Input, and resizing.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>TextArea</code> and the <code>TextAreaProps</code>, <code>TextAreaSize</code>, and <code>TextAreaResize</code> types.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code>, <code>warn.ts</code>, and <code>cx.ts</code></td><td>The shared error message, the development warning for a text area with no name, and the class name helper. Not exported.</td></tr>
+    <tr><td><code>TextArea.test.tsx</code> and <code>TextArea.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+It uses the same Base UI parts as Input: `Field.Root`, `Field.Label`, `Field.Description`, and `Field.Error` (through `FieldError`). [Base UI](https://base-ui.com), the unstyled library underneath, handles linking labels and help text, ARIA attributes, and forms. The difference is the control. Base UI has an `Input` part but no textarea, so TextArea uses `Field.Control`, the field's general-purpose control, and tells it to render a `<textarea>` instead of its usual `<input>`.
+
+## What it renders
+
+Here's a real text area in a real form. It has a description, and checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then again each time you leave the field.
+
+<Unstyled>
+  <Inspect hint="Select Send message while it's empty. Then type a message over two lines (Enter adds a line), press Tab to leave the field, and send it.">
+    <MessageForm />
+  </Inspect>
+</Unstyled>
+
+It's the same shape as an Input, with one element fewer:
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="text-area" data-size data-resize&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our class and data attributes</td><td>Holds the whole field. <code>data-size</code> and <code>data-resize</code> come from the <code>size</code> and <code>resize</code> props. Base UI adds the field's state, such as <code>data-invalid</code>, <code>data-filled</code>, and <code>data-touched</code>.</td></tr>
+    <tr><td><code>&lt;label class="text-area__label" id for&gt;</code></td><td>Base UI's <code>Field.Label</code></td><td><code>for</code> points at the textarea, so clicking the label focuses it.</td></tr>
+    <tr><td><code>&lt;p class="text-area__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code></td><td>Help text between the label and the field, read before typing, for the same reasons as an Input's.</td></tr>
+    <tr><td><code>&lt;textarea rows="3" class="text-area__control"&gt;</code></td><td>Base UI's <code>Field.Control</code>, rendering our <code>&lt;textarea&gt;</code></td><td>The field. <code>rows</code> comes from our <code>render</code> element. <code>aria-labelledby</code>, <code>aria-describedby</code>, <code>aria-invalid</code>, <code>required</code>, and the <code>data-*</code> state come from Base UI.</td></tr>
+  </tbody>
+</table>
+
+There's no box around the field, because a text area has no icons. And what you type doesn't show in the HTML: the text lives in the textarea's `value` property, as with an Input. A `defaultValue` appears as text inside the `<textarea>` tags, but only as the starting text.
+
+The error appears after the field, and its `id` joins the description's in `aria-describedby`. The error is drawn by the shared `FieldError`, which [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains, with the development warnings. [How Input works](?path=/docs/components-input--how-it-works) explains why the description sits between the label and the field, and how disabled and read-only render: they're the same native attributes here.
+
+### A description of your own
+
+A page can point the text area at more help text of its own with `aria-describedby`. Base UI adds the field's description and error to it, rather than replacing it:
+
+<Unstyled>
+  <Inspect hint="The textarea's aria-describedby lists the page's own note first, then the field's description and error.">
+    <p id="reply-note">Ada and the design team will see your reply.</p>
+    <TextArea label="Reply" aria-describedby="reply-note" description="Keep it short." invalid error="Write a reply before sending." rows={2} />
+  </Inspect>
+</Unstyled>
+
+That only works because of where the prop goes, which the next section explains.
+
+## From props to HTML
+
+### The props
+
+<Code file="components/TextArea/TextArea.tsx" name="Labelled" />
+
+The same union as Input's: a `label`, or an `aria-label`, or the code doesn't compile. The label's type, `Exclude<ReactNode, undefined | null | boolean>`, leaves out the values that render nothing. [How Input works](?path=/docs/components-input--how-it-works) explains why a text field's label is a prop rather than its children. A text area has one more reason: in HTML, a `<textarea>`'s children are its starting text, so `children` here would be easy to misread, and the type doesn't accept it.
+
+<Code file="components/TextArea/TextArea.tsx" name="TextAreaSize" />
+
+<Code file="components/TextArea/TextArea.tsx" name="TextAreaResize" />
+
+<Code file="components/TextArea/TextArea.tsx" name="OwnProps" />
+
+The props are declared here, with our JSDoc, so Storybook's docs table can show them. It doesn't read types inherited from `node_modules`.
+
+<Code file="components/TextArea/TextArea.tsx" name="TextAreaProps" />
+
+**Why the props type is built from `TextareaHTMLAttributes`.** Input's type is built from Base UI's `Input` props. But `Field.Control`'s props are typed for an `<input>`, so building on them would accept attributes a textarea doesn't have, such as `type`, `accept`, or `pattern`. Building on React's `TextareaHTMLAttributes` instead gives exactly a textarea's attributes. Three are left out: `className` (it goes on the wrapper), `children` (see above), and `cols`, a width in characters, because width is the page's job. `aria-label` is left out because `Labelled` declares it.
+
+### The component
+
+<Code file="components/TextArea/TextArea.tsx" name="TextArea" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart.** The props declared in `OwnProps` are taken out, with defaults: `size = "md"`, `resize = "vertical"`, and `rows = 4`. Whatever's left in `rest` is any other textarea attribute: `placeholder`, `maxLength`, `onBlur`, `aria-describedby`, and so on.
+2. **The wrapper.** `Field.Root` gets our class, `data-size`, `data-resize`, `name`, `disabled`, and `invalid`.
+3. **The label and description** render only when they're given, before the field.
+4. **The field.** This is the part that differs from Input.
+5. **The error** comes last, after the field, and only shows while `invalid` is true.
+
+### `Field.Control` with `render`
+
+`Field.Control` normally renders an `<input>`. Its `render` prop replaces that element. Base UI renders the element you give it, and merges its own props into it: the ids, the ARIA attributes, the event handlers, and the state.
+
+So there are two places a prop could go:
+
+- **Through `Field.Control`**, as an ordinary prop. Base UI sees it, combines it with its own, and passes it on to the textarea. Everything goes here: `rest`, `value`, `defaultValue`, `onValueChange`, `disabled`, `readOnly`, `required`, `id`, `name`, and the `ref`.
+- **On the `render` element**, `<textarea rows={rows} />`. Props there go straight onto the element, and they **override** Base UI's own.
+
+Only `rows` goes on the `render` element, because `Field.Control`'s types are an input's and an input has no `rows`. Everything else goes through `Field.Control`, so Base UI can combine it with its own. That's what made the demo above work: the page's `aria-describedby="reply-note"` went through `Field.Control`, and Base UI added the description's and error's ids after it. Put on the `render` element, it would have replaced them, and the field's own description and error would no longer be read.
+
+`rest` is passed with a cast, `as Field.Control.Props`, because its type is a textarea's and `Field.Control` expects an input's. The cast only changes what TypeScript checks. At runtime, Base UI passes every prop on to the textarea, and a test checks textarea attributes such as `maxLength`, `wrap`, and `spellCheck` arrive.
+
+## How it looks
+
+All of the look is in `text-area.css`, inside `@layer components`. The label, description, edge, hover, focus, invalid, disabled, read-only, hot dog, and forced colors rules match Input's one for one, and [How Input works](?path=/docs/components-input--how-it-works) walks through each. They use the same semantic, neutral tokens: `surface`, `ink`, `ink-muted`, `border-strong`, `focus`, and `danger`. This section covers what's different.
+
+### Lining up with an Input
+
+<Code file="components/TextArea/text-area.css" name=".text-area__control" />
+
+An Input is one line, centered in a box `--control-md` tall. A text area is many lines, starting from the top. To make the first line of a text area sit exactly where an Input's text does, so the two line up side by side in a form, the padding above and below is:
+
+`(--control-md − 1lh) / 2 − the edge`
+
+`1lh` is one line height: 24px here (16px text × 1.5). With a mouse, that's (40 − 24) / 2 − 1 = 7px. So a one-row text area is 7 + 24 + 7, plus a 1px edge above and below: 40px, exactly `--control-md`. The [Beside input](?path=/story/components-text-area--beside-input) story checks the first lines match, at both sizes and in all three themes.
+
+The edge is a custom property, `--text-area-edge`, because it isn't always 1px, and the padding has to follow it:
+
+<Code file="components/TextArea/text-area.css" name='[data-theme="hotdog"] .text-area__control' />
+
+In hot dog mode, every text field gets a `border-thick` (2px) edge. The padding takes the extra pixel off, so the text doesn't move. Windows high contrast does the same for an invalid text area, which gets a thick edge there in place of the red inset shadow it loses.
+
+<Code file="components/TextArea/text-area.css" name='.text-area[data-size="lg"] .text-area__control' />
+
+Large works the same way with `--control-lg`. Because the padding reads the size tokens, it also follows touch screens and compact density: on touch, `--control-md` is 44px, so the padding becomes 9px and a one-row text area is still `--control-md` tall. The [Input page's demo](?path=/docs/components-input--how-it-works) shows those tokens in each mode.
+
+### How it grows
+
+A text area doesn't grow as you type. Three things set its height, and none of them is JavaScript:
+
+- **`rows`** sets how tall it starts. The browser makes room for that many lines, plus the padding and edge.
+- **`min-height: var(--control-md)`** is the floor, so even a one-row text area meets `--target-min` on touch, and dragging can't make it shorter.
+- **`resize: vertical`** lets people drag the corner to make it taller, never wider, because width is the page's job.
+
+Text longer than the box scrolls inside it.
+
+<Unstyled>
+  <Growing />
+</Unstyled>
+
+<Code file="components/TextArea/text-area.css" name='.text-area[data-resize="none"] .text-area__control' />
+
+`resize="none"` turns the handle off, and so does disabled, since a field you can't use shouldn't change size. The handle is drawn by the browser at about 12px, smaller than `--target-min`. That's the one allowed exception to the target size rule: nothing depends on it, because long text scrolls, and keyboard users can't use the handle in any browser.
+
+A text area that grows with its text is an open question in `docs/revisit.md`. CSS can do it without JavaScript (`field-sizing: content`), but Firefox doesn't support it yet.
+
+<Code file="components/TextArea/text-area.css" name=".text-area" />
+
+`align-content: start` keeps the field at its own height when a grid or flex layout around it stretches the wrapper, such as a text area beside a taller column.
+
+### The rest, as in Input
+
+<Code file="components/TextArea/text-area.css" name='.text-area__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
+
+<Code file="components/TextArea/text-area.css" name='.text-area__control[aria-invalid="true"]' />
+
+<Code file="components/TextArea/text-area.css" name=".text-area__control[readonly]" />
+
+<Code file="components/TextArea/text-area.css" name=".text-area__control[readonly]::placeholder" />
+
+- Hover darkens the edge, except on a disabled, read-only, or invalid field, so a hovered invalid field keeps its red edge.
+- Invalid is styled from `aria-invalid`, with a thicker `danger` edge drawn by an inset shadow, so nothing moves.
+- Disabled dims the field and label to 50%, from the native `:disabled` and the wrapper's `data-disabled`. Read-only dims only the field, to 75%, from the native `[readonly]`, and hides the placeholder.
+- In hot dog mode, a text field keeps its hard shadow and doesn't press: you type in it rather than click it.
+- Focus is the system's outline: `--focus-width` in `--focus`, `--focus-offset` outside the edge.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** It's the browser's own `<textarea>`. Tab moves into it and out of it: Tab never types a tab character. **Enter adds a new line** rather than submitting the form, which is the big difference from an Input, so a form with a text area needs a submit button. A disabled text area is skipped by Tab. A read-only one takes focus, and you can select and copy its text.
+
+**Screen readers** announce the label as its name, that it's a text field that takes several lines, then the description and any error. If it's `required` or `invalid`, they say so too.
+
+**Forms.** What `FormData` gets:
+
+<table>
+  <thead>
+    <tr><th>The text area is</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Typed in, with <code>name="message"</code></td><td><code>message=</code> and the text, line breaks included</td></tr>
+    <tr><td>Untouched, with a <code>defaultValue</code></td><td>The <code>defaultValue</code></td></tr>
+    <tr><td>Read-only</td><td>Its text</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required and empty</td><td>The form doesn't submit, unless it has <code>noValidate</code>: the browser's own validation stops it</td></tr>
+  </tbody>
+</table>
+
+`wrap="hard"` sends the text with a line break wherever it wrapped on screen. The default, `soft`, sends it as typed. `maxLength` stops typing at the limit, so say what the limit is in the description: there's no counter yet (another open question in `docs/revisit.md`).
+
+## The whole files
+
+<details>
+<summary><code>TextArea.tsx</code></summary>
+
+<Code file="components/TextArea/TextArea.tsx" />
+
+</details>
+
+<details>
+<summary><code>text-area.css</code></summary>
+
+<Code file="components/TextArea/text-area.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/TextArea/index.ts" />
+
+</details>

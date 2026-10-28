@@ -1,0 +1,472 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import { ArrowRight, Heart } from "lucide-react";
+import * as ButtonStories from "./Button.stories";
+import { Button } from "./Button";
+import { ButtonLink } from "./ButtonLink";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { HitArea, LoadingButton, PropsToHtml, Themes } from "../../how-it-works/components/Button";
+
+<Meta of={ButtonStories} name="How it works" />
+
+# How Button works
+
+There are two components here. `Button` does something: it sends, saves, or opens. `ButtonLink` goes somewhere: it's a link that looks like a button. They look the same because they share their props, their insides, and their CSS. Which variant, size, and shape to pick is on [Choosing a button](?path=/docs/components-button--choosing-a-button). This page is about how they work.
+
+They're made of these files:
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Button.tsx</code></td><td>The action button. It's built on Base UI's Button, renders a real <code>&lt;button&gt;</code>, turns props into attributes, and handles loading.</td></tr>
+    <tr><td><code>ButtonLink.tsx</code></td><td>The link that looks like a button. It renders a plain <code>&lt;a&gt;</code>, with no Base UI.</td></tr>
+    <tr><td><code>shared.tsx</code></td><td>What the two have in common: the props for variant, size, shape, and icons, the rule that an icon-only button needs a name, and <code>Content</code>, which lays out the icons, the label, and the spinner.</td></tr>
+    <tr><td><code>button.css</code></td><td>The look of both. One class, <code>.button</code>, with variants, sizes, and states read from attributes.</td></tr>
+    <tr><td><code>index.ts</code></td><td>Exports both components and their types from the package.</td></tr>
+    <tr><td><code>src/internal/cx.ts</code> and <code>warn.ts</code></td><td>Two small helpers every component shares: one joins class names, the other prints warnings while you develop. Neither is exported from the package.</td></tr>
+  </tbody>
+</table>
+</div>
+
+**Base UI** is an unstyled React library that handles behavior and accessibility, and leaves the look to us. For a button there's little to handle, because the browser's `<button>` already does most of it. Base UI's Button adds three things Button uses: it sets `type="button"`, it can keep a disabled button focusable, and it marks the disabled state with a `data-disabled` attribute for the CSS. ButtonLink doesn't use it: Base UI's own docs say a link should be styled as a link, not passed into its Button.
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs. The demos use the real components.
+
+## 1. What it renders
+
+Each demo below is the real component, with the HTML it has rendered underneath. The HTML updates as you use it, and an attribute that just changed is underlined.
+
+### A button with a label
+
+<Unstyled>
+  <Inspect>
+    <Button>Send message</Button>
+  </Inspect>
+</Unstyled>
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;button&gt;</code></td><td>Base UI</td><td>A real button element, so the browser makes it focusable, presses it with Enter and Space, and tells screen readers it's a button.</td></tr>
+    <tr><td><code>type="button"</code></td><td>Base UI</td><td>A plain <code>&lt;button&gt;</code> inside a form submits it, because its default type is <code>submit</code>. Base UI's default is <code>button</code>, so a Button only submits a form when you pass <code>type="submit"</code>.</td></tr>
+    <tr><td><code>tabindex="0"</code></td><td>Base UI</td><td>Base UI gives every button it renders a place in the Tab order. A <code>&lt;button&gt;</code> already has one, so here it changes nothing.</td></tr>
+    <tr><td><code>data-variant</code>, <code>data-size</code>, <code>data-shape</code></td><td>Button.tsx</td><td>The <code>variant</code>, <code>size</code>, and <code>shape</code> props, each with a default, so the CSS always has a value to read.</td></tr>
+    <tr><td><code>class="button"</code></td><td>Button.tsx</td><td>Names the component for the CSS. A <code>className</code> you pass is added after it.</td></tr>
+    <tr><td><code>&lt;span class="button__label"&gt;</code></td><td>shared.tsx</td><td>Wraps the label text, so the CSS can let a long label wrap onto more lines.</td></tr>
+  </tbody>
+</table>
+</div>
+
+### An icon-only button
+
+<Unstyled>
+  <Inspect>
+    <Button variant="ghost" iconOnly aria-label="Add to favorites">
+      <Heart />
+    </Button>
+  </Inspect>
+</Unstyled>
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>aria-label</code></td><td>You</td><td>The button's only name. A screen reader reads "Add to favorites, button". The props type won't compile an icon-only button without it (section 2).</td></tr>
+    <tr><td><code>data-icon-only="true"</code></td><td>Button.tsx</td><td>Tells the CSS to make the button square. Without <code>iconOnly</code>, the attribute isn't there at all.</td></tr>
+    <tr><td><code>&lt;span class="button__icon" aria-hidden="true"&gt;</code></td><td>shared.tsx</td><td><code>aria-hidden</code> hides the icon from screen readers. The icon is a drawing: it has nothing to say that the label doesn't.</td></tr>
+    <tr><td><code>&lt;svg aria-hidden="true"&gt;</code></td><td>The icon library</td><td>Lucide, the icon set in these demos, hides its own icons too. Button doesn't rely on that: the span hides any icon you pass.</td></tr>
+    <tr><td>No <code>button__label</code></td><td>shared.tsx</td><td>An icon-only button has no label text, so it has no label element.</td></tr>
+  </tbody>
+</table>
+</div>
+
+### A loading button
+
+<Unstyled>
+  <LoadingButton />
+</Unstyled>
+
+While it's loading, five things change:
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>data-loading="true"</code></td><td>Button.tsx</td><td>For the CSS: a loading button isn't dimmed, and shows a "working" cursor.</td></tr>
+    <tr><td><code>aria-busy="true"</code></td><td>Button.tsx</td><td>Tells assistive technology the button is busy. Screen readers don't all announce it, so the label should say what's happening too: "Sending message".</td></tr>
+    <tr><td><code>aria-disabled="true"</code></td><td>Base UI</td><td>Loading counts as disabled, but the button keeps focus. So it's marked disabled for screen readers with <code>aria-disabled</code>, rather than with the <code>disabled</code> attribute, which would take it out of the Tab order.</td></tr>
+    <tr><td><code>data-disabled</code></td><td>Base UI</td><td>Present whenever Base UI's button is disabled, loading or not, so the CSS has one attribute to style both from.</td></tr>
+    <tr><td>The spinner</td><td>shared.tsx</td><td>Takes the start icon's place. It's hidden from screen readers like any icon.</td></tr>
+  </tbody>
+</table>
+</div>
+
+### A disabled button
+
+<Unstyled>
+  <Inspect>
+    <Button disabled>Send message</Button>
+  </Inspect>
+</Unstyled>
+
+A disabled button that isn't loading gets the real `disabled` attribute from Base UI. The browser then does the rest: it takes the button out of the Tab order, ignores clicks, and won't submit a form with it. `data-disabled` is there too, for the CSS. Try to avoid disabled buttons, though: one can't say why it's disabled ([Choosing a button](?path=/docs/components-button--choosing-a-button) has what to do instead).
+
+### A button link
+
+<Unstyled>
+  <Inspect>
+    <ButtonLink href="#next-project" iconEnd={<ArrowRight />} onClick={(event) => event.preventDefault()}>Next project</ButtonLink>
+  </Inspect>
+</Unstyled>
+
+ButtonLink renders an `<a href>` with the same class, the same `data-*` attributes, and the same insides, so it looks the same. Because it's a real link, it opens in a new tab with a middle click or Cmd-click, its address can be copied, and screen readers announce it as a link. Base UI isn't involved, so there's no `type`, no `tabindex` (a link with an `href` is already in the Tab order), and no `data-disabled`. (This demo's link doesn't go anywhere when you click it, to keep you on this page.)
+
+## 2. From props to HTML
+
+Change any prop and watch the HTML. Each prop becomes one attribute.
+
+<Unstyled>
+  <PropsToHtml />
+</Unstyled>
+
+### The props
+
+The props both components share are in `shared.tsx`. `variant`, `size`, and `shape` are each a fixed set of strings (the types `ButtonVariant`, `ButtonSize`, and `ButtonShape` at the top of the file), so a typo such as `variant="primay"` doesn't compile:
+
+<Code file="components/Button/shared.tsx" name="SharedProps" />
+
+The comment above each prop is its documentation: Storybook shows it in the props table on the Docs page, and your editor shows it when you hover the prop.
+
+Button's own props start from those and add Base UI's:
+
+<Code file="components/Button/Button.tsx" name="ButtonProps" />
+
+`Omit<…>` takes some of Base UI's props away:
+
+- **`className`.** Base UI also accepts a function that returns a class from the button's state. Button only takes a string, and adds its own class to it.
+- **`render`.** Base UI's `render` prop swaps the `<button>` for another element. Without it, Button is always a `<button>`, and nobody can pass in an `<a>`, which Base UI's docs warn against. That's what ButtonLink is for.
+- **`nativeButton`.** It only matters with `render`.
+- **`keyof SharedProps` and `aria-label`.** These are defined by `SharedProps` and `IconOnly`, so Base UI's versions are taken out to leave one definition of each.
+
+Everything else Base UI's Button accepts, which is every attribute a `<button>` can have (`type`, `name`, `onClick`, and so on), passes straight through. `ref` is an ordinary prop in React 19, so there's no `forwardRef`.
+
+### An icon-only button must have a name
+
+An **accessible name** is what a screen reader says a control is called. A button with text is named by its text. An icon-only button has no text, so it needs an `aria-label`. The type makes sure it has one:
+
+<Code file="components/Button/shared.tsx" name="IconOnly" />
+
+This is a union of two shapes, and the props must match one of them. In the first, `iconOnly` is `false` or left out, and `aria-label` is optional. In the second, `iconOnly` is `true` and `aria-label` is a required `string`. So `<Button iconOnly><Heart /></Button>` doesn't compile: TypeScript can't match it to either shape. Each shape has its own comments, so the docs table describes `aria-label` in both cases.
+
+The type can't catch everything. It doesn't require label text on a button that isn't icon-only, and `aria-label=""` is a string, as is a label that came back empty from a CMS. Each of these leaves a button with no name, so Button checks again while it renders:
+
+<Code file="internal/warn.ts" name="warnIfUnnamed" />
+
+<Code file="internal/warn.ts" name="hasContent" />
+
+If the label has no content and there's no `aria-label` or `aria-labelledby`, it prints a warning in the browser console that says how to fix it:
+
+> [design-system] Button: has no accessible name, so screen readers announce it without one. Give an icon-only button an aria-label that says what it does.
+
+<Code file="internal/warn.ts" name="warn" />
+
+Each warning is printed once per page load, and only in development: a production build replaces `process.env.NODE_ENV` with `"production"`, and the warning code is dropped.
+
+### The component
+
+<Code file="components/Button/Button.tsx" name="Button" />
+
+From top to bottom:
+
+- **Defaults.** `variant = "primary"`, `size = "md"`, and `shape = "rectangle"` are filled in when the props are left out, so every button renders all three attributes.
+- **The name check.** For an icon-only button, Button passes `undefined` as the label, because its children are the icon, which is hidden. Only an `aria-label` can name it.
+- **`{...rest}` first.** Everything else you pass goes on the element first, and Button's own attributes come after it. Later attributes win, so you can't override `data-variant` by accident.
+- **`className`.** `cx()` joins Button's class and yours, so `className="mt-4"` renders `class="button mt-4"`:
+
+<Code file="internal/cx.ts" name="cx" />
+
+- **`|| undefined`.** `data-icon-only={iconOnly || undefined}` is `true` or `undefined`. React writes `true` as `"true"` and leaves `undefined` out. Without `|| undefined`, a normal button would render `data-icon-only="false"`, and the CSS selector `.button[data-icon-only]` would still match it, because it only checks that the attribute is there. `data-loading` and `aria-busy` work the same way.
+- **Loading is a kind of disabled.** `disabled={disabled || loading}` disables a loading button, so it can't be pressed twice. `focusableWhenDisabled={loading}` tells Base UI to keep it focusable. So Base UI uses `aria-disabled` instead of `disabled`, and blocks it itself: it cancels clicks and pointer presses, and every key except Tab. A keyboard user who pressed it stays on it, and can Tab away as normal.
+
+### What goes inside: `Content`
+
+Both components put the same thing inside, from `shared.tsx`:
+
+<Code file="components/Button/shared.tsx" name="Content" />
+
+- **Icon-only.** One `button__icon` span, holding the icon, or the spinner while loading.
+- **With a label.** The start icon, the label, and the end icon, in that order. While loading, the spinner takes the start icon's place. The end icon stays, so the label doesn't move.
+- Every icon is wrapped in a span with `aria-hidden="true"`, so screen readers skip it whatever icon you pass.
+
+The spinner is a small SVG drawing: a faint full circle (`opacity="0.25"`) as the track, and a quarter of a circle on top, which the CSS spins. Both are drawn in `currentColor`, the text color, so the spinner matches the label in every variant and theme. `focusable="false"` stops old versions of Internet Explorer and Edge from adding the drawing to the Tab order.
+
+<Code file="components/Button/shared.tsx" name="Spinner" />
+
+### ButtonLink
+
+<Code file="components/Button/ButtonLink.tsx" name="ButtonLinkProps" />
+
+<Code file="components/Button/ButtonLink.tsx" name="ButtonLink" />
+
+ButtonLink is Button without Base UI. Its props are the shared ones plus every attribute an `<a>` can have, with `href` required. It has no `loading` or `disabled`, and passing either doesn't compile: HTML has no way to disable a link. If a link shouldn't be followed yet, leave it out until it can be.
+
+## 3. How it looks: `button.css`
+
+All of Button's look is in one stylesheet, inside `@layer components`. CSS layers decide which styles win, whatever their specificity: the design system's order is `theme, base, components, utilities`, so a Tailwind utility in your markup, such as `w-full` to stretch a button across a form, beats the component's own CSS.
+
+Every value comes from a **token**: a named design value, such as `--action` or `--control-md`, defined once in `tokens/tokens.json`. Button uses semantic tokens, which say what a value is for, rather than primitives, which say what it is (`--action` rather than `--gray-900`). Each theme points the semantic tokens at different primitives, so Button changes with the theme without any theme rules of its own. Its colors are neutral: black, white, and grays. The brand colors are for the layout around components, so the same buttons can serve other brands.
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>Tokens</th><th>What Button uses them for</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>--action</code>, <code>--action-hover</code>, <code>--on-action</code></td><td>A primary button's fill, its fill on hover, and its text</td></tr>
+    <tr><td><code>--surface</code>, <code>--surface-hover</code>, <code>--ink</code>, <code>--border-strong</code></td><td>Secondary and ghost buttons: fill, hover fill, text, and the secondary button's edge</td></tr>
+    <tr><td><code>--focus</code>, <code>--focus-width</code>, <code>--focus-offset</code></td><td>The keyboard focus outline</td></tr>
+    <tr><td><code>--control-sm</code>, <code>--control-md</code>, <code>--control-lg</code>, <code>--target-min</code></td><td>Heights, and the smallest hit area</td></tr>
+    <tr><td><code>--space-*</code>, <code>--radius-sm</code>, <code>--radius-full</code>, <code>--icon-sm</code>, <code>--icon-md</code>, <code>--border-thick</code></td><td>Padding, gaps, corners, icon sizes, and the border</td></tr>
+    <tr><td><code>--font-sans</code>, <code>--text-small</code>, <code>--text-body</code>, <code>--text-body-lg</code></td><td>Type</td></tr>
+    <tr><td><code>--duration-fast</code>, <code>--duration-loop</code>, <code>--ease-out</code>, <code>--motion-distance</code></td><td>Motion</td></tr>
+    <tr><td><code>--shadow-sm</code></td><td>The hard shadow in hot dog mode</td></tr>
+  </tbody>
+</table>
+</div>
+
+The [Color](?path=/docs/foundations-color--docs) page shows what each color token is in each theme.
+
+### The default button
+
+`.button` on its own is a medium, rectangular, primary button. Every variant, size, and shape is a change from it, so a button with no `data-*` attributes at all still looks right.
+
+<Code file="components/Button/button.css" name=".button" />
+
+- **Layout inside.** `inline-flex` lines up the icons and the label in a row, centered, with a gap between them. Where the button sits on the page (its margin, width, and alignment) isn't set here: that's the layout's job.
+- **Size.** `min-height: var(--control-md)` is 40px with a mouse and 44px on a touch screen (see "The hit area" below). It's a minimum, not a height, so a label that wraps makes the button taller.
+- **A border you can't see.** The 2px border is `transparent`, so it takes up space but doesn't show. It's there for forced colors (below), where the system draws it.
+- **Links too.** `text-decoration: none` takes the underline off a ButtonLink, and `.button:visited` keeps a visited one the same color as one you haven't visited:
+
+<Code file="components/Button/button.css" name=".button:visited" />
+
+### Variants
+
+<Code file="components/Button/button.css" name='.button[data-variant="secondary"]' />
+
+<Code file="components/Button/button.css" name='.button[data-variant="ghost"]' />
+
+Primary needs no rule of its own: it's the default. Secondary has a white fill (the card color in dark mode) and a visible `--border-strong` edge, which has at least 3:1 contrast with what's around it, so you can see where the button is. Ghost has no fill and keeps the transparent border, so it's only text until you hover it. Each is picked by an attribute selector, `[data-variant="…"]`, not by an extra class, so one attribute holds one choice and two variants can't be applied at once.
+
+### Shapes and sizes
+
+<Code file="components/Button/button.css" name='.button[data-shape="pill"]' />
+
+<Code file="components/Button/button.css" name='.button[data-size="sm"]' />
+
+<Code file="components/Button/button.css" name='.button[data-size="lg"]' />
+
+`--radius-full` is a radius far bigger than any button, so the ends are always half circles. Small buttons are 32px tall with smaller type and icons. Large ones are 48px tall (52px on touch), with larger type. Medium is the default from `.button`. Text never changes size with the pointer, only the button's height does.
+
+A label that's too long for its space wraps, and the button grows taller. It's never cut off with an ellipsis, which would hide what the button does, and a word that's too long for the button breaks rather than spilling out of it. `text-wrap: balance` evens out the lines' lengths:
+
+<Code file="components/Button/button.css" name=".button__label" />
+
+The icons are fixed squares (`flex: none` stops them shrinking when the label wraps), and the SVG inside fills its square:
+
+<Code file="components/Button/button.css" name=".button__icon" />
+
+<Code file="components/Button/button.css" name='.button[data-size="sm"] .button__icon' />
+
+<Code file="components/Button/button.css" name=".button__icon > svg" />
+
+An icon-only button drops its side padding and becomes square. `aspect-ratio: 1` sets its width from its height, so it's 40 by 40 at medium size:
+
+<Code file="components/Button/button.css" name=".button[data-icon-only]" />
+
+### Hover, without covering up a state
+
+On hover, a button lifts a little and its fill changes. `:active`, while it's pressed, puts it back down:
+
+<Code file="components/Button/button.css" name=".button:hover" />
+
+<Code file="components/Button/button.css" name=".button:active" />
+
+<Code file="components/Button/button.css" name='.button[data-variant="secondary"]:hover' />
+
+<Code file="components/Button/button.css" name='.button[data-variant="ghost"]:hover' />
+
+The lift is an eighth of `--motion-distance`. That's 1px normally, and nothing at all with reduced motion, because the token becomes 0 (see "Motion" below).
+
+A disabled button still matches `:hover` in the browser, even though it ignores clicks. Without more rules, it would lift and change color as if you could press it. So the disabled rules put it back:
+
+<Code file="components/Button/button.css" name=".button[data-disabled]:hover" />
+
+<Code file="components/Button/button.css" name=".button[data-disabled]:not([data-loading]):hover" />
+
+<Code file="components/Button/button.css" name='.button[data-disabled][data-variant="secondary"]:not([data-loading]):hover' />
+
+<Code file="components/Button/button.css" name='.button[data-disabled][data-variant="ghost"]:not([data-loading]):hover' />
+
+These work by **specificity**: when two rules set the same property, the one whose selector has more classes, attributes, and pseudo-classes wins. `.button[data-variant="secondary"]:hover` counts three. `.button[data-disabled]:not([data-loading]):hover` counts four (`:not()` counts what's inside it), so it wins and puts back the primary fill. That's wrong for a secondary button, so the rule after it adds `[data-variant="secondary"]` to reach five, and puts back the secondary fill. A loading button never lifts, but it does still take the hover fill.
+
+### Keyboard focus
+
+<Code file="components/Button/button.css" name=".button:focus-visible" />
+
+`:focus-visible` matches when the browser decides focus should be shown: when you reach the button with the keyboard, but usually not when you click it. The ring is an `outline`, not a `box-shadow`, because forced colors removes shadows but keeps outlines. It's 2px wide and 2px outside the button, which is enough to pass WCAG's rule on focus appearance even at its strictest level (2.4.13, AAA). When someone has asked their system for more contrast, `--focus-width` becomes 3px. `--focus` is near-black in light mode and near-white in dark mode, so the ring shows against the page in both.
+
+### Disabled and loading
+
+<Code file="components/Button/button.css" name=".button[data-disabled]:not([data-loading])" />
+
+<Code file="components/Button/button.css" name=".button[data-loading]" />
+
+Both states have `data-disabled`, so `:not([data-loading])` keeps the dimming for disabled buttons only. A disabled button is at half opacity, with a "not allowed" cursor. A loading button stays at full strength, so its label stays readable, and shows the "progress" cursor. The CSS uses `data-disabled` rather than the browser's `:disabled`, because a loading button isn't `:disabled`: it has `aria-disabled` instead.
+
+The spinner turns once every `--duration-loop`:
+
+<Code file="components/Button/button.css" name=".button__spinner" />
+
+<Code file="components/Button/button.css" name="@keyframes button-spin" />
+
+### The hit area
+
+A button's **hit area** is everywhere a click or tap counts as pressing it. Every hit area in the design system is at least `--target-min` in both directions: 24px with a mouse, and 44px when the device has a touch screen. Fingers are less precise than a pointer. Most buttons are already bigger than that, but a small button is only 32px tall, so on touch it would be too small.
+
+So `.button::after` adds an invisible box around the button. A pseudo-element is part of its element, so clicking it is clicking the button:
+
+<Code file="components/Button/button.css" name=".button::after" />
+
+`position: absolute` places it relative to the button, which is `position: relative`. Its insets are measured from the button's padding box, the area inside its border, and `100%` is that box's height (or width, for the inline insets). Take a small button on a touch screen:
+
+1. Its padding box is 28px tall: 32px minus the 2px border at the top and at the bottom.
+2. `(100% - var(--target-min)) / 2` is (28 − 44) / 2 = −8px. A negative inset moves the edge outwards, so the box reaches 8px above and 8px below: 28 + 16 = 44px tall.
+3. `min(0px, …)` takes whichever is smaller. With a mouse, (28 − 24) / 2 is +4px, and a positive inset would pull the box inside the button. `min()` keeps it at 0, so a button that's already big enough gets nothing extra.
+
+The same rule works for width, so a small icon-only button gets a 44px square on touch. Here are the same buttons with a mouse and on touch, with each `::after` drawn as a dashed line. The sizes are measured from the page as you see it:
+
+<Unstyled>
+  <HitArea />
+</Unstyled>
+
+On touch, a medium button is already 44px tall, so its `::after` only reaches over its own border, and the dashed line hugs its edge.
+
+`--target-min` changes with the device on its own. The tokens switch it to 44px when any touch input is present, or inside `data-pointer="coarse"`, which is how the demo shows touch on any device. Compact density (`data-density="compact"`) makes medium and large buttons smaller, but never below `--target-min`. Button never checks the pointer itself: it only reads tokens, so every mode works without changes. Because the hit area reaches past the button, leave at least `--target-gap` (8px) between small buttons, so their hit areas don't overlap. [Mouse, touch, and screen size](?path=/docs/foundations-mouse-touch-and-screen-size--docs) has the reasons behind the sizes.
+
+### Hot dog mode
+
+Hot dog is the joke theme, in ketchup and mustard. Its buttons get a thick ink outline and a hard shadow, and instead of lifting on hover, they push into the shadow when pressed:
+
+<Code file="components/Button/button.css" name='[data-theme="hotdog"] .button:not([data-variant="ghost"])' />
+
+<Code file="components/Button/button.css" name='[data-theme="hotdog"] .button:hover' />
+
+<Code file="components/Button/button.css" name='[data-theme="hotdog"] .button:not([data-variant="ghost"]):active:not([data-disabled])' />
+
+In hot dog, `--shadow-sm` is a solid shadow 2px right and 2px down. Pressing moves the button 2px right and 2px down and takes the shadow away, so the button lands exactly where its shadow was. Ghost buttons have no outline or shadow, so they don't press. Neither do disabled or loading ones, which have `data-disabled`.
+
+Try all three themes here. The switch turns on reduced motion for the demo only:
+
+<Unstyled>
+  <Themes />
+</Unstyled>
+
+### Forced colors
+
+Windows' Contrast themes replace every color on the page with a few system colors the person chose, and remove shadows and background images. This is called **forced colors**. Without care, a ghost button would become plain text, and the hot dog shadow would vanish.
+
+<Code file="components/Button/button.css" name="@media (forced-colors: active)" />
+
+- The transparent border becomes a real one, in `ButtonText`, the system's color for button text and edges. Every button, ghost ones and links too, shows its edge.
+- A disabled button turns `GrayText`, the system's color for disabled things. Its opacity goes back to 1, because dimming the system's colors could make them hard to read.
+- Focus is still visible, because it's an outline. The spinner is still visible, because it's drawn in `currentColor`.
+
+To see it without Windows, open Chrome's DevTools, open the Rendering panel, and set "Emulate CSS media feature forced-colors" to "active".
+
+### Motion
+
+`.button` transitions its colors, border, shadow, and position over `--duration-fast` (120ms) with `--ease-out`, which starts fast and slows down. So the hover lift and the fill change ease in rather than jump.
+
+When someone has asked their system for reduced motion, two tokens change, and Button needs no rules of its own:
+
+- `--motion-distance` becomes 0, so the hover lift is 0 and the button stays still. The fill still changes.
+- `--duration-loop` goes from 700ms to 1600ms, so the spinner turns more slowly. It doesn't stop, so it still shows that something is happening.
+
+The hot dog press isn't built from `--motion-distance`, so it still moves under reduced motion. Setting `data-motion="reduced"` or `data-motion="full"` on any element overrides the system setting inside it, as the switch in the demo above does.
+
+## 4. Keyboard and screen readers
+
+<div className="button-parts">
+<table>
+  <thead>
+    <tr><th>Key</th><th>Button</th><th>ButtonLink</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tab, Shift+Tab</td><td>Moves focus to it and away. A disabled button is skipped. A loading one isn't.</td><td>Moves focus to it and away.</td></tr>
+    <tr><td>Enter</td><td>Presses it.</td><td>Follows the link.</td></tr>
+    <tr><td>Space</td><td>Presses it.</td><td>Scrolls the page, as on any link. Links don't respond to Space.</td></tr>
+  </tbody>
+</table>
+</div>
+
+All of this comes from the browser, because Button is a real `<button>` and ButtonLink a real `<a>`. Base UI only steps in for a loading button, where it blocks Enter and Space but lets Tab through.
+
+A screen reader announces:
+
+- **The name.** The label text, or the `aria-label` of an icon-only button. Icons and the spinner are hidden, so they're never read out.
+- **The role.** "Button" for Button and "link" for ButtonLink. This is why ButtonLink exists: someone who hears "link" knows it goes somewhere, and can open it in a new tab.
+- **The state.** A disabled or loading button is announced as unavailable ("dimmed" in VoiceOver). Base UI's docs warn that some browser and screen reader pairs don't announce a change to the text of a button that has focus, such as "Send message" becoming "Sending message". If it matters that people hear the change, announce it somewhere else as well, such as in a status message.
+
+## The whole files
+
+<details>
+<summary><code>Button.tsx</code></summary>
+
+<Code file="components/Button/Button.tsx" />
+
+</details>
+
+<details>
+<summary><code>ButtonLink.tsx</code></summary>
+
+<Code file="components/Button/ButtonLink.tsx" />
+
+</details>
+
+<details>
+<summary><code>shared.tsx</code></summary>
+
+<Code file="components/Button/shared.tsx" />
+
+</details>
+
+<details>
+<summary><code>button.css</code></summary>
+
+<Code file="components/Button/button.css" />
+
+</details>
+
+<details>
+<summary><code>src/internal/cx.ts</code></summary>
+
+<Code file="internal/cx.ts" />
+
+</details>
+
+<details>
+<summary><code>src/internal/warn.ts</code></summary>
+
+<Code file="internal/warn.ts" />
+
+</details>

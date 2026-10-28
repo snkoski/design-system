@@ -1,0 +1,92 @@
+/* Button's "How it works" demos, beyond the shared panel in src/how-it-works/demo.css. They restyle the real Button
+   only from outside, inside these wrappers. */
+
+/* Props to HTML: the controls and the Inspect panel share one panel, so the inner one loses its own frame */
+.button-explain > .explain {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.button-explain__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: var(--space-4) var(--space-6);
+}
+.button-explain__switches {
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* Hit area: each button's ::after, normally invisible, drawn as a dashed line. On a primary button the line is the
+   same color as the fill, so it only shows where the hit area reaches past the button. */
+.button-hit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+}
+.button-hit__column {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.button-hit__name {
+  margin: 0;
+  font-weight: 600;
+}
+.button-hit__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: var(--space-6) var(--space-5);
+  padding-block: var(--space-2);
+}
+.button-hit__item {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+.button-hit__size {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+}
+.button-hit .button::after {
+  outline: var(--border-thin) dashed var(--ink);
+}
+
+/* Themes: one panel per theme, side by side */
+.button-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-3);
+}
+.button-themes__theme {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+}
+.button-themes__name {
+  margin: 0;
+  font-weight: 600;
+}
+.button-themes__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* The page's tables: code in them breaks only at spaces, so an attribute such as data-loading="true" stays on one line
+   (the shared How it works styles let code break anywhere, for long file paths on a phone). The class is doubled to
+   outweigh the shared rule's specificity. */
+.button-parts.button-parts table td code {
+  overflow-wrap: normal;
+}

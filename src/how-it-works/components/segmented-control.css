@@ -1,0 +1,51 @@
+/* SegmentedControl's "How it works" demos. The layers are copies of the real control, restyled from outside so each
+   shows only its own part. */
+.how-segment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) var(--space-8);
+  align-items: end;
+}
+
+/* The stack: every layer in the same grid cell. --apart (0 to 1) slides them down, each by its place in the stack,
+   and makes room for them. The label is drawn on top, the track at the bottom. */
+.how-layers {
+  display: grid;
+  justify-items: start;
+  padding-block-end: calc(var(--apart) * (2 * var(--space-24) + var(--space-12)));
+}
+.how-layers__layer {
+  position: relative;
+  grid-area: 1 / 1;
+  z-index: var(--depth);
+  transform: translateY(calc((2 - var(--depth)) * var(--apart) * var(--space-24)));
+}
+.how-layers__layer .segmented-control__track {
+  outline: var(--border-thin) dashed var(--border);
+}
+
+/* The caption sits under its layer, out of the flow, so every layer lines up when they're together */
+.how-layers__caption {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  display: grid;
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-small);
+  white-space: nowrap;
+  opacity: calc(var(--apart) * 2 - 1);
+}
+.how-layers__caption span {
+  color: var(--ink-muted);
+}
+
+/* Each layer shows only its own part */
+.how-layers__layer:not([data-layer="track"]) .segmented-control__track {
+  background: transparent;
+}
+.how-layers__layer:not([data-layer="highlight"]) .segment__button::before {
+  display: none;
+}
+.how-layers__layer:not([data-layer="label"]) :is(.segment__label, .segment__icon) {
+  visibility: hidden;
+}

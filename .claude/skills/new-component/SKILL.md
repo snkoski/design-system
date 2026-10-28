@@ -132,6 +132,8 @@ If the component introduces a new pattern or rule, add it to `CLAUDE.md` (code r
 
 If the proposal had a "When to use each variant" section, write it as a guidance page, `docs/brand/<topic>.md`, and render it with `src/components/<Name>/<Name>.mdx` beside the stories (`buttons.md` and `Button.mdx` are the pattern). Add the "How other systems do it" table to `docs/brand/industry.md`, with sources.
 
+Write its "How it works" page, `src/components/<Name>/HowItWorks.mdx`, following "How it works pages" in `CLAUDE.md`: the files and Base UI parts it's built from, an `<Inspect>` of the real component in its main states, how its props become attributes, and its CSS rule by rule (states, focus, forced colors, hot dog, touch sizes, and motion), all with `<Code>` blocks read from the real files. Check it in Storybook with no console errors.
+
 ## Phase 9: Independent review
 
 This runs automatically as part of this skill; the user doesn't start it. Spawn the `component-reviewer` subagent (Agent tool, `subagent_type: component-reviewer`) with the prompt: "Review the component `<Name>` in `src/components/<Name>/`. Follow your instructions and return the report in the exact shape they give." If that agent type isn't available, spawn a general-purpose agent and tell it to read and follow `.claude/agents/component-reviewer.md` exactly. Wait for the report. Don't summarize your own reasoning or decisions to it; it should judge only the repo.

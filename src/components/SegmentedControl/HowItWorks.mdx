@@ -1,0 +1,334 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SegmentedControlStories from "./SegmentedControl.stories";
+import { Segment } from "./Segment";
+import { SegmentedControl } from "./SegmentedControl";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { Layers, SegmentedControlForm, SegmentedControlStates, SegmentHitAreas, SegmentIcons } from "../../how-it-works/components/SegmentedControl";
+
+<Meta of={SegmentedControlStories} name="How it works" />
+
+# How SegmentedControl and Segment work
+
+A segmented control is a row of connected buttons where one option at a time is chosen, such as "Monthly / Yearly / Lifetime" or "List / Grid". Underneath, it's a radio group: the same Base UI parts, the same keyboard, the same hidden inputs, and the same form behavior as [RadioGroup](?path=/docs/components-radio-group--how-it-works). Read that page first. This one covers what's different: each option is drawn as a button on a gray track, and the chosen one is a white highlight with a black border.
+
+It's made of these files:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>SegmentedControl.tsx</code></td><td>The control. It's RadioGroup's structure (a field, a fieldset rendered as Base UI's radio group, the label, the description, and the error), with a track around the options and a <code>size</code>.</td></tr>
+    <tr><td><code>Segment.tsx</code></td><td>One option. Base UI's Radio in its own field item, with label text, icons, or both, and no circle.</td></tr>
+    <tr><td><code>segmented-control.css</code></td><td>The look of both: the track, the lines between options, the highlight, every state, the sizes, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>index.ts</code></td><td>Exports both components and their types from the package.</td></tr>
+    <tr><td><code>src/internal/</code></td><td>The pieces every form control shares: <code>cx()</code>, <code>FieldError</code>, and <code>warnIfUnnamed()</code>. <a href="?path=/docs/components-checkbox--how-it-works">Checkbox's How it works page</a> explains the last two.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts are the same as RadioGroup's: `Field.Root`, `Fieldset.Root` rendered as `RadioGroup`, `Fieldset.Legend`, `Field.Description`, `Field.Error`, `Field.Item`, and `Radio.Root`. A segment leaves out two: it has no `Field.Label`, because its words are inside it, and no `Radio.Indicator`, because there's no dot. Every code block on this page is read from the files when the page loads, so it's always the code that runs. The demos use the real components.
+
+## 1. What it renders
+
+Each demo is the real component, with the HTML it has rendered underneath. The HTML updates as you use it, and an attribute that just changed is underlined. Inline styles are left out.
+
+### Nothing chosen, then one chosen
+
+<Unstyled>
+  <Inspect hint="Choose an option by clicking it. Then Tab away and back, and use the arrow keys.">
+    <SegmentedControl label="Show results as" name="layout">
+      <Segment value="list">List</Segment>
+      <Segment value="grid">Grid</Segment>
+    </SegmentedControl>
+  </Inspect>
+</Unstyled>
+
+Most of it is the radio group's HTML, with the same attributes for the same reasons: `role="radiogroup"` named by the legend, `aria-checked` and the roving `tabindex` on each option, and a hidden `<input type="radio">` beside each one. RadioGroup's page explains each of those. What's different:
+
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>data-size="md"</code> on the outer wrapper</td><td><code>SegmentedControl.tsx</code></td><td>The <code>size</code> prop, <code>md</code> unless you pass <code>lg</code>. It's on the wrapper, so one attribute sizes the track and every option.</td></tr>
+    <tr><td><code>{"<div class=\"segmented-control__track\">"}</code></td><td><code>SegmentedControl.tsx</code></td><td>The gray track the options sit on. RadioGroup has a plain options wrapper here.</td></tr>
+    <tr><td><code>{"<div class=\"segment\">"}</code></td><td><code>Field.Item</code></td><td>One option, with its own ids (section 2).</td></tr>
+    <tr><td><code>{"<span role=\"radio\" class=\"segment__button\">"}</code></td><td><code>Radio.Root</code></td><td>The option you see, click, and focus. It's a <code>{"<span>"}</code>, as a radio is, not a <code>{"<button>"}</code> (section 2). There's no <code>aria-labelledby</code>: an element with the radio role takes its name from the text inside it, so the first is named "List".</td></tr>
+    <tr><td><code>{"<span class=\"segment__label\">"}</code> and <code>segment__text</code></td><td><code>Segment.tsx</code></td><td>The words. The outer span lets a label wrap inside its option. The inner one holds only the text, so a story can measure the words themselves.</td></tr>
+    <tr><td><code>{"<input type=\"radio\">"}</code></td><td>Base UI</td><td>The hidden input, beside the span inside the option's <code>{"<div>"}</code>. There's no <code>{"<label>"}</code> pointing at it: the span itself is what you click.</td></tr>
+  </tbody>
+</table>
+
+As in a radio group, the `checked` attribute on a hidden input only shows how it started. React updates the input's `checked` property when you choose, and that's what the form reads (section 5).
+
+### Every state
+
+Pick a state to see what each one changes. Invalid clears the choice and shows the error until you choose an option:
+
+<Unstyled>
+  <SegmentedControlStates />
+</Unstyled>
+
+The attributes are exactly a radio group's: `aria-invalid` on the group and every option and the error linked by `aria-describedby`; `aria-disabled` and `data-disabled` with `disabled` hidden inputs; and `aria-readonly` on the group with `data-readonly` on each option. Only the look differs, and section 3 covers it. As in a disabled radio group, Tab still reaches the chosen option of a disabled control (`docs/revisit.md`, "A disabled radio group can still be reached with Tab").
+
+### Icons
+
+<Unstyled>
+  <SegmentIcons />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<span class=\"segment__icon\" aria-hidden=\"true\">"}</code></td><td><code>Segment.tsx</code></td><td>Wraps each icon, before or after the label, and hides it from screen readers. The words already name the option, so the icon has nothing to add.</td></tr>
+    <tr><td><code>aria-label="List"</code></td><td>You</td><td>An icon-only option has no words, so this is its only name. The props type won't compile one without it (section 2).</td></tr>
+    <tr><td><code>data-icon-only="true"</code></td><td><code>Segment.tsx</code></td><td>Tells the CSS to use less padding. On an option with words, the attribute isn't there at all.</td></tr>
+    <tr><td>No <code>segment__label</code></td><td><code>Segment.tsx</code></td><td>An icon-only option renders the icon alone.</td></tr>
+  </tbody>
+</table>
+
+## 2. From props to HTML
+
+### The control
+
+<Code file="components/SegmentedControl/SegmentedControl.tsx" name="SegmentedControl" />
+
+This is RadioGroup's function with two changes: `size` becomes `data-size` on the outer wrapper, with a default of `md`, and the options sit in a `segmented-control__track` instead of a plain wrapper. Everything else works as [RadioGroup's section 2](?path=/docs/components-radio-group--how-it-works) explains. In short:
+
+- `Field.Root` gets `name`, `disabled`, and `invalid`, and passes them to every part inside.
+- `Fieldset.Root` renders Base UI's `RadioGroup` in place of its own element, so one `<div>` is both the fieldset and the radio group.
+- `{...rest}` passes `value`, `defaultValue`, `required`, `readOnly`, `form`, `aria-label`, and other attributes to Base UI's RadioGroup.
+- `value={null}` means nothing is chosen in a controlled control. `undefined` would make it uncontrolled. Your `onValueChange` only ever gets a string.
+
+<Code file="components/SegmentedControl/SegmentedControl.tsx" name="SegmentedControlSize" />
+
+`size` takes one of a fixed set of strings, so a typo doesn't compile. `md` and `lg` match Input's and Button's sizes, so a segmented control lines up with them in a row. Like Input, it has no `sm`.
+
+<Code file="components/SegmentedControl/SegmentedControl.tsx" name="SegmentedControlProps" />
+
+The props are built the same way as RadioGroup's: a `Labelled` union that requires a `label` or an `aria-label`, the documented `OwnProps`, and the rest of Base UI's RadioGroup props, minus `className`, `render`, `aria-label`, and `inputRef`.
+
+### One option
+
+<Code file="components/SegmentedControl/Segment.tsx" name="Segment" />
+
+- **The name check.** For an icon-only option, `warnIfUnnamed()` is given `undefined` as the label, because its children are a hidden icon: only an `aria-label` can name it.
+- **`Field.Item`** wraps the option and gets `disabled`, as in Radio. Without an item of its own, every option inside the control's one `Field.Root` would get the same id. The item gives each its own, while passing on the control's description and error.
+- **`Radio.Root`** is the option itself, with `className="segment__button"`. `data-icon-only={iconOnly || undefined}` renders `"true"` or nothing at all. Without `|| undefined`, a normal option would render `data-icon-only="false"`, and the CSS selector `[data-icon-only]`, which only checks that the attribute is there, would still match it.
+- **A `<span>`, not a `<button>`.** The comment in the code says why: Base UI always makes the chosen option the control's Tab stop, and a native `<button>` can't take focus while it's disabled. So a chosen, disabled button would hide the whole control from Tab, even with other options enabled. A span with the radio role can be focused while it's `aria-disabled`.
+- **Inside**, either the icon alone, or the start icon, the label, and the end icon, in that order. Every icon is wrapped in a span with `aria-hidden="true"`.
+
+<Code file="components/SegmentedControl/Segment.tsx" name="Labelled" />
+
+<Code file="components/SegmentedControl/Segment.tsx" name="Label" />
+
+An **accessible name** is what a screen reader says a control is called. The union makes sure every option has one. Without `iconOnly`, `children` is the label and is required. With `iconOnly`, `children` is the icon and `aria-label` is a required string. So `<Segment iconOnly value="grid"><LayoutGrid /></Segment>` doesn't compile. `Label` is `ReactNode` minus `undefined`, `null`, and booleans, the values that render nothing.
+
+<Code file="components/SegmentedControl/Segment.tsx" name="SegmentProps" />
+
+The props leave out what the control owns (`required` and `readOnly`, and `name`, `invalid`, and `size`, which Base UI's Radio never had), so passing them to a Segment doesn't compile. A segment also leaves out `id` and `inputRef`, which Radio keeps. On a Radio they reach the hidden input, so a `<label htmlFor>` or a form library can find it. A segment's words are inside it, and nothing needs to point at its input. `render` and `nativeButton` are left out, so it's always the span.
+
+## 3. How it looks: `segmented-control.css`
+
+All of the look is in one stylesheet, inside `@layer components`, so a Tailwind utility in your markup wins over it. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The colors are semantic tokens, which say what a value is for, and each theme points them at its own colors. They're all neutral: `--track`, `--track-hover`, `--surface`, and `--ink` point at the gray scale, white, and near-black in every theme, never at a brand color. Brand colors belong to the layout around components, so the same control can serve any brand. `pnpm check` fails if a component uses a brand token.
+
+<table>
+  <thead>
+    <tr><th>Tokens</th><th>What they're for here</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>--track</code>, <code>--track-hover</code></td><td>The gray track, and the fill of an option you hover that isn't chosen</td></tr>
+    <tr><td><code>--surface</code>, <code>--ink</code></td><td>The chosen option's fill and its border, and the words and icons</td></tr>
+    <tr><td><code>--segment-inset</code></td><td>The gap between an option's edge and its highlight (3px), so a little of the track shows around it</td></tr>
+    <tr><td><code>--focus</code>, <code>--focus-width</code>, <code>--focus-offset</code>, <code>--danger</code></td><td>The keyboard focus outline, and the invalid edge</td></tr>
+    <tr><td><code>--control-md</code>, <code>--control-lg</code>, <code>--target-min</code></td><td>The track's height in each size, and the smallest hit area</td></tr>
+    <tr><td><code>--radius-sm</code>, <code>--border-thin</code>, <code>--border-thick</code></td><td>The corners, the edges, and the chosen border</td></tr>
+    <tr><td><code>--space-*</code>, <code>--icon-md</code>, <code>--icon-stroke</code>, <code>--text-body</code>, <code>--text-body-lg</code>, <code>--leading-control</code></td><td>Padding, gaps, icons, and type</td></tr>
+    <tr><td><code>--duration-fast</code>, <code>--ease-out</code>, <code>--shadow-sm</code></td><td>Transitions, and the hard shadow in hot dog mode</td></tr>
+  </tbody>
+</table>
+
+### Three layers
+
+Each option is drawn in three layers, from the bottom: the gray track, a highlight made by the option's `::before` pseudo-element, and the words and icons on top. Pull them apart to see each one. Each layer is a copy of the real control with the other two hidden, and they follow the control above them:
+
+<Unstyled>
+  <Layers />
+</Unstyled>
+
+### The track
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segmented-control__track" />
+
+- **One gray rectangle.** `--track` fills it, with `--radius-sm` corners, the same as a rectangle Button.
+- **A grid of equal columns.** `grid-auto-flow: column` puts every option in a column of its own, and `grid-auto-columns: 1fr` makes the columns equal, so every option is as wide as the widest.
+- **An edge you can't see.** The border is `transparent`. It takes up room but doesn't show, until forced colors draws it, or the control is invalid. Because the edge counts toward the height, the track is `--control-md` tall with its edge included, the same as an Input or Button. It's a minimum, so labels that wrap make it taller.
+- **`--segment-edge`** is a custom property of the track's own, not a token: how thick its edge is right now. It's 1px normally, and other rules thicken it (invalid, hot dog). The options inside read it, so their corners and hit areas follow the edge.
+- **`max-width: 100%`** keeps it inside its container. In a narrow space the options get narrower and their labels wrap, so the page never scrolls sideways.
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment" />
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment + .segment" />
+
+Every option after the first has a thin, transparent line on its start side. Every control in the system has a border so it shows in forced colors. Connected options share theirs instead of having one each: the track's edge goes round the outside, and these lines go between the options. Together they draw the whole control's outline in forced colors, with no double lines.
+
+### Each option
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button" />
+
+- **No border of its own.** The track and the lines between options are its edges.
+- **Rounded corners, wherever it sits.** Every option has the track's corners, just inside its edge: `--radius-sm` minus `--segment-edge`. The option itself is transparent, so you don't see its corners, but its focus outline follows them. So a middle option's outline is rounded too, and matches the track's.
+- **`isolation: isolate`.** This starts a new **stacking context**: a group the browser paints as one, in its own order. It's what lets the highlight, at `z-index: -1`, sit behind the words but in front of the gray track. Without it, `z-index: -1` would drop the highlight behind the track, and the track's gray would cover it.
+- **Normal weight, always.** `font-weight: 400` is the same whether the option is chosen or not. A bold label is wider, and since every column is as wide as the widest option, choosing the widest one would make the whole control jump wider. The border shows the choice instead.
+- **No text selection,** so double-clicking an option doesn't highlight its words, and no gray flash on a tap in mobile Safari.
+
+### The highlight
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button::before" />
+
+`::before` is an empty box laid over the option, `--segment-inset` (3px) in from every side. So a little of the gray track always shows around it, on all four sides. Its corners are the option's corners minus that inset, so the curves of the track, the option, and the highlight all share one center and stay evenly spaced. Every option's highlight is rounded on all four corners, the middle one too: it floats inside its option rather than touching the edges.
+
+It has no fill at rest. Two states fill it:
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segment__button:hover:not([aria-checked="true"], [data-disabled], [data-readonly])::before' />
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segment__button[aria-checked="true"]::before' />
+
+- **Hover** fills an option that isn't chosen with `--track-hover`, a slightly darker gray. A chosen option doesn't react, because it's already chosen, and neither do disabled or read-only ones, because you can't choose them. So hover never covers up a state.
+- **Chosen** fills the highlight with `--surface`, white (the card color in dark mode), and draws a 2px `--ink` border inside it. The state is read from `aria-checked`, the attribute screen readers use, so the look can't disagree with what's announced.
+
+The border is a `box-shadow` with the `inset` keyword, which draws the shadow inside the box's edge, with no blur: a crisp line. A real `border` would make the box bigger or squeeze what's inside, and a shadow takes no room at all. The border is the cue that doesn't rely on color: it's far above 3:1 against the track and the fill in every theme. So the words and icons don't need to change, and the option never changes size. Whether a check mark in the chosen option would add anything is still open (`docs/revisit.md`, "How a chosen segment stands out").
+
+### Words and icons
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__label" />
+
+An option can get narrower than its longest word, so a control in a narrow space never makes the page scroll sideways. `overflow-wrap: anywhere` then breaks a word that doesn't fit, rather than letting it spill into the next option.
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__icon" />
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__icon svg" />
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button[data-icon-only]" />
+
+Icons are `--icon-md` squares, and every line in them is `--icon-stroke` wide, whatever stroke width the icon came with, so every option's icons match. An icon-only option has less padding.
+
+### Sizes
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control[data-size="lg"] .segmented-control__track' />
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control[data-size="lg"] .segment__button' />
+
+Large is 48px tall (52px on touch), with more padding and larger type. Medium is the default from the rules above, so a control with no `data-size` still looks right.
+
+### Focus and the hit area
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button:focus-visible" />
+
+The focus ring is an `outline`, which forced colors keeps, 2px wide and 2px outside the option. The outline reaches a little way into the options on either side, and they could paint over it. `z-index: 1` lifts the focused option above them.
+
+A **hit area** is everywhere a click or tap counts, and every one is at least `--target-min` in both directions: 24px with a mouse, 44px on a touch screen. The track is `--control-md` tall, which is never less than that, but its edge takes a pixel off the top and the bottom of each option. So the option's `::after` reaches over the edge:
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button::after" />
+
+A click anywhere from the track's top edge to its bottom edge chooses the option under it. Icon-only options are at least `--target-min` wide (`min-width` on `.segment__button`). Switch between a mouse and touch to see the sizes. The dashed lines are each option's hit area, and the sizes are measured from the page:
+
+<Unstyled>
+  <SegmentHitAreas />
+</Unstyled>
+
+The control never checks the pointer itself. The tokens change size when any touch input is present, or inside `data-pointer="coarse"`, as in the demo, and compact density (`data-density="compact"`) shrinks `--control-md` but never below `--target-min`.
+
+### Invalid, read only, and disabled
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control__group[aria-invalid="true"] .segmented-control__track' />
+
+**Invalid** turns the track's edge `--danger` and makes it 2px. It's a real border, not an inset shadow, because the chosen option's highlight would cover a shadow drawn inside the track. Setting `--segment-edge` also moves the options' corners and hit areas in to match. The error under the control says what's wrong in words.
+
+<Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control__group[aria-readonly="true"] .segment__button:not([aria-checked="true"], :focus-visible)' />
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button[data-readonly]" />
+
+**Read only** dims the options that aren't chosen to 75%, and shows the plain cursor. Other choice controls dim the control and keep the label at full strength. Here the label is inside the option, and dimming the chosen one would take its words below 4.5:1 contrast on the white fill. A focused option shows at full strength, so its focus outline does too. Whether read-only should look the same across every control is still open (`docs/revisit.md`, "How read-only fields look").
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segment__button[data-disabled]" />
+
+<Code file="components/SegmentedControl/segmented-control.css" name=".segmented-control[data-disabled] .segmented-control__track:not(:has(:focus-visible))" />
+
+**Disabled** shows the "not allowed" cursor and dims to 50%: the whole track when the control is disabled, or one option on its own. The label and description above stay at full strength. Tab can still reach the chosen option of a disabled control, and dimming it would dim its focus outline below 3:1, so whatever holds focus shows at full strength. `:has(:focus-visible)` asks whether anything inside the track has keyboard focus.
+
+### Hot dog mode
+
+<Code file="components/SegmentedControl/segmented-control.css" name='[data-theme="hotdog"] .segmented-control__track' />
+
+<Code file="components/SegmentedControl/segmented-control.css" name='[data-theme="hotdog"] .segmented-control__group[aria-invalid="true"] .segmented-control__track' />
+
+Hot dog is the joke theme, in ketchup and mustard. Every hot dog control has a chunky ink edge and a hard offset shadow, and so does the track. Buttons, checkboxes, and radios press into their shadow when clicked, but options don't: the shadow belongs to the whole track, and one option moving inside it would look broken. Invalid makes the edge one step thicker than hot dog's usual, as it does in the other themes.
+
+### Forced colors
+
+Windows' Contrast themes replace every color with a few system colors the person chose, and remove shadows. This is called **forced colors**. Without care, the track would be invisible and the chosen option's border, a shadow, would vanish.
+
+<Code file="components/SegmentedControl/segmented-control.css" name="@media (forced-colors: active)" />
+
+- **The outline appears.** The track's edge and the lines between options turn `ButtonText`, so the control and each option have a visible outline. The track becomes `Canvas`, the page color.
+- **The invalid edge** goes back to `ButtonText`, because forced colors would draw `--danger` in the page color.
+- **The chosen option fills with `Highlight`**, the system's color for selected things, with its words in `HighlightText`.
+- **`forced-color-adjust: none`** on the chosen option. Browsers draw a `Canvas` backplate behind text in forced colors, to keep it readable, and here that would hide the `HighlightText` words on the `Highlight` fill. Turning forced colors off for the option removes the backplate. It also stops the browser replacing the option's colors, so the rules set system colors themselves, including `CanvasText` for the focus outline.
+- **The highlight layer goes.** With forced colors off for the chosen option, the browser would keep the highlight's real white fill and ink border on top of the `Highlight` fill. `display: none` removes it, so the whole option shows the choice.
+- **Disabled and read only** go back to full opacity, and disabled uses `GrayText`, the system's color for disabled things.
+
+To see it without Windows, open Chrome's DevTools, open the Rendering panel, and set "Emulate CSS media feature forced-colors" to "active".
+
+## 4. Keyboard and screen readers
+
+The keyboard is a radio group's ([RadioGroup's section 4](?path=/docs/components-radio-group--how-it-works) has the full table):
+
+- **Tab** reaches the chosen option, or the first one that isn't disabled if nothing is chosen. The next Tab leaves the control.
+- **Right and Down arrows** move to the next option and choose it, and **Left and Up** to the previous one, wrapping at the ends and skipping disabled options. In a read-only control they move focus without choosing.
+- **Space** chooses the focused option. **Enter**, **Home**, and **End** do nothing.
+
+A screen reader announces the control as a radio group with its label and description, and each option as a radio button, named by its words or its `aria-label`, and checked or not. Under its look, it's a choice of one from a few, and that's what it's announced as.
+
+## 5. In a form
+
+A form sends the chosen option's `value` under the control's `name`, exactly as a radio group does: one entry when something is chosen, none when nothing is, none when it's disabled, and the value when it's read only. Try each switch:
+
+<Unstyled>
+  <SegmentedControlForm />
+</Unstyled>
+
+`required` only matters when nothing starts chosen. Most segmented controls start with one chosen, with `defaultValue`, so there's always a value to send.
+
+## The whole files
+
+<details>
+<summary><code>SegmentedControl.tsx</code></summary>
+
+<Code file="components/SegmentedControl/SegmentedControl.tsx" />
+
+</details>
+
+<details>
+<summary><code>Segment.tsx</code></summary>
+
+<Code file="components/SegmentedControl/Segment.tsx" />
+
+</details>
+
+<details>
+<summary><code>segmented-control.css</code></summary>
+
+<Code file="components/SegmentedControl/segmented-control.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/SegmentedControl/index.ts" />
+
+</details>

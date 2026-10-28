@@ -1,0 +1,322 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as CheckboxGroupStories from "./CheckboxGroup.stories";
+import { CheckboxGroup } from "./CheckboxGroup";
+import { Checkbox } from "../Checkbox";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { RequiredServices, ServicesForm } from "../../how-it-works/components/CheckboxGroup";
+
+<Meta of={CheckboxGroupStories} name="How it works" />
+
+# How Checkbox group works
+
+A checkbox group is one question with several answers, any of which can be ticked: "Which services do you need?" It's one form field made of several checkboxes, and its value is the list of the ticked options' values.
+
+Each option is a real `Checkbox`, so this page doesn't repeat how the box works. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) covers the box, its CSS, the shared error message (`FieldError`), and the dev warnings. This page covers what the group adds: one label, description, and error for the whole question, one name for the form, and the link between the group and its options.
+
+Every code block on this page is read from the real files when the page loads, so it's always the code that runs. Every demo is the real component.
+
+## 1. What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>CheckboxGroup/CheckboxGroup.tsx</code></td><td>The component. It turns your props into Base UI parts and tells the options inside that they're in a group.</td></tr>
+    <tr><td><code>CheckboxGroup/checkbox-group.css</code></td><td>The look of the label, the description, and the stack of options. Each option styles itself with <code>checkbox.css</code>.</td></tr>
+    <tr><td><code>CheckboxGroup/context.ts</code></td><td>What the group tells each checkbox inside it.</td></tr>
+    <tr><td><code>CheckboxGroup/index.ts</code></td><td>What the package exports: <code>CheckboxGroup</code> and its props type, <code>CheckboxGroupProps</code>.</td></tr>
+    <tr><td><code>Checkbox/Checkbox.tsx</code></td><td>Each option. In a group, it reads the context and renders <code>Field.Item</code> instead of a field of its own (section 3).</td></tr>
+    <tr><td><code>internal/FieldError.tsx</code>, <code>internal/warn.ts</code>, and <code>internal/cx.ts</code></td><td>The shared error message, dev warnings, and class joining, explained on <a href="?path=/docs/components-checkbox--how-it-works">How Checkbox works</a>.</td></tr>
+  </tbody>
+</table>
+
+Like Checkbox, it's built on [Base UI](https://base-ui.com), a library of React components that have behavior but no styles. These are the parts it uses:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>Renders</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Field.Root</code></td><td><code>{"<div>"}</code></td><td>One form field for the whole group. It holds the name, the disabled state, and the invalid state, and every option inside it shares them.</td></tr>
+    <tr><td><code>Fieldset.Root</code>, rendered as <code>CheckboxGroup</code></td><td><code>{"<div role=\"group\">"}</code></td><td>One element doing two jobs. <code>Fieldset</code> links it to its legend. Base UI's <code>CheckboxGroup</code> holds the value, the list of ticked options, and makes "select all" work.</td></tr>
+    <tr><td><code>Fieldset.Legend</code></td><td><code>{"<div>"}</code></td><td>The group's label. Base UI gives it an id and points the group's <code>aria-labelledby</code> at it.</td></tr>
+    <tr><td><code>Field.Description</code></td><td><code>{"<p>"}</code></td><td>Help text for the whole question, linked to the group and to every option.</td></tr>
+    <tr><td><code>Field.Item</code></td><td><code>{"<div>"}</code></td><td>Each option's wrapper, rendered by <code>Checkbox</code>. It gives the option its own label and description, and leaves the field to the group.</td></tr>
+    <tr><td><code>Field.Error</code></td><td><code>{"<div>"}</code></td><td>The group's error, through <code>FieldError</code>. Linked to the group and to every option while it shows.</td></tr>
+  </tbody>
+</table>
+
+`Fieldset.Root` would normally render a `<fieldset>`, but its `render` prop swaps that for Base UI's `CheckboxGroup`, a `<div role="group">`. So there's no native `<fieldset>` or `<legend>`. `role="group"` with `aria-labelledby` is the ARIA way of saying the same thing: these controls belong together, and this is their name.
+
+## 2. What it renders
+
+Each demo below is the real component, with the HTML it has rendered right now underneath. Use it, and the attributes that change are underlined. Inspect leaves out inline `style` attributes.
+
+### The group and its options
+
+<Unstyled>
+  <Inspect hint="Tick and untick the options. Watch the hidden inputs: each one only carries its value while it's ticked.">
+    <CheckboxGroup label="Services" name="services" defaultValue={["design"]} description="Pick any that apply. We'll send a quote for each.">
+      <Checkbox value="design" description="Logos, layouts, and brand books">Design</Checkbox>
+      <Checkbox value="development">Development</Checkbox>
+    </CheckboxGroup>
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<div class=\"checkbox-group\">"}</code></td><td>Base UI's <code>Field.Root</code></td><td>The wrapper for the whole field. Your <code>className</code> goes here.</td></tr>
+    <tr><td><code>{"<div role=\"group\">"}</code></td><td>Base UI's <code>Fieldset.Root</code> and <code>CheckboxGroup</code></td><td><code>role="group"</code> tells screen readers the options belong together. <code>aria-labelledby</code> points at the legend's id, which names the group. <code>aria-describedby</code> points at the description, and at the error while it shows.</td></tr>
+    <tr><td><code>{"<div class=\"checkbox-group__label\">"}</code></td><td>Base UI's <code>Fieldset.Legend</code></td><td>The visible label, with the id the group points at. It's not a <code>{"<label>"}</code>, so clicking it ticks nothing.</td></tr>
+    <tr><td><code>{"<p class=\"checkbox-group__description\">"}</code></td><td>Base UI's <code>Field.Description</code></td><td>Between the label and the options, so it's read before choosing.</td></tr>
+    <tr><td><code>{"<div class=\"checkbox-group__options\">"}</code></td><td>This code</td><td>A wrapper that stacks the options, and the place the group's context is provided.</td></tr>
+    <tr><td><code>{"<div class=\"checkbox\">"}</code></td><td>Base UI's <code>Field.Item</code>, rendered by <code>Checkbox</code></td><td>Each option's wrapper. Inside is an ordinary checkbox: the label row, the box, the hidden input, and the label text.</td></tr>
+    <tr><td>Each box's <code>aria-describedby</code></td><td>Base UI</td><td>Lists the group's description first, then the option's own. A screen reader on an option hears both, so the question's help text isn't lost when someone moves straight to an option.</td></tr>
+    <tr><td>Each hidden input's <code>name</code></td><td>Base UI, from the group's <code>Field.Root</code></td><td>Every option gets the group's name, so the form sends all the ticked ones under one name.</td></tr>
+    <tr><td>Each hidden input's <code>value</code></td><td>Base UI</td><td>The option's <code>value</code> while it's ticked, and an empty <code>value</code> while it isn't. An unticked checkbox sends nothing, so the empty value is never sent.</td></tr>
+  </tbody>
+</table>
+
+### Required and invalid
+
+A group has no `required` prop, because ARIA has no required state for a group. To ask for at least one choice, say "(required)" in the label, check the value when the form is sent, and set `invalid` and `error`. This demo does exactly that.
+
+<Unstyled>
+  <Inspect hint={<>Press "Request a quote" with nothing ticked. Then tick an option.</>}>
+    <RequiredServices />
+  </Inspect>
+</Unstyled>
+
+When the form is sent with nothing ticked, the demo sets `invalid` on the group. Base UI passes it from the group's `Field.Root` to everything inside:
+
+- `data-invalid` on the wrapper, the group, and every option's wrapper, label, and box.
+- `aria-invalid="true"` on every option's box and hidden input, so a screen reader announces each option as invalid.
+- The error, after the options, with an id. That id is added to the group's `aria-describedby` and to every option's. Someone who Tabs straight to an option still hears what's wrong.
+
+Ticking an option clears `invalid`, and Base UI takes all of it off again. No single box is `required`, so the browser's own validation has nothing to check: checking the group is the page's job.
+
+This is the whole pattern:
+
+```tsx
+const [value, setValue] = useState<string[]>([]);
+const [sent, setSent] = useState(false);
+const invalid = sent && value.length === 0;
+
+<CheckboxGroup
+  label="Services (required)"
+  name="services"
+  value={value}
+  onValueChange={setValue}
+  invalid={invalid}
+  error="Choose at least one service."
+>
+  <Checkbox value="design">Design</Checkbox>
+  <Checkbox value="development">Development</Checkbox>
+</CheckboxGroup>
+```
+
+### Disabled and read-only
+
+<Unstyled>
+  <Inspect hint="Click the options, and press Tab. The read-only options take focus but can't change. The disabled ones can't take focus at all.">
+    <div className="checkbox-demo__form">
+    <CheckboxGroup label="Services" name="booked" disabled defaultValue={["design"]} description="Booking opens in May.">
+      <Checkbox value="design">Design</Checkbox>
+      <Checkbox value="development">Development</Checkbox>
+    </CheckboxGroup>
+    <CheckboxGroup label="Your plan" name="plan" readOnly defaultValue={["design"]} description="Chosen when you signed up.">
+      <Checkbox value="design">Design</Checkbox>
+      <Checkbox value="development">Development</Checkbox>
+    </CheckboxGroup>
+    </div>
+  </Inspect>
+</Unstyled>
+
+- **Disabled** goes to the group's `Field.Root`, which disables every option. Each one gets what a disabled checkbox gets: `data-disabled`, `aria-disabled="true"`, `tabindex="-1"`, and a disabled hidden input, so the form doesn't send it. The group and its wrapper get `data-disabled` too.
+- **Read-only** has no Base UI prop on the group. It travels through the group's context instead (section 3), and each option adds it to its own: `aria-readonly="true"` and `data-readonly` on every box. The group element itself gets nothing, because ARIA's read-only state belongs to the controls.
+- **The label and description stay at full strength** in both. The CSS only dims the options (section 4).
+
+### Select all
+
+<Unstyled>
+  <Inspect hint={<>Click "All services" a few times. From the mix you made, it goes to all, then none, then back to your mix.</>}>
+    <CheckboxGroup label="Services" name="services" allValues={["design", "development"]} defaultValue={["design"]}>
+      <Checkbox parent>All services</Checkbox>
+      <Checkbox value="design">Design</Checkbox>
+      <Checkbox value="development">Development</Checkbox>
+    </CheckboxGroup>
+  </Inspect>
+</Unstyled>
+
+A `Checkbox` with `parent` is a "select all" box. Base UI's `CheckboxGroup` drives it with `allValues`, the values of every option:
+
+- **Its state comes from the options.** It's `aria-checked="mixed"` when some are ticked, `"true"` when all are, and `"false"` when none are.
+- **`aria-controls`** lists the ids of the boxes it controls, so assistive technology can tell what it affects.
+- **`data-parent`** appears twice. Base UI puts it on the box. This code puts `data-parent="true"` on the option's wrapper, so the group's CSS can indent the other options under its label text.
+- **Its hidden input has no name**, because Base UI leaves the name off a parent box. It never sends anything: it isn't an answer to the question.
+
+## 3. From props to HTML
+
+### The props type
+
+<Code file="components/CheckboxGroup/CheckboxGroup.tsx" name="Labelled" />
+
+A group needs a name a screen reader can announce, so the type requires a visible `label` or an `aria-label`, with the same `Exclude<ReactNode, undefined | null | boolean>` trick as Checkbox: React's `ReactNode` includes values that render nothing, and `Exclude` takes them out. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains it in full. The group's label is a `label` prop rather than `children`, because `children` are the options.
+
+<Code file="components/CheckboxGroup/CheckboxGroup.tsx" name="CheckboxGroupProps" />
+
+The rest of the props come from Base UI's `CheckboxGroup`, minus `className` (here it goes on the outer wrapper), `render` (which would swap the group element for another), and `aria-label` (which `Labelled` types).
+
+<details>
+<summary><code>OwnProps</code>, every prop this component documents</summary>
+
+<Code file="components/CheckboxGroup/CheckboxGroup.tsx" name="OwnProps" />
+
+</details>
+
+### The component
+
+<Code file="components/CheckboxGroup/CheckboxGroup.tsx" name="CheckboxGroup" />
+
+It runs top to bottom on every render:
+
+1. **Build the context.** `hasAllValues` is whether `allValues` was passed. `useMemo` keeps the same context object until `readOnly` or `hasAllValues` changes. Every option reads the context, and React re-renders all of them whenever its value is a new object, so a new object on every render would re-render every option for nothing.
+2. **Warn if it has no name**, with the shared `warnIfUnnamed`.
+3. **Make it one field.** `Field.Root` takes `name`, `disabled`, and `invalid`, and every option inside shares them.
+4. **Make the group.** `Fieldset.Root` is rendered as `BaseCheckboxGroup`, which gets the rest of the props: `value`, `defaultValue`, `onValueChange`, `allValues`, and anything else, such as `data-testid`. `ref` goes there too, so it reaches the element with `role="group"`.
+5. **The label**, only when there is one. With only an `aria-label`, there's no legend, and `aria-label` names the group directly.
+6. **The description, the options, and the error.** The options sit inside the context provider, so every `Checkbox` among them knows it's in a group. The error comes after the options, inside the group, and shows while `invalid` is true.
+
+`readOnly` isn't a prop of Base UI's `CheckboxGroup`, so it goes through the context: each option reads it and becomes read-only itself.
+
+<table>
+  <thead>
+    <tr><th>Prop</th><th>Becomes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>label</code></td><td>The legend, which names the group through <code>aria-labelledby</code></td></tr>
+    <tr><td><code>aria-label</code></td><td><code>aria-label</code> on the group element</td></tr>
+    <tr><td><code>name</code></td><td>The <code>name</code> of every option's hidden input</td></tr>
+    <tr><td><code>value</code>, <code>defaultValue</code></td><td>Which options are ticked: their <code>aria-checked</code>, and their hidden inputs' <code>checked</code> and <code>value</code></td></tr>
+    <tr><td><code>allValues</code></td><td>What a <code>parent</code> box ticks and unticks, and its <code>aria-controls</code></td></tr>
+    <tr><td><code>description</code></td><td>A <code>{"<p>"}</code>, and its id in the <code>aria-describedby</code> of the group and every option</td></tr>
+    <tr><td><code>invalid</code></td><td><code>data-invalid</code> throughout, and <code>aria-invalid="true"</code> on every option</td></tr>
+    <tr><td><code>error</code></td><td>A <code>FieldError</code> after the options, shown while <code>invalid</code> is true, and its id in the <code>aria-describedby</code> of the group and every option</td></tr>
+    <tr><td><code>disabled</code></td><td>Every option disabled, and <code>data-disabled</code> on the group</td></tr>
+    <tr><td><code>readOnly</code></td><td>Every option read-only, through the context</td></tr>
+    <tr><td><code>className</code></td><td>Added to the outer wrapper's class, next to <code>checkbox-group</code></td></tr>
+    <tr><td><code>ref</code></td><td>The element with <code>role="group"</code></td></tr>
+  </tbody>
+</table>
+
+### What the group tells its options
+
+<Code file="components/CheckboxGroup/context.ts" name="CheckboxGroupContextValue" />
+
+<Code file="components/CheckboxGroup/context.ts" name="CheckboxGroupContext" />
+
+React context is a value a component provides that any component inside it can read, however deep, without passing props through every level. Its default is `null`, so a `Checkbox` outside a group reads `null`, and one inside reads this object. Its presence is how a checkbox knows it's an option.
+
+In a group, a `Checkbox` changes in four ways. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) shows the code.
+
+- **It renders `Field.Item`, not `Field.Root`.** Base UI links each control to the nearest field around it. If an option rendered its own `Field.Root`, that would be its nearest field, and it would get its name and validity from there instead of from the group.
+- **The group's value decides what's ticked.** The option's own `checked`, `defaultChecked`, and `uncheckedValue` are ignored.
+- **The group owns the field's props.** The option's own `name`, `invalid`, `error`, and `required` are ignored. A dev warning names any you set, and where to set them instead.
+- **It needs a `value`.** That's what identifies it in the group's value, and what the form sends. Without one, a dev warning says so.
+
+An option keeps its own `disabled`, `readOnly`, `description`, and `onCheckedChange`. Disabling one option, such as one that's fully booked, leaves the rest working.
+
+## 4. How it looks
+
+`checkbox-group.css` draws only the parts the group adds. Each option is a `Checkbox`, and `checkbox.css` draws it. Like every component's CSS, it's in `@layer components`, and it uses only semantic tokens.
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group" />
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__group" />
+
+The group is a grid. `align-content: start` keeps it at its own height when a layout around it stretches it, so the options never spread apart. `min-width: 0` lets long labels wrap inside a narrow column instead of pushing it wider.
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__label" />
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__description" />
+
+The label is body size at weight 600, and the description is smaller, in `--ink-muted`, with the same line height as the error.
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__options" />
+
+The options stack with no gap. Each option's row is already `--choice-row` tall (32px with a mouse, 44px on touch), so the rows touch, and every point between two boxes belongs to one of them.
+
+<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__options:has(> .checkbox[data-parent]) > .checkbox:not([data-parent])" />
+
+With a "select all" box, the other options move in by `--choice` plus `--space-3`, the width of a box and its gap. Their boxes line up under the parent's label text, which shows they belong to it. `:has()` checks whether the options contain a parent box, using the `data-parent` its wrapper carries.
+
+**Disabled and read-only dim only the options.** `checkbox.css` dims each disabled or read-only option, and the group's label and description stay at full strength. They often say why the choices can't be changed ("Booking opens in May."), so they must stay readable. There's a testing reason too: Storybook runs axe, an accessibility checker, on every story. axe skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail.
+
+## 5. Keyboard, screen readers, and forms
+
+### Keyboard
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>What it does</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tab and Shift+Tab</td><td>Move from option to option. Every option is its own Tab stop, and disabled ones are skipped.</td></tr>
+    <tr><td>Space</td><td>Ticks or unticks the focused option.</td></tr>
+    <tr><td>Enter</td><td>Doesn't tick. Inside a form with a submit button, it sends the form, like Enter on a native checkbox.</td></tr>
+    <tr><td>Arrow keys, Home, and End</td><td>Do nothing.</td></tr>
+  </tbody>
+</table>
+
+This is the difference from a [Radio group](?path=/docs/components-radio-group--how-it-works), which is one Tab stop with arrow keys to move between its radios. Radios are one choice, so moving between them changes the answer. Checkboxes are independent, so each one is a stop of its own.
+
+### Screen readers
+
+Moving into the group, a screen reader can announce the group and its name from `role="group"` and `aria-labelledby`. On each option, it reads the option's name and state, then its `aria-describedby`: the group's description, the option's own description, and the error while there is one.
+
+### Forms
+
+<Unstyled>
+  <ServicesForm />
+</Unstyled>
+
+- **Each ticked option sends `name=value`**, all under the group's one name. Two ticked options send the name twice. On a server, or with `formData.getAll(name)`, that's a list.
+- **They're sent in page order**, not in the order they were ticked.
+- **Nothing ticked sends nothing.** There's no empty entry, so a server should read a missing name as an empty list.
+- **Disabled options never send**, ticked or not, and nor does anything in a disabled group. Read-only options do send.
+- **The "select all" box never sends**, because it has no name.
+
+## The whole files
+
+<details>
+<summary><code>CheckboxGroup.tsx</code></summary>
+
+<Code file="components/CheckboxGroup/CheckboxGroup.tsx" />
+
+</details>
+
+<details>
+<summary><code>checkbox-group.css</code></summary>
+
+<Code file="components/CheckboxGroup/checkbox-group.css" />
+
+</details>
+
+<details>
+<summary><code>context.ts</code></summary>
+
+<Code file="components/CheckboxGroup/context.ts" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/CheckboxGroup/index.ts" />
+
+</details>

@@ -1,0 +1,521 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as CheckboxStories from "./Checkbox.stories";
+import { Checkbox } from "./Checkbox";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { HitArea, SubmitDemo, TermsDemo } from "../../how-it-works/components/Checkbox";
+
+<Meta of={CheckboxStories} name="How it works" />
+
+# How Checkbox works
+
+A checkbox is a box someone ticks or unticks, with its label beside it. This page walks through the code that makes one: the props you pass, the HTML they become, the CSS that draws it, and how it behaves with a keyboard, a screen reader, and a form.
+
+Checkbox is also the pattern the other choice controls follow (Switch, Radio group, and Segmented control). So two pieces every form control shares are explained in full here: `FieldError`, the error message under a control, and the dev warnings.
+
+Every code block on this page is read from the real files when the page loads, so it's always the code that runs. Every demo is the real component.
+
+## 1. What it's made of
+
+Checkbox doesn't write its own keyboard handling, focus management, or ARIA. It's built on [Base UI](https://base-ui.com), a library of React components that have behavior but no styles. ARIA is a set of HTML attributes, such as `role` and `aria-checked`, that tell assistive technology like screen readers what an element is and what state it's in. Base UI does the behavior. This design system adds the props, the look, and the rules on top.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Checkbox/Checkbox.tsx</code></td><td>The component. It turns your props into Base UI parts, draws the tick and the dash, and warns about mistakes in development.</td></tr>
+    <tr><td><code>Checkbox/checkbox.css</code></td><td>The look: the box, the mark, every state, the hit area, hot dog mode, and Windows Contrast themes.</td></tr>
+    <tr><td><code>Checkbox/index.ts</code></td><td>What the package exports: <code>Checkbox</code> and its props type, <code>CheckboxProps</code>.</td></tr>
+    <tr><td><code>CheckboxGroup/context.ts</code></td><td>How a checkbox knows it's inside a <a href="?path=/docs/components-checkbox-group--how-it-works">Checkbox group</a>, and what the group tells it.</td></tr>
+    <tr><td><code>internal/FieldError.tsx</code> and <code>internal/field-error.css</code></td><td>The error message every form control shows: an icon and words. Shared, and not exported from the package.</td></tr>
+    <tr><td><code>internal/warn.ts</code></td><td>Development warnings, such as a checkbox with no accessible name. Shared, and not exported.</td></tr>
+    <tr><td><code>internal/cx.ts</code></td><td>Joins class names. Shared, and not exported.</td></tr>
+  </tbody>
+</table>
+
+`Checkbox.test.tsx` and `Checkbox.stories.tsx` sit beside them. The tests check behavior in a simulated browser, and every story also runs as a test in a real one. They aren't shown here, but this page links to what they prove.
+
+These are the Base UI parts it uses, and what each one gives it:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>Renders</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Field.Root</code></td><td><code>{"<div>"}</code></td><td>One form field. It holds the field's name, disabled state, and invalid state, and links its label, description, and error to the control with ids.</td></tr>
+    <tr><td><code>Field.Label</code></td><td><code>{"<label>"}</code></td><td>The label. Base UI gives it an id and points the control's <code>aria-labelledby</code> at it.</td></tr>
+    <tr><td><code>Checkbox.Root</code></td><td><code>{"<span>"}</code> and a hidden <code>{"<input>"}</code></td><td>The checkbox itself: its role, its ticked state, Space to tick it, and a real checkbox input for forms.</td></tr>
+    <tr><td><code>Checkbox.Indicator</code></td><td><code>{"<span>"}</code></td><td>The holder for the mark. It's only there while the box is ticked or mixed, and it marks its first and last frames so CSS can animate it in and out.</td></tr>
+    <tr><td><code>Field.Description</code></td><td><code>{"<p>"}</code></td><td>Help text, linked to the control with <code>aria-describedby</code>.</td></tr>
+    <tr><td><code>Field.Error</code></td><td><code>{"<div>"}</code></td><td>The error message, used through <code>FieldError</code>. Linked to the control while it shows.</td></tr>
+    <tr><td><code>Field.Item</code></td><td><code>{"<div>"}</code></td><td>Used instead of <code>Field.Root</code> when the checkbox is an option in a group (section 3).</td></tr>
+  </tbody>
+</table>
+
+## 2. What it renders
+
+Each demo below is the real Checkbox, with the HTML it has rendered right now underneath. Use it, and the attributes that change are underlined. Inspect leaves out inline `style` attributes, and Base UI's ids look like `base-ui-_r_1_`.
+
+### Unticked, ticked, and mixed
+
+<Unstyled>
+  <Inspect hint="Click a box or its label text, or press Tab to reach one and Space to tick it. The mixed box stays mixed, because you control that with the indeterminate prop: clicking it only reports the click.">
+    <Checkbox>Email me about new projects</Checkbox>
+    <Checkbox defaultChecked>Send me reminders</Checkbox>
+    <Checkbox indeterminate>All services</Checkbox>
+  </Inspect>
+</Unstyled>
+
+Here is each element, who sets each attribute, and why:
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<div class=\"checkbox\">"}</code></td><td>Base UI's <code>Field.Root</code>, with the class from this code</td><td>The wrapper for the whole field. Base UI adds <code>data-filled</code> while the box is ticked (the field "has a value"). The CSS doesn't use it.</td></tr>
+    <tr><td><code>{"<label class=\"checkbox__row\">"}</code></td><td>Base UI's <code>Field.Label</code></td><td>The label wraps the box and the text, so the whole row is the click target. Base UI gives it an <code>id</code>, and a <code>for</code> that points at the hidden input, so the browser treats it as that input's label.</td></tr>
+    <tr><td><code>{"<span class=\"checkbox__box\">"}</code></td><td>Base UI's <code>Checkbox.Root</code></td><td>The checkbox people see, focus, and hear. <code>role="checkbox"</code> says what it is. <code>tabindex="0"</code> puts it in the Tab order. <code>aria-checked</code> is <code>"false"</code>, <code>"true"</code>, or <code>"mixed"</code>. <code>aria-labelledby</code> points at the label's id, which names it. <code>data-unchecked</code>, <code>data-checked</code>, or <code>data-indeterminate</code> repeat the state for CSS, but this CSS styles from <code>aria-checked</code> instead (section 4).</td></tr>
+    <tr><td><code>{"<input type=\"checkbox\">"}</code></td><td>Base UI's <code>Checkbox.Root</code></td><td>The form's copy of the checkbox. Base UI keeps its <code>checked</code> in step with the span, so a form submits it like a native checkbox. An inline style hides it from sight, <code>aria-hidden="true"</code> from screen readers, and <code>tabindex="-1"</code> from Tab, so there is only ever one checkbox to see, hear, and reach.</td></tr>
+    <tr><td><code>{"<span class=\"checkbox__indicator\">"}</code></td><td>Base UI's <code>Checkbox.Indicator</code></td><td>Holds the mark. Base UI only renders it while the box is ticked or mixed: untick a box and watch it go.</td></tr>
+    <tr><td><code>{"<svg class=\"checkbox__mark\">"}</code></td><td>This code (<code>Mark</code>)</td><td>The tick, or the dash when mixed, so the state never depends on color alone. <code>aria-hidden="true"</code> keeps it silent, because <code>aria-checked</code> already says the state. <code>focusable="false"</code> keeps it out of the Tab order in older browsers.</td></tr>
+    <tr><td><code>{"<span class=\"checkbox__label\">"}</code></td><td>This code</td><td>Wraps your label text, so CSS can line it up with the box.</td></tr>
+  </tbody>
+</table>
+
+**Why a span, and not a real checkbox input?** Base UI renders a `<span>` so a `<label>` can wrap it, and so CSS can draw it any way it likes. Base UI gives the span everything a native checkbox has for people: the role, the state, focus, and Space. A native `<input>` stays beside it for forms, hidden from everyone.
+
+**How one click ticks once.** Clicking the box itself would normally make the label click its input too. Base UI cancels that, and clicks the hidden input itself. Clicking the label text is ordinary HTML: the browser clicks the input the label's `for` points at. Either way the input changes once, and Base UI listens for that change and updates `aria-checked`. A unit test checks that one click ticks once.
+
+### With no visible label
+
+In a table, a row's checkbox often has no visible text. Then there's no `<label>` at all, and `aria-label` names the span directly. Section 4 explains how it still gets a big enough hit area.
+
+<Unstyled>
+  <Inspect hint="Click the box. Its name, read by screen readers, is the aria-label.">
+    <Checkbox aria-label="Select row 3" />
+  </Inspect>
+</Unstyled>
+
+### With a description
+
+<Unstyled>
+  <Inspect hint="The description is linked to the box and to the hidden input with aria-describedby.">
+    <Checkbox description="About once a month. You can unsubscribe at any time.">Email me about new projects</Checkbox>
+  </Inspect>
+</Unstyled>
+
+`Field.Description` renders a `<p>` with an id, and Base UI adds `aria-describedby` with that id to the box. A screen reader reads the name, the state, and then the description. The description sits outside the `<label>`, so it isn't part of the name: the name stays short, which matters when someone is moving quickly through a form.
+
+### Invalid, with an error
+
+This is a small form that checks the box when it's sent, the way `docs/brand/forms.md` asks: validate on submit, then show the problem in words next to the field.
+
+<Unstyled>
+  <Inspect hint={<>Press "Create account" with the box unticked. Then tick it, and untick it again.</>}>
+    <TermsDemo />
+  </Inspect>
+</Unstyled>
+
+From the start, `required` gives the box `aria-required="true"` and `data-required`, and the hidden input the native `required`. When the form is sent with the box unticked, the demo sets `invalid` and these appear:
+
+- `data-invalid` on the wrapper, the label, and the box, from `Field.Root`.
+- `aria-invalid="true"` on the box and on the hidden input, so a screen reader announces it as invalid.
+- The error, a `<div class="field-error checkbox__error">` with an id, an icon, and the words.
+- That id, added to the box's `aria-describedby`. Base UI only adds it while the error shows, and takes it off when the error goes.
+
+The error's `data-starting-style`, struck through a moment after it appears, is Base UI marking its first frame, so CSS could animate it in. `field-error.css` doesn't animate it.
+
+The form has `noValidate`. Without it, the browser would check the native `required` itself, stop the form from being sent, and show its own message for the hidden input. `noValidate` turns that off, so the page checks and shows its own error.
+
+### Disabled and read-only
+
+<Unstyled>
+  <Inspect hint="Click each one, and press Tab. The read-only box takes focus, but can't change. The disabled ones can't take focus at all.">
+    <Checkbox disabled>Unticked and disabled</Checkbox>
+    <Checkbox disabled defaultChecked>Ticked and disabled</Checkbox>
+    <Checkbox readOnly defaultChecked>Joined in 2024</Checkbox>
+  </Inspect>
+</Unstyled>
+
+- **Disabled** goes to both `Field.Root` and `Checkbox.Root`. Base UI adds `data-disabled` to the wrapper, the label, the box, and the mark. The box gets `aria-disabled="true"`, and `tabindex="-1"` takes it out of the Tab order. The hidden input gets the native `disabled`, which also means a form doesn't send it.
+- **Read-only** gives the box `aria-readonly="true"` and `data-readonly`. It keeps `tabindex="0"`, so people can still Tab to it and hear its state. Base UI ignores clicks and Space. The hidden input isn't disabled, so a form still sends it.
+
+## 3. From props to HTML
+
+### The props type
+
+A checkbox must have an accessible name: the words a screen reader says for it. The props type makes that a compile error to forget.
+
+<Code file="components/Checkbox/Checkbox.tsx" name="Labelled" />
+
+It's a union of two shapes. Either there's label content in `children`, and `aria-label` is optional, or there isn't, and `aria-label` is required. Leave out both and TypeScript refuses to compile.
+
+The label's type is `Exclude<ReactNode, undefined | null | boolean>`. React's `ReactNode` includes `undefined`, `null`, `true`, and `false`, which all render nothing. Typed as plain `ReactNode`, `<Checkbox>{undefined}</Checkbox>` would compile and render a checkbox with no name. `Exclude` takes those four out. Each branch repeats its JSDoc comments, so Storybook's docs table describes both props whichever branch it reads.
+
+<Code file="components/Checkbox/Checkbox.tsx" name="CheckboxProps" />
+
+`OwnProps` lists the props this component declares and documents itself, because Storybook's docs table only reads props declared in this repo, not ones inherited from `node_modules`. Everything else comes from Base UI's `Checkbox.Root.Props`, minus a few:
+
+- `className`, which goes on the wrapper here, not the box.
+- `render` and `nativeButton`, which would swap the span for another element. The label, the CSS, and the hit area all depend on it being this span.
+- `children` and `aria-label`, which `Labelled` types instead.
+
+<details>
+<summary><code>OwnProps</code>, every prop this component documents</summary>
+
+<Code file="components/Checkbox/Checkbox.tsx" name="OwnProps" />
+
+</details>
+
+### The component
+
+<Code file="components/Checkbox/Checkbox.tsx" name="Checkbox" />
+
+It runs top to bottom on every render:
+
+1. **Is it in a group?** `useContext(CheckboxGroupContext)` reads the group's context. Outside a group it's `null`.
+2. **Set aside what a group owns.** `checked`, `defaultChecked`, `uncheckedValue`, and `required` are pulled out of `rest` into `groupable`, which is `rest` without them. On its own, the checkbox passes all of `rest` to Base UI. In a group, it passes only `groupable`, because the group's value decides what's ticked.
+3. **Warn about mistakes** that TypeScript can't catch (see "Dev warnings" below).
+4. **Build the box.** `BaseCheckbox.Root` gets the props spread first, then the ones this code decides. Later props win, so nothing in `rest` can override them. `name` is left off in a group, because the group's field names every option. `readOnly` is on if the checkbox or its group says so.
+5. **Draw the mark.** `Checkbox.Indicator` takes a `render` function, which gets Base UI's `state`. For a "select all" box in a group, the group decides when it's mixed, so the mark reads `state.indeterminate` rather than the prop.
+6. **Wrap it in its label.** With `children`, the box and the text go inside `Field.Label`. Without, the box stands alone. The description comes after.
+7. **Make it a field.** On its own, it's a `Field.Root`, which takes `name`, `disabled`, and `invalid`, and holds the error. In a group, it's a `Field.Item`.
+
+<Code file="components/Checkbox/Checkbox.tsx" name="Mark" />
+
+The mark is drawn on a 16 by 16 grid. Its stroke is `currentColor`, the text color of the element it's in, so the CSS colors it by setting the box's `color`.
+
+### From each prop to the HTML
+
+<table>
+  <thead>
+    <tr><th>Prop</th><th>Becomes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>children</code></td><td>The text in <code>.checkbox__label</code>, inside the <code>{"<label>"}</code> that names the box through <code>aria-labelledby</code></td></tr>
+    <tr><td><code>aria-label</code></td><td><code>aria-label</code> on the box</td></tr>
+    <tr><td><code>checked</code>, <code>defaultChecked</code></td><td><code>aria-checked</code> and <code>data-checked</code> or <code>data-unchecked</code> on the box, and <code>checked</code> on the hidden input</td></tr>
+    <tr><td><code>indeterminate</code></td><td><code>aria-checked="mixed"</code> and <code>data-indeterminate</code> on the box, and the dash</td></tr>
+    <tr><td><code>disabled</code></td><td><code>data-disabled</code> on every part, <code>aria-disabled="true"</code> and <code>tabindex="-1"</code> on the box, and <code>disabled</code> on the hidden input</td></tr>
+    <tr><td><code>readOnly</code></td><td><code>aria-readonly="true"</code> and <code>data-readonly</code> on the box</td></tr>
+    <tr><td><code>required</code></td><td><code>aria-required="true"</code> and <code>data-required</code> on the box, and <code>required</code> on the hidden input</td></tr>
+    <tr><td><code>invalid</code></td><td><code>aria-invalid="true"</code> on the box and the hidden input, and <code>data-invalid</code> on the wrapper, the label, and the box</td></tr>
+    <tr><td><code>error</code></td><td>A <code>FieldError</code> after the label, shown while <code>invalid</code> is true, and its id in the box's <code>aria-describedby</code></td></tr>
+    <tr><td><code>description</code></td><td>A <code>{"<p class=\"checkbox__description\">"}</code>, and its id in the box's <code>aria-describedby</code></td></tr>
+    <tr><td><code>name</code>, <code>value</code>, <code>form</code>, <code>id</code></td><td>Those attributes on the hidden input (section 5)</td></tr>
+    <tr><td><code>uncheckedValue</code></td><td>A second, <code>type="hidden"</code> input, there only while the box is unticked (section 5)</td></tr>
+    <tr><td><code>className</code></td><td>Added to the wrapper's class, next to <code>checkbox</code></td></tr>
+    <tr><td><code>ref</code>, <code>inputRef</code></td><td>The box, and the hidden input</td></tr>
+    <tr><td>Anything else, such as <code>onFocus</code> or <code>data-testid</code></td><td>Passed through to the box</td></tr>
+  </tbody>
+</table>
+
+### Inside a group: the context and `Field.Item`
+
+A [CheckboxGroup](?path=/docs/components-checkbox-group--how-it-works) makes several checkboxes one form field. The group has to tell each checkbox inside it that it's in a group, and React context is how: a value a parent provides that any component inside it can read, however deep, without passing props through every level.
+
+<Code file="components/CheckboxGroup/context.ts" name="CheckboxGroupContextValue" />
+
+<Code file="components/CheckboxGroup/context.ts" name="CheckboxGroupContext" />
+
+Its default is `null`, so a checkbox outside a group reads `null`. Inside a group it reads `readOnly`, which it adds to its own, and `hasAllValues`, which it only uses to warn.
+
+In a group, the group's `Field.Root` is the field: it owns the name, the invalid state, and the error. Base UI links each control to the nearest field around it. If each checkbox also rendered a `Field.Root` of its own, that would be the nearest one, and the checkbox would get its name and validity from there instead of from the group. So in a group it renders `Field.Item`, which is made for this: it gives an option its own label and description, and leaves the field to the group. Props the group owns, such as `name`, `invalid`, and `error`, are ignored there, and a dev warning says so.
+
+### FieldError: the error every form control shows
+
+Every form control in the system (Checkbox, CheckboxGroup, Switch, Radio group, Segmented control, Input, and TextArea) shows its error with this one component, so every error looks and reads the same.
+
+<Code file="internal/FieldError.tsx" name="FieldError" />
+
+<Code file="internal/FieldError.tsx" name="ErrorIcon" />
+
+- **It's Base UI's `Field.Error`**, so Base UI gives it an id and adds that id to the control's `aria-describedby`, but only while it shows. A screen reader reads the error after the control's name and state.
+- **`match` decides when it shows.** Each control passes its `invalid` prop. When `match` is `true`, Base UI always shows the message. Otherwise, Base UI would only show it if its own validation had failed, and these components don't use Base UI's validation. So in practice, `invalid` alone decides. A unit test checks the error is hidden when the checkbox is valid.
+- **An icon and words.** The error is never only a red border. The icon is `aria-hidden`, because the words carry the meaning.
+- **`className`** is the control's own class for this part, such as `checkbox__error`, added next to `field-error`. The shared CSS draws it, and the control's CSS only places it.
+
+Each control renders it only when there's an `error` to show, with `{error && …}`, so `invalid` with no message marks the box but adds no empty line.
+
+<Code file="internal/field-error.css" name=".field-error" />
+
+<Code file="internal/field-error.css" name=".field-error__icon" />
+
+The text is `--text-small`, in `--danger`, one of the status colors components may use because it carries meaning. The line is `--icon-md` tall, and the margin centers the smaller `--icon-sm` icon on that line.
+
+<Code file="internal/field-error.css" name="@media (forced-colors: active)" />
+
+In Windows Contrast themes, the error's color becomes `CanvasText`, the system's ordinary text color. The words and the icon still carry the meaning.
+
+Today the error comes after the field. `docs/brand/forms.md` describes a different placement, between the label and the field, and which one wins is an open question in `docs/revisit.md`.
+
+### Dev warnings
+
+Some mistakes compile fine and still break something. For those, the components print a warning in the browser's console while you develop.
+
+<Code file="internal/warn.ts" name="warn" />
+
+- **Only in development.** A consumer's build tool replaces `process.env.NODE_ENV` with `"production"` in a production build, so the check is always true and the bundler drops the rest. Nothing is printed, and no warning text ships.
+- **Once per message.** `shown` remembers every message printed, so a component that renders 100 times warns once.
+- **One format.** Every message starts `[design-system] Checkbox:`, so you can tell where it came from.
+
+A warning has to earn its place. One is added only when all three hold:
+
+1. **TypeScript can't catch it.** If a type can make the mistake fail to compile, the type does it instead.
+2. **The result is definitely broken**: wrong form data, a control with no accessible name, or a prop that silently does nothing. Never for unusual but valid use, or for style.
+3. **Nothing else would show it.** The page doesn't visibly break, and the accessibility checks in Storybook don't catch it.
+
+<Code file="internal/warn.ts" name="warnIfUnnamed" />
+
+<Code file="internal/warn.ts" name="hasContent" />
+
+`warnIfUnnamed` is the warning every form control and button calls. The props type already requires a label or an `aria-label`, but an empty string passes it, such as a label read from a content system that came back empty. `hasContent` checks whether label content would render anything: not empty, not only spaces, and not only `null`, `undefined`, or booleans. An `aria-labelledby` that points at another element's text counts as a name too.
+
+Checkbox's own warnings, all in the component above:
+
+<table>
+  <thead>
+    <tr><th>When</th><th>Why it's broken</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>The label is empty and there's no <code>aria-label</code></td><td>Screen readers announce a checkbox with no name.</td></tr>
+    <tr><td>An option in a group has no <code>value</code></td><td>It submits <code>on</code>, and the group can't tell its options apart.</td></tr>
+    <tr><td>A <code>parent</code> box is in a group without <code>allValues</code></td><td>"Select all" ticks only itself.</td></tr>
+    <tr><td>A <code>parent</code> box is outside a group</td><td>Same: there's nothing for it to select.</td></tr>
+    <tr><td>An option in a group sets <code>name</code>, <code>invalid</code>, <code>error</code>, <code>required</code>, <code>checked</code>, <code>defaultChecked</code>, or <code>uncheckedValue</code></td><td>The group owns those, so the prop silently does nothing. One message lists every ignored prop and where to set it instead.</td></tr>
+  </tbody>
+</table>
+
+They only warn about values that would have an effect. `invalid && …` is false for `invalid={false}`, which wouldn't change anything anyway, so it stays quiet. `checked !== undefined` does warn for `checked={false}`, because outside a group that would hold the box unticked.
+
+The warnings are called during render, not in an effect, so they also show when a page is rendered on a server. In the unit tests, any test that leaves a warning behind fails, so a warning can't creep in unnoticed. A test that expects one takes it with `takeWarnings()` and checks the exact words.
+
+### Joining class names
+
+<Code file="internal/cx.ts" name="cx" />
+
+`cx("checkbox", className)` gives `"checkbox"` when you pass no `className`, and `"checkbox mt-4"` when you pass `"mt-4"`. Your class goes on the wrapper, next to the component's own, which is why the `className` prop's JSDoc calls it "the place for layout classes such as margin".
+
+## 4. How it looks
+
+All of the look is in `checkbox.css`, inside `@layer components`. CSS layers set which styles win: the order is `theme, base, components, utilities`, so a Tailwind utility you add with `className` beats the component's own CSS for a one-off.
+
+The CSS follows three conventions:
+
+- **Classes name parts**: `.checkbox`, `.checkbox__row`, `.checkbox__box`, `.checkbox__indicator`, `.checkbox__mark`, `.checkbox__label`, `.checkbox__description`, and `.checkbox__error`. There are no modifier classes such as `.checkbox--checked`.
+- **States come from ARIA attributes** where one exists: `aria-checked`, `aria-invalid`, and `aria-readonly`. A screen reader announces the same attributes, so what you see and what you hear can't disagree. Disabled is styled from Base UI's `data-disabled`, because Base UI puts it on the label as well as the box, so one attribute dims both.
+- **Only semantic tokens.** A semantic token says what a value is for (`--border-strong`), not what it is (a gray). Every color token here points at the gray scale, never at a brand color, so the checkbox looks right next to any brand. The only exception is `--danger`, a status color that carries meaning.
+
+### The wrapper and the label row
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox" />
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__row" />
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__label" />
+
+The row is the click target, so its height matters. `--choice` is the box's size, 24px. `--choice-row` is how tall a row should be: 32px with a mouse, and 44px when a touch screen is present. The row's padding above and below is half the difference, `(--choice-row - --choice) / 2`: 4px with a mouse and 10px on touch. The label text's line height is `--choice`, so the first line of text is exactly as tall as the box and lines up with it. A long label wraps under itself, and the box stays beside its first line.
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox:not(:has(> .checkbox__row))" />
+
+A checkbox with no visible label has no row. The same padding then goes on the wrapper, so it's still a full row tall.
+
+### The box
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__box" />
+
+- **`--border-thick` in `--border-strong`.** A 2px edge that meets 3:1 contrast against the page in every theme. The fill changes with the state, but the edge always shows where the box is.
+- **`--surface`** is the unticked fill, and **`--radius-sm`** rounds the corners.
+- **`color: var(--on-action)`** is the mark's color, because the mark draws with `currentColor`. It's checked against the ticked fill, `--action`.
+- **The transition** fades color changes and the hot dog press over `--duration-fast` (120ms).
+
+### The hit area
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__box::after" />
+
+Every target must be at least `--target-min` in both directions: 24px with a mouse and 44px on touch. A labelled checkbox already is, because its whole row is the target. A checkbox with no label is only its 24px box. So the box gets an invisible `::after` that's `--target-min` square, centered on it. Clicks on it count as clicks on the box.
+
+`inset` is how far it reaches past the box's inner edge, so a negative inset makes it bigger. The `::after` is positioned from inside the border, so the border width is taken off too. With a mouse, `(24 - 24) / 2 - 2` is `-2px`, which makes it the box's own 24px. On touch, `(24 - 44) / 2 - 2` is `-12px`, which makes it 44px.
+
+Switch between mouse and touch to see it. The outlines are added by this demo only.
+
+<Unstyled>
+  <HitArea />
+</Unstyled>
+
+The wrapper of the second checkbox is as tall as its hit area. Without that, two unlabelled checkboxes stacked closely would overlap, and a tap meant for one would reach the other. `checkbox.css` has no media query for this: the tokens change with `data-pointer`, or by themselves when a touch screen is present, and the CSS reads them.
+
+### Hover
+
+<Code file="components/Checkbox/checkbox.css" name='.checkbox__row:hover .checkbox__box:not([data-disabled], [aria-readonly="true"])' />
+
+Hovering anywhere on the row lightens the box to `--surface-hover`, so the whole row feels like one target. Disabled and read-only boxes are left out, so they don't look like they'd respond.
+
+A hover rule must never cover up a state. `:hover` adds specificity, so a hover rule usually beats a state rule. This one only changes the background, so an invalid box keeps its `--danger` edge while hovered.
+
+### Focus
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__box:focus-visible" />
+
+`:focus-visible` matches when the browser decides focus should be shown: after the keyboard, but not after a mouse click. The ring is an `outline`, never only a `box-shadow`, because Windows Contrast themes remove box shadows but keep outlines. `--focus` meets 3:1 in every theme, and `--focus-width` grows from 2px to 3px when someone has asked their system for more contrast.
+
+### Ticked, mixed, and invalid
+
+<Code file="components/Checkbox/checkbox.css" name='.checkbox__box[aria-checked="true"]' />
+
+Ticked and mixed boxes fill with `--action`: near-black in light mode, and near-white in dark mode. The fill isn't what says "ticked": the mark is, so the state never relies on color.
+
+<Code file="components/Checkbox/checkbox.css" name='.checkbox__row:hover .checkbox__box[aria-checked="true"]:not([data-disabled], [aria-readonly="true"])' />
+
+A hovered ticked box uses `--action-hover`, so it still looks filled.
+
+<Code file="components/Checkbox/checkbox.css" name='.checkbox__box[aria-invalid="true"]' />
+
+An invalid box's edge turns `--danger`. The error message's words and icon carry the meaning; the edge only points at which control it belongs to.
+
+### Disabled and read-only
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__row[data-disabled]" />
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__box[data-disabled]" />
+
+Disabled dims the box and its label text to 50%, and shows the "not allowed" cursor.
+
+<Code file="components/Checkbox/checkbox.css" name='.checkbox__box[aria-readonly="true"]' />
+
+Read-only shows the plain cursor. The rule after this one in the file sets `opacity: 0.75` on the box alone. Read-only is a lighter cue than disabled, and the label stays at full strength, because read-only content must stay readable. At 75%, the box's edge and its mark still meet 3:1 in every theme.
+
+### The mark and its motion
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__indicator" />
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__indicator[data-starting-style]" />
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__mark" />
+
+When a box is ticked, Base UI adds the indicator with `data-starting-style` for its first frame, then takes it off. The CSS transition runs from the starting style (invisible, and scaled to `--motion-scale`, 85%) to the normal style, so the mark pops in over `--duration-base` (200ms) with `--ease-bounce`, a curve that overshoots a little. Bounce is kept for toggles, chips, and success states.
+
+When a box is unticked, Base UI adds `data-ending-style` and waits for the transition to finish before it removes the indicator. The rule after these in the file makes leaving quicker than arriving: `--duration-fast` with `--ease-in`, which starts slow and speeds up.
+
+Only `opacity` and `transform` animate, which browsers can do smoothly. Under reduced motion, the tokens change instead of the CSS: `--motion-scale` becomes 1 and `--ease-bounce` becomes a plain ease-out, so the mark fades in without moving.
+
+### Description and error
+
+<Code file="components/Checkbox/checkbox.css" name=".checkbox__description" />
+
+The description is smaller and in `--ink-muted`. A rule after it in the file indents both the description and the error by `--choice` plus `--space-3`, the width of the box and the gap, so they line up with the label text rather than the box.
+
+### Hot dog mode
+
+<Code file="components/Checkbox/checkbox.css" name='[data-theme="hotdog"] .checkbox__box' />
+
+<Code file="components/Checkbox/checkbox.css" name='[data-theme="hotdog"] .checkbox__row:active .checkbox__box:not([data-disabled], [aria-readonly="true"])' />
+
+In hot dog mode, `--shadow-sm` is a hard shadow offset 2px down and right. While you press the row or the box, the box moves 2px down and right and the shadow goes, so it looks pressed into its shadow. Disabled and read-only boxes don't press, since nothing happens when you click them.
+
+### Windows Contrast themes
+
+<Code file="components/Checkbox/checkbox.css" name="@media (forced-colors: active)" />
+
+Windows Contrast themes (forced colors) replace every color with a few system colors the person chose. The CSS can't pick colors there, but it can pick which system color goes where:
+
+- The box is `Canvas` (the page color) with a `ButtonText` edge, and the mark is `HighlightText`.
+- Ticked and mixed boxes fill with `Highlight`. The hover selectors are repeated here, because they're more specific than the plain ticked rule and would otherwise make a hovered ticked box `Canvas`, hiding the mark.
+- The invalid edge goes back to `ButtonText`. The `--danger` rule would otherwise win, and forced colors can turn it into the page color, hiding the box.
+- Disabled and read-only go back to full opacity. Disabled shows with `GrayText` instead: a gray edge, a gray fill when ticked, and gray label text.
+
+## 5. Keyboard, screen readers, and forms
+
+### Keyboard
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>What it does</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tab and Shift+Tab</td><td>Move to the next or previous checkbox. Each checkbox is its own Tab stop. Disabled ones are skipped; read-only ones aren't.</td></tr>
+    <tr><td>Space</td><td>Ticks or unticks the focused checkbox.</td></tr>
+    <tr><td>Enter</td><td>Doesn't tick, like a native checkbox. Inside a form that has a submit button, Base UI clicks that button, which sends the form, as Enter does on a native checkbox.</td></tr>
+  </tbody>
+</table>
+
+### Screen readers
+
+A screen reader learns everything from the box's attributes: it's a checkbox (`role`), what it's called (`aria-labelledby` or `aria-label`), whether it's ticked, unticked, or mixed (`aria-checked`), and whether it's required, invalid, read-only, or disabled. Then it reads the description and the error, from `aria-describedby`. The hidden input is `aria-hidden`, so it's never announced twice.
+
+### Forms
+
+The hidden input is a real `<input type="checkbox">`, so a form treats it like any native checkbox. Tick and untick these to see what the form would send:
+
+<Unstyled>
+  <SubmitDemo />
+</Unstyled>
+
+- **Ticked, with a `value`**: sends `name=value`.
+- **Ticked, with no `value`**: sends `name=on`, the browser's default.
+- **Unticked**: sends nothing at all, like a native checkbox. A server reads a missing name as "unticked".
+- **Unticked, with an `uncheckedValue`**: sends `name=uncheckedValue`. Base UI adds a second, hidden input while the box is unticked, and removes it when it's ticked.
+- **Disabled**: never sends, ticked or not, because the input is disabled. Read-only boxes do send.
+- **Required and unticked**: the browser's own validation fails, because the hidden input has `required`. Most forms use `noValidate` and show the error with `invalid` and `error` instead, as in section 2.
+
+Two props reach the hidden input for layouts that need them. `form` takes the id of a `<form>` elsewhere on the page, so a checkbox outside the form is still sent with it. `id` goes on the hidden input, not the box, so a `<label htmlFor>` elsewhere can tick it, but that label doesn't name it for screen readers. Use `children` or `aria-label` for the name.
+
+## The whole files
+
+<details>
+<summary><code>Checkbox.tsx</code></summary>
+
+<Code file="components/Checkbox/Checkbox.tsx" />
+
+</details>
+
+<details>
+<summary><code>checkbox.css</code></summary>
+
+<Code file="components/Checkbox/checkbox.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/Checkbox/index.ts" />
+
+</details>
+
+<details>
+<summary><code>CheckboxGroup/context.ts</code></summary>
+
+<Code file="components/CheckboxGroup/context.ts" />
+
+</details>
+
+<details>
+<summary><code>internal/FieldError.tsx</code></summary>
+
+<Code file="internal/FieldError.tsx" />
+
+</details>
+
+<details>
+<summary><code>internal/field-error.css</code></summary>
+
+<Code file="internal/field-error.css" />
+
+</details>
+
+<details>
+<summary><code>internal/warn.ts</code></summary>
+
+<Code file="internal/warn.ts" />
+
+</details>
+
+<details>
+<summary><code>internal/cx.ts</code></summary>
+
+<Code file="internal/cx.ts" />
+
+</details>

@@ -1,0 +1,336 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import { AtSign, Search } from "lucide-react";
+import * as InputStories from "./Input.stories";
+import { Input } from "./Input";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { EmailForm, PointerAndDensity } from "../../how-it-works/components/Input";
+
+<Meta of={InputStories} name="How it works" />
+
+# How Input works
+
+An input is a single-line text field, with its label, optional help text, and an error. It's the pattern every text field in the system follows: [Text area](?path=/docs/components-text-area--how-it-works) builds on it. This page walks through the real code underneath it: what HTML it renders, how each prop gets there, and how the CSS draws it. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+Input is a thin layer over [Base UI](https://base-ui.com), an unstyled React library that handles behavior and accessibility: linking labels and help text, ARIA attributes, and taking part in forms. Underneath, it's a real `<input>` element, so typing, selecting, autofill, and the phone keyboard all come from the browser. Our code chooses the parts, connects the props to them, and adds the look.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Input.tsx</code></td><td>The component. It puts Base UI's parts together, decides which prop goes to which part, and types the props so an input can't be built without a name.</td></tr>
+    <tr><td><code>input.css</code></td><td>The look: label, help text, field, icons, sizes, every state, hot dog mode, and Windows high contrast. It only uses design tokens.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Input</code> and the <code>InputProps</code>, <code>InputSize</code>, and <code>InputType</code> types.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code> and <code>field-error.css</code></td><td>The error message every form control shares: an icon and words. Not exported.</td></tr>
+    <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for an input with no name, and a helper that joins class names. Not exported.</td></tr>
+    <tr><td><code>Input.test.tsx</code> and <code>Input.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts, and what each one brings:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>Renders</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Field.Root</code></td><td><code>&lt;div&gt;</code></td><td>The field's shared state. It links the label, description, and error to the input, and passes <code>name</code>, <code>disabled</code>, and <code>invalid</code> down to it.</td></tr>
+    <tr><td><code>Field.Label</code></td><td><code>&lt;label&gt;</code></td><td>The label, pointing at the input with <code>for</code>, so clicking it focuses the field.</td></tr>
+    <tr><td><code>Field.Description</code></td><td><code>&lt;p&gt;</code></td><td>Help text, linked to the input with <code>aria-describedby</code>.</td></tr>
+    <tr><td><code>Field.Error</code> (inside our <code>FieldError</code>)</td><td><code>&lt;div&gt;</code></td><td>The error message, linked the same way, and only shown when the field is invalid.</td></tr>
+    <tr><td><code>Input</code></td><td><code>&lt;input&gt;</code></td><td>The field itself: a native input that reports its value with <code>onValueChange</code> and picks up the field's ids and state.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real input with a description, and under it the HTML it has rendered right now. Type in it, then press Tab to leave it, and watch the attributes change.
+
+<Unstyled>
+  <Inspect hint="Type an email address, then press Tab.">
+    <Input label="Email" type="email" autoComplete="email" description="We only use it to reply to you." />
+  </Inspect>
+</Unstyled>
+
+Each element, who puts it there, and why:
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="input" data-size="md"&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our class and <code>data-size</code></td><td>Holds the whole field. <code>data-size</code> comes from the <code>size</code> prop and picks the size in CSS. Base UI adds the field's state: <code>data-focused</code> while you're in it, <code>data-dirty</code> once the text differs from how it started, <code>data-filled</code> while it has text, and <code>data-touched</code> once you've left it. Each of Base UI's parts gets the same ones.</td></tr>
+    <tr><td><code>&lt;label class="input__label" id for&gt;</code></td><td>Base UI's <code>Field.Label</code></td><td><code>for</code> points at the input's <code>id</code>, so clicking the label focuses the field. Its <code>id</code> is also named by the input's <code>aria-labelledby</code>.</td></tr>
+    <tr><td><code>&lt;p class="input__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code></td><td>Its <code>id</code> goes into the input's <code>aria-describedby</code>, so a screen reader reads it after the field's name.</td></tr>
+    <tr><td><code>&lt;div class="input__box"&gt;</code></td><td>Our code</td><td>A box around the input to place icons over it. It's marked <code>data-icon-start</code> or <code>data-icon-end</code> when there's an icon.</td></tr>
+    <tr><td><code>&lt;input class="input__control" type id&gt;</code></td><td>Base UI's <code>Input</code>, with our class and <code>type</code></td><td>The field. <code>type</code> defaults to <code>text</code>. <code>autocomplete</code> and other native attributes pass straight through. <code>aria-labelledby</code> and <code>aria-describedby</code> come from the field.</td></tr>
+  </tbody>
+</table>
+
+What you type doesn't appear in the HTML. The text lives in the input's `value` property, which isn't part of the markup, so the browser keeps it as you type without React or the HTML being involved. A `defaultValue` shows up as a `value` attribute, but only as the starting text.
+
+### Why the description sits between the label and the field
+
+A choice control, such as a switch, has its description under its label. A text field puts it **above** the field, between the label and the box:
+
+- It's read before typing, by everyone. A hint after the field is often found only after a mistake.
+- A phone's keyboard, or the browser's autofill menu, opens below the field and can cover anything under it.
+
+The order in the HTML matches what you see, so a screen reader reading the page from top to bottom meets the label, then the hint, then the field. `aria-describedby` also reads the hint when focus lands on the field.
+
+### With icons
+
+<Unstyled>
+  <Inspect hint="Click the magnifier: the field gets focus, because the icon lets clicks through.">
+    <div className="grid gap-4">
+      <Input label="Search projects" type="search" iconStart={<Search />} placeholder="Try “branding”" />
+      <Input label="Username" iconEnd={<AtSign />} />
+    </div>
+  </Inspect>
+</Unstyled>
+
+- Each icon is wrapped in `<span class="input__icon" aria-hidden="true">`. The icons are decoration, so they're hidden from screen readers and never become part of the field's name.
+- The box gets `data-icon-start="true"` or `data-icon-end="true"`, so the CSS can make room in the input's padding.
+- The icons sit **inside** the box but **outside** the input. An `<input>` can't hold other elements.
+- `type="search"` gives the field the role `searchbox`, and some phones show a search key.
+
+### Invalid, with an error
+
+This is a real form that checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then again each time you leave the field. Whether a field is invalid is the page's decision, not the input's: the page passes `invalid` and `error`.
+
+<Unstyled>
+  <Inspect hint="Select Save email with the field empty, or with an address like ada@. Then fix it and press Tab.">
+    <EmailForm />
+  </Inspect>
+</Unstyled>
+
+- `invalid` goes to `Field.Root`, and Base UI sets `aria-invalid="true"` and `data-invalid` on the input. Our code never writes `aria-invalid` itself.
+- The error's `id` is added to `aria-describedby` after the description's, so both are read.
+- `required` is the native attribute, which tells screen readers too. The form uses `noValidate` so the page's own messages show, rather than the browser's bubbles.
+- The error is a `<div class="field-error input__error">` with an icon and words, so the problem is never only a red edge. It's drawn by the shared `FieldError`, which [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains in full, along with the development warnings.
+
+### Disabled and read-only
+
+<Unstyled>
+  <Inspect hint="Press Tab: focus skips the disabled field and lands in the read-only one.">
+    <div className="grid gap-4">
+      <Input label="Plan" disabled defaultValue="Free" />
+      <Input label="Username" readOnly defaultValue="ada" />
+    </div>
+  </Inspect>
+</Unstyled>
+
+- **Disabled** is the native `disabled` attribute: the browser blocks typing, skips the field with Tab, and leaves it out of the form. Base UI adds `data-disabled` to every part, which is how the CSS dims the label too.
+- **Read-only** is the native `readonly` attribute: you can't change the text, but you can focus it, select it, and copy it, and the form still sends it.
+
+## From props to HTML
+
+### The props
+
+An input must have a name a screen reader can announce. The props type makes that a compile error rather than something to remember:
+
+<Code file="components/Input/Input.tsx" name="Labelled" />
+
+It's a union, which TypeScript reads as "one of these": either `label`, or an `aria-label`. Leave out both and the code doesn't compile. The label's type is `Exclude<ReactNode, undefined | null | boolean>`, all of React's renderable content except the values that render nothing. Plain `ReactNode` would accept `undefined`, and a nameless input would compile.
+
+**Why `label` is a prop, not `children`.** A switch or checkbox wraps its label, so its label is its children. A text field can't: the label sits above it as a separate element, and the help text goes between them. An `<input>` has no children either, so `children` isn't accepted at all.
+
+An empty string still passes the type. That's what `warnIfUnnamed()` is for: it prints a warning in development when the label renders nothing and there's no `aria-label`. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains when the system warns.
+
+<Code file="components/Input/Input.tsx" name="InputType" />
+
+<Code file="components/Input/Input.tsx" name="InputSize" />
+
+`type` only accepts text-like types. A number or a date needs different behavior and its own component, so `type="number"` doesn't compile. `size` takes the system's two sizes.
+
+<Code file="components/Input/Input.tsx" name="OwnProps" />
+
+Most of these are Base UI's or the browser's own props, declared again here with our JSDoc. Storybook builds the docs table from the component's own types and doesn't read types inherited from `node_modules`, so a prop that isn't declared here wouldn't appear in it.
+
+<Code file="components/Input/Input.tsx" name="InputProps" />
+
+The full props type is the label union, our props, and everything else Base UI's `Input` takes, less `className` (it goes on the wrapper), `render` (which would swap the `<input>` for another element), and `children`.
+
+### The component
+
+<Code file="components/Input/Input.tsx" name="Input" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart.** The props that go somewhere specific are taken out, with their defaults: `type = "text"` and `size = "md"`. Everything else (`value`, `defaultValue`, `onValueChange`, `readOnly`, `required`, `id`, `form`, `autoComplete`, `inputMode`, `placeholder`, `aria-label`, and any other attribute) stays in `rest` and goes straight to the `<input>`.
+2. **`size` never reaches the `<input>`.** A native input has its own `size` attribute, a width in characters. Ours is a design size, so it's taken out and becomes `data-size` on the wrapper instead.
+3. **The wrapper.** `Field.Root` gets our class, joined with the consumer's by `cx()`, plus `name`, `disabled`, and `invalid`.
+4. **The label** renders only when there is one. With only an `aria-label`, there's no `<label>` element at all, and the name goes on the input.
+5. **The description** comes next, before the box, so it's between the label and the field.
+6. **The box and icons.** `data-icon-start` and `data-icon-end` are `true` or `undefined`. React leaves an attribute out entirely when it's `undefined`, so the box is only marked when there's an icon.
+7. **The input** gets `rest`, the `ref`, our class, `type`, `disabled`, and `name`. A `ref` reaches the real `<input>`, to focus it or select its text.
+8. **The error** comes last, after the box. `FieldError` gets `match={invalid}`, so the message only shows while the input is invalid. (Whether the error belongs above the field too is an open question in `docs/revisit.md`.)
+
+## How it looks
+
+All of the input's look is in `input.css`, inside `@layer components`. Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
+
+The input only uses **semantic tokens**, named for their job rather than their color: `surface`, `ink`, `ink-muted`, `border-strong`, `focus`, and `danger`. Each theme gives them its own values. All but `danger` point at the gray scale, so components stay neutral and the brand colors live in the layout around them. `danger` is a status color, used where it carries meaning.
+
+### The parts
+
+<Code file="components/Input/input.css" name=".input" />
+
+<Code file="components/Input/input.css" name=".input__label" />
+
+<Code file="components/Input/input.css" name=".input__description" />
+
+<Code file="components/Input/input.css" name=".input__box" />
+
+<Code file="components/Input/input.css" name=".input__box:not(:first-child)" />
+
+The wrapper is a one-column grid, with `--space-1` between rows. The box adds another `--space-1` above itself when something comes before it, so the field sits a little further from the text above than the label sits from its help text. The wrapper sets no margin and no width: where the field sits and how wide it is belong to the page, set with a class on the wrapper. The field fills whatever width that gives it.
+
+### The field
+
+<Code file="components/Input/input.css" name=".input__control" />
+
+The `<input>` is the visible box, so a click anywhere in it focuses it.
+
+- **Height** is `--control-md`, and the padding is only at the sides. The text centers itself in the height.
+- **Edge:** a `border-thin` edge in `border-strong`, which meets 3:1 against the field in every theme.
+- **Type:** `--text-body`, 16px, on every screen. Under 16px, iPhones zoom in when a field gets focus.
+- **`appearance: none`** turns off the browser's own field styling, so it looks the same everywhere.
+- **Transitions** soften the edge changing on hover and focus, over `--duration-fast` (120ms).
+
+<Code file="components/Input/input.css" name=".input__control::placeholder" />
+
+<Code file="components/Input/input.css" name=".input__control::-webkit-search-cancel-button" />
+
+A placeholder is `ink-muted`, which meets 4.5:1 contrast, and Firefox's own fading is turned off. A placeholder is an example, never the label: it disappears as you type. The browser's own clear button on search fields is hidden, because it can't be themed and is only about 12px wide. Escape still clears the field.
+
+### Sizes: mouse, touch, and density
+
+<Code file="components/Input/input.css" name='.input[data-size="lg"] .input__control' />
+
+Large uses `--control-lg`, more side padding, and `--text-body-lg`. Neither size sets a pixel height. They read `--control-md` and `--control-lg`, and those tokens change with the device:
+
+- **With a mouse**, they're 40px and 48px.
+- **On touch**, when any touch screen is present (so a touchscreen laptop counts), they're 44px and 52px. Every control's hit area is at least `--target-min`, which is 44px on touch.
+- **Compact density**, under `data-density="compact"`, makes them one step smaller for dense screens such as tables, but never below `--target-min`.
+
+`data-pointer="coarse"` or `"fine"` on any element forces one mode for everything inside it. The demo uses that to show all four at once. The text stays the same size in every column: only the field's height changes.
+
+<Unstyled>
+  <PointerAndDensity />
+</Unstyled>
+
+Compact on touch shows the floor at work. Compact's own values are 32px and 40px, both under the 44px `--target-min` on touch, so both sizes come out at 44px.
+
+An `<input>` can't have the invisible pseudo-element that stretches a switch's or a button's hit area, so a text field is never smaller than `--target-min`. That's why there's no small size.
+
+### Icons
+
+<Code file="components/Input/input.css" name=".input__icon" />
+
+<Code file="components/Input/input.css" name=".input__icon:first-child" />
+
+<Code file="components/Input/input.css" name=".input__box[data-icon-start] .input__control" />
+
+The icon is laid over the input, `--icon-md` (20px) wide, and in `ink-muted`. `pointer-events: none` lets clicks pass through it to the input underneath, so a click on the magnifier focuses the field. A story checks it with a real hit test: the element under the icon's center must be the input.
+
+Its position is the input's side padding plus its edge, so it lines up with where the text would start. The input's padding on that side grows by the icon and `--space-2`, so the text starts after it. Large fields have matching rules with `--space-4`.
+
+### Hover, focus, and invalid
+
+<Code file="components/Input/input.css" name='.input__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
+
+Hover darkens the edge to `ink`. The `:not()` matters. `:hover` makes a selector more specific, so without it, a hovered invalid field would lose its red edge, and a disabled or read-only field would look as if it could be changed.
+
+<Code file="components/Input/input.css" name=".input__control:focus-visible" />
+
+Focus is an **outline**, never only a shadow, so it survives Windows high contrast. It sits `--focus-offset` outside the edge, in `--focus`. A text field shows it however it got focus, mouse or keyboard, because you need to see where you're typing.
+
+<Code file="components/Input/input.css" name='.input__control[aria-invalid="true"]' />
+
+Invalid is styled from `aria-invalid`, the attribute screen readers read, so the look and what's announced can't disagree. The edge turns `danger` and gets thicker. The extra thickness is an inset shadow rather than a wider border: a wider border would push the text over by a pixel and change the field's size.
+
+### Disabled and read-only
+
+<Code file="components/Input/input.css" name=".input__control:disabled" />
+
+<Code file="components/Input/input.css" name=".input__control[readonly]" />
+
+<Code file="components/Input/input.css" name=".input__control[readonly]::placeholder" />
+
+- **Disabled** dims the field and its label to 50%. It's styled from the native `:disabled`, which a real `<input>` has. The label isn't an input, so it's reached through the wrapper's `data-disabled`, from Base UI. A further rule sets the `not-allowed` cursor.
+- **Read-only** dims only the field, to 75%, and keeps the label at full strength, because read-only content must stay readable. The text in it still meets 4.5:1. It's styled from the native `[readonly]` attribute.
+- A read-only field hides its placeholder. A placeholder suggests what to type, which doesn't apply when you can't, and at 75% it would fall below 4.5:1.
+
+### Hot dog mode
+
+<Code file="components/Input/input.css" name='[data-theme="hotdog"] .input__control' />
+
+<Code file="components/Input/input.css" name='[data-theme="hotdog"] .input__control[aria-invalid="true"]' />
+
+Hot dog mode, the system's ketchup-and-mustard joke theme, gives every field a `border-thick` ink edge and a hard 2px shadow. Buttons, checkboxes, and switches press into their shadow when clicked, but a text field doesn't: you type in it, so it keeps its shadow. An invalid field lists both shadows, the inset one that thickens the edge and the hard one.
+
+### Windows high contrast
+
+<Code file="components/Input/input.css" name="@media (forced-colors: active)" />
+
+In forced colors mode (Windows Contrast themes), the browser replaces the page's colors with a few system colors and drops shadows. These rules use the system's field colors, `Field` and `FieldText`. They reset the dimming to full opacity and use `GrayText` for disabled instead, and turn the icon `FieldText`. The inset shadow that thickens an invalid edge is gone in this mode, so the edge becomes a real `border-thick` border.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** All of it is the browser's own `<input>`. Tab moves into the field and out of it, in the order of the page. Enter submits the form it's in. Escape clears a search field. A disabled field is skipped. A read-only field takes focus, and you can select and copy its text.
+
+**Screen readers** announce the label as the field's name, then the kind of field (such as "edit text" or "search"), then the description and any error. If it's `required` or `invalid`, they say so too. Icons are hidden and not read.
+
+**Phones.** Set `type`, `inputMode`, and `autoComplete` so phones and browsers can help: `type="email"` shows a keyboard with `@`, and `autoComplete="email"` offers the saved address (WCAG 1.3.5).
+
+**Forms.** What `FormData` gets:
+
+<table>
+  <thead>
+    <tr><th>The input is</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Typed in, with <code>name="fullName"</code></td><td><code>fullName=</code> and the text</td></tr>
+    <tr><td>Untouched, with a <code>defaultValue</code></td><td>The <code>defaultValue</code></td></tr>
+    <tr><td>Empty</td><td><code>fullName=</code> and an empty string</td></tr>
+    <tr><td>Read-only</td><td>Its text</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required and empty</td><td>The form doesn't submit, unless it has <code>noValidate</code>: the browser's own validation stops it</td></tr>
+  </tbody>
+</table>
+
+`id` goes on the `<input>`, so an outside `<label htmlFor>` can point at it. `form` names a `<form>` by its id, for an input that sits outside it.
+
+## The whole files
+
+<details>
+<summary><code>Input.tsx</code></summary>
+
+<Code file="components/Input/Input.tsx" />
+
+</details>
+
+<details>
+<summary><code>input.css</code></summary>
+
+<Code file="components/Input/input.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/Input/index.ts" />
+
+</details>
+
+<details>
+<summary><code>src/internal/FieldError.tsx</code></summary>
+
+<Code file="internal/FieldError.tsx" />
+
+</details>

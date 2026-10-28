@@ -1,0 +1,403 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as RadioGroupStories from "./RadioGroup.stories";
+import { Radio } from "./Radio";
+import { RadioGroup } from "./RadioGroup";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { RadioGroupForm, RadioGroupStates, RadioHitAreas } from "../../how-it-works/components/RadioGroup";
+
+<Meta of={RadioGroupStories} name="How it works" />
+
+# How RadioGroup and Radio work
+
+A radio group asks one question and offers a few answers, of which exactly one can be chosen. It's two components. `RadioGroup` is the question: its label, help text, error, and which answer is chosen. `Radio` is one answer: a circle, a dot when it's chosen, and its words. [SegmentedControl](?path=/docs/components-segmented-control--how-it-works) is the same group drawn as connected buttons, and its page builds on this one.
+
+They're made of these files:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>RadioGroup.tsx</code></td><td>The group. It puts four of Base UI's parts together into one field, and adds the label, the description, and the error.</td></tr>
+    <tr><td><code>Radio.tsx</code></td><td>One option. Base UI's Radio, wrapped in its own field item, with its label, its dot, and an optional description.</td></tr>
+    <tr><td><code>radio-group.css</code></td><td>The look of both: the label, the stack of options, the circle and its dot, every state, the hit areas, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>index.ts</code></td><td>Exports both components and their props types from the package.</td></tr>
+    <tr><td><code>src/internal/</code></td><td>Pieces every form control shares, not exported from the package: <code>cx()</code> joins class names, <code>FieldError</code> draws the error, and <code>warnIfUnnamed()</code> warns about a control with no name.</td></tr>
+  </tbody>
+</table>
+
+**Base UI** is an unstyled React library. It handles behavior and accessibility (keyboard, focus, and the ARIA attributes screen readers read) and leaves the look to us. RadioGroup and Radio are built from these Base UI parts:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Field.Root</code></td><td>Makes the whole group one form field. It owns the field's <code>name</code>, and whether it's disabled or invalid, and passes them to everything inside. It links the label, description, and error to the controls with ids.</td></tr>
+    <tr><td><code>Fieldset.Root</code> and <code>Fieldset.Legend</code></td><td>A group of controls with one label, the legend. The group is named by the legend.</td></tr>
+    <tr><td><code>RadioGroup</code></td><td>Holds which option is chosen, controlled or not. Makes the group one Tab stop and moves between options with the arrow keys.</td></tr>
+    <tr><td><code>Field.Description</code> and <code>Field.Error</code></td><td>The help text and the error message, each linked to the group and every option with <code>aria-describedby</code>.</td></tr>
+    <tr><td><code>Field.Item</code></td><td>Wraps one option, giving it its own ids, label, and description inside the group's field (section 2).</td></tr>
+    <tr><td><code>Field.Label</code></td><td>A real <code>{"<label>"}</code> for one option, linked to it.</td></tr>
+    <tr><td><code>Radio.Root</code> and <code>Radio.Indicator</code></td><td>The radio itself: a focusable <code>{"<span>"}</code> with the radio role, and a hidden <code>{"<input type=\"radio\">"}</code> beside it for forms. The indicator holds the dot, and is only there while the radio is chosen.</td></tr>
+  </tbody>
+</table>
+
+Base UI's own documentation, at base-ui.com, lists everything these parts can do. Every code block on this page is read from the files when the page loads, so it's always the code that runs. The demos use the real components.
+
+## 1. What it renders
+
+Each demo below is the real component, with the HTML it has rendered underneath. The HTML updates as you use it, and an attribute that just changed is underlined. Inline styles are left out.
+
+### Nothing chosen, then one chosen
+
+<Unstyled>
+  <Inspect hint="Choose a plan by clicking a circle or its words. Then Tab away and back, and use the arrow keys.">
+    <RadioGroup label="Plan" name="plan">
+      <Radio value="free">Free</Radio>
+      <Radio value="team">Team</Radio>
+      <Radio value="business">Business</Radio>
+    </RadioGroup>
+  </Inspect>
+</Unstyled>
+
+From the outside in:
+
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<div class=\"radio-group\">"}</code></td><td>Base UI's <code>Field.Root</code>, with the class from <code>RadioGroup.tsx</code></td><td>The outer wrapper, and the place a <code>className</code> you pass goes. Base UI marks the field's state on it: <code>data-filled</code> once something is chosen, and <code>data-focused</code>, <code>data-touched</code>, and <code>data-dirty</code> once you've used it. The CSS doesn't use those, but your own styles can.</td></tr>
+    <tr><td><code>role="radiogroup"</code></td><td>Base UI's <code>RadioGroup</code></td><td>Tells screen readers that the options inside belong together and only one can be chosen. It's on a <code>{"<div>"}</code>, not a <code>{"<fieldset>"}</code>: <code>Fieldset.Root</code> renders Base UI's <code>RadioGroup</code> in place of its own element (section 2), so one element is both.</td></tr>
+    <tr><td><code>aria-labelledby</code> on the group</td><td>Base UI</td><td>Points at the legend's <code>id</code>, so the group's name is "Plan". Base UI makes the ids up (<code>base-ui-…</code>), unique on the page.</td></tr>
+    <tr><td><code>{"<div class=\"radio-group__label\">"}</code></td><td><code>Fieldset.Legend</code></td><td>The visible label. Base UI renders a legend as a <code>{"<div>"}</code> and links it by its id, which works whether the group is a <code>{"<fieldset>"}</code> or, as here, a <code>{"<div>"}</code>.</td></tr>
+    <tr><td><code>{"<div class=\"radio-group__options\">"}</code></td><td><code>RadioGroup.tsx</code></td><td>Holds the options, so the CSS can stack them.</td></tr>
+    <tr><td><code>{"<div class=\"radio\">"}</code></td><td><code>Field.Item</code></td><td>One option. It holds the label row and, if there is one, the option's description.</td></tr>
+    <tr><td><code>{"<label class=\"radio__row\" for=\"…\">"}</code></td><td><code>Field.Label</code></td><td>The circle and its words, in one real label. Its <code>for</code> points at the hidden input, so clicking the words clicks the input, and the browser does the choosing.</td></tr>
+    <tr><td><code>{"<span role=\"radio\">"}</code></td><td><code>Radio.Root</code></td><td>The radio you see and focus: the circle. A <code>{"<span>"}</code> can't be labelled by a <code>{"<label>"}</code>, so Base UI finds the label pointing at its input and copies the label's id into the span's <code>aria-labelledby</code>. That's how it's named "Free".</td></tr>
+    <tr><td><code>aria-checked</code></td><td>Base UI</td><td><code>"true"</code> on the chosen option, <code>"false"</code> on the others. The CSS draws the chosen state from it, so what you see and what a screen reader hears can't disagree.</td></tr>
+    <tr><td><code>data-checked</code> or <code>data-unchecked</code></td><td>Base UI</td><td>The same state again, for styling. The CSS here uses <code>aria-checked</code> instead.</td></tr>
+    <tr><td><code>tabindex</code></td><td>Base UI</td><td><code>"0"</code> on one option, <code>"-1"</code> on the rest: see "One Tab stop" below.</td></tr>
+    <tr><td><code>data-composite-item-active</code></td><td>Base UI</td><td>Marks the chosen option as the one the arrow keys start from. "Composite" is Base UI's name for a widget made of several items with one Tab stop.</td></tr>
+    <tr><td><code>{"<span class=\"radio__indicator\">"}</code> and its <code>{"<svg>"}</code></td><td><code>Radio.Indicator</code>, with the dot from <code>Radio.tsx</code></td><td>The dot. Base UI only renders it while the option is chosen, so the other circles are empty. The drawing is <code>aria-hidden</code>: <code>aria-checked</code> already says it's chosen.</td></tr>
+    <tr><td><code>{"<input type=\"radio\">"}</code></td><td>Base UI</td><td>The hidden input: see below.</td></tr>
+    <tr><td><code>{"<span class=\"radio__label\">"}</code></td><td><code>Radio.tsx</code></td><td>The words, so the CSS can line their first line up with the circle.</td></tr>
+  </tbody>
+</table>
+
+### One Tab stop
+
+A radio group is a single stop when you press Tab. Only one option at a time has `tabindex="0"`, which puts it in the Tab order. The others have `tabindex="-1"`, which lets them take focus but leaves them out of the Tab order. This is called a **roving tab index**, because the 0 moves to whichever option is current:
+
+- With an option chosen, it's the chosen one.
+- With nothing chosen, it's the first option that isn't disabled. (In the demo, that's Free before you choose anything.)
+
+Inside the group, the arrow keys move focus, wrapping from the last option to the first, and skipping disabled ones. Moving also chooses. Base UI does this in two steps: the group notes that an arrow key was pressed, and then the option that receives focus clicks its own hidden input. Focus arriving by Tab doesn't choose anything, so tabbing into a group with nothing chosen leaves it that way until you press Space or an arrow key.
+
+### The hidden input
+
+Next to every radio, Base UI renders an `<input type="radio">`. It's there for forms: the browser only submits and validates real inputs, so this is what a `<form>` sends and what `required` checks. Base UI keeps it in step with the radio and gives it the group's `name`, the option's `value`, and the `disabled`, `required`, `readonly`, and `form` the group has. It's hidden three ways:
+
+- An inline style shrinks it to a 1px clipped box, so you can't see it. (The demo leaves inline styles out.)
+- `tabindex="-1"` keeps it out of the Tab order: the span is what you focus.
+- `aria-hidden="true"` hides it from screen readers, so each option is only announced once.
+
+A click on the circle or its label reaches this input, and Base UI listens for the input's change. So choosing always goes through the browser's own radio behavior.
+
+There's one thing in the demo's HTML that can mislead: the `checked` attribute on a hidden input only shows how it started. Once you choose something, React updates the input's `checked` property, which HTML doesn't show, and leaves the attribute where it was. The property is what the form reads, as the form demo in section 5 shows.
+
+### Description, error, and every state
+
+With a `description`, Base UI renders a `<p>` and adds its id to the group's `aria-describedby`, and to every radio's. A screen reader reads it when you reach the group, and again on each option. A radio's own `description` goes after the group's in that radio's `aria-describedby`:
+
+<Unstyled>
+  <Inspect>
+    <RadioGroup label="Plan" description="You can change your plan at any time." defaultValue="free">
+      <Radio value="free" description="For one person">
+        Free
+      </Radio>
+      <Radio value="team" description="Up to 10 people">
+        Team
+      </Radio>
+    </RadioGroup>
+  </Inspect>
+</Unstyled>
+
+Pick a state to see what each one changes. Invalid clears the choice and shows the error until you choose a plan, the way a form shows it after you submit with nothing chosen:
+
+<Unstyled>
+  <RadioGroupStates />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>State</th><th>What changes</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Invalid</td><td><code>aria-invalid="true"</code> on the group and every radio, and <code>data-invalid</code> on the wrapper and every option's parts. The error appears as <code>{"<div class=\"field-error radio-group__error\">"}</code>, and its id joins the group's and every radio's <code>aria-describedby</code>.</td><td>A screen reader announces the group and each option as invalid, and reads the error with them. The error is words with an icon, so it never relies on the red edge alone. How <code>FieldError</code> draws it is on <a href="?path=/docs/components-checkbox--how-it-works">Checkbox's How it works page</a>.</td></tr>
+    <tr><td>Disabled</td><td><code>aria-disabled="true"</code> on the group and every radio, <code>data-disabled</code> on the wrapper, the description, and every option's parts, and <code>disabled</code> on every hidden input.</td><td>Nothing can be chosen, and a disabled input isn't submitted. The chosen radio keeps <code>tabindex="0"</code>, so Tab still reaches it and a screen reader announces it as unavailable. That's Base UI's choice, and the system keeps it for now (<code>docs/revisit.md</code>, "A disabled radio group can still be reached with Tab").</td></tr>
+    <tr><td>Read only</td><td><code>aria-readonly="true"</code> and <code>data-readonly</code> on the group, <code>data-readonly</code> on every radio, and <code>readonly</code> on every hidden input.</td><td>The choice can be read, focused, and submitted, but not changed. The arrow keys still move focus, but don't choose. ARIA has no read-only state for a single radio, only for the group, so the radios carry Base UI's <code>data-readonly</code> for the CSS.</td></tr>
+  </tbody>
+</table>
+
+### Why `null` means nothing chosen
+
+To control the group, you hold its value in your own state and pass `value` and `onValueChange`. A group with nothing chosen yet needs a value that means "nothing", and that's `null`, not `undefined`. React's rule, which Base UI follows, is that a component whose `value` is `undefined` controls itself: Base UI decides once, on the first render, whether `value` is `undefined`, and stays that way. So clearing a controlled group by setting `value={undefined}` wouldn't clear it: Base UI would print an error about switching from controlled to uncontrolled, and go back to showing its own remembered value. `null` keeps the group controlled and chooses nothing. The form demo in section 5 has a button that sets it back to `null`.
+
+## 2. From props to HTML
+
+### The group
+
+<Code file="components/RadioGroup/RadioGroup.tsx" name="RadioGroup" />
+
+From the top:
+
+- **The name check.** `warnIfUnnamed()` prints a warning while you develop if the group would have no name, for example a label that came back empty from a CMS. [Checkbox's How it works page](?path=/docs/components-checkbox--how-it-works) explains it, and every form control's warnings.
+- **`Field.Root` gets `name`, `disabled`, and `invalid`.** Base UI's RadioGroup reads all three from the field, and the field passes `disabled` and `invalid` on to the parts inside it: each `Field.Item`, label, and radio. That's why one prop marks everything in the state table above. `className` goes here too, joined to `radio-group` by `cx()`, so the layout classes you pass land on the outer wrapper.
+- **`Fieldset.Root` renders the group.** Base UI's `render` prop replaces a part's element with the one you give it, and merges their props. Here the fieldset's element is replaced by Base UI's RadioGroup, so one `<div>` is both the fieldset (named by its legend) and the radio group (with its value and keyboard handling). The fieldset's children (the legend, description, options, and error) go inside it.
+- **Everything else goes to Base UI's RadioGroup.** `{...rest}` passes on `value`, `defaultValue`, `required`, `readOnly`, `form`, `aria-label`, and any other attribute. `ref` reaches the element with the radiogroup role.
+- **`<string | null>`** tells TypeScript the group's value is a string or `null` (see "Why `null` means nothing chosen"). Base UI's `onValueChange` could, by its type, pass `null`. A person choosing never does, so the wrapper only calls your `onValueChange` with a string. Your handler's type says so: it gets a `string`, never `null`.
+- **The label only renders when there is one.** With `aria-label` and no `label`, there's no legend, and the group is named by `aria-label` instead.
+- **The error only renders when there's an `error`,** and `FieldError` only shows it while `invalid` is true (`match={invalid}`). So you can pass the message all the time and switch `invalid` on and off.
+
+### The group's props
+
+<Code file="components/RadioGroup/RadioGroup.tsx" name="RadioGroupProps" />
+
+The props are three types joined with `&`:
+
+- **`Labelled`**, which makes sure the group has a name (below).
+- **`OwnProps`**, every prop RadioGroup documents itself, with a comment that Storybook shows in the props table. Most are Base UI's, declared again here because Storybook's props table leaves out props inherited from packages in `node_modules`. It's in the whole file at the end of this page.
+- **Base UI's RadioGroup props, minus some.** `className` (Base UI's can be a function; this one is a string), `render` (RadioGroup uses it itself), `aria-label` (`Labelled` owns it), and `inputRef` (a ref to one hidden input; Radio has its own), and every prop `OwnProps` declares again. Everything left, such as `onBlur` or `data-*` attributes, passes through.
+
+An **accessible name** is what a screen reader says a control is called. The props type won't compile without one:
+
+<Code file="components/RadioGroup/RadioGroup.tsx" name="Labelled" />
+
+It's a union: the props must match one of the two shapes. Either there's a `label` and `aria-label` is optional, or there's no `label` and `aria-label` is a required string. `label` is typed `Exclude<ReactNode, undefined | null | boolean>`: anything React can render, except the values that render nothing. Plain `ReactNode` includes `undefined`, so `label={maybeLabel}` would compile even when there's nothing in it. Both shapes have the same comments, so the docs table describes the props in either case.
+
+### One option
+
+<Code file="components/RadioGroup/Radio.tsx" name="Radio" />
+
+- **The circle** is Base UI's `Radio.Root` with `Radio.Indicator` and the dot inside. `{...rest}` gives it `value`, `id`, `ref`, `inputRef`, `aria-label`, and any other attribute. Base UI puts `id` and `inputRef` on the hidden input and `ref` on the span.
+- **With label text**, the circle and the words go inside `Field.Label`, so the whole row is a label and clicking anywhere on it chooses the option. **With no label text**, the circle is rendered alone, and `aria-label` names it. Then there's no `<label>` element at all.
+- **`Field.Item` gets `disabled`**, not `Radio.Root`. Base UI's Radio counts itself disabled if its field item is, and the item marks the label row with `data-disabled` too, which the CSS uses to dim the words.
+
+Why every option needs a `Field.Item`: Base UI's field links a label to a control by giving the control an id, and giving the label that id in its `for`. One `Field.Root` holds one set of ids. The group is one field, so without an item of its own, every option's hidden input would get the field's one id, every label's `for` would point at the same input, and the options would share their descriptions. `Field.Item` starts a fresh set of ids for each option, while still passing on the group's description and error. That's why a radio's `aria-describedby` lists the group's description first, then its own.
+
+<Code file="components/RadioGroup/Radio.tsx" name="RadioProps" />
+
+<Code file="components/RadioGroup/Radio.tsx" name="Labelled" />
+
+The props leave out what the group owns. `required` and `readOnly` are set on the RadioGroup, and so are `name` and `invalid`, which Base UI's Radio never had. So `<Radio required>` doesn't compile, rather than compiling and doing nothing. A Radio only works inside a RadioGroup, so it doesn't need to find out whether it's in one. Used on its own, it still compiles, and it visibly does nothing, so you notice straight away. `disabled` is the one state an option can have by itself: one plan can be sold out.
+
+`render` and `nativeButton` are left out too, so the radio is always Base UI's `<span>`. That's on purpose: a native `<button>` can't take focus while it's disabled, and Base UI always makes the chosen radio the group's Tab stop. A chosen, disabled button would hide the whole group from Tab.
+
+## 3. How it looks: `radio-group.css`
+
+All of the look is in one stylesheet, inside `@layer components`. The design system's layer order is `theme, base, components, utilities`, so a Tailwind utility in your markup wins over the component's own CSS. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The CSS uses semantic tokens, which say what a value is for (`--action`), never primitives, which say what it is (`--gray-900`). Each theme points the semantic tokens at different colors, so the radio changes with the theme without rules of its own. They're all neutral grays, black, and white: brand colors belong to the layout around components.
+
+<table>
+  <thead>
+    <tr><th>Tokens</th><th>What they're for here</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>--surface</code>, <code>--surface-hover</code>, <code>--border-strong</code></td><td>An empty circle: its fill, its fill on hover, and its edge, which meets 3:1 contrast</td></tr>
+    <tr><td><code>--action</code>, <code>--action-hover</code>, <code>--on-action</code></td><td>A chosen circle: its fill, its fill on hover, and the dot</td></tr>
+    <tr><td><code>--ink</code>, <code>--ink-muted</code>, <code>--danger</code></td><td>The words, the descriptions, and the invalid edge</td></tr>
+    <tr><td><code>--focus</code>, <code>--focus-width</code>, <code>--focus-offset</code></td><td>The keyboard focus outline</td></tr>
+    <tr><td><code>--choice</code>, <code>--choice-row</code>, <code>--target-min</code></td><td>The circle's size, each row's height, and the smallest hit area</td></tr>
+    <tr><td><code>--space-*</code>, <code>--icon-sm</code>, <code>--icon-md</code>, <code>--radius-full</code>, <code>--border-thick</code></td><td>Gaps, the dot's box, line heights, the round corners, and the edge</td></tr>
+    <tr><td><code>--duration-fast</code>, <code>--duration-base</code>, <code>--ease-out</code>, <code>--ease-in</code>, <code>--ease-bounce</code>, <code>--motion-scale</code></td><td>Motion</td></tr>
+    <tr><td><code>--shadow-sm</code></td><td>The hard shadow in hot dog mode</td></tr>
+  </tbody>
+</table>
+
+### The group and its options
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio-group__group" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio-group__label" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio-group__options" />
+
+The group is a grid that stacks the label, the description, the options, and the error, with a small gap. `justify-items: start` keeps each piece as wide as its content, so a row's hit area ends where its words do. `min-width: 0` lets the group shrink inside a narrow layout. The group sets no margin or width of its own: where it sits is the layout's job.
+
+### Each row
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__row" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__label" />
+
+The row is the label: the circle and the words side by side. Its padding makes it `--choice-row` tall: 32px with a mouse and 44px on a touch screen. The rows stack with no gap, so the whole column is clickable and there's no dead space between options. The words' line height is the circle's size, so the first line centers on the circle and longer text wraps underneath. `-webkit-tap-highlight-color: transparent` turns off the gray flash mobile Safari draws on a tapped label.
+
+### The circle
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle" />
+
+- **Size and shape.** `--choice` is 24px, and `--radius-full` makes it a circle.
+- **The edge.** A 2px `--border-strong` edge, which meets 3:1 contrast with the page in every theme whatever the fill is, so you can always see where the circle is.
+- **The dot's color.** `color: var(--on-action)` sets the text color, and the dot is drawn in `currentColor`, so it shows on the chosen fill.
+- **Transitions.** Changes of fill, edge, shadow, and position ease over `--duration-fast` (120ms).
+
+### Chosen
+
+<Code file="components/RadioGroup/radio-group.css" name='.radio__circle[aria-checked="true"]' />
+
+The chosen circle fills with `--action`, near black (near white in dark mode), and the dot shows inside it. The state is read from `aria-checked`, the attribute screen readers use, so the look can't disagree with what's announced. Color never carries the meaning alone: the dot is a shape, there whatever the colors are.
+
+The dot pops in. Base UI marks the indicator with `data-starting-style` on its first frame and `data-ending-style` as it leaves, and waits for the transition to finish before removing it:
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__indicator" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__indicator[data-starting-style]" />
+
+It starts at 0 opacity and `--motion-scale` (85% of its size), and grows to full size with `--ease-bounce`, which overshoots a little. Leaving is quicker than arriving: a rule after these sets `--duration-fast` and `--ease-in` while `data-ending-style` is on. With reduced motion, `--motion-scale` becomes 1 and `--ease-bounce` a plain ease-out, so the dot fades without moving, and the CSS needs no reduced-motion rule of its own.
+
+### Hover, without covering up a state
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__row:hover .radio__circle:not([data-disabled], [data-readonly])" />
+
+<Code file="components/RadioGroup/radio-group.css" name='.radio__row:hover .radio__circle[aria-checked="true"]:not([data-disabled], [data-readonly])' />
+
+Hovering anywhere on the row lightens an empty circle to `--surface-hover`, and darkens a chosen one to `--action-hover`. A disabled or read-only circle doesn't change, because you can't choose it. Hover only changes the fill, never the edge, so it can't hide the red edge of an invalid radio.
+
+The second rule is more specific than the first: `[aria-checked="true"]` adds one attribute, so for a chosen circle it wins and keeps the dark fill. **Specificity** is how CSS picks between two rules that set the same property: the selector with more ids, classes, attributes, and pseudo-classes wins, and `:not()` counts what's inside it.
+
+### Keyboard focus
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle:focus-visible" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-disabled]:focus-visible" />
+
+`:focus-visible` matches when the browser decides focus should show, such as when you arrive by keyboard. The ring is an `outline`, not a `box-shadow`, because forced colors (below) removes shadows and keeps outlines. Tab can still reach the chosen radio of a disabled group, and the disabled dim (below) would dim its outline too, below 3:1. So a focused disabled circle shows at full strength. Its words stay dim.
+
+### Invalid, read only, and disabled
+
+<Code file="components/RadioGroup/radio-group.css" name='.radio__circle[aria-invalid="true"]' />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-readonly]" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__row[data-disabled]" />
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-disabled]" />
+
+- **Invalid** turns the edge `--danger`. The error message under the group says what's wrong in words.
+- **Read only** shows the plain cursor, and a rule after it dims only the circle, to 75% opacity. The words stay at full strength, because read-only content must stay readable. At 75%, the edge and the dot still meet 3:1 in every theme.
+- **Disabled** shows the "not allowed" cursor, and dims the circle and its words to 50%.
+
+Neither state dims the group's label or description. axe, the accessibility checker every story runs, skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail it.
+
+### The hit areas
+
+A **hit area** is everywhere a click or tap counts. Every hit area in the system is at least `--target-min` in both directions: 24px with a mouse, and 44px when the device has a touch screen. A radio has two:
+
+- **With words**, the whole row is the label, and it's `--choice-row` tall: 32px with a mouse, 44px on touch.
+- **With no words**, the circle is alone, and 24px is too small on touch. So the circle gets an invisible `::after` box, centered on it, `--target-min` square. A pseudo-element is part of its element, so clicking it is clicking the circle.
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio__circle::after" />
+
+Its insets are measured from inside the circle's 2px edge, where its 20px padding box starts. On touch, `(24 − 44) / 2 − 2` is −12px, and a negative inset reaches outwards, so the box is 20 + 24 = 44px. With a mouse, it's −2px, and the box is 24px.
+
+The wrapper of a radio with no words is padded to `--choice-row` too. Without that, stacked radios would be only 24px apart, and their 44px hit areas would overlap on touch, each taking some of the next one's taps:
+
+<Code file="components/RadioGroup/radio-group.css" name=".radio:not(:has(> .radio__row))" />
+
+Switch between a mouse and touch to see them. The dashed lines are the hit areas, and the sizes are measured from the page:
+
+<Unstyled>
+  <RadioHitAreas />
+</Unstyled>
+
+The tokens switch to their touch sizes when any touch input is present, or inside `data-pointer="coarse"`, which is how the demo shows touch on any device. The CSS never checks the pointer itself: it only reads tokens.
+
+### Hot dog mode
+
+Hot dog is the joke theme, in ketchup and mustard. Its controls get a hard offset shadow, and press into it when clicked:
+
+<Code file="components/RadioGroup/radio-group.css" name='[data-theme="hotdog"] .radio__circle' />
+
+<Code file="components/RadioGroup/radio-group.css" name='[data-theme="hotdog"] .radio__row:active .radio__circle:not([data-disabled], [data-readonly])' />
+
+`--shadow-sm` is a solid shadow 2px right and 2px down in hot dog. Pressing moves the circle 2px right and down and takes the shadow away, so the circle lands where its shadow was. Disabled and read-only circles don't press. The press isn't built from a motion token, so it still happens with reduced motion: it's feedback that you pressed, not decoration.
+
+### Forced colors
+
+Windows' Contrast themes replace every color with a few system colors the person chose, and remove shadows. This is called **forced colors**.
+
+<Code file="components/RadioGroup/radio-group.css" name="@media (forced-colors: active)" />
+
+- **The circle** gets a `ButtonText` edge on `Canvas`, the page color, and the dot `HighlightText`.
+- **The invalid edge** goes back to `ButtonText`. The invalid rule is more specific than the circle's, so it would otherwise keep `--danger`, which forced colors redraws in the page color, hiding the circle.
+- **A chosen circle** fills with `Highlight`, the system's color for selected things. The hover rules are repeated in this block: they're more specific than the plain chosen rule, so without them a hovered chosen circle would take the hover fill, which forced colors turns into `Canvas`, and the dot would vanish.
+- **Disabled and read only** go back to full opacity, because dimming the system's colors could make them unreadable. Disabled uses `GrayText` instead, the system's color for disabled things.
+
+To see it without Windows, open Chrome's DevTools, open the Rendering panel, and set "Emulate CSS media feature forced-colors" to "active".
+
+## 4. Keyboard and screen readers
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>What it does</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tab, Shift+Tab</td><td>Moves focus into the group, to the chosen option, or the first option that isn't disabled if nothing is chosen. The next Tab leaves the group.</td></tr>
+    <tr><td>Down arrow, Right arrow</td><td>Moves to the next option and chooses it. From the last option, it wraps to the first. Disabled options are skipped.</td></tr>
+    <tr><td>Up arrow, Left arrow</td><td>Moves to the previous option and chooses it, wrapping from the first to the last.</td></tr>
+    <tr><td>Space</td><td>Chooses the focused option. You need it when you've tabbed into a group with nothing chosen.</td></tr>
+    <tr><td>Enter</td><td>Nothing. Base UI stops it, because a radio is chosen with Space. It doesn't submit the form either.</td></tr>
+    <tr><td>Home, End</td><td>Nothing. Base UI turns them off for radio groups.</td></tr>
+  </tbody>
+</table>
+
+In a read-only group, the arrow keys move focus without choosing, and Space does nothing. In a disabled group, Tab can still reach the chosen option, and nothing else works.
+
+As you enter the group, a screen reader announces its name, from the legend through `aria-labelledby`, and its description and error, through `aria-describedby`. On each option it reads the option's name, that it's a radio button, whether it's checked (`aria-checked`), and the descriptions and error linked to it. `aria-required`, `aria-invalid`, and `aria-disabled` let it say, in its own words, that the group is required, invalid, or unavailable. Say "(required)" in the label too, so everyone sees it, not only screen reader users.
+
+## 5. In a form
+
+A form sends the hidden inputs: the chosen one's `value`, under the group's `name`. Try each switch, and clear the choice:
+
+<Unstyled>
+  <RadioGroupForm />
+</Unstyled>
+
+- **Chosen:** `FormData` has one entry, such as `plan = "team"`.
+- **Nothing chosen:** no entry at all, not an empty one. On the server, the field is missing.
+- **Disabled:** no entry, even with something chosen, because a disabled input is never submitted.
+- **Read only:** the chosen value is sent. Read-only blocks changes, not submitting.
+- **Required with nothing chosen:** the browser's own validation would stop the form submitting, because `required` is on every hidden input. The demo's form has `noValidate`, which turns that off, as a form that shows its own errors does: it checks the value on submit and sets `invalid` and `error` ([the Required story](?path=/story/components-radio-group--required) shows how). `required` still puts `aria-required` on the group.
+- **`form`:** a group outside its `<form>` can still submit with it. Pass the form's `id` as `form`, and Base UI puts it on every hidden input.
+
+## The whole files
+
+<details>
+<summary><code>RadioGroup.tsx</code></summary>
+
+<Code file="components/RadioGroup/RadioGroup.tsx" />
+
+</details>
+
+<details>
+<summary><code>Radio.tsx</code></summary>
+
+<Code file="components/RadioGroup/Radio.tsx" />
+
+</details>
+
+<details>
+<summary><code>radio-group.css</code></summary>
+
+<Code file="components/RadioGroup/radio-group.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/RadioGroup/index.ts" />
+
+</details>
