@@ -21,6 +21,7 @@ Components are drawn in black, white, and grays. The brand colors belong to the 
 - Brand: `brand` for bands and panels in a layout, with `on-brand` text. Never white text on `brand`. Highlighted panels and callouts use `surface-tint`.
 - Links: `link`, always underlined in running text.
 - Chips, badges, and selection: `highlight` with `on-highlight`.
+- Behind a modal dialog, the page is dimmed with `backdrop`: a see-through near black, the only color token with transparency. It never sits behind text that has to meet a contrast ratio.
 - Decorative lines use `border`. Anything someone must see to use (input edges, checkbox outlines) uses `border-strong`.
 - Status: `success`, `warning`, and `danger` for text and icons, with `success-soft`, `warning-soft`, and `danger-soft` as message backgrounds (text on those is `ink`). A status color is always paired with an icon or a word. Success is teal, not green, so it never depends on red-green hue alone.
 

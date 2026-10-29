@@ -57,7 +57,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 | Pattern | Keys |
 | --- | --- |
 | Button | Enter and Space activate. Toggle buttons use `aria-pressed` and keep the same label. |
-| Dialog | Tab and Shift+Tab cycle inside; Escape closes; focus returns to the trigger. Focus starts on the first field, or on the least destructive button for confirmations. |
+| Dialog | Tab and Shift+Tab cycle inside; Escape closes; focus returns to the trigger. Focus starts on the first field, or on the least destructive button for confirmations, or on a scrolling body with nothing inside it to Tab to. |
 | Menu | Enter, Space, or Down opens on the first item; Up and Down move; Home and End jump; typing a letter jumps to a match; Escape closes. |
 | Tabs | Tab moves into the tab list and then to the panel; Left and Right move between tabs. |
 | Combobox | Down opens the list; Up and Down move; Enter picks; Escape closes. |

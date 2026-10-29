@@ -20,7 +20,7 @@ A rough list of components, not a plan. It came from a quick talk about what one
 
 | # | Component | Status |
 | --- | --- | --- |
-| 8 | Dialog or modal, with header, body, and actions, a focus trap, Escape to close, scroll lock, and `aria-modal` | Not built |
+| 8 | Dialog or modal, with header, body, and actions, a focus trap, Escape to close, scroll lock, and `aria-modal` | Built: Dialog, AlertDialog, and DialogClose. Base UI hides the rest of the page from screen readers (`aria-hidden`), blocks clicks outside, and keeps focus inside; Dialog adds `aria-modal` too. |
 | 9 | Popover, and menu or dropdown | Not built |
 | 10 | Listbox or combobox, which covers the mention autocomplete | Not built |
 | 11 | Toast | Not built |

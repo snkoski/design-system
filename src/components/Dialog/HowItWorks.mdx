@@ -1,0 +1,238 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as DialogStories from "./Dialog.stories";
+import { Code } from "../../how-it-works/Code";
+import { Inspect } from "../../how-it-works/Inspect";
+import { DeleteDialog, ProfileDialog, RenameDialog, TermsDialog } from "../../how-it-works/components/Dialog";
+
+<Meta of={DialogStories} name="How it works" />
+
+# How Dialog works
+
+A dialog is a window over the page for a short task, such as "Edit profile", or a question that needs an answer, such as "Delete project?". This page walks through the real code underneath Dialog, AlertDialog, and DialogClose: what HTML they render, how each prop gets there, and how the CSS draws them. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+All three are built on [Base UI](https://base-ui.com), an unstyled React library that handles behavior and accessibility. For a dialog that's most of the work: moving focus in and keeping it there, closing with Escape, hiding the rest of the page from screen readers, stopping the page from scrolling, and giving focus back when it closes. Our code chooses the parts, connects the props to them, and adds the look.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Dialog.tsx</code></td><td>Dialog: Base UI's Dialog root and trigger, around the shared frame, with a close button.</td></tr>
+    <tr><td><code>AlertDialog.tsx</code></td><td>AlertDialog: Base UI's AlertDialog root and trigger, around the same frame, with no close button.</td></tr>
+    <tr><td><code>DialogClose.tsx</code></td><td>A Button that closes the dialog it's in.</td></tr>
+    <tr><td><code>shared.tsx</code></td><td>What the two dialogs share: their props, and <code>Frame</code>, which draws the backdrop, the window, and everything in it. Not exported.</td></tr>
+    <tr><td><code>dialog.css</code></td><td>The look: the dimmed page, the window, its sizes, motion, hot dog mode, and Windows high contrast. It only uses design tokens.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: the three components and their types.</td></tr>
+    <tr><td><code>Dialog.test.tsx</code>, <code>Dialog.stories.tsx</code>, and the same for the other two</td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts, and what each one brings:
+
+<table>
+  <thead>
+    <tr><th>Base UI part</th><th>Renders</th><th>What it provides</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Dialog.Root</code> or <code>AlertDialog.Root</code></td><td>Nothing</td><td>The open state, and everything that happens on opening and closing. AlertDialog's root gives the window <code>role="alertdialog"</code> and ignores clicks outside it.</td></tr>
+    <tr><td><code>Dialog.Trigger</code> or <code>AlertDialog.Trigger</code></td><td>The button you pass</td><td>Opens the dialog, and tells screen readers that it does.</td></tr>
+    <tr><td><code>Dialog.Portal</code></td><td><code>&lt;div&gt;</code> at the end of <code>&lt;body&gt;</code></td><td>Moves the dialog out of wherever it's written, so nothing on the page can clip it or cover it. <code>container</code> picks another element.</td></tr>
+    <tr><td><code>Dialog.Backdrop</code></td><td><code>&lt;div&gt;</code></td><td>The layer that dims the page.</td></tr>
+    <tr><td><code>Dialog.Viewport</code></td><td><code>&lt;div&gt;</code></td><td>A full-screen box the window is centered in, holding the focus guards.</td></tr>
+    <tr><td><code>Dialog.Popup</code></td><td><code>&lt;div role="dialog"&gt;</code></td><td>The window: focus moves into it, stays in it, and leaves it with Escape.</td></tr>
+    <tr><td><code>Dialog.Title</code> and <code>Dialog.Description</code></td><td><code>&lt;h2&gt;</code> and <code>&lt;p&gt;</code></td><td>The heading and the sentence under it, with the ids that name and describe the window.</td></tr>
+    <tr><td><code>Dialog.Close</code></td><td>The button you pass</td><td>Closes the dialog. AlertDialog uses this same part, so one DialogClose works in both.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Open the dialog, and watch the HTML under it. It opens inside the gray box rather than over this whole page, through its `container` prop, so the view below can see it. While it's open, the rest of this page is out of reach, just as a page would be: press Escape or Cancel to come back. The list leaves out inline `style` attributes.
+
+<Unstyled>
+  <Inspect hint="Click Edit profile, or press Tab to reach it and then Enter. Press Escape to close it again.">
+    <ProfileDialog />
+  </Inspect>
+</Unstyled>
+
+Before it opens, there's only the trigger. Once it's open:
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;button aria-haspopup="dialog" aria-expanded&gt;</code></td><td>Your Button, with Base UI's <code>Dialog.Trigger</code> attributes merged in</td><td>Screen readers announce it as opening a dialog, and whether it's open. <code>aria-controls</code> points at the window while it's open, and <code>data-popup-open</code> is there for styling.</td></tr>
+    <tr><td><code>&lt;div data-base-ui-portal&gt;</code></td><td>Base UI's <code>Dialog.Portal</code></td><td>Holds everything below. Normally it's the last thing in <code>&lt;body&gt;</code>.</td></tr>
+    <tr><td><code>&lt;div role="presentation" aria-hidden="true"&gt;</code>, empty</td><td>Base UI</td><td>A clear layer over the whole screen (its inline style is <code>position: fixed; inset: 0</code>). It's what catches a click anywhere outside the window, so nothing behind can be clicked.</td></tr>
+    <tr><td><code>&lt;div class="dialog__backdrop" role="presentation" aria-hidden="true"&gt;</code></td><td>Base UI's <code>Dialog.Backdrop</code>, with our class</td><td>Dims the page. It's only a picture, so it's hidden from screen readers. A click on it is a click outside the window.</td></tr>
+    <tr><td><code>&lt;div class="dialog__viewport" role="presentation"&gt;</code></td><td>Base UI's <code>Dialog.Viewport</code>, with our class</td><td>Centers the window. Clicks on it, around the window, count as outside too.</td></tr>
+    <tr><td><code>&lt;span data-base-ui-focus-guard tabindex="0" aria-hidden="true"&gt;</code> (two)</td><td>Base UI</td><td>Invisible stops before and after the window. When Tab leaves the last button, it lands on a guard, which sends focus back to the first one; Shift+Tab does the same the other way. That's how focus stays inside.</td></tr>
+    <tr><td><code>&lt;div class="dialog" role="dialog" tabindex="-1" aria-modal="true"&gt;</code></td><td>Base UI's <code>Dialog.Popup</code>, with our class, <code>data-size</code>, and <code>aria-modal</code></td><td>The window. <code>aria-labelledby</code> points at the title and <code>aria-describedby</code> at the description, so a screen reader announces "Edit profile, dialog" and then the sentence. <code>tabindex="-1"</code> lets Base UI focus the window itself when it's opened by touch, so a phone keyboard doesn't pop up for the first field.</td></tr>
+    <tr><td><code>&lt;h2 class="dialog__title"&gt;</code> and <code>&lt;p class="dialog__description"&gt;</code></td><td>Base UI's <code>Dialog.Title</code> and <code>Dialog.Description</code>, inside our <code>dialog__header</code></td><td>The ids the window's <code>aria-labelledby</code> and <code>aria-describedby</code> point at.</td></tr>
+    <tr><td><code>&lt;div class="dialog__body"&gt;</code> and <code>&lt;div class="dialog__actions"&gt;</code></td><td>Our code</td><td>The children, and the buttons. The body gets <code>tabindex="0"</code> only when it has to (see "When the body scrolls").</td></tr>
+    <tr><td><code>&lt;button class="button dialog__close" aria-label="Close"&gt;</code></td><td>Our DialogClose, with Base UI's <code>Dialog.Close</code></td><td>The X. It's last, so the first focus lands on the field (see "The close button comes last").</td></tr>
+  </tbody>
+</table>
+
+None of these layers has a `z-index`. They're last in `<body>`, so they're drawn over the page, as long as the app's own root has `isolation: isolate`: then anything the app stacks with `z-index`, such as a fixed header, stays inside the root, below the dialog. README and **Choosing a dialog** say so.
+
+Two things change outside the dialog too. Everything else on the page gets `aria-hidden="true"`, so screen readers can't wander out of the window (and `data-base-ui-inert`, Base UI's own marker; it isn't the HTML `inert` attribute). Nothing outside can be clicked, because the clear layer covers it, or reached with Tab, because of the focus guards. And `<body>` gets `overflow: hidden` (with `scrollbar-gutter: stable` on `<html>`, so the page doesn't shift sideways when its scrollbar goes), so the page behind doesn't scroll.
+
+### The close button comes last
+
+The X is drawn in the top corner, but it's the last thing in the window's HTML. When a dialog opens, Base UI moves focus to the first thing in it that can take focus. With the X first, every dialog would open with focus on "Close". Last, focus starts on the first field, or on "Cancel" when there are no fields: the least destructive answer, as **Accessibility** asks.
+
+### `aria-modal`
+
+Base UI doesn't set `aria-modal="true"`; it hides the rest of the page itself instead. We add it anyway. It says the same thing in the way screen readers and checkers expect, and without it, axe (the checker every story runs) doesn't treat an alert dialog as modal, so it flags the hidden focus guards as focusable content hidden from screen readers.
+
+## AlertDialog
+
+An AlertDialog is the same frame, with Base UI's AlertDialog root and trigger. Open it and compare: the window's role is `alertdialog`, there's no X, and a click on the dimmed page does nothing. Escape and the two buttons still close it.
+
+<Unstyled>
+  <Inspect hint="Click Delete project, then click the dimmed area around the window: nothing happens. Press Escape or Cancel.">
+    <DeleteDialog />
+  </Inspect>
+</Unstyled>
+
+## When the body scrolls
+
+When the content is taller than the space, the body scrolls on its own while the title and buttons stay. A keyboard user can only scroll something that has focus. Inside a form, the fields take focus, and the browser scrolls each one into view. With only text inside, nothing can, so the body itself needs `tabindex="0"`. But if the body always had it, it would be the first thing in the window and take the first focus from the fields. So it gets one only while it scrolls with nothing inside to Tab to. Open this one and watch `tabindex` appear on the body.
+
+<Unstyled>
+  <Inspect hint="Click Read the terms, then press Shift+Tab to reach the body, and the arrow keys to scroll it.">
+    <TermsDialog />
+  </Inspect>
+</Unstyled>
+
+## A form in a dialog
+
+With `onSubmit`, the body and the buttons go inside one `<form>`, so Enter in a field submits it, and so does a `type="submit"` button among the actions. The form has `display: contents`, so it doesn't change the layout. Submitting doesn't close the dialog: this handler reads the form, then closes it.
+
+<Unstyled>
+  <Inspect hint="Click Rename project, change the name, and press Enter.">
+    <RenameDialog />
+  </Inspect>
+</Unstyled>
+
+## From props to HTML
+
+### The props
+
+Both dialogs take the same props. `title` is required, and typed so it can't be `undefined`, `null`, or a boolean: it's what names the window for screen readers. The rest of the props an HTML `<div>` takes (`id`, `data-*`, `aria-*`) go on the window.
+
+<Code file="components/Dialog/shared.tsx" name="SharedProps" />
+
+Dialog adds optional `actions` and the close button's name. AlertDialog requires `actions`, because its buttons are the only way to answer.
+
+<Code file="components/Dialog/Dialog.tsx" name="DialogProps" />
+
+<Code file="components/Dialog/AlertDialog.tsx" name="AlertDialogProps" />
+
+### The components
+
+Dialog sorts its props. The ones about opening and closing go to Base UI's root. `trigger` becomes the trigger, through Base UI's `render` prop: Base UI renders your Button, with its own attributes merged in. Everything else goes to the frame, with Dialog's defaults: `md`, and a close button named "Close". An empty title passes the type (it's a string), so `warnIfUnnamed` prints a warning while you develop.
+
+<Code file="components/Dialog/Dialog.tsx" name="Dialog" />
+
+AlertDialog does the same with Base UI's AlertDialog root and trigger, defaults to `sm`, and passes no `closeLabel`, so the frame draws no close button.
+
+<Code file="components/Dialog/AlertDialog.tsx" name="AlertDialog" />
+
+DialogClose renders Base UI's `Dialog.Close` as our Button. Its one difference from Button is the default variant, `secondary`.
+
+<Code file="components/Dialog/DialogClose.tsx" name="DialogClose" />
+
+### The frame
+
+`Frame` draws everything inside the root. It leaves out an empty title (an empty heading would still be what names the window, over any `aria-label`), the body when there are no children, and the actions when there are none. With `onSubmit`, the body and actions go in a form.
+
+<Code file="components/Dialog/shared.tsx" name="Frame" />
+
+The body's `tabindex` comes from this hook. It measures the body after every render, and again whenever the body or anything directly inside it changes size. The body is kept in state rather than a ref, because Base UI's portal adds it to the page after the frame renders, and setting the state renders again so the hook can measure it.
+
+<Code file="components/Dialog/shared.tsx" name="useNeedsFocus" />
+
+<Code file="components/Dialog/shared.tsx" name="FOCUSABLE" />
+
+## How it looks
+
+### The dimmed page
+
+The backdrop covers the screen in `backdrop`, a see-through near black: the only color token with transparency.
+
+<Code file="components/Dialog/dialog.css" name=".dialog__backdrop" />
+
+### Centering, with a gutter
+
+The viewport covers the screen too, and centers the window in a single grid cell. Its padding is the gutter between the window and the screen's edges. The cell is set to the size of the screen, so the window's `max-height: 100%` means "the screen, less the gutter".
+
+<Code file="components/Dialog/dialog.css" name=".dialog__viewport" />
+
+### The window
+
+The window is as wide as its size allows, and no wider than the viewport. It's a column: header, body, and actions. The border is there even where the shadow seems to be enough, because Windows high contrast removes shadows.
+
+<Code file="components/Dialog/dialog.css" name=".dialog" />
+
+<Code file="components/Dialog/dialog.css" name='.dialog[data-size="sm"]' />
+
+<Code file="components/Dialog/dialog.css" name='.dialog[data-size="lg"]' />
+
+The sizes are tokens: `dialog-sm` (400px), `dialog-md` (600px, the default), and `dialog-lg` (800px). On a screen narrower than that, `width: 100%` and the gutter take over.
+
+When it's opened by touch, the window itself has focus, and shows the usual outline:
+
+<Code file="components/Dialog/dialog.css" name=".dialog:focus-visible" />
+
+### Opening and closing
+
+Base UI marks the window and backdrop with `data-starting-style` as they appear and `data-ending-style` as they leave, so plain CSS transitions can animate both ways. The window fades in and rises by `--motion-distance`, over `--duration-slow`. It leaves faster, over `--duration-base` with `--ease-in`, as everything in the system does. Under reduced motion, `--motion-distance` is 0 and both durations shrink to 120ms, so it only fades, with no change to this CSS.
+
+<Code file="components/Dialog/dialog.css" name=".dialog[data-starting-style]" />
+
+<Code file="components/Dialog/dialog.css" name=".dialog__backdrop[data-starting-style]" />
+
+<Code file="components/Dialog/dialog.css" name=".dialog[data-ending-style]" />
+
+### Header, close button, body, and actions
+
+The header leaves room for the close button beside the title, but only when there is one (an AlertDialog's title can use the full width).
+
+<Code file="components/Dialog/dialog.css" name=".dialog__header" />
+
+<Code file="components/Dialog/dialog.css" name=".dialog:has(> .dialog__close)" />
+
+<Code file="components/Dialog/dialog.css" name=".dialog__title" />
+
+The close button is a small ghost Button, positioned in the corner so its center lines up with the title's first line. Being a Button, it already has an invisible hit area of `--target-min`: 24px with a mouse and 44px on touch.
+
+<Code file="components/Dialog/dialog.css" name=".dialog__close" />
+
+The body is the part that scrolls. `min-height: 0` lets it shrink below its content in the column, which is what makes it scroll. A scrolling box cuts off anything that sticks out of it, such as the focus outline of a field at its edge, so the body has a little padding, taken back by a negative margin.
+
+<Code file="components/Dialog/dialog.css" name=".dialog__body" />
+
+<Code file="components/Dialog/dialog.css" name=".dialog__actions" />
+
+On a short screen (a phone turned sideways, or a page zoomed to 400%), there's no room for the title and buttons to stay put while the body scrolls: the body would shrink to nothing and the buttons would fall off the bottom. So below 30em (480px) of height, the whole window scrolls instead. It's a container query on the viewport, which is the size of the screen, so a story can check it in a short box.
+
+<Code file="components/Dialog/dialog.css" name="@container (max-height: 30em)" />
+
+From 40em (640px) wide, the window has more room inside, and the close button moves with the padding:
+
+<Code file="components/Dialog/dialog.css" name="@media (min-width: 40em)" />
+
+### Hot dog and Windows high contrast
+
+In hot dog mode the window gets a thick ink edge, and `shadow-lg` is already a hard 6px offset there. Unlike buttons, it doesn't press: it isn't something you click.
+
+<Code file="components/Dialog/dialog.css" name='[data-theme="hotdog"] .dialog' />
+
+In Windows high contrast, shadows disappear and colors are replaced by the system's. The edge becomes the window's outline, and the backdrop becomes a wash of the page color, so the window still stands out.
+
+<Code file="components/Dialog/dialog.css" name="@media (forced-colors: active)" />

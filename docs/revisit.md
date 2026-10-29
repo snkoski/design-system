@@ -261,3 +261,23 @@ Raised while writing the components' How it works pages (2026-10-28).
 Then write the roadmap, point CLAUDE.md at it, and delete `docs/temp-roadmap.md` and this entry.
 
 Raised 2026-10-29.
+
+## Dialog widths
+
+**Today:** Dialog and AlertDialog come in `sm`, `md`, and `lg`: 400, 600, and 800px (the `dialog-sm`, `dialog-md`, and `dialog-lg` tokens), Atlassian's widths. Dialog defaults to `md` and AlertDialog to `sm`.
+
+**Why it's in question:** they were picked to try out, not decided. Other systems disagree a lot: Primer's default is 320px and its largest 640px, Polaris uses 380, 620, and 980px, and Material caps a dialog at 560dp (`docs/brand/industry.md`, Dialogs).
+
+**To decide:** look at real dialogs from the first app at each size (Storybook's Dialog → Sizes story), and whether three sizes are needed or two would do. Changing a width is a token change; removing a size is a breaking change to the `size` prop.
+
+Raised while building Dialog (2026-10-29).
+
+## Dialog buttons on narrow screens
+
+**Today:** a dialog's buttons sit at the bottom right, primary last, and wrap when they don't fit, each at its own width and still right-aligned. On a 320px screen, "Cancel" and "Save profile" end up on two lines (Storybook's Dialog → Narrow screen story).
+
+**Why it's in question:** it looks loose. Other systems handle it differently: Material stacks them with the confirming action on top, Carbon makes two buttons fill the bottom edge side by side, and Apple puts the likeliest choice at the top of a stack.
+
+**To decide:** keep wrapping; stack them full width below a breakpoint (and in which order, given that the visual order and the tab order should match); or make two buttons share the row equally, as Carbon does.
+
+Raised while building Dialog (2026-10-29).

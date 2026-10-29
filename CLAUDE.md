@@ -84,10 +84,10 @@ src/how-it-works/            the pieces of every "How it works" page: <Code> (re
 ## Tokens
 
 - `tokens/tokens.json` is the only place values are defined. `src/styles/tokens.css` and `tailwind-theme.css` are generated: never edit them by hand.
-- Two tiers. **Primitives** are the raw palette (`tangerine-500`, `gray-900`). **Semantic tokens** say what a value is for (`bg`, `surface`, `surface-tint`, `surface-hover`, `track`, `track-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `brand`, `on-brand`, `link`, `highlight`, `on-highlight`, `focus`, `success`, `warning`, `danger` and their `-soft` versions). **Components use semantic tokens only, never primitives.**
+- Two tiers. **Primitives** are the raw palette (`tangerine-500`, `gray-900`). **Semantic tokens** say what a value is for (`bg`, `surface`, `surface-tint`, `surface-hover`, `track`, `track-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `brand`, `on-brand`, `link`, `highlight`, `on-highlight`, `focus`, `success`, `warning`, `danger` and their `-soft` versions, and `backdrop`). **Components use semantic tokens only, never primitives.**
 - **Components are neutral.** The tokens they draw with (`surface`, `surface-hover`, `track`, `track-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, `focus`) point at the pure gray scale (`gray-*`, plus `white` and `char-950`), never at a brand hue. `brand`, `on-brand`, and `surface-tint` are for layouts, and `pnpm check` fails if a component uses them. A hover fill is `surface-hover`. Status colors (`success`, `warning`, `danger`) are fine where they carry meaning. See `docs/brand/color.md`.
 - Semantic colors have a value per theme, usually an alias such as `"{tangerine-500}"`.
-- **Colors are HSL only**, written `hsl(H S% L%)`. Never hex, never named colors. If a tool or library outputs hex, convert it.
+- **Colors are HSL only**, written `hsl(H S% L%)`, or `hsl(H S% L% / A%)` for a see-through layer (`backdrop`, which dims the page behind a modal; never in a contrast pair). Never hex, never named colors. If a tool or library outputs hex, convert it.
 - Every token has a `usage` note saying where it's used. Text colors name the backgrounds they're checked on.
 - No raw values in component CSS. If a value is missing, add a token first.
 - Motion tokens (`--duration-*`, `--ease-*`, `--motion-distance`) and the fluid heading sizes are written by `build-tokens.mjs`, because `tokens.json` has no motion family.
@@ -283,6 +283,19 @@ Checkbox is the pattern for choice controls (checkboxes, switches, radios), and 
 - Declare each Base UI prop you want in Storybook's docs table explicitly on the component's props type, with JSDoc. Storybook doesn't read props inherited from `node_modules`.
 - In tests, check names and descriptions with `toHaveAccessibleName` and `toHaveAccessibleDescription`, and check what the form submits with `FormData`.
 
+## Dialogs and other overlays
+
+Dialog is the pattern for anything Base UI renders in a portal (dialogs now; popovers, menus, tooltips, and toasts later). Dialog, AlertDialog, and DialogClose share `src/components/Dialog/`.
+
+- Base UI renders the popup at the end of `<body>`, not where it's written, and while a modal is open it hides everything else from screen readers (`aria-hidden`; not the `inert` attribute), covers it with a clear layer that catches clicks, keeps Tab inside with focus guards, and stops the page scrolling. Its `container` prop takes another element. A ref works only if it's set before the popup opens, so for one that starts open, pass the element itself.
+- Base UI adds the portal last in `<body>` and sets no `z-index`, so a consumer's app root needs `isolation: isolate` to keep its own stacking (a fixed header) below it. README and `docs/brand/dialogs.md` say so, and Dialog's `OverAFixedHeader` story checks it.
+- A popup sizes itself (`width: 100%` up to its size token), the one exception to "components don't set their own width": it isn't laid out by the page.
+- Set `aria-modal="true"` on a modal popup. Base UI doesn't, and without it axe doesn't count an alert dialog as modal, and flags Base UI's hidden focus guards (`aria-hidden-focus`).
+- A button drawn in a corner (Dialog's close button) comes last in the HTML, so the first focus lands on the first field or button, as `docs/brand/accessibility.md` asks; CSS places it.
+- Stories render the popup inside the story, so `canvas` queries, `data-pointer`, `data-theme`, and the screenshot recipe all reach it: a stage element with `contain: layout` (so the fixed backdrop fills it, not the screen), passed as `container` once it exists (a state setter as its ref). Several open modals side by side (`AllThemes`) pass axe. Tag every story that starts open `!autodocs`, so the docs page never goes inert.
+- Base UI moves focus a moment after a popup opens or closes, and after Tab wraps around inside one, so check focus with `waitFor`, in unit tests and `play` functions alike. Simulated keys (`userEvent.keyboard`) don't scroll anything; check that a scrolling area can take focus instead.
+- Base UI's portal mounts its contents after the component renders, so code that measures an element inside it uses a state setter as the ref (Dialog's body), not `useRef`.
+
 ## Dev warnings
 
 `warn()` and `warnIfUnnamed()` in `src/internal/warn.ts` print a console warning in development, once per message, prefixed `[design-system] <Component>:`. A consumer's production build replaces `process.env.NODE_ENV` and drops them. Add one only when all three hold:
@@ -319,7 +332,7 @@ The message says what's wrong and how to fix it. Warn about values that would ha
 
 Every component and experiment has a "How it works" page, `HowItWorks.mdx` beside its stories (`<Meta of={Stories} name="How it works" />`), that walks through its real code in the order it runs, for people who use the system and want to know what's underneath.
 
-- Show code with `<Code file="components/Switch/Switch.tsx" name="Switch" />` from `src/how-it-works/Code.tsx`. The path is from `src`. `name` is a top-level declaration (function, constant, interface, type, or class), or in a CSS file a rule by how its selector list or at-rule starts (`name=".switch__thumb"`, `name="@media (forced-colors: active)"`). The first rule that starts that way wins, so name more of the list (`name=".a, .b"`) to pick a later one, and use single quotes around a selector with double quotes in it. Leave `name` out for the whole file. The code is read from the file when the page loads, so it can't go out of date, and `src/how-it-works/sources.test.ts` fails if any `<Code>` on any page stops finding its code. Write each `<Code … />` on one line.
+- Show code with `<Code file="components/Switch/Switch.tsx" name="Switch" />` from `src/how-it-works/Code.tsx`. The path is from `src`. `name` is a top-level declaration (function, constant, interface, type, or class), or in a CSS file a rule by how its selector list or at-rule starts (`name=".switch__thumb"`, `name="@media (forced-colors: active)"`). The first rule that starts that way wins, so name more of the list (`name=".a, .b"`) to pick a later one, and use single quotes around a selector with double quotes in it. Leave `name` out for the whole file. The code is read from the file when the page loads, so it can't go out of date, and `src/how-it-works/sources.test.ts` fails if any `<Code>` on any page stops finding its code. Write each `<Code … />` on one line. After adding a new component folder, that test can say a new file isn't among the sources: Vitest's cache holds the old file list, so delete `node_modules/.vitest-cache` and run it again.
 - Show what a component renders with `<Inspect>`: the real component, and under it its live HTML, marking each attribute as it changes.
 - Demos call the real code. Shared pieces (`Slider`, the `.explain` panel, chart styles) are in `src/how-it-works/demo.tsx` and `demo.css`. A component's own demos go in `src/how-it-works/components/<Name>.tsx`, never in the component's folder, which is published and checked by `pnpm check`. An experiment's go in its folder as `explain.tsx`.
 - MDX: Markdown tables don't render, so use HTML `<table>`. Wrap demos in `<Unstyled>`.

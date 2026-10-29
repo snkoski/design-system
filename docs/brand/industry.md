@@ -151,6 +151,25 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 | Disable submit button | No | No | No | Short forms only | — | — | **No** |
 | Placeholder as label | No | No | — | — | No essential info | — | **No** |
 
+## Dialogs
+
+| System | Name | Widths | Buttons | A click outside closes it | Close (X) button | On phones |
+| --- | --- | --- | --- | --- | --- | --- |
+| Material 3 | Dialog | 280 to 560dp | Trailing edge, confirm last; two at most | Not stated | Full-screen dialogs only | Full-screen, for compact screens only |
+| Carbon | Modal | xs, sm, md, lg, as shares of the grid | Primary on the right; two buttons fill the bottom edge | Passive modals only | Always, in the header | Full width at 320px |
+| Primer | Dialog | 296, 320 (default), 480, 640px | Primary on the right | Yes, unless a form has unsaved changes | Required, always visible | A bottom sheet, or full screen for dialogs with fields |
+| Atlassian | Modal dialog | 400, 600, 800, 968px | Primary on the right | Yes | "Always", though the code's default is off | Not stated |
+| Polaris | Modal | small, default, large (380, 620, 980px in the code) | Secondary, then primary | Yes | Yes | Anchored to the bottom, full width |
+| Fluent 2 | Dialog | Not stated | Up to three | Modal yes; non-modal and alert no | Only when there's no Cancel | Not stated |
+| Apple | Alert, sheet | Not stated | The likeliest choice trailing; Cancel leading | Sheets can be swiped away | Alerts none; sheets have Cancel and Done | Sheets rest at half and full height |
+| GOV.UK | None | — | — | — | — | — |
+| USWDS | Modal | default and large | A button group in the footer | Not stated | Yes, except "forced action" modals | — |
+| **Sherbet** | **Dialog, AlertDialog** | **400, 600 (default), 800px** | **Primary last, bottom right** | **Dialog yes, AlertDialog no** | **Dialog always, AlertDialog never** | **Centered, 16px from each edge** |
+
+Most systems put the primary action last, on the right, and close a dialog on a click outside. Primer is the only one that makes an exception for unsaved changes. Sherbet's Dialog leaves that to `onOpenChange`, which can cancel the close and ask "Discard changes?" instead. AlertDialog works like Fluent's alert: only its buttons and Escape answer it. Widths vary the most: Primer's default is only 320px, while Atlassian's 400, 600, and 800px match Sherbet's three sizes.
+
+GOV.UK has no modal dialog. One was proposed in its community backlog, which is now a discussion on its main repository, with comments that modals are easy to get wrong and that some screen readers ignore `aria-modal`.
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -173,3 +192,4 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 - [U.S. Web Design System](https://designsystem.digital.gov/components/typography/)
 - [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [WAI-ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/)
+- Dialogs: [Material 3](https://m3.material.io/components/dialogs/guidelines), [Carbon](https://carbondesignsystem.com/components/modal/usage/) and [its sizes](https://carbondesignsystem.com/components/modal/style/), [Primer](https://primer.style/product/components/dialog/guidelines/), [Atlassian](https://atlassian.design/components/modal-dialog/usage), [Polaris](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/deprecated/modal.mdx), [Fluent 2](https://fluent2.microsoft.design/components/web/react/core/dialog/usage), Apple [alerts](https://developer.apple.com/design/human-interface-guidelines/alerts) and [sheets](https://developer.apple.com/design/human-interface-guidelines/sheets), [GOV.UK's discussion](https://github.com/alphagov/govuk-design-system/discussions/6148), and [USWDS](https://designsystem.digital.gov/components/modal/)

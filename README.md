@@ -95,6 +95,8 @@ If the app uses Tailwind, add the layout-only theme after Tailwind:
 
 Set the theme with `data-theme="light" | "dark" | "hotdog"` on `<html>`. With no attribute, light or dark follows the visitor's system setting.
 
+Give the element your app renders into `isolation: isolate` (for example `#root { isolation: isolate; }`). Dialogs open in a layer added at the end of `<body>`, and this keeps everything the app stacks with `z-index`, such as a fixed header, below them.
+
 ## Adding a component
 
 1. If Base UI has a matching primitive (dialog, menu, tabs, popover…), build on it. shadcn's version of the component is a good starting point for structure; swap its Tailwind styling for a CSS file that follows the rules above.

@@ -1,0 +1,13 @@
+/* Dialog's "How it works" demos: a small page for each dialog to open in, so the live HTML view can see it */
+.how-dialog__page {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--space-3);
+  height: 26rem;
+  padding: var(--space-4);
+  overflow: hidden;
+  contain: layout; /* the backdrop and viewport are position: fixed; this makes them fill the page, not the screen */
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
