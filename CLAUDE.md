@@ -18,6 +18,8 @@ Tell the user it's still off whenever a component is finished, or when the syste
 
 Decisions made for now that we may want to change, and open questions, go in `docs/revisit.md`: what we do today, why, and what would settle it. Check it before changing anything it mentions.
 
+There's no roadmap yet. `docs/temp-roadmap.md` is a rough list of components one app would need, with what's built so far; it isn't decided and its order is a guess. Check it when choosing what to build next, and update its status when a component on it is built.
+
 The palette name may change, so never put "Sherbet" in file names, class names, CSS variables, or package names.
 
 ## Stack
@@ -67,6 +69,7 @@ scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
 docs/revisit.md              decisions to come back to, and open questions
+docs/temp-roadmap.md         a rough, undecided list of components to build, until there's a real roadmap
 docs/reading-list.json       articles and design system pages to read later: the only place links are added
 docs/reading-list.md, .html  generated from the JSON by scripts/build-reading-list.mjs (pnpm reading-list); never edit
 src/experiments/             ideas being tried out; relaxed rules, never published (see Experiments)

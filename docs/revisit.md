@@ -245,3 +245,19 @@ Raised while writing the components' How it works pages (2026-10-28).
 **To decide:** whether to show live properties (`checked`, and maybe `value` for text fields) next to the attributes, marked so they can't be mistaken for HTML, or to keep the view to real HTML and leave the explanation to the pages.
 
 Raised while writing the components' How it works pages (2026-10-28).
+
+## A full roadmap
+
+**Today:** there's no roadmap. `docs/temp-roadmap.md` is a rough list of 21 components in four tiers (primitives, overlays, composites, and layout), from a quick talk about what one app we may rebuild with this system would need. Components are built one at a time with `/new-component`, in whatever order seems useful next.
+
+**Why it's in question:** the list is shaped by one app and was never checked against anything else. Without a real order, it's hard to tell how close the system is to a first beta, which is also when Chromatic gets turned back on.
+
+**To decide:**
+- Which components a first beta needs, and which can wait.
+- The order, including what each one depends on: a menu and a combobox need a popover, an avatar group needs an avatar, and a password field needs Input and an icon button.
+- Whether the docs' own expectations (an error summary, a danger tone for buttons, a spinner and a skeleton, a high-contrast theme) belong in it.
+- Whether a component the app needs belongs in the system at all, or in the app (an app shell, an empty state).
+
+Then write the roadmap, point CLAUDE.md at it, and delete `docs/temp-roadmap.md` and this entry.
+
+Raised 2026-10-29.
