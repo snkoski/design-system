@@ -106,7 +106,7 @@ Then prove the tests can fail: break the component three ways that matter (for e
 
 ## Phase 7: Look at it
 
-Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Check alignment, every state, focus, hot dog mode, and dark mode. In a worktree, use a port other than 6107, so another session's screenshots don't collide with yours.
+Screenshot the `AllThemes` story in all three themes with the recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad directory, and open each image with the Read tool. Screenshot a fresh `pnpm build-storybook`, served on its own port, not a running dev server: a dev server started before you added the story files doesn't show them, and restarting it isn't yours to do without asking. Check alignment, every state, focus, hot dog mode, and dark mode. In a worktree, use a port other than 6107, so another session's screenshots don't collide with yours.
 
 Then screenshot the light theme again with `data-pointer="coarse"` and with `data-density="compact"` set on the section (`page.locator('section[data-theme=light]').evaluate((el) => el.dataset.pointer = 'coarse')`). Check that it grows or shrinks with the tokens, that icons and labels stay centered, and that nothing overlaps.
 
@@ -124,6 +124,10 @@ If the `AllThemes` matrix lays components out in columns, check that each one ke
 
 If any part is dimmed with `opacity` (read-only, for example), check the contrast of everything inside it at that opacity, placeholders and icons included. If a dimmed control can still receive focus (a disabled radio group's selected radio), its focus outline is dimmed too: check it still meets 3:1, or restore full opacity on `:focus-visible`. `pnpm check:contrast` only knows undimmed pairs, so compute the composited colors by hand (blend each color with the page color at the opacity) and check 4.5:1 for text and 3:1 for edges and meaningful icons.
 
+Check it at 320×256 CSS px, the size of a 320px-wide screen zoomed to 400% (WCAG 1.4.10 Reflow): set the viewport to that, or render the story in a box that size when the component sizes itself from its container. Everything must stay readable and every control reachable, with nothing scrolled out of reach. A Dialog's body once shrank to nothing there and its buttons fell below its bottom edge. If the component needs a rule for short screens, add a story that checks it.
+
+For a component that renders in a portal (a dialog, popover, menu, tooltip, or toast), also open it under a page header with `position: fixed` and a `z-index`, inside a root with `isolation: isolate`, and check the popup is on top where they overlap (`document.elementFromPoint`). Assert first that they do overlap, or the check passes without testing anything. See "Dialogs and other overlays" in `CLAUDE.md`.
+
 Fix what looks wrong and check again.
 
 ## Phase 8: Docs
@@ -132,7 +136,7 @@ If the component introduces a new pattern or rule, add it to `CLAUDE.md` (code r
 
 If the proposal had a "When to use each variant" section, write it as a guidance page, `docs/brand/<topic>.md`, and render it with `src/components/<Name>/<Name>.mdx` beside the stories (`buttons.md` and `Button.mdx` are the pattern). Add the "How other systems do it" table to `docs/brand/industry.md`, with sources.
 
-Write its "How it works" page, `src/components/<Name>/HowItWorks.mdx`, following "How it works pages" in `CLAUDE.md`: the files and Base UI parts it's built from, an `<Inspect>` of the real component in its main states, how its props become attributes, and its CSS rule by rule (states, focus, forced colors, hot dog, touch sizes, and motion), all with `<Code>` blocks read from the real files. Check it in Storybook with no console errors.
+Write its "How it works" page, `src/components/<Name>/HowItWorks.mdx`, following "How it works pages" in `CLAUDE.md`: the files and Base UI parts it's built from, an `<Inspect>` of the real component in its main states, how its props become attributes, and its CSS rule by rule (states, focus, forced colors, hot dog, touch sizes, and motion), all with `<Code>` blocks read from the real files. Check it in Storybook with no console errors. If `src/how-it-works/sources.test.ts` says one of the new component's files isn't among the sources, Vitest's cache holds the old file list: delete `node_modules/.vitest-cache` and run it again.
 
 ## Phase 9: Independent review
 
