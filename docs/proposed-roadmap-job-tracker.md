@@ -21,86 +21,71 @@ The "Blocks" column says what can't be built well until the question is answered
 
 | # | Question | Blocks | Status |
 | --- | --- | --- | --- |
-| Q1 | Shared CSS for form controls | Every new form control | Open |
-| Q2 | Where a field's error goes | Every new form control | Open |
-| Q3 | Brand colors near components (`link`, `highlight`) | Badge, Tag, Breadcrumbs, any link inside a component | Open |
-| Q4 | A danger style for buttons | AlertDialog, every delete in the job tracker | Open |
-| Q5 | Color transitions and the "transform and opacity only" rule | Every new component's CSS | Open |
-| Q6 | Status colors and a categorical palette | Badge, the job tracker's StatusBadge, chart colors | Open |
-| Q7 | Date and number fields | NumberField, a date field | Open |
-| Q8 | Links inside a router | Breadcrumbs, side navigation, any component that renders a link | Open |
-| Q9 | A layouts tier where brand colors are allowed | AppShell, PageHeader | Open |
-| Q10 | Is a native select allowed? | NativeSelect | Open |
-| Q11 | How read-only fields look | Read-only states of every new form control | Open |
-| Q12 | A field that re-checks on blur can make the submit button miss a click | New form controls' demos, the job tracker's form settings | Open |
+| Q1 | Shared CSS for form controls | Every new form control | Decided |
+| Q2 | Where a field's error goes | Every new form control | Decided |
+| Q3 | Brand colors near components (`link`, `highlight`) | Badge, Tag, Breadcrumbs, any link inside a component | Decided |
+| Q4 | A danger style for buttons | AlertDialog, every delete in the job tracker | Decided |
+| Q5 | Color transitions and the "transform and opacity only" rule | Every new component's CSS | Decided |
+| Q6 | Status colors and a categorical palette | Badge, the job tracker's StatusBadge, chart colors | Decided |
+| Q7 | Date and number fields | NumberField, a date field | Decided |
+| Q8 | Links inside a router | Breadcrumbs, side navigation, any component that renders a link | Decided |
+| Q9 | A layouts tier where brand colors are allowed | AppShell, PageHeader | Decided |
+| Q10 | Is a native select allowed? | NativeSelect | Decided |
+| Q11 | How read-only fields look | Read-only states of every new form control | Decided |
+| Q12 | A field that re-checks on blur can make the submit button miss a click | New form controls' demos, the job tracker's form settings | Decided |
 
 ### Q1. Shared CSS for form controls
 
-Already in `docs/revisit.md`. Input's styles are copied into TextArea today, and the choice controls repeat each other's CSS. The next form controls on the plan (NativeSelect, NumberField, a date field, Select, and Combobox) would make that two copies into six. Extract a text-field base (and a choice-control base) into `src/internal/` first, the way `field-error.css` is shared now.
+**Decided (2026-11-04):** shared base classes, the way `FieldError` is shared. What form controls have in common is in `src/internal/`: `field.css` (labels and descriptions), `text-field.css` (Input and TextArea), `choice.css` (Checkbox, Radio, and Switch), and `choice-group.css` (CheckboxGroup, RadioGroup, and SegmentedControl). Each part carries the shared class next to its own, and each component's CSS keeps only what's different. Nothing looks different: every story's screenshot, and every form control's computed styles at rest, hovered, pressed, and focused, in normal and forced colors, match the build before. NativeSelect, NumberField, and a date field will use `text-field`. Recorded in `CLAUDE.md` (Form controls, "Shared CSS") and `docs/brand/building.md`.
 
 ### Q2. Where a field's error goes
 
-Already in `docs/revisit.md`. Moving the error changes every form control and `FieldError`. Settle it before the number of form controls roughly doubles.
+**Decided (2026-11-04):** the error goes between the label (and description) and the control, as GOV.UK and USWDS do, so it's read before the field and a phone keyboard or autofill menu can't cover it. It starts with a visually hidden "Error:", so a screen reader can tell it from the description, and its icon is a warning triangle. A single checkbox or switch, whose label sits beside it, shows its error above the whole row. Every form control and the RichText experiment do this through the shared `FieldError`. Recorded in `docs/brand/forms.md`, `docs/brand/industry.md`, and `CLAUDE.md`. Could be looked at again once real forms use it, if errors under the field turn out to work better.
 
 ### Q3. Brand colors near components
 
-Already in `docs/revisit.md`. Badge, Tag, and Breadcrumbs are the first components that would carry `link` or `highlight` into a component. Choose between keeping them as brand colors set by the site, neutral versions for components, or status colors only on badges.
+**Decided (2026-11-04):** neutral versions inside components, for now. A link inside a component (a breadcrumb, a terms link in a checkbox label) is `ink` and underlined; a tag or chip is gray. `link` and `highlight` stay brand colors for the page around components, and `pnpm check` now fails if a component uses `link`, `highlight`, or `on-highlight`. Form controls already style any link in their label, description, or error this way (`src/internal/field.css`). Badge colors are part of Q6. More color can come back later, once the components are built. Recorded in `docs/brand/color.md`, `tokens/tokens.json`, and `CLAUDE.md`.
 
 ### Q4. A danger style for buttons
 
-Already in `docs/revisit.md`. The job tracker deletes things on six or more screens, and the confirm dialog's confirm button needs an answer: a `tone="danger"` prop with new tokens, or `secondary` plus a label that names what's lost.
+**Decided (2026-11-04):** a light danger style, built. Button takes `tone="danger"` on `secondary` and `ghost` buttons with label text: red words, icon, and edge (no fill), filling `danger-soft` on hover. It needs no new tokens. The props type won't take it on a primary or icon-only button. Delete buttons and a destructive confirm dialog's final button are `secondary` with `tone="danger"`, and the label names what will be lost. A filled red primary can come later if a page needs one. Recorded in `docs/brand/buttons.md` and `docs/brand/industry.md`.
 
 ### Q5. Color transitions
 
-Already in `docs/revisit.md`. The written rule says to animate only `transform` and `opacity`, but every component fades its colors. Every new CSS file will either follow the rule or not, so settle it once.
+**Decided (2026-11-04):** keep the color fades and change the rule. Movement, entrances, and exits animate only `transform` and `opacity`; a control's state change may also fade `color`, `background-color`, `border-color`, and `box-shadow` over `--duration-fast`, with the properties listed and never `all`. Layout properties never animate. Recorded in `docs/brand/motion.md` and `CLAUDE.md`.
 
 ### Q6. Status colors and a categorical palette
 
-New. The tokens have `success`, `warning`, and `danger`, with soft versions. The job tracker has eight application statuses (saved, applied, phone screen, technical, onsite, offer, rejected, and withdrawn), each with its own color today, plus bar charts.
-
-Options:
-- Add an `info` or `neutral` badge tone and accept that most statuses stay gray (offer is success, rejected is danger, and the rest are neutral).
-- Add a categorical palette for data visualization only, which keeps components neutral.
-- Both.
-
-Status text plus an icon already satisfies "color never carries meaning alone", so this is about how statuses look, not whether they're accessible.
+**Decided (2026-11-04):** status tones only, mostly gray, for now. Badge takes a `tone` (`neutral`, the default, `success`, `warning`, or `danger`), drawn with the status colors and their soft versions. In the job tracker, offer is `success`, rejected is `danger`, and saved, applied, phone screen, technical, onsite, and withdrawn are `neutral`: their words tell them apart. No categorical palette yet: the job tracker's charts are one color each, so it waits until a chart needs more than one. When Badge is built, consider also letting it take a color for cases that need one (an idea to look at then, not decided: it would let a page bring color back without changing the components' neutral default). Recorded in `docs/brand/color.md`.
 
 ### Q7. Date and number fields
 
-New. `Input`'s `type` allows only text-like types, so there is no `date` or `number`. The job tracker uses each four times (follow-up dates, salary, and so on).
+**Decided (2026-11-04):** a NumberField and a DatePicker.
 
-- Numbers: Base UI has NumberField. Build it on Q1's shared text-field base.
-- Dates: either allow `type="date"` on Input (the browser's own picker, which is accessible and good on phones, but styled differently in each browser) or build a DateField. Base UI has no date picker.
+- **Numbers:** NumberField, on Base UI's NumberField, using the shared text-field CSS. Its value is a number (or `null` when empty) through `onValueChange`, it can format as you type (currency, thousands), and the arrow keys step it. Input still has no `type="number"`. A text field with `inputMode="numeric"` for codes and IDs is a separate open question in `docs/revisit.md` ("A text field for codes and IDs").
+- **Dates:** a DatePicker following shadcn's Base UI date picker: Base UI's Popover with a calendar from React DayPicker, plus a text field so the date can be typed as well as picked. It submits `yyyy-mm-dd` like a native date field, and keeps dates as date-only strings so time zones can't shift them. Every day is at least `--target-min` (44px on touch). Input still has no `type="date"`. Adds React DayPicker and `date-fns` as dependencies; check the package name and version when installing (the DayPicker site now shows version 10 as `@daypicker/react`, while shadcn imports `react-day-picker`).
+
+Recorded in `CLAUDE.md` (the Base UI rule now allows a well-tested library where Base UI has nothing, such as React DayPicker for a calendar) and `docs/brand/forms.md`.
 
 ### Q8. Links inside a router
 
-New. `ButtonLink` renders a plain `<a>`. In an app with client-side routing (the job tracker uses TanStack Router), a plain `<a>` reloads the whole page.
-
-`ButtonLink` spreads its props onto the `<a>` and accepts `ref`, so wrapping it in the app with TanStack Router's `createLink(ButtonLink)` should work. This hasn't been tested yet; confirm it first.
-
-Then decide the rule for components that render links, for example:
-- Every component that renders one link uses a plain `<a>`, spreads its props, and forwards its ref, so any router can wrap it.
-- Components with several links inside (Breadcrumbs, side navigation) take the links as children, so the app passes its own router links in.
+**Decided (2026-11-04):** plain links, and links passed in as children. Tested first: `createLink(ButtonLink)` with TanStack Router 1.170 renders a real `<a>` with the right `href` and ButtonLink's look, navigates without a reload, sets `aria-current="page"` on the current page, passes the ref to the `<a>`, and leaves Cmd-click to the browser; `to` is type-checked. So the job tracker wraps ButtonLink once and needs nothing from the design system. Rule: a component that is one link renders a plain `<a>`, spreads its props, and accepts a `ref`; a component with several links (Breadcrumbs, side navigation, pagination) takes them as children. No router code and no link provider in the system. ButtonLink's tests now check every prop a router adds passes through. Recorded in `CLAUDE.md` ("Links and routers") and `docs/brand/buttons.md`.
 
 ### Q9. A layouts tier where brand colors are allowed
 
-New. `pnpm check` fails any component that uses `brand` or `surface-tint`, because brand colors belong to the layout around components. But an app shell (side navigation and top bar) and a page header are exactly where the brand should show.
-
-Decide whether to add a tier for them, such as `src/layouts/`, with its own rules in `CLAUDE.md` and `check-rules.mjs`: brand tokens allowed, still tested, still accessible, still published. Or decide that these stay in each app.
+**Decided (2026-11-04):** no layouts tier for now. AppShell and PageHeader are ordinary components in `src/components/`, neutral like everything else, with the same rules and checks. An app that wants its brand in the shell sets it with its own CSS on the wrapper (a `brand` or `surface-tint` background), and the components inside stay neutral. If brand color should be built in later, allowing brand tokens for those few files would turn this into a layouts tier. Recorded in `CLAUDE.md` and `docs/brand/color.md`.
 
 ### Q10. Is a native select allowed?
 
-New. CLAUDE.md says interactive components such as select are built on Base UI. The job tracker has 33 native `<select>`s, many inside react-hook-form forms, where a native element works with `register` and Base UI's Select needs a `Controller`.
-
-A NativeSelect would render a `<select>` through `Field.Control`, the way TextArea renders a `<textarea>`. That doesn't hand-roll any keyboard handling or ARIA, since the browser provides it, and native selects are the best choice on phones. Decide whether it fits the rule (and say so in CLAUDE.md), or whether every select uses Base UI's Select.
+**Decided (2026-11-04):** both. NativeSelect renders a real `<select>` through `Field.Control`, like TextArea, and is the default for forms: the browser provides its keyboard and ARIA, phones open their own picker, and it submits with any form. Base UI's Select is for options that need more than plain text (icons, a second line). CLAUDE.md's "built on Base UI" rule now says a native `<input>`, `<textarea>`, or `<select>` in `Field.Control` counts. Recorded in `CLAUDE.md`, `docs/brand/accessibility.md`, and `docs/brand/forms.md`.
 
 ### Q11. How read-only fields look
 
-Already in `docs/revisit.md`. Each control handles read-only differently today. Every new form control needs a read-only state, so pick one cue first.
+**Decided (2026-11-04):** a "Read only" note with a lock beside the label, and nothing dims. It says it in words, works the same on every control (RichText included), and keeps every value at full contrast. It's hidden from screen readers, which already announce read-only. A group shows it once, beside its label; a whole read-only form repeats it on every field, which is fine for now. Every form control and the RichText experiment do this through the shared `ReadOnlyNote`. Recorded in `docs/brand/accessibility.md` and `CLAUDE.md`. The job tracker has no read-only fields yet, so look at it again when one is needed.
 
 ### Q12. A field that re-checks on blur
 
-Already in `docs/revisit.md`. It affects the forms guidance and new form controls' demos. For the job tracker, react-hook-form's defaults (`mode: "onSubmit"`, `reValidateMode: "onChange"`) already match the "re-check while typing" option.
+**Decided (2026-11-04):** validate on submit, then re-check each field as it changes, and never on blur. The error clears as soon as it's fixed, before anyone reaches for the button. This is react-hook-form's default (`mode: "onSubmit"`, `reValidateMode: "onChange"`), so the job tracker needs no change. Recorded in `docs/brand/forms.md` and `CLAUDE.md`; the Input and TextArea demos now re-check on change. Also decided: components never depend on a form library or validate for themselves. They take `invalid` and `error`, so any library, or none, can drive them (CLAUDE.md, Form controls).
 
 ## What already exists
 
@@ -132,7 +117,7 @@ Compared with the first version of this roadmap (2026-10-29), the design system 
 | A separate toggle chip component | CheckboxGroup drawn as chips, or Base UI's ToggleGroup | The same idea as SegmentedControl, for choosing several |
 | ProgressBar | Base UI's Meter for "topics done", Progress for loading | Completion is a measurement, not a task in progress |
 | Rebuild the topic status button that cycles ○ ◐ ● | Use a three-option SegmentedControl or a select | A button that cycles through states is hard to understand and doesn't announce what it does |
-| AppShell and PageHeader as ordinary components | A layouts tier | Components can't use brand colors. See Q9 |
+| A layouts tier for AppShell and PageHeader | Ordinary, neutral components; the app adds its brand around them with its own CSS | Decided in Q9: no brand colors inside components, for now |
 | A Prose component for Markdown | Pair it with the RichText experiment | The job tracker's notes editor could use RichText, and the read view needs a matching prose style |
 
 ## Build order for the design system
@@ -143,7 +128,7 @@ Start only after the open questions are answered.
 
 1. **Spinner.** Move the private one out of `Button/shared.tsx` and export it. It uses `--duration-loop`.
 2. **Separator**, on Base UI.
-3. **Badge**, with `data-tone` (Q3, Q6).
+3. **Badge**, with `data-tone`: `neutral` (default), `success`, `warning`, or `danger` (Q3, Q6). Look then at also taking a color (Q6).
 4. **Skeleton.**
 5. **Meter and Progress**, on Base UI.
 
@@ -151,7 +136,7 @@ Start only after the open questions are answered.
 
 1. **NativeSelect** (Q10). It renders a `<select>` through `Field.Control`, like TextArea. The job tracker has 33 selects, so this is the biggest single step in its migration.
 2. **NumberField**, on Base UI (Q7).
-3. **A date field**, whichever Q7 decides.
+3. **DatePicker**: a text field and a calendar button, the calendar from React DayPicker in Base UI's Popover, following shadcn's Base UI date picker (Q7).
 4. **FileInput**: a real `<input type="file">` with a label.
 5. **Rating**, built like SegmentedControl on RadioGroup.
 6. **A chip group**, built on CheckboxGroup or ToggleGroup.
@@ -180,9 +165,9 @@ Start only after the open questions are answered.
 6. **Toast.**
 7. **Menu.**
 
-### Phase 5: layouts, where brand colors are allowed (Q9)
+### Phase 5: page structure (Q9: ordinary, neutral components)
 
-1. **AppShell**: side navigation and top bar, using Drawer on small screens.
+1. **AppShell**: side navigation and top bar, using Drawer on small screens. Neutral; the app can give the wrapper a brand background with its own CSS.
 2. **PageHeader**: title, description, and actions.
 3. **Toolbar or filter bar**: Base UI's Toolbar with compact density.
 4. **Prose**: styles for rendered Markdown.
@@ -192,7 +177,7 @@ Start only after the open questions are answered.
 
 These are specific to the job tracker and become thin pieces built from the design system:
 
-- **StatusBadge**: maps each application status to a Badge tone and icon (Q6).
+- **StatusBadge**: maps each application status to a Badge tone (Q6): offer is `success`, rejected is `danger`, and the rest are `neutral`, told apart by their words.
 - **Chart colors**: recharts reading the design system's CSS variables.
 - **Kanban board and the sortable resource list**, on dnd-kit. The design system says anything done by dragging also works with a click. The board has the status select for that. Check whether the resource list can be reordered without dragging; if not, add move up and move down buttons.
 - **ApplicationForm, JobDescriptionView, QuestionCard, TopicNode, VersionRow, and ResearchSection**: rebuilt from the components above.

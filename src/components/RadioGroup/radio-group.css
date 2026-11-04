@@ -1,168 +1,27 @@
-/* RadioGroup and Radio: what they are (label, description, the stack of radios, the circle and its dot, error).
-   Where the group sits (margin, width) is the layout's job. The group repeats CheckboxGroup's CSS and the circle
-   repeats much of Checkbox's box, on purpose for now: see docs/revisit.md. */
+/* RadioGroup and Radio: what's their own (the round circle and its dot). The group's wrapper, label, description,
+   and stack of radios are shared with CheckboxGroup, and a radio's row, label, description, edge, hover, focus,
+   chosen, invalid, read-only, disabled, hot dog, and forced colors rules with Checkbox and Switch, in
+   internal/choice-group.css, choice.css, and field.css (.choice-group, .choice, and their parts). Where the group sits (margin, width) is the
+   layout's job. */
 @layer components {
-  /* The group. align-content: start keeps it at its own height when a grid or flex layout stretches it. */
-  .radio-group {
-    display: grid;
-    align-content: start;
-    font-family: var(--font-sans);
-    color: var(--ink);
-  }
-
-  .radio-group__group {
-    display: grid;
-    align-content: start;
-    justify-items: start;
-    row-gap: var(--space-1);
-    min-width: 0;
-  }
-
-  .radio-group__label {
-    font-size: var(--text-body);
-    font-weight: 600;
-    line-height: var(--leading-control);
-  }
-
-  .radio-group__description {
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--icon-md);
-    color: var(--ink-muted);
-  }
-
-  /* Each radio's row is already choice-row tall, so they stack with no gap */
-  .radio-group__options {
-    display: grid;
-    justify-items: start;
-  }
-
   /* One radio */
   .radio {
-    display: grid;
     align-content: start;
-    justify-items: start;
-    row-gap: var(--space-1);
-    font-size: var(--text-body);
-  }
-
-  /* The label is the click target. It's as tall as choice-row, and the circle sits on its first line. */
-  /* With no visible label there's no row, so the wrapper itself is choice-row tall. Otherwise the hit area
-     spills into the control above or below, and stacked radios without labels would steal each other's clicks. */
-  .radio:not(:has(> .radio__row)) {
-    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
-  }
-
-  .radio__row {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .radio__label {
-    line-height: var(--choice); /* the first line is as tall as the circle, so they center */
-    min-width: 0;
   }
 
   .radio__circle {
-    position: relative;
-    display: inline-flex;
-    flex: none;
-    align-items: center;
     justify-content: center;
-    box-sizing: border-box;
     width: var(--choice);
-    height: var(--choice);
-    margin: 0;
     padding: 0;
-    border: var(--border-thick) solid var(--border-strong); /* the 3:1 edge, whatever the fill is */
     border-radius: var(--radius-full);
-    background: var(--surface);
     color: var(--on-action);
-    cursor: pointer;
-    transition:
-      background-color var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out),
-      box-shadow var(--duration-fast) var(--ease-out),
-      transform var(--duration-fast) var(--ease-out);
   }
 
-  /* A radio with no visible label still gets a target-min hit area */
-  .radio__circle::after {
-    content: "";
-    position: absolute;
-    inset: calc((var(--choice) - var(--target-min)) / 2 - var(--border-thick));
-  }
-
-  .radio__row:hover .radio__circle:not([data-disabled], [data-readonly]),
-  .radio__circle:hover:not([data-disabled], [data-readonly]) {
-    background: var(--surface-hover);
-  }
-
-  .radio__circle:focus-visible {
-    outline: var(--focus-width) solid var(--focus);
-    outline-offset: var(--focus-offset);
-  }
   /* Tab can still reach the selected radio of a disabled group. Dimming it would dim its focus outline too. */
   .radio__circle[data-disabled]:focus-visible {
     opacity: 1;
   }
 
-  /* Selected: filled, with a dot. The dot is what says "selected", not the fill. */
-  .radio__circle[aria-checked="true"] {
-    background: var(--action);
-  }
-  .radio__row:hover .radio__circle[aria-checked="true"]:not([data-disabled], [data-readonly]),
-  .radio__circle[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
-    background: var(--action-hover);
-  }
-
-  .radio__circle[aria-invalid="true"] {
-    border-color: var(--danger);
-  }
-
-  /* Read-only: a lighter cue than disabled. Only the circle dims; the label stays readable.
-     ARIA has no read-only state for a radio (the group has aria-readonly), so this uses Base UI's data-readonly. */
-  .radio__circle[data-readonly],
-  .radio__row:has(.radio__circle[data-readonly]) {
-    cursor: default;
-  }
-  .radio__circle[data-readonly] {
-    opacity: 0.75;
-  }
-
-  /* Disabled */
-  .radio__row[data-disabled],
-  .radio__circle[data-disabled] {
-    cursor: not-allowed;
-  }
-  .radio__circle[data-disabled],
-  .radio__row[data-disabled] .radio__label {
-    opacity: 0.5;
-  }
-
-  /* The dot */
-  .radio__indicator {
-    display: inline-flex;
-    width: var(--icon-sm);
-    height: var(--icon-sm);
-    transition:
-      opacity var(--duration-base) var(--ease-out),
-      transform var(--duration-base) var(--ease-bounce);
-  }
-  .radio__indicator[data-starting-style],
-  .radio__indicator[data-ending-style] {
-    opacity: 0;
-    transform: scale(var(--motion-scale));
-  }
-  /* Leaving is quicker than arriving */
-  .radio__indicator[data-ending-style] {
-    transition-duration: var(--duration-fast);
-    transition-timing-function: var(--ease-in);
-  }
   .radio__dot {
     width: 100%;
     height: 100%;
@@ -170,53 +29,13 @@
 
   /* A radio's description lines up with its label text, not the circle. The group's error is .field-error. */
   .radio__description {
-    margin: 0;
     padding-inline-start: calc(var(--choice) + var(--space-3));
-    font-size: var(--text-small);
-    line-height: var(--icon-md);
-    color: var(--ink-muted);
   }
 
-  /* Hot dog mode: a hard shadow to press into */
-  [data-theme="hotdog"] .radio__circle {
-    box-shadow: var(--shadow-sm);
-  }
-  [data-theme="hotdog"] .radio__row:active .radio__circle:not([data-disabled], [data-readonly]),
-  [data-theme="hotdog"] .radio__circle:active:not([data-disabled], [data-readonly]) {
-    transform: translate(2px, 2px);
-    box-shadow: none;
-  }
-
-  /* Windows Contrast themes: system colors, with the dot in a contrasting color */
+  /* Windows Contrast themes: the dot in a color that contrasts with the Highlight fill */
   @media (forced-colors: active) {
     .radio__circle {
-      border-color: ButtonText;
-      background: Canvas;
       color: HighlightText;
-    }
-    /* The danger edge outranks the rule above, and forced colors would draw it in the page color, hiding the circle */
-    .radio__circle[aria-invalid="true"] {
-      border-color: ButtonText;
-    }
-    .radio__circle[aria-checked="true"],
-    .radio__row:hover .radio__circle[aria-checked="true"]:not([data-disabled], [data-readonly]),
-    .radio__circle[aria-checked="true"]:hover:not([data-disabled], [data-readonly]) {
-      background: Highlight; /* the hover fill would otherwise become Canvas and hide the dot */
-      border-color: Highlight;
-    }
-    .radio__circle[data-disabled],
-    .radio__circle[data-readonly],
-    .radio__row[data-disabled] .radio__label {
-      opacity: 1;
-    }
-    .radio__circle[data-disabled] {
-      border-color: GrayText;
-    }
-    .radio__circle[data-disabled][aria-checked="true"] {
-      background: GrayText;
-    }
-    .radio__row[data-disabled] .radio__label {
-      color: GrayText;
     }
   }
 }

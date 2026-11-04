@@ -134,14 +134,14 @@ describe("RichText", () => {
       expect(screen.getByRole("textbox", { name: "Reply" })).toBeInTheDocument();
     });
 
-    it("puts the description between the label and the box, and the error after the box", () => {
+    it("puts the description and then the error between the label and the box", () => {
       const { container } = render(<RichText label="Message" description="Help" error="Wrong" invalid />);
       const classes = [...container.firstElementChild!.children].map((child) => child.className);
       expect(classes.slice(0, 4)).toEqual([
         "rich-text__label",
         "rich-text__description",
-        "rich-text__box",
         expect.stringContaining("rich-text__error"),
+        "rich-text__box",
       ]);
     });
 
@@ -910,6 +910,25 @@ describe("RichText", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<RichText label="Message" readOnly defaultValue="word" />);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest(".rich-text__label")).toHaveTextContent("Message");
+      expect(getEditor()).toHaveAccessibleName("Message");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<RichText label="Message" defaultValue="word" />);
+      expect(getEditor()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<RichText label="Message" readOnly disabled defaultValue="word" />);
+      expect(getEditor()).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("blocks typing and formatting but keeps its value", async () => {
       const user = userEvent.setup();
       const { value } = renderReporting({ defaultValue: "word", readOnly: true });
@@ -1000,7 +1019,7 @@ describe("RichText", () => {
     it("shows the error, linked to the field, when invalid", () => {
       render(<RichText label="Message" invalid error="Write something first." />);
       expect(screen.getByText("Write something first.")).toBeInTheDocument();
-      expect(getEditor()).toHaveAccessibleDescription("Write something first.");
+      expect(getEditor()).toHaveAccessibleDescription("Error: Write something first.");
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -1021,7 +1040,7 @@ describe("RichText", () => {
       expect(screen.queryByText("Write something first.")).toBeNull();
       rerender(<RichText label="Message" error="Write something first." invalid />);
       expect(screen.getByText("Write something first.")).toBeInTheDocument();
-      expect(getEditor()).toHaveAccessibleDescription("Write something first.");
+      expect(getEditor()).toHaveAccessibleDescription("Error: Write something first.");
     });
 
     it("is invalid with no error text without breaking", () => {
@@ -1032,7 +1051,7 @@ describe("RichText", () => {
 
     it("reads the description and the error together", () => {
       render(<RichText label="Message" description="Markdown works too." invalid error="Write something first." />);
-      expect(getEditor()).toHaveAccessibleDescription("Markdown works too. Write something first.");
+      expect(getEditor()).toHaveAccessibleDescription("Markdown works too. Error: Write something first.");
     });
 
     it("keeps its own description and error linked when given an aria-describedby", () => {

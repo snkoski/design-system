@@ -66,13 +66,21 @@ describe("TextArea", () => {
       expect(container.querySelector("label")).toBeNull();
     });
 
-    it("puts the description between the label and the field, and the error after the field", () => {
+    it("puts the description and then the error between the label and the field", () => {
       const { container } = render(<TextArea label="Message" description="Keep it short." invalid error="Write a message." />);
-      const parts = ["text-area__label", "text-area__description", "text-area__control", "text-area__error"];
+      const parts = ["text-area__label", "text-area__description", "text-area__error", "text-area__control"];
       const order = [...container.querySelectorAll(parts.map((part) => `.${part}`).join(", "))].map((el) =>
         parts.find((part) => el.classList.contains(part)),
       );
       expect(order).toEqual(parts);
+    });
+
+    it("puts the shared text field classes next to its own, so text-field.css and field.css draw what Input and TextArea share", () => {
+      const { container } = render(<TextArea label="Message" description="Keep it short." />);
+      expect(container.firstElementChild).toHaveClass("text-field", "text-area");
+      expect(screen.getByText("Message")).toHaveClass("field-label", "text-area__label");
+      expect(screen.getByText("Keep it short.")).toHaveClass("field-description", "text-area__description");
+      expect(getTextArea()).toHaveClass("text-field__control", "text-area__control");
     });
 
     it("applies className to the outer wrapper, next to its own class", () => {
@@ -254,6 +262,25 @@ describe("TextArea", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<TextArea label="Notes" readOnly defaultValue="Kept" />);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest("label")).toHaveTextContent("Notes");
+      expect(getTextArea()).toHaveAccessibleName("Notes");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<TextArea label="Notes" defaultValue="Kept" />);
+      expect(getTextArea()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<TextArea label="Notes" readOnly disabled defaultValue="Kept" />);
+      expect(getTextArea()).toHaveAttribute("readonly");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("blocks typing but keeps its value", async () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
@@ -312,7 +339,7 @@ describe("TextArea", () => {
     it("shows the error, linked to the textarea, when invalid", () => {
       render(<TextArea label="Message" invalid error="Write a message." />);
       expect(screen.getByText("Write a message.")).toBeInTheDocument();
-      expect(getTextArea()).toHaveAccessibleDescription("Write a message.");
+      expect(getTextArea()).toHaveAccessibleDescription("Error: Write a message.");
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -331,7 +358,7 @@ describe("TextArea", () => {
 
     it("reads the description and the error together", () => {
       render(<TextArea label="Message" invalid description="Keep it short." error="Write a message." />);
-      expect(getTextArea()).toHaveAccessibleDescription("Keep it short. Write a message.");
+      expect(getTextArea()).toHaveAccessibleDescription("Keep it short. Error: Write a message.");
     });
 
     it("shows the error again when invalid turns on later", () => {
@@ -354,7 +381,7 @@ describe("TextArea", () => {
           <TextArea label="Message" description="Keep it short." invalid error="Write a message." aria-describedby="hint" />
         </>,
       );
-      expect(getTextArea()).toHaveAccessibleDescription("Markdown works. Keep it short. Write a message.");
+      expect(getTextArea()).toHaveAccessibleDescription("Markdown works. Keep it short. Error: Write a message.");
       expect(getTextArea()).toHaveAttribute("aria-invalid", "true");
     });
 

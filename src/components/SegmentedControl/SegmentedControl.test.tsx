@@ -78,6 +78,20 @@ describe("SegmentedControl", () => {
       expect(new Set(ids).size).toBe(3);
     });
 
+    it("puts the shared group classes next to its own, so choice-group.css and field.css draw what the groups share", () => {
+      const { container } = render(
+        <SegmentedControl label="Choose" description="Pick what suits you.">
+          {options}
+        </SegmentedControl>,
+      );
+      expect(container.firstElementChild).toHaveClass("choice-group", "segmented-control");
+      expect(getGroup()).toHaveClass("choice-group__group", "segmented-control__group");
+      expect(screen.getByText("Choose")).toHaveClass("field-label", "segmented-control__label");
+      expect(screen.getByText("Pick what suits you.")).toHaveClass("field-description", "segmented-control__description");
+      expect(container.querySelector(".segmented-control__track")).toBeInTheDocument();
+      expect(container.querySelector(".choice-group__options")).toBeNull();
+    });
+
     it("applies className to the outer wrapper, next to its own class", () => {
       const { container } = render(
         <SegmentedControl label="Billing" className="mt-4">
@@ -406,15 +420,15 @@ describe("SegmentedControl", () => {
       for (const option of getOptions()) expect(option).toHaveAccessibleDescription("You can switch at any time.");
     });
 
-    it("shows the error after the options, linked to the group, when invalid", () => {
+    it("shows the error before the options, linked to the group, when invalid", () => {
       render(
         <SegmentedControl label="Billing" invalid error="Choose how to pay.">
           {options}
         </SegmentedControl>,
       );
       const error = screen.getByText("Choose how to pay.");
-      expect(getGroup()).toHaveAccessibleDescription("Choose how to pay.");
-      expect(getOption("Lifetime").compareDocumentPosition(error)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose how to pay.");
+      expect(error.compareDocumentPosition(getOption("Monthly"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -434,7 +448,7 @@ describe("SegmentedControl", () => {
           {options}
         </SegmentedControl>,
       );
-      expect(getGroup()).toHaveAccessibleDescription("You can switch at any time. Choose how to pay.");
+      expect(getGroup()).toHaveAccessibleDescription("You can switch at any time. Error: Choose how to pay.");
     });
 
     it("keeps its own description and error linked when given an aria-describedby", () => {
@@ -580,10 +594,10 @@ describe("SegmentedControl", () => {
       expect(getGroup()).toHaveAttribute("aria-required", "true");
       expect(screen.queryByText("Choose how to pay.")).not.toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Continue" }));
-      expect(getGroup()).toHaveAccessibleDescription("Choose how to pay.");
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose how to pay.");
       for (const option of getOptions()) {
         expect(option).toHaveAttribute("aria-invalid", "true");
-        expect(option).toHaveAccessibleDescription("Choose how to pay.");
+        expect(option).toHaveAccessibleDescription("Error: Choose how to pay.");
       }
     });
 
@@ -672,6 +686,25 @@ describe("SegmentedControl", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<SegmentedControl label="Billing" readOnly>{options}</SegmentedControl>);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest(".segmented-control__label")).toHaveTextContent("Billing");
+      expect(getGroup()).toHaveAccessibleName("Billing");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<SegmentedControl label="Billing">{options}</SegmentedControl>);
+      expect(getGroup()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<SegmentedControl label="Billing" readOnly disabled>{options}</SegmentedControl>);
+      expect(getGroup()).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("marks the group read-only, and each option for styling", () => {
       render(
         <SegmentedControl label="Billing" readOnly>

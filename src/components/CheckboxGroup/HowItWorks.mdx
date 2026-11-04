@@ -24,7 +24,8 @@ Every code block on this page is read from the real files when the page loads, s
   </thead>
   <tbody>
     <tr><td><code>CheckboxGroup/CheckboxGroup.tsx</code></td><td>The component. It turns your props into Base UI parts and tells the options inside that they're in a group.</td></tr>
-    <tr><td><code>CheckboxGroup/checkbox-group.css</code></td><td>The look of the label, the description, and the stack of options. Each option styles itself with <code>checkbox.css</code>.</td></tr>
+    <tr><td><code>CheckboxGroup/checkbox-group.css</code></td><td>The look that's the group's own: the options moving in under a "select all" box. Each option styles itself with <code>checkbox.css</code>.</td></tr>
+    <tr><td><code>internal/choice-group.css</code> and <code>internal/field.css</code></td><td>The look it shares with RadioGroup and SegmentedControl: the wrapper, the group, and the stack of options (<code>choice-group.css</code>), and the label and description every form control shares (<code>field.css</code>). Part of the published stylesheet.</td></tr>
     <tr><td><code>CheckboxGroup/context.ts</code></td><td>What the group tells each checkbox inside it.</td></tr>
     <tr><td><code>CheckboxGroup/index.ts</code></td><td>What the package exports: <code>CheckboxGroup</code> and its props type, <code>CheckboxGroupProps</code>.</td></tr>
     <tr><td><code>Checkbox/Checkbox.tsx</code></td><td>Each option. In a group, it reads the context and renders <code>Field.Item</code> instead of a field of its own (section 3).</td></tr>
@@ -96,7 +97,7 @@ When the form is sent with nothing ticked, the demo sets `invalid` on the group.
 
 - `data-invalid` on the wrapper, the group, and every option's wrapper, label, and box.
 - `aria-invalid="true"` on every option's box and hidden input, so a screen reader announces each option as invalid.
-- The error, after the options, with an id. That id is added to the group's `aria-describedby` and to every option's. Someone who Tabs straight to an option still hears what's wrong.
+- The error, between the description and the options, with an id. That id is added to the group's `aria-describedby` and to every option's. Someone who Tabs straight to an option still hears what's wrong.
 
 Ticking an option clears `invalid`, and Base UI takes all of it off again. No single box is `required`, so the browser's own validation has nothing to check: checking the group is the page's job.
 
@@ -138,8 +139,8 @@ const invalid = sent && value.length === 0;
 </Unstyled>
 
 - **Disabled** goes to the group's `Field.Root`, which disables every option. Each one gets what a disabled checkbox gets: `data-disabled`, `aria-disabled="true"`, `tabindex="-1"`, and a disabled hidden input, so the form doesn't send it. The group and its wrapper get `data-disabled` too.
-- **Read-only** has no Base UI prop on the group. It travels through the group's context instead (section 3), and each option adds it to its own: `aria-readonly="true"` and `data-readonly` on every box. The group element itself gets nothing, because ARIA's read-only state belongs to the controls.
-- **The label and description stay at full strength** in both. The CSS only dims the options (section 4).
+- **Read-only** has no Base UI prop on the group. It travels through the group's context instead (section 3), and each option adds it to its own: `aria-readonly="true"` and `data-readonly` on every box. The group element itself gets nothing, because ARIA's read-only state belongs to the controls. The group's label gets a "Read only" note with a lock, hidden from screen readers, and the options don't repeat it. The shared `ReadOnlyNote` draws it, and [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains it.
+- **The label and description stay at full strength** in both. Disabled dims only the options (section 4), and read-only dims nothing.
 
 ### Select all
 
@@ -190,7 +191,7 @@ It runs top to bottom on every render:
 3. **Make it one field.** `Field.Root` takes `name`, `disabled`, and `invalid`, and every option inside shares them.
 4. **Make the group.** `Fieldset.Root` is rendered as `BaseCheckboxGroup`, which gets the rest of the props: `value`, `defaultValue`, `onValueChange`, `allValues`, and anything else, such as `data-testid`. `ref` goes there too, so it reaches the element with `role="group"`.
 5. **The label**, only when there is one. With only an `aria-label`, there's no legend, and `aria-label` names the group directly.
-6. **The description, the options, and the error.** The options sit inside the context provider, so every `Checkbox` among them knows it's in a group. The error comes after the options, inside the group, and shows while `invalid` is true.
+6. **The description, the error, and the options.** The error comes after the description and before the options, inside the group, and shows while `invalid` is true. The options sit inside the context provider, so every `Checkbox` among them knows it's in a group.
 
 `readOnly` isn't a prop of Base UI's `CheckboxGroup`, so it goes through the context: each option reads it and becomes read-only itself.
 
@@ -206,7 +207,7 @@ It runs top to bottom on every render:
     <tr><td><code>allValues</code></td><td>What a <code>parent</code> box ticks and unticks, and its <code>aria-controls</code></td></tr>
     <tr><td><code>description</code></td><td>A <code>{"<p>"}</code>, and its id in the <code>aria-describedby</code> of the group and every option</td></tr>
     <tr><td><code>invalid</code></td><td><code>data-invalid</code> throughout, and <code>aria-invalid="true"</code> on every option</td></tr>
-    <tr><td><code>error</code></td><td>A <code>FieldError</code> after the options, shown while <code>invalid</code> is true, and its id in the <code>aria-describedby</code> of the group and every option</td></tr>
+    <tr><td><code>error</code></td><td>A <code>FieldError</code> before the options, shown while <code>invalid</code> is true, and its id in the <code>aria-describedby</code> of the group and every option</td></tr>
     <tr><td><code>disabled</code></td><td>Every option disabled, and <code>data-disabled</code> on the group</td></tr>
     <tr><td><code>readOnly</code></td><td>Every option read-only, through the context</td></tr>
     <tr><td><code>className</code></td><td>Added to the outer wrapper's class, next to <code>checkbox-group</code></td></tr>
@@ -233,21 +234,21 @@ An option keeps its own `disabled`, `readOnly`, `description`, and `onCheckedCha
 
 ## 4. How it looks
 
-`checkbox-group.css` draws only the parts the group adds. Each option is a `Checkbox`, and `checkbox.css` draws it. Like every component's CSS, it's in `@layer components`, and it uses only semantic tokens.
+Most of the group's look is shared with RadioGroup and SegmentedControl: `internal/choice-group.css` has the wrapper, the group, and the stack of options, and `internal/field.css` the label and description. Each part carries a shared class next to its own, such as `class="choice-group__group checkbox-group__group"`. `checkbox-group.css` has only what this group adds. Each option is a `Checkbox`, drawn by `checkbox.css` and `internal/choice.css`. Like every component's CSS, it's in `@layer components`, and it uses only semantic tokens.
 
-<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group" />
+<Code file="internal/choice-group.css" name=".choice-group" />
 
-<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__group" />
+<Code file="internal/choice-group.css" name=".choice-group__group" />
 
 The group is a grid. `align-content: start` keeps it at its own height when a layout around it stretches it, so the options never spread apart. `min-width: 0` lets long labels wrap inside a narrow column instead of pushing it wider.
 
-<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__label" />
+<Code file="internal/field.css" name=".field-label" />
 
-<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__description" />
+<Code file="internal/field.css" name=".field-description" />
 
 The label is body size at weight 600, and the description is smaller, in `--ink-muted`, with the same line height as the error.
 
-<Code file="components/CheckboxGroup/checkbox-group.css" name=".checkbox-group__options" />
+<Code file="internal/choice-group.css" name=".choice-group__options" />
 
 The options stack with no gap. Each option's row is already `--choice-row` tall (32px with a mouse, 44px on touch), so the rows touch, and every point between two boxes belongs to one of them.
 
@@ -255,7 +256,7 @@ The options stack with no gap. Each option's row is already `--choice-row` tall 
 
 With a "select all" box, the other options move in by `--choice` plus `--space-3`, the width of a box and its gap. Their boxes line up under the parent's label text, which shows they belong to it. `:has()` checks whether the options contain a parent box, using the `data-parent` its wrapper carries.
 
-**Disabled and read-only dim only the options.** `checkbox.css` dims each disabled or read-only option, and the group's label and description stay at full strength. They often say why the choices can't be changed ("Booking opens in May."), so they must stay readable. There's a testing reason too: Storybook runs axe, an accessibility checker, on every story. axe skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail.
+**Disabled dims only the options.** `internal/choice.css` dims each disabled option, and the group's label and description stay at full strength. They often say why the choices can't be changed ("Booking opens in May."), so they must stay readable. There's a testing reason too: Storybook runs axe, an accessibility checker, on every story. axe skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail. Read-only dims nothing: the note beside the label is its cue.
 
 ## 5. Keyboard, screen readers, and forms
 
@@ -304,6 +305,13 @@ Moving into the group, a screen reader can announce the group and its name from 
 <summary><code>checkbox-group.css</code></summary>
 
 <Code file="components/CheckboxGroup/checkbox-group.css" />
+
+</details>
+
+<details>
+<summary><code>internal/choice-group.css</code></summary>
+
+<Code file="internal/choice-group.css" />
 
 </details>
 

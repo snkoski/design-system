@@ -1,0 +1,102 @@
+/* What Input and TextArea share: the wrapper, the field's edge, every state, hot dog mode, and forced colors. Each part
+   carries a shared class next to its own (`text-field__control input__control`), and each component's own CSS keeps
+   only what's different: heights, icons, padding, and resizing. Imported before the components' CSS, so at equal
+   specificity a component's own rule wins. */
+@layer components {
+  .text-field {
+    display: grid;
+    row-gap: var(--space-1);
+    font-family: var(--font-sans);
+    color: var(--ink);
+  }
+
+  /* The control is the visible field, so a click anywhere in it focuses it. Its edge is a custom property, because
+     hot dog mode and forced colors thicken it, and a text area's padding has to follow it. */
+  .text-field__control {
+    --text-field-edge: var(--border-thin);
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding-inline: var(--space-3);
+    border: var(--text-field-edge) solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: var(--text-body);
+    line-height: var(--leading-control);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .text-field__control::placeholder {
+    color: var(--ink-muted);
+    opacity: 1; /* Firefox fades placeholders by default */
+  }
+
+  .text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"]) {
+    border-color: var(--ink);
+  }
+
+  .text-field__control:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Invalid: a danger edge, thickened with an inset shadow so the size and the text don't move */
+  .text-field__control[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: inset 0 0 0 calc(var(--border-thick) - var(--border-thin)) var(--danger);
+  }
+
+  /* Large. Each field sets its own height. */
+  .text-field[data-size="lg"] .text-field__control {
+    padding-inline: var(--space-4);
+    font-size: var(--text-body-lg);
+  }
+
+  /* Disabled: the field and its label dim */
+  .text-field__control:disabled,
+  .text-field[data-disabled] .field-label {
+    opacity: 0.5;
+  }
+  .text-field__control:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Read-only: the field stays at full strength, and a "Read only" note beside the label is the cue (ReadOnlyNote).
+     A placeholder shows what to type, which doesn't apply when you can't type, and could be mistaken for a value. */
+  .text-field__control[readonly]::placeholder {
+    color: transparent;
+  }
+
+  /* Hot dog mode: chunky ink edge and a hard shadow. Text fields don't press: you type in them. */
+  [data-theme="hotdog"] .text-field__control {
+    --text-field-edge: var(--border-thick);
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .text-field__control[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 var(--border-thin) var(--danger), var(--shadow-sm); /* thicker edge, as in other themes */
+  }
+
+  /* Windows Contrast themes: the system's field colors */
+  @media (forced-colors: active) {
+    .text-field__control {
+      border-color: FieldText;
+      background: Field;
+      color: FieldText;
+    }
+    .text-field__control:disabled,
+    .text-field[data-disabled] .field-label {
+      opacity: 1;
+      border-color: GrayText;
+      color: GrayText;
+    }
+    /* The inset shadow that thickens the invalid edge is removed here, so use a real thick edge */
+    .text-field__control[aria-invalid="true"] {
+      --text-field-edge: var(--border-thick);
+    }
+  }
+}

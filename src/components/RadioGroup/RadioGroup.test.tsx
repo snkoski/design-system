@@ -61,6 +61,19 @@ describe("RadioGroup", () => {
       for (const radio of getRadios()) expect(wrapper).toContainElement(radio);
     });
 
+    it("puts the shared group classes next to its own, so choice-group.css and field.css draw what the groups share", () => {
+      const { container } = render(
+        <RadioGroup label="Choose" description="Pick what suits you.">
+          {options}
+        </RadioGroup>,
+      );
+      expect(container.firstElementChild).toHaveClass("choice-group", "radio-group");
+      expect(getGroup()).toHaveClass("choice-group__group", "radio-group__group");
+      expect(screen.getByText("Choose")).toHaveClass("field-label", "radio-group__label");
+      expect(screen.getByText("Pick what suits you.")).toHaveClass("field-description", "radio-group__description");
+      expect(container.querySelector(".radio-group__options")).toHaveClass("choice-group__options");
+    });
+
     it("applies className to the outer wrapper, next to its own class", () => {
       const { container } = render(
         <RadioGroup label="Plan" className="mt-4">
@@ -371,15 +384,15 @@ describe("RadioGroup", () => {
       for (const radio of getRadios()) expect(radio).toHaveAccessibleDescription("You can change it later.");
     });
 
-    it("shows the error after the options, linked to the group, when invalid", () => {
+    it("shows the error before the options, linked to the group, when invalid", () => {
       render(
         <RadioGroup label="Plan" invalid error="Choose a plan.">
           {options}
         </RadioGroup>,
       );
       const error = screen.getByText("Choose a plan.");
-      expect(getGroup()).toHaveAccessibleDescription("Choose a plan.");
-      expect(getRadio("Business").compareDocumentPosition(error)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose a plan.");
+      expect(error.compareDocumentPosition(getRadio("Free"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -399,7 +412,7 @@ describe("RadioGroup", () => {
           {options}
         </RadioGroup>,
       );
-      expect(getGroup()).toHaveAccessibleDescription("You can change it later. Choose a plan.");
+      expect(getGroup()).toHaveAccessibleDescription("You can change it later. Error: Choose a plan.");
     });
 
     it("hides the error when the group is valid", () => {
@@ -523,10 +536,10 @@ describe("RadioGroup", () => {
       expect(getGroup()).toHaveAttribute("aria-required", "true");
       expect(screen.queryByText("Choose a plan.")).not.toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Continue" }));
-      expect(getGroup()).toHaveAccessibleDescription("Choose a plan.");
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose a plan.");
       for (const radio of getRadios()) {
         expect(radio).toHaveAttribute("aria-invalid", "true");
-        expect(radio).toHaveAccessibleDescription("Choose a plan.");
+        expect(radio).toHaveAccessibleDescription("Error: Choose a plan.");
       }
     });
 
@@ -617,6 +630,25 @@ describe("RadioGroup", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<RadioGroup label="Plan" readOnly>{options}</RadioGroup>);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest(".radio-group__label")).toHaveTextContent("Plan");
+      expect(getGroup()).toHaveAccessibleName("Plan");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<RadioGroup label="Plan">{options}</RadioGroup>);
+      expect(getGroup()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<RadioGroup label="Plan" readOnly disabled>{options}</RadioGroup>);
+      expect(getGroup()).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("marks the group read-only, and each radio for styling", () => {
       render(
         <RadioGroup label="Plan" readOnly>

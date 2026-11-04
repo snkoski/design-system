@@ -3,6 +3,7 @@ import { Input as BaseInput } from "@base-ui/react/input";
 import type { InputHTMLAttributes, ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 export type InputType = "text" | "email" | "password" | "search" | "tel" | "url";
@@ -40,13 +41,13 @@ interface OwnProps {
   iconEnd?: ReactNode;
   /** Help text between the label and the field, read before typing. Linked to the input for screen readers. */
   description?: ReactNode;
-  /** The message shown under the field when `invalid` is true, with an icon. Linked to the input. */
+  /** The message shown between the description and the field when `invalid` is true, with an icon. Linked to the input. */
   error?: ReactNode;
   /** Marks the input as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;
   /** Blocks typing and removes the input from the tab order. A disabled input isn't submitted. */
   disabled?: boolean;
-  /** Keeps the input focusable, readable, and submitted, but blocks changes. */
+  /** Keeps the input focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label. */
   readOnly?: boolean;
   /** Tells assistive technology and the form that the field must be filled in. Say so in the label too, in words. */
   required?: boolean;
@@ -98,23 +99,28 @@ export function Input({
 }: InputProps) {
   warnIfUnnamed("Input", label, rest, "Give it a label or an aria-label.");
   return (
-    <Field.Root className={cx("input", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
-      {label !== undefined && <Field.Label className="input__label">{label}</Field.Label>}
-      {description && <Field.Description className="input__description">{description}</Field.Description>}
+    <Field.Root className={cx("text-field", "input", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
+      {label !== undefined && (
+        <Field.Label className="field-label input__label">
+          {label}
+          {rest.readOnly && !disabled && <ReadOnlyNote />}
+        </Field.Label>
+      )}
+      {description && <Field.Description className="field-description input__description">{description}</Field.Description>}
+      {error && (
+        <FieldError className="input__error" match={invalid}>
+          {error}
+        </FieldError>
+      )}
       <div
         className="input__box"
         data-icon-start={iconStart ? true : undefined}
         data-icon-end={iconEnd ? true : undefined}
       >
         {iconStart && <span className="input__icon" aria-hidden="true">{iconStart}</span>}
-        <BaseInput {...rest} ref={ref} className="input__control" type={type} disabled={disabled} name={name} />
+        <BaseInput {...rest} ref={ref} className="text-field__control input__control" type={type} disabled={disabled} name={name} />
         {iconEnd && <span className="input__icon" aria-hidden="true">{iconEnd}</span>}
       </div>
-      {error && (
-        <FieldError className="input__error" match={invalid}>
-          {error}
-        </FieldError>
-      )}
     </Field.Root>
   );
 }

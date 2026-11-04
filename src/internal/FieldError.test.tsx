@@ -22,7 +22,7 @@ describe("FieldError", () => {
 
   it("links the message to the field's control", () => {
     render(<Email invalid />);
-    expect(screen.getByRole("textbox", { name: "Email" })).toHaveAccessibleDescription("Enter an email address.");
+    expect(screen.getByRole("textbox", { name: "Email" })).toHaveAccessibleDescription("Error: Enter an email address.");
   });
 
   it("puts an icon before the words, hidden from screen readers", () => {
@@ -33,6 +33,24 @@ describe("FieldError", () => {
     expect(icon).toHaveClass("field-error__icon");
     expect(icon).toHaveAttribute("aria-hidden", "true");
     expect(icon).toHaveAttribute("focusable", "false");
+  });
+
+  it("starts the message with \"Error:\" for screen readers, in its own part that the CSS hides", () => {
+    render(<Email invalid />);
+    const error = screen.getByText("Enter an email address.").closest(".field-error");
+    const prefix = error?.querySelector(".field-error__prefix");
+    expect(prefix).toHaveTextContent(/^Error:$/);
+    expect(prefix).not.toHaveAttribute("aria-hidden");
+    expect(prefix?.nextElementSibling).toHaveTextContent("Enter an email address.");
+    expect(screen.getByRole("textbox", { name: "Email" })).toHaveAccessibleDescription("Error: Enter an email address.");
+  });
+
+  it("draws the icon as a warning triangle", () => {
+    render(<Email invalid />);
+    const icon = screen.getByText("Enter an email address.").closest(".field-error")?.querySelector("svg");
+    expect(icon).toHaveAttribute("viewBox", "0 0 24 24");
+    expect(icon?.querySelector("path")).toHaveAttribute("d", expect.stringMatching(/^m21\.73 18-8-14/));
+    expect(icon?.querySelector("circle")).toBeNull();
   });
 
   it("adds the component's own class next to field-error", () => {

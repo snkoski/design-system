@@ -2,6 +2,7 @@ import { Field } from "@base-ui/react/field";
 import type { ReactNode, Ref, TextareaHTMLAttributes } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 export type TextAreaSize = "md" | "lg";
@@ -40,13 +41,13 @@ interface OwnProps {
   onValueChange?: (value: string, eventDetails: Field.Control.ChangeEventDetails) => void;
   /** Help text between the label and the field, read before typing. Linked to the text area for screen readers. */
   description?: ReactNode;
-  /** The message shown under the field when `invalid` is true, with an icon. Linked to the text area. */
+  /** The message shown between the description and the field when `invalid` is true, with an icon. Linked to the text area. */
   error?: ReactNode;
   /** Marks the text area as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;
   /** Blocks typing and removes the text area from the tab order. A disabled text area isn't submitted. */
   disabled?: boolean;
-  /** Keeps the text area focusable, readable, and submitted, but blocks changes. */
+  /** Keeps the text area focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label. */
   readOnly?: boolean;
   /** Tells assistive technology and the form that the field must be filled in. Say so in the label too, in words. */
   required?: boolean;
@@ -108,16 +109,26 @@ export function TextArea({
 }: TextAreaProps) {
   warnIfUnnamed("TextArea", label, rest, "Give it a label or an aria-label.");
   return (
-    <Field.Root className={cx("text-area", className)} data-size={size} data-resize={resize} name={name} disabled={disabled} invalid={invalid}>
-      {label !== undefined && <Field.Label className="text-area__label">{label}</Field.Label>}
-      {description && <Field.Description className="text-area__description">{description}</Field.Description>}
+    <Field.Root className={cx("text-field", "text-area", className)} data-size={size} data-resize={resize} name={name} disabled={disabled} invalid={invalid}>
+      {label !== undefined && (
+        <Field.Label className="field-label text-area__label">
+          {label}
+          {readOnly && !disabled && <ReadOnlyNote />}
+        </Field.Label>
+      )}
+      {description && <Field.Description className="field-description text-area__description">{description}</Field.Description>}
+      {error && (
+        <FieldError className="text-area__error" match={invalid}>
+          {error}
+        </FieldError>
+      )}
       {/* Base UI has no textarea, so its field control renders one. Every prop goes through Field.Control, which
           passes it on to the textarea and adds its own: a consumer's aria-describedby is merged with the
           description and error, rather than replacing them. Its props are typed for an <input>, hence the cast. */}
       <Field.Control
         {...(rest as Field.Control.Props)}
         ref={ref}
-        className="text-area__control"
+        className="text-field__control text-area__control"
         id={id}
         name={name}
         value={value}
@@ -128,11 +139,6 @@ export function TextArea({
         required={required}
         render={<textarea rows={rows} />}
       />
-      {error && (
-        <FieldError className="text-area__error" match={invalid}>
-          {error}
-        </FieldError>
-      )}
     </Field.Root>
   );
 }

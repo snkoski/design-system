@@ -361,7 +361,7 @@ The label is a `span`, not a `<label>`, because a `<label>` only works for form 
 - **The toolbar is one Tab stop.** Tab reaches it before the field, on its first button. The arrow keys move between buttons, wrapping at the ends, and Tab moves on to the field. Base UI's `Toolbar` handles this (it's called a **roving tab stop**). The toolbar is named "Formatting", its groups are named "Text style", "Insert", and "Blocks", and `aria-controls` says which field it formats.
 - **Shortcuts work in the field**, so you don't have to go back to the toolbar. Each button's `aria-keyshortcuts` tells screen readers its shortcut, and its tooltip shows it.
 - **Tab leaves the field**, even in a list (`ListItemNoTab`, section 3). Enter adds a line.
-- **Read-only** has no toolbar, since none of it could be used, and its absence shows that the field can't be changed. It stays in the tab order (`tabindex="0"`), so you can reach, read, and copy its text and follow its links. It's still submitted.
+- **Read-only** has a "Read only" note beside the label, as every form control does (the shared `ReadOnlyNote`, hidden from screen readers), and no toolbar, since none of it could be used. Nothing dims, so links and inline code keep their contrast. It stays in the tab order (`tabindex="0"`), so you can reach, read, and copy its text and follow its links. It's still submitted.
 - **Disabled** is skipped by Tab, toolbar and field alike, and isn't submitted.
 
 ### How it looks

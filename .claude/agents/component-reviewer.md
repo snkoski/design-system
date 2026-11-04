@@ -63,8 +63,9 @@ Check that it's current first: if any file in `src/components/<Name>/` is newer 
 **CSS**
 - Semantic token choice: `border-strong` for control edges, `ink-muted` only on the grounds its usage note allows, `action` fills never relied on for the 3:1 edge.
 - The component sets its inner padding but no outer margin or width.
+- A form control uses the shared CSS in `src/internal/` (`field.css`, `text-field.css`, `choice.css`, `choice-group.css`): its parts carry the shared classes, and its own CSS doesn't copy or override a shared rule (CLAUDE.md, Form controls, "Shared CSS"). Flag any rule that repeats one from a shared file.
 - Hot dog mode: thick ink border, hard shadow, and pressing into the shadow on `:active`, like Button and Checkbox.
-- Motion: only `transform` and `opacity` move; durations and easing come from tokens; exits are faster and use `--ease-in`; slides use `--motion-distance` and pops use `--motion-scale` so reduced motion works without extra rules; `--ease-bounce` only for chips, toggles, and success states.
+- Motion: only `transform` and `opacity` move; state changes may fade `color`, `background-color`, `border-color`, and `box-shadow` over `--duration-fast`, with the properties listed (never `all`); no layout property animates; durations and easing come from tokens; exits are faster and use `--ease-in`; slides use `--motion-distance` and pops use `--motion-scale` so reduced motion works without extra rules; `--ease-bounce` only for chips, toggles, and success states.
 
 **Tests** (`Name.test.tsx`)
 - Coverage of the list in the Testing section of `CLAUDE.md`: defaults, every variant and state, blocked behavior when disabled or read-only, keyboard, focus order, name and description, controlled and uncontrolled use, callbacks, refs, pass-through props, `className`, form submission for form controls, and prop types with `expectTypeOf`.

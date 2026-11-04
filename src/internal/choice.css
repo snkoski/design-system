@@ -1,0 +1,170 @@
+/* What Checkbox, Radio, and Switch share: the row, the label, the control's edge and fill, the hit area, every state,
+   the mark's motion, hot dog mode, and forced colors. Each part carries a shared class next to its own
+   (`choice__control checkbox__box`), and each component's own CSS keeps only what's different: the box's, circle's,
+   or track's shape and size, the mark, dot, or thumb, and the description's indent. Imported before the components'
+   CSS, so at equal specificity a component's own rule wins. */
+@layer components {
+  .choice {
+    display: grid;
+    justify-items: start;
+    row-gap: var(--space-1);
+    font-size: var(--text-body);
+  }
+
+  /* The label is the click target. It's as tall as choice-row, and the control sits on its first line. */
+  /* With no visible label there's no row, so the wrapper itself is choice-row tall. Otherwise the hit area
+     spills into the control above or below, and stacked controls without labels would steal each other's clicks. */
+  .choice:not(:has(> .choice__row)) {
+    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
+  }
+
+  .choice__row {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-block: calc((var(--choice-row) - var(--choice)) / 2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .choice__label {
+    line-height: var(--choice); /* the first line is as tall as the control, so they center */
+    min-width: 0;
+  }
+
+  /* The box, circle, or track. Each sets its own width, shape, and padding. */
+  .choice__control {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    box-sizing: border-box;
+    height: var(--choice);
+    margin: 0;
+    border: var(--border-thick) solid var(--border-strong); /* the 3:1 edge, whatever the fill is */
+    background: var(--surface);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* A control with no visible label still gets a target-min hit area */
+  .choice__control::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--choice) - var(--target-min)) / 2 - var(--border-thick));
+  }
+
+  /* Read-only is aria-readonly on a checkbox or switch. ARIA has no read-only state for a radio (only its group has
+     aria-readonly), so a radio has Base UI's data-readonly instead. The rules below leave out both. */
+  .choice__row:hover .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+  .choice__control:hover:not([data-disabled], [aria-readonly="true"], [data-readonly]) {
+    background: var(--surface-hover);
+  }
+
+  .choice__control:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Ticked, mixed, chosen, or on: filled. The mark, dot, or thumb's position is what says so, not the fill. */
+  .choice__control[aria-checked="true"],
+  .choice__control[aria-checked="mixed"] {
+    background: var(--action);
+  }
+  .choice__row:hover .choice__control[aria-checked="true"]:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+  .choice__row:hover .choice__control[aria-checked="mixed"]:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+  .choice__control[aria-checked="true"]:hover:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+  .choice__control[aria-checked="mixed"]:hover:not([data-disabled], [aria-readonly="true"], [data-readonly]) {
+    background: var(--action-hover);
+  }
+
+  .choice__control[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+
+  /* Read-only: the control stays at full strength, and a "Read only" note beside the label is the cue (ReadOnlyNote) */
+  .choice__control[aria-readonly="true"],
+  .choice__control[data-readonly],
+  .choice__row:has(.choice__control[aria-readonly="true"], .choice__control[data-readonly]) {
+    cursor: default;
+  }
+
+  /* Disabled: the control and its label dim */
+  .choice__row[data-disabled],
+  .choice__control[data-disabled] {
+    cursor: not-allowed;
+  }
+  .choice__control[data-disabled],
+  .choice__row[data-disabled] .choice__label {
+    opacity: 0.5;
+  }
+
+  /* A checkbox's mark or a radio's dot: it pops in and fades out */
+  .choice__indicator {
+    display: inline-flex;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-bounce);
+  }
+  .choice__indicator[data-starting-style],
+  .choice__indicator[data-ending-style] {
+    opacity: 0;
+    transform: scale(var(--motion-scale));
+  }
+  /* Leaving is quicker than arriving */
+  .choice__indicator[data-ending-style] {
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-in);
+  }
+
+  /* Hot dog mode: a hard shadow to press into */
+  [data-theme="hotdog"] .choice__control {
+    box-shadow: var(--shadow-sm);
+  }
+  [data-theme="hotdog"] .choice__row:active .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+  [data-theme="hotdog"] .choice__control:active:not([data-disabled], [aria-readonly="true"], [data-readonly]) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Windows Contrast themes: system colors. Each control colors its own mark, dot, or thumb. */
+  @media (forced-colors: active) {
+    .choice__control {
+      border-color: ButtonText;
+      background: Canvas;
+    }
+    /* The danger edge outranks the rule above, and forced colors would draw it in the page color, hiding the control */
+    .choice__control[aria-invalid="true"] {
+      border-color: ButtonText;
+    }
+    .choice__control[aria-checked="true"],
+    .choice__control[aria-checked="mixed"],
+    .choice__row:hover .choice__control[aria-checked="true"]:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+    .choice__row:hover .choice__control[aria-checked="mixed"]:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+    .choice__control[aria-checked="true"]:hover:not([data-disabled], [aria-readonly="true"], [data-readonly]),
+    .choice__control[aria-checked="mixed"]:hover:not([data-disabled], [aria-readonly="true"], [data-readonly]) {
+      background: Highlight; /* the hover fill would otherwise become Canvas and hide the mark */
+      border-color: Highlight;
+    }
+    .choice__control[data-disabled],
+    .choice__row[data-disabled] .choice__label {
+      opacity: 1;
+    }
+    .choice__control[data-disabled] {
+      border-color: GrayText;
+    }
+    .choice__control[data-disabled][aria-checked="true"],
+    .choice__control[data-disabled][aria-checked="mixed"] {
+      background: GrayText;
+    }
+    .choice__row[data-disabled] .choice__label {
+      color: GrayText;
+    }
+  }
+}

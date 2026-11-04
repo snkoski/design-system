@@ -11,6 +11,9 @@ Forms are where accessibility and clear writing matter most. These rules follow 
 - One column. Field order matches visual order.
 - Size fields to their expected input: a postcode field is narrow, an address field is wide.
 - Set `type`, `inputmode`, and `autocomplete` so browsers and phones can help.
+- To choose one option from a list, use a **NativeSelect**: a real `<select>`, which opens the phone's own picker and works with any form. Use **Select** only when the options need more than plain text, such as an icon or a second line. For two to five options that fit on screen, radios or a segmented control are often clearer than either.
+- **Numbers** that are amounts or quantities (a salary, a count of minutes) use a **NumberField**, which can format as you type and step with the arrow keys. Don't use `type="number"`: the scroll wheel changes it by accident, it accepts "e", and it drops leading zeros. Codes and IDs that happen to be digits aren't numbers (see "A text field for codes and IDs" in `docs/revisit.md`).
+- **Dates** use a **DatePicker**: a text field where the date can be typed, with a button that opens a calendar. It submits `yyyy-mm-dd`.
 
 ## Required and optional fields
 
@@ -24,13 +27,16 @@ The big systems disagree here: GOV.UK marks optional fields and bans asterisks, 
 
 ## Validation
 
-- **Validate when the form is submitted**, not while someone is typing (GOV.UK and Primer). After a failed submit, a field may re-check itself when the person leaves it.
+- **Validate when the form is submitted**, not while someone is filling it in for the first time (GOV.UK and Primer).
+- **After a failed submit, re-check each field as it changes**, so an error goes away as soon as it's fixed. This is the default in react-hook-form (`mode: "onSubmit"`, `reValidateMode: "onChange"`) and Base UI's `Field` (`validationMode="onSubmit"`). Without a library, it's one line in the field's `onChange`.
+- **Don't re-check when a field loses focus.** Pressing the submit button is what takes focus away from the field. If the fix makes the error disappear then, everything below it moves up, the button moves out from under the pointer, and the click is lost.
 - **Never disable the submit button** to show a form is incomplete. Let people submit and tell them what's missing (GOV.UK, Primer, and Atlassian).
 - Never clear what someone typed, even if it's wrong.
+- **The page validates, not the components.** Every form control takes `invalid` and `error` and leaves the timing above to the page. Components never depend on a form library, so they work with any library, or none.
 
 ## Errors
 
-- **Inline error:** below the label and hint, directly above the field, in `danger` with an icon and the word "Error:" for screen readers (hidden visually). The field gets a `danger` border and `aria-invalid="true"`, and the message is linked with `aria-describedby`. Today's components still put the error after the field, with no "Error:"; which placement wins is open (see `docs/revisit.md`).
+- **Inline error:** below the label and hint, directly above the field, in `danger` with a warning triangle and the word "Error:" for screen readers (hidden visually). It's read before the field, and a phone keyboard or autofill menu can't cover it. A single checkbox or switch, whose label sits beside it, shows its error above the whole row. The field gets a `danger` border and `aria-invalid="true"`, and the message is linked with `aria-describedby`. Every form control does this through the shared `FieldError`.
 - **Error summary:** when a submit fails with **two or more errors**, show a summary at the top of the form, before the first heading inside it, titled "There is a problem." Each item links to its field. Move focus to the summary. For a single error, move focus to that field.
 - Add "Error: " to the start of the page `<title>` while errors are showing.
 - Write messages using the rules in **Voice and copy**: what went wrong and how to fix it, specific, no blame. The inline message and the summary use the same words.

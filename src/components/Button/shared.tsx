@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonShape = "rectangle" | "pill";
+export type ButtonTone = "neutral" | "danger";
 
 export interface SharedProps {
   /** Visual weight. Use `primary` for the one main action in a view. Default: `primary`. */

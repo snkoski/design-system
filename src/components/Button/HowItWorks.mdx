@@ -56,7 +56,7 @@ Each demo below is the real component, with the HTML it has rendered underneath.
     <tr><td><code>&lt;button&gt;</code></td><td>Base UI</td><td>A real button element, so the browser makes it focusable, presses it with Enter and Space, and tells screen readers it's a button.</td></tr>
     <tr><td><code>type="button"</code></td><td>Base UI</td><td>A plain <code>&lt;button&gt;</code> inside a form submits it, because its default type is <code>submit</code>. Base UI's default is <code>button</code>, so a Button only submits a form when you pass <code>type="submit"</code>.</td></tr>
     <tr><td><code>tabindex="0"</code></td><td>Base UI</td><td>Base UI gives every button it renders a place in the Tab order. A <code>&lt;button&gt;</code> already has one, so here it changes nothing.</td></tr>
-    <tr><td><code>data-variant</code>, <code>data-size</code>, <code>data-shape</code></td><td>Button.tsx</td><td>The <code>variant</code>, <code>size</code>, and <code>shape</code> props, each with a default, so the CSS always has a value to read.</td></tr>
+    <tr><td><code>data-variant</code>, <code>data-size</code>, <code>data-shape</code>, <code>data-tone</code></td><td>Button.tsx</td><td>The <code>variant</code>, <code>size</code>, <code>shape</code>, and <code>tone</code> props, each with a default, so the CSS always has a value to read. ButtonLink has no <code>tone</code>: a link goes somewhere, and never destroys anything.</td></tr>
     <tr><td><code>class="button"</code></td><td>Button.tsx</td><td>Names the component for the CSS. A <code>className</code> you pass is added after it.</td></tr>
     <tr><td><code>&lt;span class="button__label"&gt;</code></td><td>shared.tsx</td><td>Wraps the label text, so the CSS can let a long label wrap onto more lines.</td></tr>
   </tbody>
@@ -156,9 +156,17 @@ Button's own props start from those and add Base UI's:
 - **`className`.** Base UI also accepts a function that returns a class from the button's state. Button only takes a string, and adds its own class to it.
 - **`render`.** Base UI's `render` prop swaps the `<button>` for another element. Without it, Button is always a `<button>`, and nobody can pass in an `<a>`, which Base UI's docs warn against. That's what ButtonLink is for.
 - **`nativeButton`.** It only matters with `render`.
-- **`keyof SharedProps` and `aria-label`.** These are defined by `SharedProps` and `IconOnly`, so Base UI's versions are taken out to leave one definition of each.
+- **`keyof SharedProps`, `aria-label`, and `tone`.** These are defined by `SharedProps`, `IconOnly`, and `Toned`, so Base UI's versions (where it has one) are taken out to leave one definition of each.
 
 Everything else Base UI's Button accepts, which is every attribute a `<button>` can have (`type`, `name`, `onClick`, and so on), passes straight through. `ref` is an ordinary prop in React 19, so there's no `forwardRef`.
+
+### Danger only where it can work
+
+`tone="danger"` marks an action that destroys or loses something. It's only allowed where it can be seen clearly and say what's lost, and the type enforces that:
+
+<Code file="components/Button/Button.tsx" name="Toned" />
+
+Like `IconOnly`, it's a union of two shapes. The first is the ordinary button, with `tone` left out or `"neutral"`. In the second, `tone` is `"danger"`, `variant` must be `"secondary"` or `"ghost"`, and `iconOnly` can't be `true`. So `<Button tone="danger">Delete</Button>` doesn't compile (the default variant is primary), and nor does a danger icon-only button, which would have no words to say what will be lost. Choosing a button explains when to use it.
 
 ### An icon-only button must have a name
 
@@ -188,7 +196,7 @@ Each warning is printed once per page load, and only in development: a productio
 
 From top to bottom:
 
-- **Defaults.** `variant = "primary"`, `size = "md"`, and `shape = "rectangle"` are filled in when the props are left out, so every button renders all three attributes.
+- **Defaults.** `variant = "primary"`, `size = "md"`, `shape = "rectangle"`, and `tone = "neutral"` are filled in when the props are left out, so every button renders all four attributes.
 - **The name check.** For an icon-only button, Button passes `undefined` as the label, because its children are the icon, which is hidden. Only an `aria-label` can name it.
 - **`{...rest}` first.** Everything else you pass goes on the element first, and Button's own attributes come after it. Later attributes win, so you can't override `data-variant` by accident.
 - **`className`.** `cx()` joins Button's class and yours, so `className="mt-4"` renders `class="button mt-4"`:
@@ -266,6 +274,18 @@ The [Color](?path=/docs/foundations-color--docs) page shows what each color toke
 <Code file="components/Button/button.css" name='.button[data-variant="ghost"]' />
 
 Primary needs no rule of its own: it's the default. Secondary has a white fill (the card color in dark mode) and a visible `--border-strong` edge, which has at least 3:1 contrast with what's around it, so you can see where the button is. Ghost has no fill and keeps the transparent border, so it's only text until you hover it. Each is picked by an attribute selector, `[data-variant="…"]`, not by an extra class, so one attribute holds one choice and two variants can't be applied at once.
+
+### Danger
+
+<Code file="components/Button/button.css" name='.button[data-tone="danger"]' />
+
+<Code file="components/Button/button.css" name='.button[data-tone="danger"][data-variant="secondary"]' />
+
+<Code file="components/Button/button.css" name='.button[data-tone="danger"]:hover:not([data-disabled])' />
+
+A danger button's words and icon are `--danger`, the same red as an error message, and a secondary one's edge is too. Hovering fills it with `--danger-soft`, the pale red behind error messages, so it's clear what's about to happen. There's no red fill at rest: the button stays a secondary or ghost button, and its label names what will be lost. In hot dog mode, the danger edge replaces the usual ink one, so it still stands out. `--danger` meets 4.5:1 on the page, on `--surface`, and on `--danger-soft` in every theme (`tokens/contrast.json`). In forced colors it's drawn in the system's button colors like any button, and the label carries the meaning.
+
+The tone rules come after the variants in the file and are just as specific, so they win over a variant's own text and edge colors. The hover rule is more specific than a variant's hover, so it wins there too.
 
 ### Shapes and sizes
 

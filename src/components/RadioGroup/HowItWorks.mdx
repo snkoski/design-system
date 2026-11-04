@@ -21,7 +21,8 @@ They're made of these files:
   <tbody>
     <tr><td><code>RadioGroup.tsx</code></td><td>The group. It puts four of Base UI's parts together into one field, and adds the label, the description, and the error.</td></tr>
     <tr><td><code>Radio.tsx</code></td><td>One option. Base UI's Radio, wrapped in its own field item, with its label, its dot, and an optional description.</td></tr>
-    <tr><td><code>radio-group.css</code></td><td>The look of both: the label, the stack of options, the circle and its dot, every state, the hit areas, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>radio-group.css</code></td><td>The look that's their own: the round circle, the dot, a radio's description indent, and a focused disabled circle.</td></tr>
+    <tr><td><code>src/internal/choice-group.css</code>, <code>choice.css</code>, and <code>field.css</code></td><td>The look they share with other controls: the group and its stack of options (with CheckboxGroup and SegmentedControl), each row, the circle's edge and fill, every state, the hit areas, hot dog mode, and forced colors (with Checkbox and Switch), and the label and description (with every form control). Part of the published stylesheet.</td></tr>
     <tr><td><code>index.ts</code></td><td>Exports both components and their props types from the package.</td></tr>
     <tr><td><code>src/internal/</code></td><td>Pieces every form control shares, not exported from the package: <code>cx()</code> joins class names, <code>FieldError</code> draws the error, and <code>warnIfUnnamed()</code> warns about a control with no name.</td></tr>
   </tbody>
@@ -138,7 +139,7 @@ Pick a state to see what each one changes. Invalid clears the choice and shows t
   <tbody>
     <tr><td>Invalid</td><td><code>aria-invalid="true"</code> on the group and every radio, and <code>data-invalid</code> on the wrapper and every option's parts. The error appears as <code>{"<div class=\"field-error radio-group__error\">"}</code>, and its id joins the group's and every radio's <code>aria-describedby</code>.</td><td>A screen reader announces the group and each option as invalid, and reads the error with them. The error is words with an icon, so it never relies on the red edge alone. How <code>FieldError</code> draws it is on <a href="?path=/docs/components-checkbox--how-it-works">Checkbox's How it works page</a>.</td></tr>
     <tr><td>Disabled</td><td><code>aria-disabled="true"</code> on the group and every radio, <code>data-disabled</code> on the wrapper, the description, and every option's parts, and <code>disabled</code> on every hidden input.</td><td>Nothing can be chosen, and a disabled input isn't submitted. The chosen radio keeps <code>tabindex="0"</code>, so Tab still reaches it and a screen reader announces it as unavailable. That's Base UI's choice, and the system keeps it for now (<code>docs/revisit.md</code>, "A disabled radio group can still be reached with Tab").</td></tr>
-    <tr><td>Read only</td><td><code>aria-readonly="true"</code> and <code>data-readonly</code> on the group, <code>data-readonly</code> on every radio, and <code>readonly</code> on every hidden input.</td><td>The choice can be read, focused, and submitted, but not changed. The arrow keys still move focus, but don't choose. ARIA has no read-only state for a single radio, only for the group, so the radios carry Base UI's <code>data-readonly</code> for the CSS.</td></tr>
+    <tr><td>Read only</td><td><code>aria-readonly="true"</code> and <code>data-readonly</code> on the group, <code>data-readonly</code> on every radio, <code>readonly</code> on every hidden input, and a "Read only" note in the group's label, hidden from screen readers (the shared <code>ReadOnlyNote</code>, explained on <a href="?path=/docs/components-checkbox--how-it-works">Checkbox's How it works page</a>).</td><td>The choice can be read, focused, and submitted, but not changed. The arrow keys still move focus, but don't choose. ARIA has no read-only state for a single radio, only for the group, so the radios carry Base UI's <code>data-readonly</code> for the CSS.</td></tr>
   </tbody>
 </table>
 
@@ -156,7 +157,7 @@ From the top:
 
 - **The name check.** `warnIfUnnamed()` prints a warning while you develop if the group would have no name, for example a label that came back empty from a CMS. [Checkbox's How it works page](?path=/docs/components-checkbox--how-it-works) explains it, and every form control's warnings.
 - **`Field.Root` gets `name`, `disabled`, and `invalid`.** Base UI's RadioGroup reads all three from the field, and the field passes `disabled` and `invalid` on to the parts inside it: each `Field.Item`, label, and radio. That's why one prop marks everything in the state table above. `className` goes here too, joined to `radio-group` by `cx()`, so the layout classes you pass land on the outer wrapper.
-- **`Fieldset.Root` renders the group.** Base UI's `render` prop replaces a part's element with the one you give it, and merges their props. Here the fieldset's element is replaced by Base UI's RadioGroup, so one `<div>` is both the fieldset (named by its legend) and the radio group (with its value and keyboard handling). The fieldset's children (the legend, description, options, and error) go inside it.
+- **`Fieldset.Root` renders the group.** Base UI's `render` prop replaces a part's element with the one you give it, and merges their props. Here the fieldset's element is replaced by Base UI's RadioGroup, so one `<div>` is both the fieldset (named by its legend) and the radio group (with its value and keyboard handling). The fieldset's children (the legend, description, error, and options) go inside it.
 - **Everything else goes to Base UI's RadioGroup.** `{...rest}` passes on `value`, `defaultValue`, `required`, `readOnly`, `form`, `aria-label`, and any other attribute. `ref` reaches the element with the radiogroup role.
 - **`<string | null>`** tells TypeScript the group's value is a string or `null` (see "Why `null` means nothing chosen"). Base UI's `onValueChange` could, by its type, pass `null`. A person choosing never does, so the wrapper only calls your `onValueChange` with a string. Your handler's type says so: it gets a `string`, never `null`.
 - **The label only renders when there is one.** With `aria-label` and no `label`, there's no legend, and the group is named by `aria-label` instead.
@@ -196,9 +197,9 @@ The props leave out what the group owns. `required` and `readOnly` are set on th
 
 `render` and `nativeButton` are left out too, so the radio is always Base UI's `<span>`. That's on purpose: a native `<button>` can't take focus while it's disabled, and Base UI always makes the chosen radio the group's Tab stop. A chosen, disabled button would hide the whole group from Tab.
 
-## 3. How it looks: `radio-group.css`
+## 3. How it looks
 
-All of the look is in one stylesheet, inside `@layer components`. The design system's layer order is `theme, base, components, utilities`, so a Tailwind utility in your markup wins over the component's own CSS. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The CSS uses semantic tokens, which say what a value is for (`--action`), never primitives, which say what it is (`--gray-900`). Each theme points the semantic tokens at different colors, so the radio changes with the theme without rules of its own. They're all neutral grays, black, and white: brand colors belong to the layout around components.
+The look is in four stylesheets, all inside `@layer components`. Most of it is shared, so a fix there is a fix to every control that uses it: `internal/choice-group.css` has the group and its stack of options, `internal/choice.css` each radio's row, edge, fill, states, hit area, hot dog mode, and forced colors (the same rules as Checkbox and Switch, explained in full on [How Checkbox works](?path=/docs/components-checkbox--how-it-works)), and `internal/field.css` the label and descriptions. Each part carries a shared class next to its own, such as `class="choice__control radio__circle"`. `radio-group.css` has only what's the radio's own, and it's imported after the shared files, so it wins where they set the same thing. The design system's layer order is `theme, base, components, utilities`, so a Tailwind utility in your markup wins over the component's own CSS. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The CSS uses semantic tokens, which say what a value is for (`--action`), never primitives, which say what it is (`--gray-900`). Each theme points the semantic tokens at different colors, so the radio changes with the theme without rules of its own. They're all neutral grays, black, and white: brand colors belong to the layout around components.
 
 <table>
   <thead>
@@ -218,23 +219,25 @@ All of the look is in one stylesheet, inside `@layer components`. The design sys
 
 ### The group and its options
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio-group__group" />
+<Code file="internal/choice-group.css" name=".choice-group__group" />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio-group__label" />
+<Code file="internal/field.css" name=".field-label" />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio-group__options" />
+<Code file="internal/choice-group.css" name=".choice-group__options" />
 
-The group is a grid that stacks the label, the description, the options, and the error, with a small gap. `justify-items: start` keeps each piece as wide as its content, so a row's hit area ends where its words do. `min-width: 0` lets the group shrink inside a narrow layout. The group sets no margin or width of its own: where it sits is the layout's job.
+The group is a grid that stacks the label, the description, the error, and the options, with a small gap. `justify-items: start` keeps each piece as wide as its content, so a row's hit area ends where its words do. `min-width: 0` lets the group shrink inside a narrow layout. The group sets no margin or width of its own: where it sits is the layout's job.
 
 ### Each row
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__row" />
+<Code file="internal/choice.css" name=".choice__row" />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__label" />
+<Code file="internal/choice.css" name=".choice__label" />
 
 The row is the label: the circle and the words side by side. Its padding makes it `--choice-row` tall: 32px with a mouse and 44px on a touch screen. The rows stack with no gap, so the whole column is clickable and there's no dead space between options. The words' line height is the circle's size, so the first line centers on the circle and longer text wraps underneath. `-webkit-tap-highlight-color: transparent` turns off the gray flash mobile Safari draws on a tapped label.
 
 ### The circle
+
+<Code file="internal/choice.css" name=".choice__control" />
 
 <Code file="components/RadioGroup/radio-group.css" name=".radio__circle" />
 
@@ -245,31 +248,31 @@ The row is the label: the circle and the words side by side. Its padding makes i
 
 ### Chosen
 
-<Code file="components/RadioGroup/radio-group.css" name='.radio__circle[aria-checked="true"]' />
+<Code file="internal/choice.css" name='.choice__control[aria-checked="true"]' />
 
 The chosen circle fills with `--action`, near black (near white in dark mode), and the dot shows inside it. The state is read from `aria-checked`, the attribute screen readers use, so the look can't disagree with what's announced. Color never carries the meaning alone: the dot is a shape, there whatever the colors are.
 
 The dot pops in. Base UI marks the indicator with `data-starting-style` on its first frame and `data-ending-style` as it leaves, and waits for the transition to finish before removing it:
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__indicator" />
+<Code file="internal/choice.css" name=".choice__indicator" />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__indicator[data-starting-style]" />
+<Code file="internal/choice.css" name=".choice__indicator[data-starting-style]" />
 
 It starts at 0 opacity and `--motion-scale` (85% of its size), and grows to full size with `--ease-bounce`, which overshoots a little. Leaving is quicker than arriving: a rule after these sets `--duration-fast` and `--ease-in` while `data-ending-style` is on. With reduced motion, `--motion-scale` becomes 1 and `--ease-bounce` a plain ease-out, so the dot fades without moving, and the CSS needs no reduced-motion rule of its own.
 
 ### Hover, without covering up a state
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__row:hover .radio__circle:not([data-disabled], [data-readonly])" />
+<Code file="internal/choice.css" name='.choice__row:hover .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
-<Code file="components/RadioGroup/radio-group.css" name='.radio__row:hover .radio__circle[aria-checked="true"]:not([data-disabled], [data-readonly])' />
+<Code file="internal/choice.css" name='.choice__row:hover .choice__control[aria-checked="true"]:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
-Hovering anywhere on the row lightens an empty circle to `--surface-hover`, and darkens a chosen one to `--action-hover`. A disabled or read-only circle doesn't change, because you can't choose it. Hover only changes the fill, never the edge, so it can't hide the red edge of an invalid radio.
+Hovering anywhere on the row lightens an empty circle to `--surface-hover`, and darkens a chosen one to `--action-hover`. A disabled or read-only circle doesn't change, because you can't choose it. ARIA has no read-only state for a single radio, so Base UI marks it `data-readonly`; the shared rules leave out both that and a checkbox's or switch's `aria-readonly`. Hover only changes the fill, never the edge, so it can't hide the red edge of an invalid radio.
 
 The second rule is more specific than the first: `[aria-checked="true"]` adds one attribute, so for a chosen circle it wins and keeps the dark fill. **Specificity** is how CSS picks between two rules that set the same property: the selector with more ids, classes, attributes, and pseudo-classes wins, and `:not()` counts what's inside it.
 
 ### Keyboard focus
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__circle:focus-visible" />
+<Code file="internal/choice.css" name=".choice__control:focus-visible" />
 
 <Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-disabled]:focus-visible" />
 
@@ -277,19 +280,19 @@ The second rule is more specific than the first: `[aria-checked="true"]` adds on
 
 ### Invalid, read only, and disabled
 
-<Code file="components/RadioGroup/radio-group.css" name='.radio__circle[aria-invalid="true"]' />
+<Code file="internal/choice.css" name='.choice__control[aria-invalid="true"]' />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-readonly]" />
+<Code file="internal/choice.css" name='.choice__control[aria-readonly="true"]' />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__row[data-disabled]" />
+<Code file="internal/choice.css" name=".choice__row[data-disabled]" />
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__circle[data-disabled]" />
+<Code file="internal/choice.css" name=".choice__control[data-disabled]" />
 
-- **Invalid** turns the edge `--danger`. The error message under the group says what's wrong in words.
-- **Read only** shows the plain cursor, and a rule after it dims only the circle, to 75% opacity. The words stay at full strength, because read-only content must stay readable. At 75%, the edge and the dot still meet 3:1 in every theme.
+- **Invalid** turns the edge `--danger`. The error message above the options says what's wrong in words.
+- **Read only** shows the plain cursor and doesn't dim: the circles and their words stay at full strength, because read-only content must stay readable. The cue is the "Read only" note beside the group's label.
 - **Disabled** shows the "not allowed" cursor, and dims the circle and its words to 50%.
 
-Neither state dims the group's label or description. axe, the accessibility checker every story runs, skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail it.
+Disabled doesn't dim the group's label or description. axe, the accessibility checker every story runs, skips the contrast check on a disabled control's own label, but not on a group's legend, so a dimmed legend would fail it.
 
 ### The hit areas
 
@@ -298,13 +301,13 @@ A **hit area** is everywhere a click or tap counts. Every hit area in the system
 - **With words**, the whole row is the label, and it's `--choice-row` tall: 32px with a mouse, 44px on touch.
 - **With no words**, the circle is alone, and 24px is too small on touch. So the circle gets an invisible `::after` box, centered on it, `--target-min` square. A pseudo-element is part of its element, so clicking it is clicking the circle.
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio__circle::after" />
+<Code file="internal/choice.css" name=".choice__control::after" />
 
 Its insets are measured from inside the circle's 2px edge, where its 20px padding box starts. On touch, `(24 − 44) / 2 − 2` is −12px, and a negative inset reaches outwards, so the box is 20 + 24 = 44px. With a mouse, it's −2px, and the box is 24px.
 
 The wrapper of a radio with no words is padded to `--choice-row` too. Without that, stacked radios would be only 24px apart, and their 44px hit areas would overlap on touch, each taking some of the next one's taps:
 
-<Code file="components/RadioGroup/radio-group.css" name=".radio:not(:has(> .radio__row))" />
+<Code file="internal/choice.css" name=".choice:not(:has(> .choice__row))" />
 
 Switch between a mouse and touch to see them. The dashed lines are the hit areas, and the sizes are measured from the page:
 
@@ -318,9 +321,9 @@ The tokens switch to their touch sizes when any touch input is present, or insid
 
 Hot dog is the joke theme, in ketchup and mustard. Its controls get a hard offset shadow, and press into it when clicked:
 
-<Code file="components/RadioGroup/radio-group.css" name='[data-theme="hotdog"] .radio__circle' />
+<Code file="internal/choice.css" name='[data-theme="hotdog"] .choice__control' />
 
-<Code file="components/RadioGroup/radio-group.css" name='[data-theme="hotdog"] .radio__row:active .radio__circle:not([data-disabled], [data-readonly])' />
+<Code file="internal/choice.css" name='[data-theme="hotdog"] .choice__row:active .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
 `--shadow-sm` is a solid shadow 2px right and 2px down in hot dog. Pressing moves the circle 2px right and down and takes the shadow away, so the circle lands where its shadow was. Disabled and read-only circles don't press. The press isn't built from a motion token, so it still happens with reduced motion: it's feedback that you pressed, not decoration.
 
@@ -328,12 +331,14 @@ Hot dog is the joke theme, in ketchup and mustard. Its controls get a hard offse
 
 Windows' Contrast themes replace every color with a few system colors the person chose, and remove shadows. This is called **forced colors**.
 
+<Code file="internal/choice.css" name="@media (forced-colors: active)" />
+
 <Code file="components/RadioGroup/radio-group.css" name="@media (forced-colors: active)" />
 
 - **The circle** gets a `ButtonText` edge on `Canvas`, the page color, and the dot `HighlightText`.
 - **The invalid edge** goes back to `ButtonText`. The invalid rule is more specific than the circle's, so it would otherwise keep `--danger`, which forced colors redraws in the page color, hiding the circle.
 - **A chosen circle** fills with `Highlight`, the system's color for selected things. The hover rules are repeated in this block: they're more specific than the plain chosen rule, so without them a hovered chosen circle would take the hover fill, which forced colors turns into `Canvas`, and the dot would vanish.
-- **Disabled and read only** go back to full opacity, because dimming the system's colors could make them unreadable. Disabled uses `GrayText` instead, the system's color for disabled things.
+- **Disabled** goes back to full opacity, because dimming the system's colors could make them unreadable, and uses `GrayText` instead, the system's color for disabled things.
 
 To see it without Windows, open Chrome's DevTools, open the Rendering panel, and set "Emulate CSS media feature forced-colors" to "active".
 
@@ -392,6 +397,13 @@ A form sends the hidden inputs: the chosen one's `value`, under the group's `nam
 <summary><code>radio-group.css</code></summary>
 
 <Code file="components/RadioGroup/radio-group.css" />
+
+</details>
+
+<details>
+<summary><code>internal/choice-group.css</code></summary>
+
+<Code file="internal/choice-group.css" />
 
 </details>
 

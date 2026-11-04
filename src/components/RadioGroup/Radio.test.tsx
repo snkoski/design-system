@@ -45,6 +45,20 @@ describe("Radio", () => {
       expect(container.querySelector("label")).toBeNull();
     });
 
+    it("puts the shared choice classes next to its own, so choice.css and field.css draw what Checkbox, Radio, and Switch share", () => {
+      render(
+        <RadioGroup label="Plan" defaultValue="free">
+          <Radio value="free" description="For one person.">Free</Radio>
+        </RadioGroup>,
+      );
+      expect(screen.getByText("Free").closest(".radio")).toHaveClass("choice", "radio");
+      expect(screen.getByText("Free")).toHaveClass("choice__label", "radio__label");
+      expect(screen.getByText("Free").closest("label")).toHaveClass("choice__row", "radio__row");
+      expect(getRadio("Free")).toHaveClass("choice__control", "radio__circle");
+      expect(getRadio("Free").firstElementChild).toHaveClass("choice__indicator", "radio__indicator");
+      expect(screen.getByText("For one person.")).toHaveClass("field-description", "radio__description");
+    });
+
     it("applies className to its wrapper, next to its own class", () => {
       render(
         <RadioGroup label="Plan">

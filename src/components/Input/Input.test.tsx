@@ -72,13 +72,21 @@ describe("Input", () => {
       expect(container.querySelector("label")).toBeNull();
     });
 
-    it("puts the description between the label and the box, and the error after the box", () => {
+    it("puts the description and then the error between the label and the box", () => {
       const { container } = render(<Input label="Email" description="We never share it." invalid error="Enter an email." />);
-      const parts = ["input__label", "input__description", "input__box", "input__error"];
+      const parts = ["input__label", "input__description", "input__error", "input__box"];
       const order = [...container.querySelectorAll(parts.map((part) => `.${part}`).join(", "))].map((el) =>
         parts.find((part) => el.classList.contains(part)),
       );
       expect(order).toEqual(parts);
+    });
+
+    it("puts the shared text field classes next to its own, so text-field.css and field.css draw what Input and TextArea share", () => {
+      const { container } = render(<Input label="Email" description="We reply within a day." />);
+      expect(container.firstElementChild).toHaveClass("text-field", "input");
+      expect(screen.getByText("Email")).toHaveClass("field-label", "input__label");
+      expect(screen.getByText("We reply within a day.")).toHaveClass("field-description", "input__description");
+      expect(getInput()).toHaveClass("text-field__control", "input__control");
     });
 
     it("applies className to the outer wrapper, next to its own class", () => {
@@ -275,6 +283,25 @@ describe("Input", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<Input label="Username" readOnly defaultValue="ada" />);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest("label")).toHaveTextContent("Username");
+      expect(getInput()).toHaveAccessibleName("Username");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<Input label="Username" defaultValue="ada" />);
+      expect(getInput()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<Input label="Username" readOnly disabled defaultValue="ada" />);
+      expect(getInput()).toHaveAttribute("readonly");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("blocks typing but keeps its value", async () => {
       const onValueChange = vi.fn();
       const user = userEvent.setup();
@@ -333,7 +360,7 @@ describe("Input", () => {
     it("shows the error, linked to the input, when invalid", () => {
       render(<Input label="Email" invalid error="Enter an email address." />);
       expect(screen.getByText("Enter an email address.")).toBeInTheDocument();
-      expect(getInput()).toHaveAccessibleDescription("Enter an email address.");
+      expect(getInput()).toHaveAccessibleDescription("Error: Enter an email address.");
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -352,7 +379,7 @@ describe("Input", () => {
 
     it("reads the description and the error together", () => {
       render(<Input label="Email" invalid description="We never share it." error="Enter an email address." />);
-      expect(getInput()).toHaveAccessibleDescription("We never share it. Enter an email address.");
+      expect(getInput()).toHaveAccessibleDescription("We never share it. Error: Enter an email address.");
     });
 
     it("shows the error again when invalid turns on later", () => {

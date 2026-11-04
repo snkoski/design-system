@@ -22,6 +22,7 @@ It's made of these files:
     <tr><td><code>SegmentedControl.tsx</code></td><td>The control. It's RadioGroup's structure (a field, a fieldset rendered as Base UI's radio group, the label, the description, and the error), with a track around the options and a <code>size</code>.</td></tr>
     <tr><td><code>Segment.tsx</code></td><td>One option. Base UI's Radio in its own field item, with label text, icons, or both, and no circle.</td></tr>
     <tr><td><code>segmented-control.css</code></td><td>The look of both: the track, the lines between options, the highlight, every state, the sizes, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>src/internal/choice-group.css</code> and <code>field.css</code></td><td>The wrapper, the group, the label, and the description, shared with RadioGroup and CheckboxGroup. Part of the published stylesheet.</td></tr>
     <tr><td><code>index.ts</code></td><td>Exports both components and their types from the package.</td></tr>
     <tr><td><code>src/internal/</code></td><td>The pieces every form control shares: <code>cx()</code>, <code>FieldError</code>, and <code>warnIfUnnamed()</code>. <a href="?path=/docs/components-checkbox--how-it-works">Checkbox's How it works page</a> explains the last two.</td></tr>
   </tbody>
@@ -70,7 +71,7 @@ Pick a state to see what each one changes. Invalid clears the choice and shows t
   <SegmentedControlStates />
 </Unstyled>
 
-The attributes are exactly a radio group's: `aria-invalid` on the group and every option and the error linked by `aria-describedby`; `aria-disabled` and `data-disabled` with `disabled` hidden inputs; and `aria-readonly` on the group with `data-readonly` on each option. Only the look differs, and section 3 covers it. As in a disabled radio group, Tab still reaches the chosen option of a disabled control (`docs/revisit.md`, "A disabled radio group can still be reached with Tab").
+The attributes are exactly a radio group's: `aria-invalid` on the group and every option and the error linked by `aria-describedby`; `aria-disabled` and `data-disabled` with `disabled` hidden inputs; and `aria-readonly` on the group with `data-readonly` on each option, plus a "Read only" note in the label, hidden from screen readers (the shared `ReadOnlyNote`, explained on [Checkbox's How it works page](?path=/docs/components-checkbox--how-it-works)). Only the look differs, and section 3 covers it. As in a disabled radio group, Tab still reaches the chosen option of a disabled control (`docs/revisit.md`, "A disabled radio group can still be reached with Tab").
 
 ### Icons
 
@@ -133,7 +134,7 @@ The props leave out what the control owns (`required` and `readOnly`, and `name`
 
 ## 3. How it looks: `segmented-control.css`
 
-All of the look is in one stylesheet, inside `@layer components`, so a Tailwind utility in your markup wins over it. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The colors are semantic tokens, which say what a value is for, and each theme points them at its own colors. They're all neutral: `--track`, `--track-hover`, `--surface`, and `--ink` point at the gray scale, white, and near-black in every theme, never at a brand color. Brand colors belong to the layout around components, so the same control can serve any brand. `pnpm check` fails if a component uses a brand token.
+The wrapper, the group, the label, and the description look the same as in a radio group, so they come from the shared `internal/choice-group.css` and `internal/field.css`: each part carries a shared class next to its own (`class="choice-group__group segmented-control__group"`). [How RadioGroup works](?path=/docs/components-radio-group--how-it-works) shows those rules. Everything else is in `segmented-control.css`, inside `@layer components`, so a Tailwind utility in your markup wins over it. Every value is a **token**, a named design value defined once in `tokens/tokens.json`. The colors are semantic tokens, which say what a value is for, and each theme points them at its own colors. They're all neutral: `--track`, `--track-hover`, `--surface`, and `--ink` point at the gray scale, white, and near-black in every theme, never at a brand color. Brand colors belong to the layout around components, so the same control can serve any brand. `pnpm check` fails if a component uses a brand token.
 
 <table>
   <thead>
@@ -246,13 +247,11 @@ The control never checks the pointer itself. The tokens change size when any tou
 
 <Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control__group[aria-invalid="true"] .segmented-control__track' />
 
-**Invalid** turns the track's edge `--danger` and makes it 2px. It's a real border, not an inset shadow, because the chosen option's highlight would cover a shadow drawn inside the track. Setting `--segment-edge` also moves the options' corners and hit areas in to match. The error under the control says what's wrong in words.
-
-<Code file="components/SegmentedControl/segmented-control.css" name='.segmented-control__group[aria-readonly="true"] .segment__button:not([aria-checked="true"], :focus-visible)' />
+**Invalid** turns the track's edge `--danger` and makes it 2px. It's a real border, not an inset shadow, because the chosen option's highlight would cover a shadow drawn inside the track. Setting `--segment-edge` also moves the options' corners and hit areas in to match. The error above the track says what's wrong in words.
 
 <Code file="components/SegmentedControl/segmented-control.css" name=".segment__button[data-readonly]" />
 
-**Read only** dims the options that aren't chosen to 75%, and shows the plain cursor. Other choice controls dim the control and keep the label at full strength. Here the label is inside the option, and dimming the chosen one would take its words below 4.5:1 contrast on the white fill. A focused option shows at full strength, so its focus outline does too. Whether read-only should look the same across every control is still open (`docs/revisit.md`, "How read-only fields look").
+**Read only** shows the plain cursor and doesn't dim: every option stays at full strength, so the chosen option's words keep their contrast on its fill. The cue is the "Read only" note beside the label, as on every form control.
 
 <Code file="components/SegmentedControl/segmented-control.css" name=".segment__button[data-disabled]" />
 
@@ -279,7 +278,7 @@ Windows' Contrast themes replace every color with a few system colors the person
 - **The chosen option fills with `Highlight`**, the system's color for selected things, with its words in `HighlightText`.
 - **`forced-color-adjust: none`** on the chosen option. Browsers draw a `Canvas` backplate behind text in forced colors, to keep it readable, and here that would hide the `HighlightText` words on the `Highlight` fill. Turning forced colors off for the option removes the backplate. It also stops the browser replacing the option's colors, so the rules set system colors themselves, including `CanvasText` for the focus outline.
 - **The highlight layer goes.** With forced colors off for the chosen option, the browser would keep the highlight's real white fill and ink border on top of the `Highlight` fill. `display: none` removes it, so the whole option shows the choice.
-- **Disabled and read only** go back to full opacity, and disabled uses `GrayText`, the system's color for disabled things.
+- **Disabled** goes back to full opacity and uses `GrayText`, the system's color for disabled things.
 
 To see it without Windows, open Chrome's DevTools, open the Rendering panel, and set "Emulate CSS media feature forced-colors" to "active".
 

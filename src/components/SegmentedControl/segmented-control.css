@@ -1,35 +1,8 @@
-/* SegmentedControl and Segment: what they are (label, description, the gray track, the options inside it, error).
-   Where the control sits (margin) is the layout's job. The label, description, and error repeat RadioGroup's. */
+/* SegmentedControl and Segment: what they are (the gray track and the options inside it). The wrapper, label, and
+   description are shared with the other groups in internal/choice-group.css and field.css (.choice-group, .choice-group__group,
+   .field-label, .field-description), and the error is .field-error. Where the control sits (margin) is the layout's
+   job. */
 @layer components {
-  /* The control. align-content: start keeps it at its own height when a grid or flex layout stretches it. */
-  .segmented-control {
-    display: grid;
-    align-content: start;
-    font-family: var(--font-sans);
-    color: var(--ink);
-  }
-
-  .segmented-control__group {
-    display: grid;
-    align-content: start;
-    justify-items: start; /* the track hugs its options */
-    row-gap: var(--space-1);
-    min-width: 0;
-  }
-
-  .segmented-control__label {
-    font-size: var(--text-body);
-    font-weight: 600;
-    line-height: var(--leading-control);
-  }
-
-  .segmented-control__description {
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--icon-md);
-    color: var(--ink-muted);
-  }
-
   /* The track: one gray rectangle, with a rectangle Button's corners. Its edge is transparent, so it only shows in forced
      colors and when the control is invalid, but it still counts toward the control's height, so the track lines up with
      an Input or Button. Every option is as wide as the widest. Labels wrap rather than push the page wider. */
@@ -174,11 +147,8 @@
     border-color: var(--danger);
   }
 
-  /* Read-only: a lighter cue than disabled. Only the options that aren't chosen dim: dimming the chosen one would
-     take its label below 4.5:1 on the fill. A focused option shows at full strength, so its outline does too. */
-  .segmented-control__group[aria-readonly="true"] .segment__button:not([aria-checked="true"], :focus-visible) {
-    opacity: 0.75;
-  }
+  /* Read-only: every option stays at full strength, and a "Read only" note beside the label is the cue
+     (ReadOnlyNote) */
   .segment__button[data-readonly] {
     cursor: default;
   }
@@ -241,8 +211,7 @@
       color: HighlightText;
     }
     .segmented-control[data-disabled] .segmented-control__track:not(:has(:focus-visible)),
-    .segmented-control:not([data-disabled]) .segment__button[data-disabled]:not(:focus-visible),
-    .segmented-control__group[aria-readonly="true"] .segment__button:not([aria-checked="true"], :focus-visible) {
+    .segmented-control:not([data-disabled]) .segment__button[data-disabled]:not(:focus-visible) {
       opacity: 1;
     }
     .segmented-control[data-disabled] .segmented-control__track,

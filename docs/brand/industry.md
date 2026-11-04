@@ -133,7 +133,7 @@ Primer ships nine themes, including high-contrast and colorblind variants. Carbo
 | Carbon | Primary, secondary, tertiary, and ghost | On primary, tertiary, and ghost |
 | Primer | Primary, default, and invisible | Its own variant |
 | Atlassian | Primary, default, and subtle | Its own `danger` and `warning` styles |
-| **Sherbet** | **Primary, secondary, and ghost** | **None yet; planned as a tone on all three** |
+| **Sherbet** | **Primary, secondary, and ghost** | **A tone on secondary and ghost: red words and edge, no fill** |
 
 Every system limits primary buttons: Carbon to one per page (dialogs and side panels aside), Primer to one per group and rarely more than one per page. Sherbet allows one per view.
 
@@ -146,8 +146,9 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Mark required or optional | Optional | Required | Required (asterisk) | The minority | Optional | Required (asterisk) | **Optional, no asterisks** |
-| When to validate | On submit | On submit | As you type | On leaving a field | On leaving a field | — | **On submit, then on leaving a field** |
+| When to validate | On submit | On submit | As you type | On leaving a field | On leaving a field | — | **On submit, then as you type** |
 | Error summary | Always | 3+ errors | — | — | — | — | **2+ errors** |
+| Where an inline error goes | Above the field | Below the field | Below the field | Below the field | Below the field | Above the field | **Above the field** |
 | Disable submit button | No | No | No | Short forms only | — | — | **No** |
 | Placeholder as label | No | No | — | — | No essential info | — | **No** |
 

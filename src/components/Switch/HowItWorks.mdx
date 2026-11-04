@@ -21,7 +21,8 @@ Switch is a thin layer over [Base UI](https://base-ui.com), an unstyled React li
   </thead>
   <tbody>
     <tr><td><code>Switch.tsx</code></td><td>The component. It puts Base UI's parts together, decides which prop goes to which part, and types the props so a switch can't be built without a name.</td></tr>
-    <tr><td><code>switch.css</code></td><td>The look: track, thumb, colors, sizes, every state, hot dog mode, and Windows high contrast. It only uses design tokens.</td></tr>
+    <tr><td><code>switch.css</code></td><td>The look that's the switch's own: the track's size and shape, the thumb and its slide, and the description's indent. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/choice.css</code> and <code>field.css</code></td><td>The look it shares with Checkbox and Radio: the row, the label, the track's edge and fill, the hit area, every state, hot dog mode, and Windows high contrast (<code>choice.css</code>), and the description (<code>field.css</code>). Part of the published stylesheet.</td></tr>
     <tr><td><code>index.ts</code></td><td>What the package exports: <code>Switch</code> and the <code>SwitchProps</code> type.</td></tr>
     <tr><td><code>src/internal/FieldError.tsx</code> and <code>field-error.css</code></td><td>The error message every form control shares: an icon and words. Not exported.</td></tr>
     <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for a switch with no name, and a helper that joins class names. Not exported.</td></tr>
@@ -104,7 +105,7 @@ This switch is `required`, `invalid`, and has a description and an `error`.
 </Unstyled>
 
 - **Disabled.** A `<span>` has no `disabled` attribute, so Base UI uses `aria-disabled="true"` to tell screen readers, and `tabindex="-1"` to take it out of the Tab order. The hidden checkbox gets a real `disabled`, so the form leaves it out. Every part, from the wrapper to the thumb, gets `data-disabled`.
-- **Read-only.** Base UI sets `aria-readonly="true"` and `data-readonly`, keeps `tabindex="0"`, and ignores clicks and keys itself. The switch stays in the Tab order, so someone using a screen reader can still find it and hear whether it's on.
+- **Read-only.** Base UI sets `aria-readonly="true"` and `data-readonly`, keeps `tabindex="0"`, and ignores clicks and keys itself. The switch stays in the Tab order, so someone using a screen reader can still find it and hear whether it's on. The label gets a "Read only" note with a lock, hidden from screen readers, which already announce it. The shared `ReadOnlyNote` draws it, and [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains it.
 
 ### In a form
 
@@ -162,7 +163,7 @@ Reading it top to bottom:
 
 ## How it looks
 
-All of the switch's look is in `switch.css`, inside `@layer components`. Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
+The switch's look is in three files, all inside `@layer components`. What it shares with Checkbox and Radio is in `internal/choice.css`, and its description's look in `internal/field.css`, so a fix there is a fix to all of them; [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains those rules in full. Each part carries a shared class next to its own, such as `class="choice__control switch__track"` on the track. `switch.css` has only what's the switch's own, and it's imported after the shared files, so it wins where they set the same thing. Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
 
 The switch only uses **semantic tokens**, named for their job rather than their color: `surface`, `surface-hover`, `border-strong`, `action`, `action-hover`, `on-action`, `ink`, `ink-muted`, `focus`, and `danger`. Each theme gives them its own values. All but `danger` point at the gray scale, so components stay neutral and the brand colors live in the layout around them. `danger` is a status color, used where it carries meaning.
 
@@ -172,21 +173,23 @@ The switch only uses **semantic tokens**, named for their job rather than their 
 
 The track is `--choice` tall (24px) and 1.75 times as wide (42px). The width is stored in `--switch-track-width` because the thumb's travel and the description's indent are worked out from it.
 
-<Code file="components/Switch/switch.css" name=".switch__row" />
+<Code file="internal/choice.css" name=".choice__row" />
 
-<Code file="components/Switch/switch.css" name=".switch__label" />
+<Code file="internal/choice.css" name=".choice__label" />
 
 The row is the label, and it's `--choice-row` tall: 32px with a mouse, and 44px when the device has a touch screen. The padding above and below is half of what's left after the 24px track, so the track sits on the label's first line, which is also 24px tall. If the label wraps onto more lines, the track stays beside the first one.
+
+<Code file="internal/choice.css" name=".choice__control" />
 
 <Code file="components/Switch/switch.css" name=".switch__track" />
 
 The track has a `border-thick` edge in `border-strong`, which meets 3:1 contrast in every theme on its own, whatever the fill is. So the switch shows clearly when it's off, and the edge never relies on the fill. `box-sizing: border-box` keeps the edge inside the 24 × 42px box.
 
-<Code file="components/Switch/switch.css" name=".switch__track::after" />
+<Code file="internal/choice.css" name=".choice__control::after" />
 
 Every interactive target is at least `--target-min` in both directions: 24px with a mouse, 44px on touch. When there's a label, the row already meets it. Without one, this invisible pseudo-element stretches the track's hit area. An absolutely positioned child is placed from inside its parent's border, so the inset is half of `--choice - --target-min`, less the 2px edge. With a mouse that's -2px, exactly the track's own 24px. On touch it's -12px, giving 44px.
 
-<Code file="components/Switch/switch.css" name=".switch:not(:has(> .switch__row))" />
+<Code file="internal/choice.css" name=".choice:not(:has(> .choice__row))" />
 
 On touch, that 44px area is taller than the 24px track, and would spill into a control above or below. So a switch without a label pads its own wrapper to `--choice-row`, which keeps neighbors' hit areas apart.
 
@@ -196,7 +199,7 @@ Text never changes size with the pointer. And compact density (`data-density="co
 
 <Code file="components/Switch/switch.css" name=".switch__thumb" />
 
-<Code file="components/Switch/switch.css" name='.switch__track[aria-checked="true"]' />
+<Code file="internal/choice.css" name='.choice__control[aria-checked="true"]' />
 
 <Code file="components/Switch/switch.css" name='.switch__track[aria-checked="true"] .switch__thumb' />
 
@@ -218,44 +221,46 @@ You can test this without changing your device's setting: `data-motion="full"` o
 
 ### Hover, focus, and invalid
 
-<Code file="components/Switch/switch.css" name='.switch__row:hover .switch__track:not([data-disabled], [aria-readonly="true"])' />
+<Code file="internal/choice.css" name='.choice__row:hover .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
-<Code file="components/Switch/switch.css" name='.switch__row:hover .switch__track[aria-checked="true"]:not([data-disabled], [aria-readonly="true"])' />
+<Code file="internal/choice.css" name='.choice__row:hover .choice__control[aria-checked="true"]:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
 Hovering anywhere on the row changes the track's fill: `surface-hover` when off, `action-hover` when on. The `:not()` leaves out disabled and read-only switches, which can't change, so they shouldn't look as if they will.
 
-<Code file="components/Switch/switch.css" name=".switch__track:focus-visible" />
+<Code file="internal/choice.css" name=".choice__control:focus-visible" />
 
 Focus is an **outline**, never only a shadow, so it survives Windows high contrast. `:focus-visible` shows it when the browser judges that focus should be visible, such as after the Tab key, and not after a mouse click.
 
-<Code file="components/Switch/switch.css" name='.switch__track[aria-invalid="true"]' />
+<Code file="internal/choice.css" name='.choice__control[aria-invalid="true"]' />
 
 Invalid changes the edge to `danger`. Hover only changes the fill, so a hovered invalid switch keeps its red edge. (A text field's hover changes its edge, so it has to leave invalid out: see [How Input works](?path=/docs/components-input--how-it-works).)
 
 ### Disabled and read-only
 
-<Code file="components/Switch/switch.css" name='.switch__track[aria-readonly="true"]' />
+<Code file="internal/choice.css" name='.choice__control[aria-readonly="true"]' />
 
-<Code file="components/Switch/switch.css" name=".switch__row[data-disabled]" />
+<Code file="internal/choice.css" name=".choice__row[data-disabled]" />
 
-The cursor says what will happen: `default` for read-only, because nothing will, and `not-allowed` for disabled. The rules after these dim them:
+The cursor says what will happen: `default` for read-only, because nothing will, and `not-allowed` for disabled.
 
-- **Disabled** sets `opacity: 0.5` on the track and on the label text.
-- **Read-only** sets `opacity: 0.75` on the track only. The label stays at full strength, because read-only content must stay readable. At 75%, the edge and the thumb still meet 3:1.
+- **Disabled** also sets `opacity: 0.5` on the track and on the label text.
+- **Read-only** doesn't dim: the switch and its label stay at full strength, because read-only content must stay readable. The cue is the "Read only" note beside the label.
 
 Disabled is styled from Base UI's `data-disabled` rather than `aria-disabled`. Base UI puts `data-disabled` on every part (the wrapper, the label, the track, and the thumb), so one attribute reaches the label too. ARIA's read-only state, `aria-readonly`, is on the track, so read-only is styled from that.
 
-The description and the error are indented by the track's width plus the gap, so they line up with the label text rather than the track.
+The description is indented by the track's width plus the gap, so it lines up with the label text rather than the track. The error isn't: it sits above the whole row, at its start.
 
 ### Hot dog mode
 
-<Code file="components/Switch/switch.css" name='[data-theme="hotdog"] .switch__track' />
+<Code file="internal/choice.css" name='[data-theme="hotdog"] .choice__control' />
 
-<Code file="components/Switch/switch.css" name='[data-theme="hotdog"] .switch__row:active .switch__track:not([data-disabled], [aria-readonly="true"])' />
+<Code file="internal/choice.css" name='[data-theme="hotdog"] .choice__row:active .choice__control:not([data-disabled], [aria-readonly="true"], [data-readonly])' />
 
 Hot dog mode, the system's ketchup-and-mustard joke theme, gives controls a hard offset shadow. In hot dog, `--shadow-sm` is a 2px solid shadow down and to the right. Pressing a switch (`:active`) moves it 2px into its shadow and drops the shadow, like a button. Text fields keep their shadow: you type in them rather than press them.
 
 ### Windows high contrast
+
+<Code file="internal/choice.css" name="@media (forced-colors: active)" />
 
 <Code file="components/Switch/switch.css" name="@media (forced-colors: active)" />
 
@@ -263,7 +268,7 @@ In forced colors mode (Windows Contrast themes), the browser replaces the page's
 
 - The track is `Canvas` with a `ButtonText` edge, and the thumb is `ButtonText`.
 - On fills the track with `Highlight` and turns the thumb `HighlightText`, so on and off still differ.
-- The hover selectors are repeated for the on state. A hover rule is more specific than `.switch__track[aria-checked="true"]`, so without them, hovering an "on" switch would win, turn the track back to `Canvas`, and hide the thumb.
+- The hover selectors are repeated for the on state. A hover rule is more specific than `.choice__control[aria-checked="true"]`, so without them, hovering an "on" switch would win, turn the track back to `Canvas`, and hide the thumb.
 - Opacity is reset to 1, and disabled uses `GrayText` instead.
 
 ## Keyboard, screen readers, and forms
@@ -305,6 +310,13 @@ In forced colors mode (Windows Contrast themes), the browser replaces the page's
 <summary><code>switch.css</code></summary>
 
 <Code file="components/Switch/switch.css" />
+
+</details>
+
+<details>
+<summary><code>internal/choice.css</code></summary>
+
+<Code file="internal/choice.css" />
 
 </details>
 

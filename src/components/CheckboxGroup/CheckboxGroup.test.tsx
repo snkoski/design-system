@@ -63,6 +63,19 @@ describe("CheckboxGroup", () => {
       for (const box of getBoxes()) expect(wrapper).toContainElement(box);
     });
 
+    it("puts the shared group classes next to its own, so choice-group.css and field.css draw what the groups share", () => {
+      const { container } = render(
+        <CheckboxGroup label="Choose" description="Pick what suits you.">
+          {options}
+        </CheckboxGroup>,
+      );
+      expect(container.firstElementChild).toHaveClass("choice-group", "checkbox-group");
+      expect(getGroup()).toHaveClass("choice-group__group", "checkbox-group__group");
+      expect(screen.getByText("Choose")).toHaveClass("field-label", "checkbox-group__label");
+      expect(screen.getByText("Pick what suits you.")).toHaveClass("field-description", "checkbox-group__description");
+      expect(container.querySelector(".checkbox-group__options")).toHaveClass("choice-group__options");
+    });
+
     it("applies className to the outer wrapper, next to its own class", () => {
       const { container } = render(
         <CheckboxGroup label="Services" className="mt-4">
@@ -297,15 +310,15 @@ describe("CheckboxGroup", () => {
       expect(getBox("Writing")).toHaveAccessibleDescription("Pick any that apply.");
     });
 
-    it("shows the error after the options, linked to the group, when invalid", () => {
+    it("shows the error before the options, linked to the group, when invalid", () => {
       render(
         <CheckboxGroup label="Services" invalid error="Choose at least one service.">
           {options}
         </CheckboxGroup>,
       );
       const error = screen.getByText("Choose at least one service.");
-      expect(getGroup()).toHaveAccessibleDescription("Choose at least one service.");
-      expect(getBox("Writing").compareDocumentPosition(error)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose at least one service.");
+      expect(error.compareDocumentPosition(getBox("Design"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -325,7 +338,7 @@ describe("CheckboxGroup", () => {
           {options}
         </CheckboxGroup>,
       );
-      expect(getGroup()).toHaveAccessibleDescription("Pick any that apply. Choose at least one service.");
+      expect(getGroup()).toHaveAccessibleDescription("Pick any that apply. Error: Choose at least one service.");
     });
 
     it("hides the error when the group is valid", () => {
@@ -415,10 +428,10 @@ describe("CheckboxGroup", () => {
       expect(screen.getByRole("group", { name: "Services (required)" })).toBeInTheDocument();
       expect(screen.queryByText("Choose at least one service.")).not.toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "Send" }));
-      expect(getGroup()).toHaveAccessibleDescription("Choose at least one service.");
+      expect(getGroup()).toHaveAccessibleDescription("Error: Choose at least one service.");
       for (const box of getBoxes()) {
         expect(box).toHaveAttribute("aria-invalid", "true");
-        expect(box).toHaveAccessibleDescription("Choose at least one service.");
+        expect(box).toHaveAccessibleDescription("Error: Choose at least one service.");
       }
     });
 
@@ -516,6 +529,25 @@ describe("CheckboxGroup", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<CheckboxGroup label="Services" readOnly>{options}</CheckboxGroup>);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest(".checkbox-group__label")).toHaveTextContent("Services");
+      expect(getGroup()).toHaveAccessibleName("Services");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<CheckboxGroup label="Services">{options}</CheckboxGroup>);
+      expect(getGroup()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<CheckboxGroup label="Services" readOnly disabled>{options}</CheckboxGroup>);
+      expect(getBoxes()[0]).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("marks every option read-only", () => {
       render(
         <CheckboxGroup label="Services" readOnly>

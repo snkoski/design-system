@@ -1,46 +1,12 @@
-/* CheckboxGroup: what it is (label, description, the stack of options, error). Where it sits (margin, width)
-   is the layout's job. Each option is a Checkbox and styles itself. */
+/* CheckboxGroup: what's its own. The wrapper, label, description, and the stack of options are shared with RadioGroup
+   in internal/choice-group.css and field.css (.choice-group and its parts, .field-label, .field-description). Each option is a
+   Checkbox and styles itself. Where the group sits (margin, width) is the layout's job. */
 @layer components {
-  /* align-content: start keeps the stack at its own height when a grid or flex layout stretches the group */
-  .checkbox-group {
-    display: grid;
-    align-content: start;
-    font-family: var(--font-sans);
-    color: var(--ink);
-  }
-
-  .checkbox-group__group {
-    display: grid;
-    align-content: start;
-    justify-items: start;
-    row-gap: var(--space-1);
-    min-width: 0;
-  }
-
-  .checkbox-group__label {
-    font-size: var(--text-body);
-    font-weight: 600;
-    line-height: var(--leading-control);
-  }
-
-  .checkbox-group__description {
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--icon-md);
-    color: var(--ink-muted);
-  }
-
-  /* Each option's row is already choice-row tall, so they stack with no gap */
-  .checkbox-group__options {
-    display: grid;
-    justify-items: start;
-  }
-
   /* With a "select all" box, the options' boxes line up under its label text */
   .checkbox-group__options:has(> .checkbox[data-parent]) > .checkbox:not([data-parent]) {
     padding-inline-start: calc(var(--choice) + var(--space-3));
   }
 
-  /* The error's look is .field-error. Disabled and read-only dim the options (checkbox.css), not the group's
-     label and description. Those stay readable at 4.5:1: the description often says why the group can't be changed. */
+  /* The error's look is .field-error. Disabled dims the options (choice.css), not the group's label and
+     description. Those stay readable at 4.5:1: the description often says why the group can't be changed. */
 }

@@ -65,6 +65,26 @@ describe("ButtonLink", () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
+  it("passes through everything a router's link wrapper adds, so createLink(ButtonLink) works", async () => {
+    // TanStack Router's createLink, React Router's Link, and Next's Link give the wrapped component an href, a click
+    // handler that navigates without a reload, the current-page state, and a ref. Checked with TanStack Router 1.170.
+    const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault());
+    const ref = createRef<HTMLAnchorElement>();
+    render(
+      <ButtonLink href="/projects" onClick={onClick} aria-current="page" data-status="active" ref={ref} className="mt-4">
+        See projects
+      </ButtonLink>,
+    );
+    const link = screen.getByRole("link", { name: "See projects" });
+    expect(link).toHaveAttribute("href", "/projects");
+    expect(link).toHaveAttribute("aria-current", "page");
+    expect(link).toHaveAttribute("data-status", "active");
+    expect(link).toHaveClass("button", "mt-4");
+    expect(ref.current).toBe(link);
+    await userEvent.setup().click(link);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
   it("forwards its ref to the anchor element", () => {
     const ref = createRef<HTMLAnchorElement>();
     render(<ButtonLink href="/work" ref={ref}>Work</ButtonLink>);

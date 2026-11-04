@@ -4,6 +4,7 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import type { ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 /** A group needs a name a screen reader can announce: a visible label, or an `aria-label`. */
@@ -38,7 +39,7 @@ interface OwnProps {
   required?: boolean;
   /** Help text between the label and the options, read before choosing. Linked to the group and to each radio. */
   description?: ReactNode;
-  /** The message shown under the options when `invalid` is true, with an icon. Linked to the group and to each radio. */
+  /** The message shown between the description and the options when `invalid` is true, with an icon. Linked to the group and to each radio. */
   error?: ReactNode;
   /** Marks the group and every radio as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;
@@ -48,7 +49,7 @@ interface OwnProps {
    * reached with Tab, and is announced as disabled.
    */
   disabled?: boolean;
-  /** Keeps the group focusable, readable, and submitted, but blocks changes. The arrow keys move focus without selecting. */
+  /** Keeps the group focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the group's label. The arrow keys move focus without selecting. */
   readOnly?: boolean;
   /** The id of a `<form>` to submit with, when the group sits outside that form. */
   form?: string;
@@ -86,8 +87,8 @@ export function RadioGroup({
   warnIfUnnamed("RadioGroup", label, rest, "Give it a label or an aria-label.");
 
   return (
-    <Field.Root className={cx("radio-group", className)} name={name} disabled={disabled} invalid={invalid}>
-      <Fieldset.Root className="radio-group__group" render={
+    <Field.Root className={cx("choice-group", "radio-group", className)} name={name} disabled={disabled} invalid={invalid}>
+      <Fieldset.Root className="choice-group__group radio-group__group" render={
           // null is how a controlled group says nothing is selected; a person's choice is never null
           <BaseRadioGroup<string | null>
             {...rest}
@@ -95,14 +96,19 @@ export function RadioGroup({
             onValueChange={(value, eventDetails) => value !== null && onValueChange?.(value, eventDetails)}
           />
         }>
-        {label !== undefined && <Fieldset.Legend className="radio-group__label">{label}</Fieldset.Legend>}
-        {description && <Field.Description className="radio-group__description">{description}</Field.Description>}
-        <div className="radio-group__options">{children}</div>
+        {label !== undefined && (
+          <Fieldset.Legend className="field-label radio-group__label">
+            {label}
+            {rest.readOnly && !disabled && <ReadOnlyNote />}
+          </Fieldset.Legend>
+        )}
+        {description && <Field.Description className="field-description radio-group__description">{description}</Field.Description>}
         {error && (
           <FieldError className="radio-group__error" match={invalid}>
             {error}
           </FieldError>
         )}
+        <div className="choice-group__options radio-group__options">{children}</div>
       </Fieldset.Root>
     </Field.Root>
   );
