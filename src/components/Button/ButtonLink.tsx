@@ -12,7 +12,9 @@ export type ButtonLinkProps = SharedProps &
 
 /**
  * A link that looks like a button. Renders a real `<a>`, so it navigates, opens in a
- * new tab, and is announced as a link. Links can't be disabled; remove it instead.
+ * new tab, and is announced as a link. Links can't be disabled; remove it instead. In an app with client-side routing,
+ * wrap it with the router so it navigates without a reload, such as TanStack Router's `createLink(ButtonLink)`: it passes
+ * every prop and the ref through to the `<a>`.
  */
 export function ButtonLink({
   variant = "primary",

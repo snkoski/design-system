@@ -6,6 +6,7 @@ import type { ReactNode, Ref } from "react";
 import { CheckboxGroupContext } from "./context";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 /** A group needs a name a screen reader can announce: a visible label, or an `aria-label`. */
@@ -39,7 +40,7 @@ interface OwnProps {
   name?: string;
   /** Help text between the label and the options, read before choosing. Linked to the group and to each option. */
   description?: ReactNode;
-  /** The message shown under the options when `invalid` is true, with an icon. Linked to the group and to each option. */
+  /** The message shown between the description and the options when `invalid` is true, with an icon. Linked to the group and to each option. */
   error?: ReactNode;
   /**
    * Marks every option as failing validation. Pair it with `error` so the problem is in words, not just color.
@@ -49,7 +50,7 @@ interface OwnProps {
   invalid?: boolean;
   /** Blocks all interaction with every option and removes them from the tab order. A disabled group isn't submitted. */
   disabled?: boolean;
-  /** Keeps every option focusable, readable, and submitted, but blocks changes. */
+  /** Keeps every option focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the group's label. */
   readOnly?: boolean;
   /** Applied to the outer wrapper, so it's the place for layout classes such as margin. */
   className?: string;
@@ -88,18 +89,23 @@ export function CheckboxGroup({
   warnIfUnnamed("CheckboxGroup", label, rest, "Give it a label or an aria-label.");
 
   return (
-    <Field.Root className={cx("checkbox-group", className)} name={name} disabled={disabled} invalid={invalid}>
-      <Fieldset.Root className="checkbox-group__group" render={<BaseCheckboxGroup {...rest} ref={ref} />}>
-        {label !== undefined && <Fieldset.Legend className="checkbox-group__label">{label}</Fieldset.Legend>}
-        {description && <Field.Description className="checkbox-group__description">{description}</Field.Description>}
-        <div className="checkbox-group__options">
-          <CheckboxGroupContext.Provider value={context}>{children}</CheckboxGroupContext.Provider>
-        </div>
+    <Field.Root className={cx("choice-group", "checkbox-group", className)} name={name} disabled={disabled} invalid={invalid}>
+      <Fieldset.Root className="choice-group__group checkbox-group__group" render={<BaseCheckboxGroup {...rest} ref={ref} />}>
+        {label !== undefined && (
+          <Fieldset.Legend className="field-label checkbox-group__label">
+            {label}
+            {readOnly && !disabled && <ReadOnlyNote />}
+          </Fieldset.Legend>
+        )}
+        {description && <Field.Description className="field-description checkbox-group__description">{description}</Field.Description>}
         {error && (
           <FieldError className="checkbox-group__error" match={invalid}>
             {error}
           </FieldError>
         )}
+        <div className="choice-group__options checkbox-group__options">
+          <CheckboxGroupContext.Provider value={context}>{children}</CheckboxGroupContext.Provider>
+        </div>
       </Fieldset.Root>
     </Field.Root>
   );

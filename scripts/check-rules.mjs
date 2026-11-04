@@ -50,9 +50,14 @@ if (existsSync(twTheme)) for (const match of read(twTheme).matchAll(/(--[\w-]+)\
 const tokens = JSON.parse(read(join(root, "tokens/tokens.json")));
 const primitives = tokens.color.tokens.filter((token) => /^Primitive\./.test(token.usage)).map((token) => token.name);
 // Brand colors belong to the layout around components, never to a component (docs/brand/color.md)
-const BRAND_TOKENS = ["brand", "on-brand", "surface-tint"];
+const BRAND_TOKENS = ["brand", "on-brand", "surface-tint", "link", "highlight", "on-highlight"];
 
 const cssFiles = [...walk(join(root, "src/components")), ...walk(join(root, "src/internal"))].filter((file) => file.endsWith(".css"));
+// Custom properties a shared stylesheet in src/internal defines (such as --text-field-edge) are valid in every
+// component that uses its classes
+for (const file of cssFiles.filter((file) => file.includes("/src/internal/"))) {
+  for (const match of stripComments(read(file)).matchAll(/(--[\w-]+)\s*:/g)) definedProps.add(match[1]);
+}
 for (const file of cssFiles) {
   const raw = read(file);
   const css = stripComments(raw);

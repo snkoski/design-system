@@ -69,6 +69,20 @@
     background: var(--surface-hover);
   }
 
+  /* Danger tone, on secondary and ghost (the props type allows nothing else): the words, icon, and a secondary
+     button's edge turn danger, and hovering fills it with danger-soft, so it's clear what's about to happen. There's no
+     red fill: the label still says what will be lost. Hot dog's ink edge gives way to the danger edge. */
+  .button[data-tone="danger"] {
+    color: var(--danger);
+  }
+  .button[data-tone="danger"][data-variant="secondary"],
+  [data-theme="hotdog"] .button[data-tone="danger"][data-variant="secondary"] {
+    border-color: var(--danger);
+  }
+  .button[data-tone="danger"]:hover:not([data-disabled]) {
+    background: var(--danger-soft);
+  }
+
   /* Shapes */
   .button[data-shape="pill"] {
     border-radius: var(--radius-full);

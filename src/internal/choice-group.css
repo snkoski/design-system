@@ -1,0 +1,26 @@
+/* What CheckboxGroup, RadioGroup, and SegmentedControl share: the wrapper, the group, and the stack of options. The
+   label and description are field.css. Each part carries a shared class next to its own
+   (`choice-group__group radio-group__group`), and each component's own CSS keeps only what's different. */
+@layer components {
+  /* align-content: start keeps the group at its own height when a grid or flex layout stretches it */
+  .choice-group {
+    display: grid;
+    align-content: start;
+    font-family: var(--font-sans);
+    color: var(--ink);
+  }
+
+  .choice-group__group {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    row-gap: var(--space-1);
+    min-width: 0;
+  }
+
+  /* Each option's row is already choice-row tall, so they stack with no gap */
+  .choice-group__options {
+    display: grid;
+    justify-items: start;
+  }
+}

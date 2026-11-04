@@ -38,7 +38,7 @@ Pick a variant by how much attention the action deserves, not by how it looks. M
 ## Button or link
 
 - **A button does something:** sends, saves, opens a dialog, or changes what's on screen. Use `Button`.
-- **A link goes somewhere:** another page, or a file to download. Use `ButtonLink` when a link needs to look like a button. It's still an `<a>`, so it opens in a new tab, can be copied, and is announced as a link.
+- **A link goes somewhere:** another page, or a file to download. Use `ButtonLink` when a link needs to look like a button. It's still an `<a>`, so it opens in a new tab, can be copied, and is announced as a link. In an app with a router, wrap it once so it navigates without reloading the page: `const RouterButtonLink = createLink(ButtonLink)` with TanStack Router.
 - Never use a button to navigate or a link to submit.
 
 ## Labels and icons
@@ -55,10 +55,11 @@ Pick a variant by how much attention the action deserves, not by how it looks. M
 
 ## Destructive actions
 
-There is no danger style yet (see `docs/revisit.md`). Until there is:
+A destructive action (one that deletes, removes, or loses something) is a `secondary` button with `tone="danger"`: red words, icon, and edge, filling pale red on hover. In a toolbar, a table row, or a menu, use `ghost` with `tone="danger"`.
 
-- A destructive action is a `secondary` button whose label names what will be lost: "Delete project."
-- Unless it can be undone, it opens a confirmation dialog that says what will happen. The dialog's final button is `primary`, with the same label, and "Cancel" is `secondary`.
+- **The label names what will be lost:** "Delete project," not "Delete." The red is never the only sign.
+- **Not on `primary`, not icon-only, and never on "Cancel".** The props type won't take it on a primary or icon-only button. A primary button keeps its neutral fill: the danger style has no red fill.
+- Unless it can be undone, it opens a confirmation dialog that says what will happen. The dialog's final button repeats the label, also `secondary` with `tone="danger"`, and "Cancel" is `secondary`.
 - Prefer undo over confirmation when you can offer it: "Project deleted," with an "Undo" button in the toast.
 
-When a danger style is added, it's planned as a `tone="danger"` prop on `primary`, `secondary`, and `ghost`, following Carbon and Uber's Base. It will never go on the "Cancel" button, never on an icon-only button, and never be the only sign that something is destructive: the label always says so too.
+A filled red danger button, on `primary`, may come later if a page needs one; it would need `danger-hover` and `on-danger` tokens, and care in hot dog mode, whose brand is ketchup red.

@@ -16,8 +16,8 @@ function problemWith(email: string) {
 
 /**
  * An email field in a real form that checks itself the way docs/brand/forms.md says: when the form is submitted,
- * then again each time you leave the field. Put it inside <Inspect> to watch `aria-invalid` and `aria-describedby`
- * change.
+ * then, after a failed submit, again each time it changes. Put it inside <Inspect> to watch `aria-invalid` and
+ * `aria-describedby` change.
  */
 export function EmailForm() {
   const field = useRef<HTMLInputElement>(null);
@@ -52,7 +52,7 @@ export function EmailForm() {
         description="We only use it to reply to you."
         invalid={error !== undefined}
         error={error}
-        onBlur={(event) => {
+        onChange={(event) => {
           if (checked) setError(problemWith(event.currentTarget.value));
         }}
       />

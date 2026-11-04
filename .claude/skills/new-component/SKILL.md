@@ -80,7 +80,7 @@ Then ask for approval or changes. Continue only after the user approves. If they
 ## Phase 4: Implement
 
 1. Add any new token to `tokens/tokens.json` with a usage note, then `pnpm tokens`. Never edit generated CSS.
-2. Write `<Name>.tsx` (JSDoc on the component and every prop) and `<name>.css` (in `@layer components`).
+2. Write `<Name>.tsx` (JSDoc on the component and every prop) and `<name>.css` (in `@layer components`). A form control puts the shared classes from `src/internal/` (`field.css`, `text-field.css`, `choice.css`, `choice-group.css`) on its parts next to its own, and `<name>.css` holds only what's different; see "Shared CSS" under Form controls in `CLAUDE.md`. If the new control needs a shared rule to change, change it in the shared file and check every control that uses it.
 3. Add `index.ts`, export from `src/index.ts`, and import the CSS in `src/styles/index.css`.
 4. Add every new color pair to `tokens/contrast.json`.
 5. Make the tests pass by fixing the component. **Never delete, skip, weaken, or comment out a test.** If a test looks wrong, work out whether the component or the test is at fault. A test with a real bug (such as a focus assumption broken by an earlier click) may be fixed in a way that checks the same behavior at least as strictly; say so in the final report. If you think the expected behavior itself is wrong, stop and ask the user. The test-removal hook will flag removed tests or assertions.

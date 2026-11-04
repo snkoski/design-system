@@ -52,6 +52,15 @@ describe("Switch", () => {
       expect(container.querySelector("label")).toBeNull();
     });
 
+    it("puts the shared choice classes next to its own, so choice.css and field.css draw what Checkbox, Radio, and Switch share", () => {
+      const { container } = render(<Switch description="Sent by email.">Alerts</Switch>);
+      expect(container.firstElementChild).toHaveClass("choice", "switch");
+      expect(screen.getByText("Alerts")).toHaveClass("choice__label", "switch__label");
+      expect(screen.getByText("Alerts").closest("label")).toHaveClass("choice__row", "switch__row");
+      expect(getSwitch()).toHaveClass("choice__control", "switch__track");
+      expect(screen.getByText("Sent by email.")).toHaveClass("field-description", "switch__description");
+    });
+
     it("applies className to the outer wrapper, next to its own class", () => {
       const { container } = render(<Switch className="mt-4">Alerts</Switch>);
       expect(container.firstElementChild).toHaveClass("switch", "mt-4");
@@ -236,6 +245,25 @@ describe("Switch", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<Switch readOnly>Alerts</Switch>);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest("label")).toHaveTextContent("Alerts");
+      expect(getSwitch()).toHaveAccessibleName("Alerts");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<Switch>Alerts</Switch>);
+      expect(getSwitch()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<Switch readOnly disabled>Alerts</Switch>);
+      expect(getSwitch()).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("blocks changes from the switch and from the label", async () => {
       const onCheckedChange = vi.fn();
       const user = userEvent.setup();
@@ -306,7 +334,18 @@ describe("Switch", () => {
     it("shows the error, linked to the switch, when invalid", () => {
       render(<Switch invalid error="Turn this on to continue.">Alerts</Switch>);
       expect(screen.getByText("Turn this on to continue.")).toBeInTheDocument();
-      expect(getSwitch()).toHaveAccessibleDescription("Turn this on to continue.");
+      expect(getSwitch()).toHaveAccessibleDescription("Error: Turn this on to continue.");
+    });
+
+    it("puts the error above the row, before the switch and its label", () => {
+      render(
+        <Switch invalid description="About once a month." error="Turn this on to continue.">
+          Alerts
+        </Switch>,
+      );
+      const error = screen.getByText("Turn this on to continue.");
+      expect(error.compareDocumentPosition(getSwitch())).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(error.compareDocumentPosition(screen.getByText("Alerts"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -328,7 +367,7 @@ describe("Switch", () => {
           Alerts
         </Switch>,
       );
-      expect(getSwitch()).toHaveAccessibleDescription("About once a month. Turn this on to continue.");
+      expect(getSwitch()).toHaveAccessibleDescription("Error: Turn this on to continue. About once a month.");
     });
 
     it("shows the error again when invalid turns on later", () => {

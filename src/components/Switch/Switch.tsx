@@ -3,6 +3,7 @@ import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import type { ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 /** A switch needs a name a screen reader can announce: visible label text, or an `aria-label`. */
@@ -29,7 +30,7 @@ interface OwnProps {
   onCheckedChange?: (checked: boolean, eventDetails: BaseSwitch.Root.ChangeEventDetails) => void;
   /** Blocks all interaction and removes the switch from the tab order. */
   disabled?: boolean;
-  /** Keeps the switch focusable and readable, but blocks changes. */
+  /** Keeps the switch focusable and readable, but blocks changes. Shows "Read only" beside the label. */
   readOnly?: boolean;
   /** Tells assistive technology and the form that this switch must be on. Say so in the label too, in words. */
   required?: boolean;
@@ -51,7 +52,7 @@ interface OwnProps {
   uncheckedValue?: string;
   /** Secondary text under the label. Linked to the switch so screen readers read it too. */
   description?: ReactNode;
-  /** The message shown when `invalid` is true, with an icon. Linked to the switch. */
+  /** The message shown above the row when `invalid` is true, with an icon. Linked to the switch. */
   error?: ReactNode;
   /** Applied to the outer wrapper, so it's the place for layout classes such as margin. */
   className?: string;
@@ -83,27 +84,30 @@ export function Switch({
 }: SwitchProps) {
   warnIfUnnamed("Switch", children, rest, "Give it label text (children) or an aria-label.");
   const control = (
-    <BaseSwitch.Root {...rest} className="switch__track" disabled={disabled} name={name}>
+    <BaseSwitch.Root {...rest} className="choice__control switch__track" disabled={disabled} name={name}>
       <BaseSwitch.Thumb className="switch__thumb" />
     </BaseSwitch.Root>
   );
 
   return (
-    <Field.Root className={cx("switch", className)} name={name} disabled={disabled} invalid={invalid}>
-      {children === undefined ? (
-        control
-      ) : (
-        <Field.Label className="switch__row">
-          {control}
-          <span className="switch__label">{children}</span>
-        </Field.Label>
-      )}
-      {description && <Field.Description className="switch__description">{description}</Field.Description>}
+    <Field.Root className={cx("choice", "switch", className)} name={name} disabled={disabled} invalid={invalid}>
       {error && (
         <FieldError className="switch__error" match={invalid}>
           {error}
         </FieldError>
       )}
+      {children === undefined ? (
+        control
+      ) : (
+        <Field.Label className="choice__row switch__row">
+          {control}
+          <span className="choice__label switch__label">
+            {children}
+            {rest.readOnly && !disabled && <ReadOnlyNote />}
+          </span>
+        </Field.Label>
+      )}
+      {description && <Field.Description className="field-description switch__description">{description}</Field.Description>}
     </Field.Root>
   );
 }

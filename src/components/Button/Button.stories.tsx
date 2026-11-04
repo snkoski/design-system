@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ArrowRight, Download, Heart, Plus } from "lucide-react";
+import { ArrowRight, Download, Heart, Plus, Trash2 } from "lucide-react";
 import { expect, fn } from "storybook/test";
 import { Button } from "./Button";
 
@@ -37,6 +37,7 @@ const meta = {
     variant: { control: "inline-radio", options: ["primary", "secondary", "ghost"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     shape: { control: "inline-radio", options: ["rectangle", "pill"] },
+    tone: { control: "inline-radio", options: ["neutral", "danger"] },
     iconStart: { control: false },
     iconEnd: { control: false },
   },
@@ -52,7 +53,8 @@ export const Playground: Story = {};
 export const Variants: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-4">
-      <Button {...args} variant="primary">Primary</Button>
+      {/* A primary button can't be danger, so it ignores a tone chosen in the controls */}
+      <Button {...args} tone="neutral" variant="primary">Primary</Button>
       <Button {...args} variant="secondary">Secondary</Button>
       <Button {...args} variant="ghost">Ghost</Button>
     </div>
@@ -69,8 +71,9 @@ export const Shapes: Story = {
     <div className="flex flex-wrap items-center gap-4">
       <Button {...args} shape="rectangle">Rectangle</Button>
       <Button {...args} shape="pill">Pill</Button>
-      <Button {...args} shape="rectangle" iconOnly aria-label="Add to favorites"><Heart /></Button>
-      <Button {...args} shape="pill" iconOnly aria-label="Add to favorites"><Heart /></Button>
+      {/* An icon-only button can't be danger */}
+      <Button {...args} tone="neutral" shape="rectangle" iconOnly aria-label="Add to favorites"><Heart /></Button>
+      <Button {...args} tone="neutral" shape="pill" iconOnly aria-label="Add to favorites"><Heart /></Button>
     </div>
   ),
   play: async ({ canvas, canvasElement }) => {
@@ -165,9 +168,9 @@ export const Narrow: Story = {
 export const IconOnly: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-4">
-      <Button {...args} iconOnly aria-label="Add to favorites"><Heart /></Button>
-      <Button {...args} iconOnly variant="secondary" aria-label="Add to favorites"><Heart /></Button>
-      <Button {...args} iconOnly variant="ghost" size="sm" aria-label="Add to favorites"><Heart /></Button>
+      <Button {...args} tone="neutral" iconOnly aria-label="Add to favorites"><Heart /></Button>
+      <Button {...args} tone="neutral" iconOnly variant="secondary" aria-label="Add to favorites"><Heart /></Button>
+      <Button {...args} tone="neutral" iconOnly variant="ghost" size="sm" aria-label="Add to favorites"><Heart /></Button>
     </div>
   ),
   play: async ({ canvas, canvasElement }) => {
@@ -194,6 +197,36 @@ export const IconOnly: Story = {
   },
 };
 
+/**
+ * For an action that destroys or loses something. `tone="danger"` turns a secondary or ghost button's words, icon, and
+ * edge red, and hovering fills it pale red. There's no red fill, and the label always names what will be lost. Only on
+ * `secondary` and `ghost` buttons with label text: the props type won't take it on a primary or icon-only button.
+ * See **Choosing a button**.
+ */
+export const Danger: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-4">
+      <Button {...args} iconOnly={false} variant="secondary" tone="danger" iconStart={<Trash2 />}>Delete project</Button>
+      <Button {...args} iconOnly={false} variant="ghost" tone="danger">Remove from list</Button>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--danger)";
+    canvasElement.append(probe);
+    const danger = getComputedStyle(probe).color;
+    probe.remove();
+    const secondary = canvas.getByRole("button", { name: "Delete project" });
+    const ghost = canvas.getByRole("button", { name: "Remove from list" });
+    await expect(secondary).toHaveAttribute("data-tone", "danger");
+    await expect(getComputedStyle(secondary).color).toBe(danger);
+    await expect(getComputedStyle(secondary).borderTopColor).toBe(danger);
+    await expect(getComputedStyle(ghost).color).toBe(danger);
+    // No red fill: the background stays the variant's own
+    await expect(getComputedStyle(secondary).backgroundColor).not.toBe(danger);
+  },
+};
+
 /** Loading blocks clicks but stays focusable, so keyboard users don't lose their place. */
 export const Loading: Story = {
   args: { loading: true, children: "Sending message" },
@@ -202,7 +235,7 @@ export const Loading: Story = {
 export const Disabled: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-4">
-      <Button {...args} disabled variant="primary">Primary</Button>
+      <Button {...args} tone="neutral" disabled variant="primary">Primary</Button>
       <Button {...args} disabled variant="secondary">Secondary</Button>
       <Button {...args} disabled variant="ghost">Ghost</Button>
     </div>
@@ -228,6 +261,19 @@ function Matrix() {
           <Button variant={variant} shape="pill" iconOnly aria-label="Add to favorites"><Heart /></Button>
           <Button variant={variant} loading>Loading</Button>
           <Button variant={variant} disabled>Disabled</Button>
+        </div>
+      ))}
+      {(["secondary", "ghost"] as const).map((variant) => (
+        <div key={`danger-${variant}`} className="flex flex-wrap items-center gap-3">
+          {sizes.map((size) => (
+            <Button key={size} variant={variant} tone="danger" size={size}>
+              {variant} danger {size}
+            </Button>
+          ))}
+          <Button variant={variant} tone="danger" iconStart={<Trash2 />}>Delete</Button>
+          <Button variant={variant} tone="danger" shape="pill">Pill</Button>
+          <Button variant={variant} tone="danger" loading>Deleting</Button>
+          <Button variant={variant} tone="danger" disabled>Disabled</Button>
         </div>
       ))}
     </div>

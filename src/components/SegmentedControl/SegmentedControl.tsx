@@ -4,6 +4,7 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import type { ReactNode, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 
 export type SegmentedControlSize = "md" | "lg";
@@ -42,7 +43,7 @@ interface OwnProps {
   required?: boolean;
   /** Help text between the label and the options, read before choosing. Linked to the control and to each option. */
   description?: ReactNode;
-  /** The message shown under the options when `invalid` is true, with an icon. Linked to the control and to each option. */
+  /** The message shown between the description and the options when `invalid` is true, with an icon. Linked to the control and to each option. */
   error?: ReactNode;
   /** Marks the control and every option as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;
@@ -51,7 +52,7 @@ interface OwnProps {
    * reached with Tab, and is announced as disabled.
    */
   disabled?: boolean;
-  /** Keeps the control focusable, readable, and submitted, but blocks changes. The arrow keys move focus without choosing. */
+  /** Keeps the control focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label. The arrow keys move focus without choosing. */
   readOnly?: boolean;
   /** The id of a `<form>` to submit with, when the control sits outside that form. */
   form?: string;
@@ -95,8 +96,8 @@ export function SegmentedControl({
   warnIfUnnamed("SegmentedControl", label, rest, "Give it a label or an aria-label.");
 
   return (
-    <Field.Root className={cx("segmented-control", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
-      <Fieldset.Root className="segmented-control__group" render={
+    <Field.Root className={cx("choice-group", "segmented-control", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
+      <Fieldset.Root className="choice-group__group segmented-control__group" render={
           // null is how a controlled control says nothing is chosen; a person's choice is never null
           <BaseRadioGroup<string | null>
             {...rest}
@@ -104,14 +105,19 @@ export function SegmentedControl({
             onValueChange={(value, eventDetails) => value !== null && onValueChange?.(value, eventDetails)}
           />
         }>
-        {label !== undefined && <Fieldset.Legend className="segmented-control__label">{label}</Fieldset.Legend>}
-        {description && <Field.Description className="segmented-control__description">{description}</Field.Description>}
-        <div className="segmented-control__track">{children}</div>
+        {label !== undefined && (
+          <Fieldset.Legend className="field-label segmented-control__label">
+            {label}
+            {rest.readOnly && !disabled && <ReadOnlyNote />}
+          </Fieldset.Legend>
+        )}
+        {description && <Field.Description className="field-description segmented-control__description">{description}</Field.Description>}
         {error && (
           <FieldError className="segmented-control__error" match={invalid}>
             {error}
           </FieldError>
         )}
+        <div className="segmented-control__track">{children}</div>
       </Fieldset.Root>
     </Field.Root>
   );

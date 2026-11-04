@@ -135,7 +135,8 @@ export const Default: Story = {
       await expect(getComputedStyle(host!, "::before").animationName).toBe("sheen");
       // Halfway through, the band is visible
       await expect(opacityHalfway(host!)).toBeGreaterThan(0);
-      swept.add(host!.classList[0]!);
+      // The part's own class comes last, after any shared one (choice__control checkbox__box)
+      swept.add([...host!.classList].at(-1)!);
     }
     // Every kind of focusable part was reached, and swept
     await expect([...swept].sort()).toEqual(["button", "checkbox__box", "input__box", "radio__circle", "switch__track"]);

@@ -2,11 +2,36 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import type { Ref } from "react";
 import { warnIfUnnamed } from "../../internal/warn";
 import { Content, cx } from "./shared";
-import type { IconOnly, SharedProps } from "./shared";
+import type { ButtonVariant, IconOnly, SharedProps } from "./shared";
+
+/**
+ * Danger is only for a secondary or ghost button with a visible label: a primary button keeps its neutral fill, and an
+ * icon-only button has no words to say what will be lost.
+ */
+type Toned =
+  | {
+      /**
+       * `danger` marks an action that destroys or loses something, such as "Delete project": red words, icon, and edge,
+       * with no fill. Only on `secondary` and `ghost` buttons with label text. Default: `neutral`.
+       */
+      tone?: "neutral";
+    }
+  | {
+      /**
+       * `danger` marks an action that destroys or loses something, such as "Delete project": red words, icon, and edge,
+       * with no fill. Only on `secondary` and `ghost` buttons with label text. Default: `neutral`.
+       */
+      tone: "danger";
+      /** Danger works on `secondary` and `ghost` only. */
+      variant: Exclude<ButtonVariant, "primary">;
+      /** Danger needs label text, so an icon-only button can't be danger. */
+      iconOnly?: false;
+    };
 
 export type ButtonProps = SharedProps &
   IconOnly &
-  Omit<BaseButton.Props, "className" | "render" | "nativeButton" | keyof SharedProps | "aria-label"> & {
+  Toned &
+  Omit<BaseButton.Props, "className" | "render" | "nativeButton" | keyof SharedProps | "aria-label" | "tone"> & {
     /** Shows a spinner and blocks clicks, but keeps the button focusable so keyboard users don't lose their place. */
     loading?: boolean;
     ref?: Ref<HTMLButtonElement>;
@@ -20,6 +45,7 @@ export function Button({
   variant = "primary",
   size = "md",
   shape = "rectangle",
+  tone = "neutral",
   iconStart,
   iconEnd,
   iconOnly = false,
@@ -43,6 +69,7 @@ export function Button({
       data-variant={variant}
       data-size={size}
       data-shape={shape}
+      data-tone={tone}
       data-icon-only={iconOnly || undefined}
       data-loading={loading || undefined}
       aria-busy={loading || undefined}

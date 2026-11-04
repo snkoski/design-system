@@ -10,8 +10,8 @@ import "./text-area.css";
 /* Live demos for TextArea's "How it works" page. They render the real TextArea, so what they show is what ships. */
 
 /**
- * A message field in a real form that checks itself when the form is submitted, then each time you leave the field,
- * and shows what the form sent, line breaks included. Put it inside <Inspect>.
+ * A message field in a real form that checks itself when the form is submitted, then, after a failed submit, each
+ * time it changes, and shows what the form sent, line breaks included. Put it inside <Inspect>.
  */
 export function MessageForm() {
   const field = useRef<HTMLTextAreaElement>(null);
@@ -47,7 +47,7 @@ export function MessageForm() {
         description="Tell us about your project. We reply within two days."
         invalid={error !== undefined}
         error={error}
-        onBlur={(event) => {
+        onChange={(event) => {
           if (checked) setError(problemWith(event.currentTarget.value));
         }}
       />

@@ -55,8 +55,8 @@ export function Radio({ children, description, disabled, className, ...rest }: R
   warnIfUnnamed("Radio", children, rest, "Give it label text (children) or an aria-label.");
 
   const circle = (
-    <BaseRadio.Root {...rest} className="radio__circle">
-      <BaseRadio.Indicator className="radio__indicator">
+    <BaseRadio.Root {...rest} className="choice__control radio__circle">
+      <BaseRadio.Indicator className="choice__indicator radio__indicator">
         <svg className="radio__dot" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <circle cx="8" cy="8" r="4" fill="currentColor" />
         </svg>
@@ -65,16 +65,16 @@ export function Radio({ children, description, disabled, className, ...rest }: R
   );
 
   return (
-    <Field.Item className={cx("radio", className)} disabled={disabled}>
+    <Field.Item className={cx("choice", "radio", className)} disabled={disabled}>
       {children === undefined ? (
         circle
       ) : (
-        <Field.Label className="radio__row">
+        <Field.Label className="choice__row radio__row">
           {circle}
-          <span className="radio__label">{children}</span>
+          <span className="choice__label radio__label">{children}</span>
         </Field.Label>
       )}
-      {description && <Field.Description className="radio__description">{description}</Field.Description>}
+      {description && <Field.Description className="field-description radio__description">{description}</Field.Description>}
     </Field.Item>
   );
 }

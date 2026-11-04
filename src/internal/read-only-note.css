@@ -1,0 +1,31 @@
+/* The "Read only" note every form control shows beside its label when it's read-only: a lock and words in the muted
+   ink descriptions use. It sits inline after the label's text and wraps onto the next line as a whole when the label
+   is long. */
+@layer components {
+  .read-only-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-inline-start: var(--space-2);
+    font-size: var(--text-small);
+    font-weight: 400;
+    line-height: var(--icon-md);
+    white-space: nowrap;
+    vertical-align: top;
+    color: var(--ink-muted);
+  }
+
+  .read-only-note__icon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    stroke-width: var(--icon-stroke);
+  }
+
+  /* Windows Contrast themes: the words carry the meaning, in the system text color */
+  @media (forced-colors: active) {
+    .read-only-note {
+      color: CanvasText;
+    }
+  }
+}

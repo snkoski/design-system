@@ -281,9 +281,9 @@
     cursor: not-allowed;
   }
 
-  /* Read-only: the toolbar is gone, which is the cue. The text isn't dimmed as TextArea's is: links and inline code
-     would fall below 4.5:1 at 75%. See "Read-only fields" in docs/revisit.md. */
-  /* A placeholder shows what to type, which doesn't apply when you can't type, and at 75% it would fall below 4.5:1 */
+  /* Read-only: a "Read only" note beside the label is the cue (ReadOnlyNote), as in every form control, and the
+     toolbar is gone, since none of it could be used. Nothing dims.
+     A placeholder shows what to type, which doesn't apply when you can't type, and could be mistaken for a value. */
   .rich-text__editor[aria-readonly="true"] p.is-editor-empty:first-child::before {
     content: none;
   }

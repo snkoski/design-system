@@ -14,6 +14,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { warnIfUnnamed } from "../../internal/warn";
 import { markSelection, normalizeHref, richTextExtensions, toMarkdown, unmarkSelection } from "./markdown";
 import "./rich-text.css";
@@ -73,13 +74,13 @@ interface OwnProps {
   onValueChange?: (markdown: string) => void;
   /** Help text between the label and the field, read before typing. Linked to the field for screen readers. */
   description?: ReactNode;
-  /** The message shown under the field when `invalid` is true, with an icon. Linked to the field. */
+  /** The message shown between the description and the field when `invalid` is true, with an icon. Linked to the field. */
   error?: ReactNode;
   /** Marks the field as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;
   /** Blocks typing and formatting, and removes the field and its toolbar from the tab order. Not submitted. */
   disabled?: boolean;
-  /** Keeps the field focusable, readable, and submitted, but blocks changes and hides the toolbar. Its links can be followed. */
+  /** Keeps the field focusable, readable, and submitted, but blocks changes and hides the toolbar. Shows "Read only" beside the label. Its links can be followed. */
   readOnly?: boolean;
   /**
    * Tells assistive technology that the field must be filled in. The browser doesn't check it, so check the value
@@ -597,9 +598,15 @@ export function RichText({
           }}
         >
           {label}
+          {readOnly && !disabled && <ReadOnlyNote />}
         </Field.Label>
       )}
       {description && <Field.Description className="rich-text__description">{description}</Field.Description>}
+      {error && (
+        <FieldError className="rich-text__error" match={invalid}>
+          {error}
+        </FieldError>
+      )}
       <div className="rich-text__box">
         {/* Read-only has no toolbar: none of it could be used, and its absence shows the field can't be changed */}
         {!readOnly && (
@@ -678,11 +685,6 @@ export function RichText({
           )}
         />
       </div>
-      {error && (
-        <FieldError className="rich-text__error" match={invalid}>
-          {error}
-        </FieldError>
-      )}
       {name !== undefined && <input type="hidden" name={name} form={form} value={markdown} disabled={disabled} />}
     </Field.Root>
   );

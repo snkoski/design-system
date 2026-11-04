@@ -5,6 +5,7 @@ import type { ReactNode, Ref } from "react";
 import { CheckboxGroupContext } from "../CheckboxGroup/context";
 import { cx } from "../../internal/cx";
 import { FieldError } from "../../internal/FieldError";
+import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
 import { hasContent, warn, warnIfUnnamed } from "../../internal/warn";
 
 /** A checkbox needs a name a screen reader can announce: visible label text, or an `aria-label`. */
@@ -42,7 +43,7 @@ interface OwnProps {
   parent?: boolean;
   /** Blocks all interaction and removes the checkbox from the tab order. */
   disabled?: boolean;
-  /** Keeps the checkbox focusable and readable, but blocks changes. Inside a read-only CheckboxGroup, it's always read-only. */
+  /** Keeps the checkbox focusable and readable, but blocks changes. Shows "Read only" beside the label. Inside a read-only CheckboxGroup it is always read-only, and the group's label shows the note instead. */
   readOnly?: boolean;
   /**
    * Tells assistive technology and the form that this box must be ticked. Say so in the label too, in words.
@@ -76,7 +77,7 @@ interface OwnProps {
   uncheckedValue?: string;
   /** Secondary text under the label. Linked to the checkbox so screen readers read it too. */
   description?: ReactNode;
-  /** The message shown when `invalid` is true, with an icon. Linked to the checkbox. Ignored inside a CheckboxGroup: set `error` on the group. */
+  /** The message shown above the row when `invalid` is true, with an icon. Linked to the checkbox. Ignored inside a CheckboxGroup: set `error` on the group. */
   error?: ReactNode;
   /** Applied to the outer wrapper, so it's the place for layout classes such as margin. */
   className?: string;
@@ -160,7 +161,7 @@ export function Checkbox({
   const box = (
     <BaseCheckbox.Root
       {...(group ? groupable : rest)}
-      className="checkbox__box"
+      className="choice__control checkbox__box"
       disabled={disabled}
       name={group ? undefined : name}
       readOnly={readOnly || group?.readOnly}
@@ -168,7 +169,7 @@ export function Checkbox({
       indeterminate={indeterminate}
     >
       <BaseCheckbox.Indicator
-        className="checkbox__indicator"
+        className="choice__indicator checkbox__indicator"
         render={(props, state) => (
           <span {...props}>
             {/* The group decides when a parent box is mixed, so read it from Base UI's state */}
@@ -184,32 +185,36 @@ export function Checkbox({
       {children === undefined ? (
         box
       ) : (
-        <Field.Label className="checkbox__row">
+        <Field.Label className="choice__row checkbox__row">
           {box}
-          <span className="checkbox__label">{children}</span>
+          <span className="choice__label checkbox__label">
+            {children}
+            {/* In a read-only group, the group's legend has the note */}
+            {readOnly && !disabled && !group?.readOnly && <ReadOnlyNote />}
+          </span>
         </Field.Label>
       )}
-      {description && <Field.Description className="checkbox__description">{description}</Field.Description>}
+      {description && <Field.Description className="field-description checkbox__description">{description}</Field.Description>}
     </>
   );
 
   // In a group, each checkbox is an item of the group's field rather than a field of its own
   if (group) {
     return (
-      <Field.Item className={cx("checkbox", className)} disabled={disabled} data-parent={parent || undefined}>
+      <Field.Item className={cx("choice", "checkbox", className)} disabled={disabled} data-parent={parent || undefined}>
         {content}
       </Field.Item>
     );
   }
 
   return (
-    <Field.Root className={cx("checkbox", className)} name={name} disabled={disabled} invalid={invalid}>
-      {content}
+    <Field.Root className={cx("choice", "checkbox", className)} name={name} disabled={disabled} invalid={invalid}>
       {error && (
         <FieldError className="checkbox__error" match={invalid}>
           {error}
         </FieldError>
       )}
+      {content}
     </Field.Root>
   );
 }

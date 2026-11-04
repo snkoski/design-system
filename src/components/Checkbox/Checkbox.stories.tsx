@@ -60,6 +60,33 @@ export const Invalid: Story = {
   },
 };
 
+/**
+ * A link in the label, such as the terms to accept, is ink and underlined like every link inside a component,
+ * not the page's brand-colored link.
+ */
+export const LinkInLabel: Story = {
+  render: (args) => (
+    <Checkbox {...args}>
+      I accept the <a href="#terms">terms and conditions</a>
+    </Checkbox>
+  ),
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole("link", { name: "terms and conditions" });
+    const label = link.closest<HTMLElement>(".checkbox__label")!;
+    const ink = getComputedStyle(label).color;
+    await expect(getComputedStyle(link).color).toBe(ink);
+    await expect(getComputedStyle(link).textDecorationLine).toBe("underline");
+    // The link's color is set, not inherited (Tailwind's reset makes links inherit): recoloring the label leaves it ink
+    label.style.color = "red";
+    try {
+      await expect(getComputedStyle(label).color).not.toBe(ink);
+      await expect(getComputedStyle(link).color).toBe(ink);
+    } finally {
+      label.style.color = "";
+    }
+  },
+};
+
 /** A disabled checkbox can't be focused or changed. It keeps its ticked state. */
 export const Disabled: Story = {
   render: (args) => (

@@ -41,6 +41,16 @@ describe("Checkbox", () => {
       expect(container.querySelector("label")).toBeNull();
     });
 
+    it("puts the shared choice classes next to its own, so choice.css and field.css draw what Checkbox, Radio, and Switch share", () => {
+      const { container } = render(<Checkbox description="You can change this later." defaultChecked>Accept terms</Checkbox>);
+      expect(container.firstElementChild).toHaveClass("choice", "checkbox");
+      expect(screen.getByText("Accept terms")).toHaveClass("choice__label", "checkbox__label");
+      expect(screen.getByText("Accept terms").closest("label")).toHaveClass("choice__row", "checkbox__row");
+      expect(getBox()).toHaveClass("choice__control", "checkbox__box");
+      expect(getBox().firstElementChild).toHaveClass("choice__indicator", "checkbox__indicator");
+      expect(screen.getByText("You can change this later.")).toHaveClass("field-description", "checkbox__description");
+    });
+
     it("applies className to the outer wrapper, next to its own class", () => {
       const { container } = render(<Checkbox className="mt-4">Accept terms</Checkbox>);
       expect(container.firstElementChild).toHaveClass("checkbox", "mt-4");
@@ -265,6 +275,25 @@ describe("Checkbox", () => {
   });
 
   describe("read only", () => {
+    it("says \"Read only\" beside the label, hidden from screen readers and left out of the name", () => {
+      render(<Checkbox readOnly>Accept terms</Checkbox>);
+      const note = screen.getByText("Read only");
+      expect(note).toHaveClass("read-only-note");
+      expect(note).toHaveAttribute("aria-hidden", "true");
+      expect(note.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      expect(note.closest("label")).toHaveTextContent("Accept terms");
+      expect(getBox()).toHaveAccessibleName("Accept terms");
+    });
+
+    it("has no note when it isn't read-only, or when it's disabled as well", () => {
+      const { rerender } = render(<Checkbox>Accept terms</Checkbox>);
+      expect(getBox()).toBeInTheDocument();
+      expect(screen.queryByText("Read only")).toBeNull();
+      rerender(<Checkbox readOnly disabled>Accept terms</Checkbox>);
+      expect(getBox()).toHaveAttribute("aria-readonly", "true");
+      expect(screen.queryByText("Read only")).toBeNull();
+    });
+
     it("blocks changes from the box and from the label", async () => {
       const onCheckedChange = vi.fn();
       const user = userEvent.setup();
@@ -331,7 +360,18 @@ describe("Checkbox", () => {
     it("shows the error, linked to the checkbox, when invalid", () => {
       render(<Checkbox invalid error="You must accept the terms.">Accept terms</Checkbox>);
       expect(screen.getByText("You must accept the terms.")).toBeInTheDocument();
-      expect(getBox()).toHaveAccessibleDescription("You must accept the terms.");
+      expect(getBox()).toHaveAccessibleDescription("Error: You must accept the terms.");
+    });
+
+    it("puts the error above the row, before the box and its label", () => {
+      render(
+        <Checkbox invalid description="We will email you a copy." error="You must accept the terms.">
+          Accept terms
+        </Checkbox>,
+      );
+      const error = screen.getByText("You must accept the terms.");
+      expect(error.compareDocumentPosition(getBox())).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(error.compareDocumentPosition(screen.getByText("Accept terms"))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("gives the error an icon that is hidden from screen readers", () => {
@@ -354,7 +394,7 @@ describe("Checkbox", () => {
           Accept terms
         </Checkbox>,
       );
-      expect(getBox()).toHaveAccessibleDescription("We will email you a copy. You must accept the terms.");
+      expect(getBox()).toHaveAccessibleDescription("Error: You must accept the terms. We will email you a copy.");
     });
 
     it("shows the error again when invalid turns on later", () => {
@@ -655,6 +695,29 @@ describe("Checkbox", () => {
       await user.click(screen.getByRole("checkbox", { name: "Writing" }));
       expect(screen.getByRole("checkbox", { name: "Design" })).not.toBeChecked();
       expect(screen.getByRole("checkbox", { name: "Writing" })).toBeChecked();
+    });
+
+    it("leaves the \"Read only\" note to the group's label when the group is read-only", () => {
+      render(
+        <CheckboxGroup label="Services" readOnly>
+          <Checkbox value="design" readOnly>Design</Checkbox>
+          <Checkbox value="writing">Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getAllByText("Read only")).toHaveLength(1);
+      expect(screen.getByText("Read only").closest(".checkbox-group__label")).toHaveTextContent("Services");
+    });
+
+    it("shows its own \"Read only\" note when it's read-only in a group that isn't", () => {
+      render(
+        <CheckboxGroup label="Services">
+          <Checkbox value="design" readOnly>Design</Checkbox>
+          <Checkbox value="writing">Writing</Checkbox>
+        </CheckboxGroup>,
+      );
+      expect(screen.getAllByText("Read only")).toHaveLength(1);
+      expect(screen.getByText("Read only").closest(".checkbox__label")).toHaveTextContent("Design");
+      expect(screen.getByRole("checkbox", { name: "Design" })).toBeInTheDocument();
     });
 
     it("is read-only when the group is, even if it says readOnly={false}", () => {

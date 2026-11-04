@@ -1,0 +1,29 @@
+/* The label and description every form control shares, so they look the same everywhere. A part carries the shared
+   class next to its own (`field-label input__label`), and the component's own CSS only places it. The other shared
+   pieces: text-field.css, choice.css, choice-group.css, field-error.css, and read-only-note.css. */
+@layer components {
+  /* A text field's label, and a group's label (its legend). A choice control's label sits beside it: .choice__label. */
+  .field-label {
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: var(--leading-control);
+  }
+
+  .field-description {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--icon-md);
+    color: var(--ink-muted);
+  }
+
+  /* A link in a control's text, such as "I accept the terms" in a checkbox label: neutral like every component, so
+     ink and underlined rather than the page's brand-colored link. The underline is what marks it as a link.
+     base.css's offset still applies. Forced colors draws it in LinkText. */
+  .field-label a,
+  .field-description a,
+  .choice__label a,
+  .field-error a {
+    color: var(--ink);
+    text-decoration-line: underline;
+  }
+}

@@ -18,6 +18,7 @@ Two kinds of CSS, with a fixed boundary between them.
 - Inner padding belongs to the component, so a button is the same size everywhere it is used.
 - Tailwind is used only for spacing, sizing, and layout. Its color, font, and shadow utilities are not used; those come from component classes and tokens.
 - Layer order: `@layer theme, base, components, utilities;` Component CSS goes in `components`, so a utility in the markup can still override it for a one-off exception.
+- Form controls share what they have in common: one stylesheet for labels and descriptions, one for text fields, one for checkboxes, radios, and switches, and one for groups. Each part carries the shared class next to its own (`class="choice__control checkbox__box"`), and a component's own CSS holds only what's different about it, so a fix to the shared look reaches every control at once.
 
 ```html
 <section class="grid gap-6 md:grid-cols-3 mt-12">

@@ -30,9 +30,9 @@ These are requirements. A component that breaks one is not done. The baseline is
 ## Choice controls and fields
 
 - For a checkbox, radio, or switch, the whole label is the click target, and each row is `choice-row` tall. The checked state shows a mark (a tick, a dash, or a radio's dot) or a position (a switch's thumb) as well as a fill, and the box edge always meets 3:1 on its own, because the action fill does not.
-- Read-only controls look slightly lighter (the control at 75% opacity, the label unchanged), so people can tell they can't be changed before they try. Disabled controls are lighter still, at 50%. A segmented control's labels sit inside its options, so read-only dims only the options that aren't chosen: dimmed, the chosen option's label would fall below 4.5:1 on its fill.
+- A read-only control says so in words: "Read only" and a lock, in muted text beside its label, so people can tell it can't be changed before they try. Nothing dims, so the value, links, and a chosen option's label keep their full contrast. The note is hidden from screen readers, which already announce the control as read only. A group shows it once, beside the group's label. A control with no visible label has nowhere to show it. Disabled controls dim to 50% instead.
 - A radio group is one Tab stop, and the arrow keys move between its radios and select them. A segmented control works the same way, because it is a radio group drawn as connected buttons on a gray track; its chosen option is a rounded white (the card color in dark mode) highlight with a black (near-white in dark mode) border, set just inside the option. The border shows the choice, so the label and icons don't change and the control never changes size. A group of checkboxes is one Tab stop per box.
-- A group of checkboxes or radios has a label that names the question, and its help text and error belong to the whole group. The error is linked to every option, so it's announced on each. When the group is disabled or read-only, only the options dim: the group's label and help text stay at full strength, because the help text often says why the choices can't be changed.
+- A group of checkboxes or radios has a label that names the question, and its help text and error belong to the whole group. The error is linked to every option, so it's announced on each. When the group is disabled, only the options dim: the group's label and help text stay at full strength, because the help text often says why the choices can't be changed.
 - A group of checkboxes has no required state in ARIA. To ask for at least one choice, say "(required)" in the group's label, and show an error in words if nothing is ticked.
 - A text field's help text sits between its label and the field, so it's read before typing. A text field is never shorter than `control-md` (40px with a mouse, 44px on touch).
 
@@ -52,7 +52,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 ## Keyboard, pointer, and screen readers
 
 - Use real elements: `<button>` for actions, `<a href>` for navigation, `<label>` for every input. A link that looks like a button is still an `<a>`.
-- Build interactive components (dialog, menu, tabs, select, tooltip, popover) on Base UI through shadcn. Never hand-roll their keyboard or ARIA behavior. Base UI follows the WAI-ARIA Authoring Practices, which define the keys people expect:
+- Build interactive components (dialog, menu, tabs, select, tooltip, popover) on Base UI through shadcn. Never hand-roll their keyboard or ARIA behavior. A native `<input>`, `<textarea>`, or `<select>` in Base UI's `Field` counts too: the browser provides its keyboard and ARIA. Base UI follows the WAI-ARIA Authoring Practices, which define the keys people expect:
 
 | Pattern | Keys |
 | --- | --- |

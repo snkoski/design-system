@@ -22,6 +22,18 @@ describe("Button", () => {
       expect(button).toHaveAttribute("data-size", "md");
     });
 
+    it("defaults to the neutral tone", () => {
+      render(<Button>Save</Button>);
+      expect(screen.getByRole("button")).toHaveAttribute("data-tone", "neutral");
+    });
+
+    it.each(["secondary", "ghost"] as const)("maps tone=danger on a %s button to data-tone", (variant) => {
+      render(<Button variant={variant} tone="danger">Delete project</Button>);
+      const button = screen.getByRole("button", { name: "Delete project" });
+      expect(button).toHaveAttribute("data-tone", "danger");
+      expect(button).toHaveAttribute("data-variant", variant);
+    });
+
     it("defaults to the rectangle shape", () => {
       render(<Button>Save</Button>);
       expect(screen.getByRole("button")).toHaveAttribute("data-shape", "rectangle");
@@ -292,6 +304,17 @@ describe("Button", () => {
       expectTypeOf<{ iconOnly: true }>().not.toExtend<ButtonProps>();
       expectTypeOf<{ iconOnly: true; "aria-label": string }>().toExtend<ButtonProps>();
       expectTypeOf<{ children: string }>().toExtend<ButtonProps>();
+    });
+
+    it("only takes tone=danger on a secondary or ghost button with label text", () => {
+      expectTypeOf<{ variant: "secondary"; tone: "danger"; children: string }>().toExtend<ButtonProps>();
+      expectTypeOf<{ variant: "ghost"; tone: "danger"; children: string }>().toExtend<ButtonProps>();
+      expectTypeOf<{ variant: "primary"; tone: "danger"; children: string }>().not.toExtend<ButtonProps>();
+      // The default variant is primary, so danger needs a variant
+      expectTypeOf<{ tone: "danger"; children: string }>().not.toExtend<ButtonProps>();
+      expectTypeOf<{ variant: "secondary"; tone: "danger"; iconOnly: true; "aria-label": string }>().not.toExtend<ButtonProps>();
+      expectTypeOf<{ variant: "primary"; tone: "neutral"; children: string }>().toExtend<ButtonProps>();
+      expectTypeOf<{ tone: "warning"; children: string }>().not.toExtend<ButtonProps>();
     });
 
     it("only accepts known variants, sizes, and shapes", () => {

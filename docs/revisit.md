@@ -19,16 +19,6 @@ SegmentedControl is built on the same RadioGroup and behaves the same way, so wh
 
 Raised while building RadioGroup (2026-10-20).
 
-## Shared CSS for form controls
-
-**Today:** the CSS is duplicated. `radio-group.css` repeats CheckboxGroup's group styles (label, description, stacked options, and the error placement), and its radio circle repeats much of Checkbox's box (edge, hover, focus, invalid, read-only, disabled, hit area, hot dog press, and forced colors). Switch already repeats some of the same pieces. `text-area.css` repeats most of Input's: the label, description, edge, hover, focus, invalid, disabled, read-only, hot dog, and forced colors.
-
-**Why it's in question:** a fix to one copy can be missed in the others. Checkbox's invalid edge disappearing in forced colors is the kind of bug that would have to be fixed in every copy.
-
-**To decide:** whether to extract shared CSS, such as a group stylesheet, a choice-control base, and a text-field base in `src/internal/`, the same way `field-error.css` is shared now. Also how the shared class names would sit next to each component's own classes, and how to do it without changing how any component looks (Chromatic would show any difference).
-
-Raised while building RadioGroup (2026-10-20).
-
 ## A text area that grows with its text
 
 **Today:** a TextArea starts at a fixed number of `rows` and scrolls when the text is longer. People can drag it taller with the resize handle.
@@ -55,7 +45,7 @@ Raised while building TextArea (2026-10-21). RichText added (2026-10-21).
 
 **Why it's in question:** in every other theme the edge itself changes, so this is the one combination where it doesn't. It's rare: hot dog is a joke theme, and forced colors replaces its colors anyway.
 
-**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), and fixing Input and TextArea together, ideally as part of sharing text-field CSS (see "Shared CSS for form controls").
+**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), which would be one change in `src/internal/text-field.css` now that Input and TextArea share it.
 
 Raised while building TextArea (2026-10-21).
 
@@ -145,40 +135,6 @@ Raised while building RichText (2026-10-21).
 
 Raised while building RichText (2026-10-21).
 
-## How read-only fields look
-
-**Today:** each control does its own thing. Input and TextArea dim the field to 75% and hide the placeholder, keeping the label at full strength. Checkbox, Switch, and Radio dim the control to 75%. SegmentedControl dims only the options that aren't chosen, because the chosen option's label sits on its fill. The RichText experiment hides its toolbar and doesn't dim at all, because links and inline code would fall below 4.5:1 at 75%.
-
-**Why it's in question:** the rule is that people should be able to tell a field can't be changed before they try (`docs/brand/accessibility.md`). A 75% dim is a quiet cue, and it can't be used wherever colored text would lose contrast. There's no one pattern yet for what read-only should mean visually.
-
-**To decide:** what read-only is for in the sites and apps that use the system (showing a saved value, a locked setting, a sent message), and then one cue for all of it. Options: the dim; dropping the field's edge and background so it reads as plain text; or a "Read only" note or lock icon beside the label, in words. Whatever is chosen has to meet contrast in every theme and work in forced colors.
-
-**Compare in Storybook:** Revisit → How read-only fields look.
-
-Raised while building RichText (2026-10-21).
-
-## A danger style for buttons
-
-**Today:** Button has no danger style. A destructive action is a `secondary` button whose label names what's lost, behind a confirmation dialog (`docs/brand/buttons.md`).
-
-**Why it's in question:** most systems give destructive actions their own look (Carbon, Primer, Atlassian, and Uber's Base), so they stand out in a confirmation dialog or a settings page.
-
-**To decide:** a `tone="danger"` prop (`data-tone="danger"`) on `primary`, `secondary`, and `ghost`, never on icon-only buttons. It needs `danger-hover` and `on-danger` tokens that pass contrast in all three themes. Now that components are neutral, a red danger button no longer clashes with a brand-colored primary one. Hot dog mode still needs care: its `brand` is ketchup red, so a danger button on a ketchup band would disappear into it.
-
-Raised while comparing button systems (2026-10-22).
-
-## Where a field's error goes
-
-**Today:** every form control shows its error after the field (below the control, or below a group's options), through the shared `FieldError`, with an icon and the message. There's no visually hidden "Error:" before the message. `docs/brand/forms.md` asks for the GOV.UK pattern instead: the error between the label and hint and the field, with a hidden "Error:".
-
-**Why it's in question:** the error above the field is read before the field, like the description, and a phone keyboard or autofill menu can't cover it, the same reason the description sits there. Below the field is closer to what most React libraries and shadcn do, and it's what's built.
-
-**To decide:** look at both side by side in Storybook (a comparison story for Input, TextArea, Checkbox, CheckboxGroup, RadioGroup, and SegmentedControl, in all three themes), then pick one. Moving it changes every form control and `FieldError`, and the "Error:" prefix changes what screen readers announce, so it's its own branch.
-
-**Compare in Storybook:** Revisit → Where a field's error goes.
-
-Raised while reviewing the forms guidance (2026-10-22).
-
 ## Icon size in large buttons and segments
 
 **Today:** Button's and SegmentedControl's `lg` sizes use `icon-md` (20px), the same as `md`. `docs/brand/iconography.md` says large buttons use `icon-lg` (24px).
@@ -191,16 +147,6 @@ Raised while reviewing the forms guidance (2026-10-22).
 
 Raised while reviewing the iconography guidance (2026-10-22).
 
-## Brand colors that are still near components
-
-**Today:** components are neutral and never use `brand` or `surface-tint` (`pnpm check` enforces it). Two brand-colored tokens still sit close to components: `link` (tangerine, mint in dark, ketchup in hot dog), which `base.css` gives every `<a>`, and `highlight` (mint, peach in dark, ketchup in hot dog), meant for chips, badges, and selection.
-
-**Why it's in question:** a link inside a component (a help link in a field's description, say) or a future Chip or Badge component would carry the brand color into it, which goes against keeping components neutral and reusable. But links in running text are one of the brand's "small flourishes", and a neutral link is harder to spot.
-
-**To decide:** when a component first needs a link or a chip. Options: keep `link` and `highlight` as brand colors, set by the site; give components neutral versions (an underlined `ink` link, a gray chip); or let a Badge take a status color only.
-
-Raised while making components neutral (2026-10-27).
-
 ## Hot dog's pressed shadow on a black button
 
 **Today:** in hot dog mode, a primary button is now black with a black hard shadow, so the shadow reads as a thicker edge on the bottom and right rather than a separate shape. Pressing still moves the button into it. Secondary buttons, checkboxes, and switches are white or black with the same black shadow.
@@ -211,30 +157,25 @@ Raised while making components neutral (2026-10-27).
 
 Raised while making components neutral (2026-10-27).
 
-## Color transitions and the "transform and opacity only" rule
+## Clicking a link in a checkbox's or switch's label changes it
 
-**Today:** CLAUDE.md and `docs/brand/motion.md` say to animate only `transform` and `opacity`. But every component fades its state colors over `--duration-fast`: Button, Checkbox, Radio, and Switch transition `background-color`, `border-color`, and `box-shadow` (Button also `color`), Input and TextArea transition `border-color` and `box-shadow`, and SegmentedControl transitions its edge, label color, and highlight. The How it works pages describe what the code does.
+**Today:** a link inside a Checkbox's or Switch's label (`<Checkbox>I accept the <a href="/terms">terms and conditions</a></Checkbox>`) is styled like every link in a component, `ink` and underlined, but clicking it also ticks the box or turns the switch on, as well as following the link. A unit test confirmed it for both (2026-11-04). Radio's row works the same way, so it probably does too; not checked yet. In a native `<label>`, clicking a link inside it only follows the link: the browser skips the label's own action for interactive content. Base UI's label handles the click itself, so that doesn't happen here.
 
-**Why it's in question:** the rule and the code disagree, so one of them is wrong. The rule exists because `transform` and `opacity` can run on the compositor without repainting. A 100ms color fade on a small control costs very little, and turning it off would make hover and checked states snap.
+**Why it's in question:** someone who clicks "terms and conditions" to read them has accepted them without meaning to, and a screen reader user isn't told. Accepting terms is the most common reason to put a link in a checkbox label.
 
-**To decide:** whether to change the rule to allow short color, border, and shadow fades on state changes (keeping layout properties like width, height, top, and left banned), or to remove those transitions so the code follows the rule. Either way, update `motion.md` and CLAUDE.md to match.
+**To decide:** whether a choice control ignores clicks that start on a link or other interactive element inside its label (and how: checking the click's target in the label's click handler, or keeping the link outside the label), and whether Radio needs the same fix. Write the failing test first: click the link, and the box stays unticked. The Checkbox "Link in label" story is the place to show it.
 
-Raised while writing the components' How it works pages (2026-10-28).
+Raised while making links inside components neutral (Q3, 2026-11-04).
 
-## A field that re-checks on blur can make the submit button miss a click
+## A text field for codes and IDs
 
-**Today:** `docs/brand/forms.md` says to validate on submit, and after a failed submit a field may re-check itself when the person leaves it. The demos on the Input and TextArea How it works pages do this.
+**Today:** numbers that are quantities or money get a NumberField, built on Base UI's NumberField (planned, Q7). Input has no `inputMode` guidance and no numeric type: `type` allows text, email, password, search, tel, and url.
 
-**Why it's in question:** pressing the submit button is what makes the field lose focus. If the fix made the field valid, its error disappears between pressing and releasing, everything below it moves up by the error's height, and the submit button moves out from under the pointer. A click on its lower part then does nothing, because the press and release land on different elements. It happens in any form that follows the rule, not just the demos.
+**Why it's in question:** some numbers aren't quantities: a verification code, a postcode, an account or card number. They can start with 0, shouldn't step up and down or get thousands separators, and still want the phone's number keyboard. GOV.UK uses a text input with `inputmode="numeric"` for these rather than `type="number"`. Input already passes `inputMode` through, so this may only need guidance, not a new component.
 
-**To decide:**
-- Re-check while typing instead of on leaving the field, once a field has shown an error. The error then goes away as soon as it's fixed, before anyone reaches for the button.
-- Or keep the space an error took until the next submit, so nothing below moves.
-- Or leave errors in place until the next submit, and drop re-checking on blur.
+**To decide:** when a page first needs one: whether to document `<Input inputMode="numeric" autoComplete="one-time-code">` (and `spellCheck={false}`, `pattern`) as the pattern for codes and IDs in `docs/brand/forms.md`, or add something dedicated, such as a one-time-code field with a box per digit.
 
-Then update `forms.md` and the Input and TextArea demos.
-
-Raised while writing the components' How it works pages (2026-10-28).
+Raised while deciding date and number fields (Q7, 2026-11-04).
 
 ## Showing whether a hidden input is checked in the live HTML view
 

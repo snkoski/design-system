@@ -22,7 +22,8 @@ Input is a thin layer over [Base UI](https://base-ui.com), an unstyled React lib
   </thead>
   <tbody>
     <tr><td><code>Input.tsx</code></td><td>The component. It puts Base UI's parts together, decides which prop goes to which part, and types the props so an input can't be built without a name.</td></tr>
-    <tr><td><code>input.css</code></td><td>The look: label, help text, field, icons, sizes, every state, hot dog mode, and Windows high contrast. It only uses design tokens.</td></tr>
+    <tr><td><code>input.css</code></td><td>The look that's Input's own: the field's height, the icons, and the large size's height. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/text-field.css</code> and <code>field.css</code></td><td>The look Input shares with TextArea: the wrapper, the field, its edge, every state, hot dog mode, and Windows high contrast (<code>text-field.css</code>), and the label and help text every form control shares (<code>field.css</code>). Not components, but part of the published stylesheet.</td></tr>
     <tr><td><code>index.ts</code></td><td>What the package exports: <code>Input</code> and the <code>InputProps</code>, <code>InputSize</code>, and <code>InputType</code> types.</td></tr>
     <tr><td><code>src/internal/FieldError.tsx</code> and <code>field-error.css</code></td><td>The error message every form control shares: an icon and words. Not exported.</td></tr>
     <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for an input with no name, and a helper that joins class names. Not exported.</td></tr>
@@ -99,10 +100,10 @@ The order in the HTML matches what you see, so a screen reader reading the page 
 
 ### Invalid, with an error
 
-This is a real form that checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then again each time you leave the field. Whether a field is invalid is the page's decision, not the input's: the page passes `invalid` and `error`.
+This is a real form that checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then, after a failed submit, again each time it changes, so the error goes away as soon as it's fixed. It doesn't check when you leave the field: that's when you're reaching for the button, and an error disappearing then would move the button out from under your click. Whether a field is invalid is the page's decision, not the input's: the page passes `invalid` and `error`.
 
 <Unstyled>
-  <Inspect hint="Select Save email with the field empty, or with an address like ada@. Then fix it and press Tab.">
+  <Inspect hint="Select Save email with the field empty, or with an address like ada@. Then type to fix it, and watch the error go as soon as it's right.">
     <EmailForm />
   </Inspect>
 </Unstyled>
@@ -124,7 +125,7 @@ This is a real form that checks itself the way [Forms](?path=/docs/foundations-f
 </Unstyled>
 
 - **Disabled** is the native `disabled` attribute: the browser blocks typing, skips the field with Tab, and leaves it out of the form. Base UI adds `data-disabled` to every part, which is how the CSS dims the label too.
-- **Read-only** is the native `readonly` attribute: you can't change the text, but you can focus it, select it, and copy it, and the form still sends it.
+- **Read-only** is the native `readonly` attribute: you can't change the text, but you can focus it, select it, and copy it, and the form still sends it. The label gets a "Read only" note with a lock, hidden from screen readers, which already announce the field as read only. The shared `ReadOnlyNote` draws it, and [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains it.
 
 ## From props to HTML
 
@@ -165,23 +166,25 @@ Reading it top to bottom:
 3. **The wrapper.** `Field.Root` gets our class, joined with the consumer's by `cx()`, plus `name`, `disabled`, and `invalid`.
 4. **The label** renders only when there is one. With only an `aria-label`, there's no `<label>` element at all, and the name goes on the input.
 5. **The description** comes next, before the box, so it's between the label and the field.
-6. **The box and icons.** `data-icon-start` and `data-icon-end` are `true` or `undefined`. React leaves an attribute out entirely when it's `undefined`, so the box is only marked when there's an icon.
-7. **The input** gets `rest`, the `ref`, our class, `type`, `disabled`, and `name`. A `ref` reaches the real `<input>`, to focus it or select its text.
-8. **The error** comes last, after the box. `FieldError` gets `match={invalid}`, so the message only shows while the input is invalid. (Whether the error belongs above the field too is an open question in `docs/revisit.md`.)
+6. **The error** comes after the description, still before the box, for the same reasons. `FieldError` gets `match={invalid}`, so the message only shows while the input is invalid.
+7. **The box and icons.** `data-icon-start` and `data-icon-end` are `true` or `undefined`. React leaves an attribute out entirely when it's `undefined`, so the box is only marked when there's an icon.
+8. **The input** gets `rest`, the `ref`, our class, `type`, `disabled`, and `name`. A `ref` reaches the real `<input>`, to focus it or select its text.
 
 ## How it looks
 
-All of the input's look is in `input.css`, inside `@layer components`. Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
+The input's look is in three files, all inside `@layer components`. `internal/text-field.css` has everything Input shares with TextArea, and `internal/field.css` the label and help text every form control shares, so a fix is made once for all of them. Each part carries a shared class next to its own, such as `class="text-field__control input__control"` on the `<input>`, and the shared files style the shared classes. `input.css` has only what's Input's own: its height, its icons, and the large size's height. The shared files are imported first, so when they and `input.css` set the same thing with equally specific selectors, Input's own rule wins.
+
+Layers set which CSS wins regardless of how specific a selector is, and the order is `theme, base, components, utilities`. So a Tailwind utility in the markup (in `utilities`) can override a component for a one-off.
 
 The input only uses **semantic tokens**, named for their job rather than their color: `surface`, `ink`, `ink-muted`, `border-strong`, `focus`, and `danger`. Each theme gives them its own values. All but `danger` point at the gray scale, so components stay neutral and the brand colors live in the layout around them. `danger` is a status color, used where it carries meaning.
 
 ### The parts
 
-<Code file="components/Input/input.css" name=".input" />
+<Code file="internal/text-field.css" name=".text-field" />
 
-<Code file="components/Input/input.css" name=".input__label" />
+<Code file="internal/field.css" name=".field-label" />
 
-<Code file="components/Input/input.css" name=".input__description" />
+<Code file="internal/field.css" name=".field-description" />
 
 <Code file="components/Input/input.css" name=".input__box" />
 
@@ -191,23 +194,27 @@ The wrapper is a one-column grid, with `--space-1` between rows. The box adds an
 
 ### The field
 
+<Code file="internal/text-field.css" name=".text-field__control" />
+
 <Code file="components/Input/input.css" name=".input__control" />
 
 The `<input>` is the visible box, so a click anywhere in it focuses it.
 
-- **Height** is `--control-md`, and the padding is only at the sides. The text centers itself in the height.
-- **Edge:** a `border-thin` edge in `border-strong`, which meets 3:1 against the field in every theme.
+- **Height** is `--control-md`, and the padding is only at the sides. The text centers itself in the height. The height is Input's own; a text area sets a minimum height instead.
+- **Edge:** a `border-thin` edge in `border-strong`, which meets 3:1 against the field in every theme. Its width is a custom property, `--text-field-edge`, because hot dog mode and forced colors thicken it, and a text area's padding has to follow it.
 - **Type:** `--text-body`, 16px, on every screen. Under 16px, iPhones zoom in when a field gets focus.
 - **`appearance: none`** turns off the browser's own field styling, so it looks the same everywhere.
 - **Transitions** soften the edge changing on hover and focus, over `--duration-fast` (120ms).
 
-<Code file="components/Input/input.css" name=".input__control::placeholder" />
+<Code file="internal/text-field.css" name=".text-field__control::placeholder" />
 
 <Code file="components/Input/input.css" name=".input__control::-webkit-search-cancel-button" />
 
 A placeholder is `ink-muted`, which meets 4.5:1 contrast, and Firefox's own fading is turned off. A placeholder is an example, never the label: it disappears as you type. The browser's own clear button on search fields is hidden, because it can't be themed and is only about 12px wide. Escape still clears the field.
 
 ### Sizes: mouse, touch, and density
+
+<Code file="internal/text-field.css" name='.text-field[data-size="lg"] .text-field__control' />
 
 <Code file="components/Input/input.css" name='.input[data-size="lg"] .input__control' />
 
@@ -241,39 +248,39 @@ Its position is the input's side padding plus its edge, so it lines up with wher
 
 ### Hover, focus, and invalid
 
-<Code file="components/Input/input.css" name='.input__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
+<Code file="internal/text-field.css" name='.text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
 
 Hover darkens the edge to `ink`. The `:not()` matters. `:hover` makes a selector more specific, so without it, a hovered invalid field would lose its red edge, and a disabled or read-only field would look as if it could be changed.
 
-<Code file="components/Input/input.css" name=".input__control:focus-visible" />
+<Code file="internal/text-field.css" name=".text-field__control:focus-visible" />
 
 Focus is an **outline**, never only a shadow, so it survives Windows high contrast. It sits `--focus-offset` outside the edge, in `--focus`. A text field shows it however it got focus, mouse or keyboard, because you need to see where you're typing.
 
-<Code file="components/Input/input.css" name='.input__control[aria-invalid="true"]' />
+<Code file="internal/text-field.css" name='.text-field__control[aria-invalid="true"]' />
 
 Invalid is styled from `aria-invalid`, the attribute screen readers read, so the look and what's announced can't disagree. The edge turns `danger` and gets thicker. The extra thickness is an inset shadow rather than a wider border: a wider border would push the text over by a pixel and change the field's size.
 
 ### Disabled and read-only
 
-<Code file="components/Input/input.css" name=".input__control:disabled" />
+<Code file="internal/text-field.css" name=".text-field__control:disabled" />
 
-<Code file="components/Input/input.css" name=".input__control[readonly]" />
-
-<Code file="components/Input/input.css" name=".input__control[readonly]::placeholder" />
+<Code file="internal/text-field.css" name=".text-field__control[readonly]::placeholder" />
 
 - **Disabled** dims the field and its label to 50%. It's styled from the native `:disabled`, which a real `<input>` has. The label isn't an input, so it's reached through the wrapper's `data-disabled`, from Base UI. A further rule sets the `not-allowed` cursor.
-- **Read-only** dims only the field, to 75%, and keeps the label at full strength, because read-only content must stay readable. The text in it still meets 4.5:1. It's styled from the native `[readonly]` attribute.
-- A read-only field hides its placeholder. A placeholder suggests what to type, which doesn't apply when you can't, and at 75% it would fall below 4.5:1.
+- **Read-only** doesn't dim: the field and its label stay at full strength, because read-only content must stay readable. The cue is the "Read only" note beside the label.
+- A read-only field hides its placeholder, styled from the native `[readonly]` attribute. A placeholder suggests what to type, which doesn't apply when you can't, and in an empty field it could be mistaken for a value.
 
 ### Hot dog mode
 
-<Code file="components/Input/input.css" name='[data-theme="hotdog"] .input__control' />
+<Code file="internal/text-field.css" name='[data-theme="hotdog"] .text-field__control' />
 
-<Code file="components/Input/input.css" name='[data-theme="hotdog"] .input__control[aria-invalid="true"]' />
+<Code file="internal/text-field.css" name='[data-theme="hotdog"] .text-field__control[aria-invalid="true"]' />
 
 Hot dog mode, the system's ketchup-and-mustard joke theme, gives every field a `border-thick` ink edge and a hard 2px shadow. Buttons, checkboxes, and switches press into their shadow when clicked, but a text field doesn't: you type in it, so it keeps its shadow. An invalid field lists both shadows, the inset one that thickens the edge and the hard one.
 
 ### Windows high contrast
+
+<Code file="internal/text-field.css" name="@media (forced-colors: active)" />
 
 <Code file="components/Input/input.css" name="@media (forced-colors: active)" />
 
@@ -318,6 +325,20 @@ In forced colors mode (Windows Contrast themes), the browser replaces the page's
 <summary><code>input.css</code></summary>
 
 <Code file="components/Input/input.css" />
+
+</details>
+
+<details>
+<summary><code>internal/text-field.css</code></summary>
+
+<Code file="internal/text-field.css" />
+
+</details>
+
+<details>
+<summary><code>internal/field.css</code></summary>
+
+<Code file="internal/field.css" />
 
 </details>
 
