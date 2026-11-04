@@ -10,6 +10,12 @@ The brand book (principles, voice, color usage, type, layout, motion, iconograph
 
 When a rule or guideline changes, update the matching file in `docs/brand/`. If it's a rule about how code is written, update this file too.
 
+## Open questions block new components
+
+`docs/proposed-roadmap-job-tracker.md` plans the next components and moving the job tracker app onto the system. Its "Open questions" table must be fully answered before any new component is started. The planned font trial can go first; anything that adds a component waits. If someone asks for a new component while a question there is still "Open", say so and point to the question before doing anything else.
+
+When a question is decided, follow "The rule" at the top of that file: record the answer there, move it into this file or `docs/brand/`, delete any matching `docs/revisit.md` entry, and copy the file to the job tracker (`~/Development/job-tracker/proposed-roadmap-job-tracker.md`). This repo's copy is the one to edit.
+
 ## Visual tests are paused
 
 Chromatic's workflow has been switched off on GitHub since 2026-10-27, to save the free plan's snapshots while the components are still being built. The Test workflow still runs every story's play function and axe, but nothing checks how stories look, so look at every visual change yourself (see "Looking at a component").
@@ -174,6 +180,7 @@ Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
 
 ## Adding a component
 
+0. Check that every question in `docs/proposed-roadmap-job-tracker.md` is answered (see "Open questions block new components"). If any is still open, stop and say which.
 1. If Base UI has a matching primitive, build on it. shadcn's version is a good reference for structure; replace its Tailwind styling with a CSS file that follows the rules above.
    Read Base UI's docs for it first: `node_modules/@base-ui/react/docs/react/components/<name>.md` ships with the package and is authoritative. Before writing CSS, render the primitive in a throwaway Vitest test and print the DOM, to see exactly which ARIA and `data-*` attributes it sets (Checkbox's `aria-checked="mixed"`, `aria-invalid`, and `data-disabled` came from this). Delete the throwaway test afterwards.
 2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.test.tsx`, `Name.stories.tsx`, and `index.ts`.
