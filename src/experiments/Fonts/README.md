@@ -6,6 +6,9 @@ Fonts kept here for trying out later. Nothing imports them, so they never reach 
 
 A monospaced variable font, from Thin (100) to ExtraBold (800), under the SIL Open Font License (`fonts/PaperMono-OFL.txt`). It was compared with Geist on 2026-11-04, as headings only and for everything, and we kept Geist.
 
+- `paper-mono-v1.000/` is the download as it came: TTF and OTF files for design tools, a woff2 per weight, and the variable woff2.
+- `fonts/` holds the one file a site needs, the variable woff2 (renamed, since `[` and `]` in a file name trip up URLs), and the license.
+
 ## Trying a font
 
 1. Download it, and put the variable `.woff2` file and its license in `fonts/` here. A variable font is one file for every weight, so prefer it over one file per weight.
