@@ -86,6 +86,26 @@ export function stitchesBetween(from: [number, number], to: [number, number]): [
   }
 }
 
+/** A shape on the grid, such as some text: true where it has a stitch, row by row from the top left */
+export interface Mask {
+  columns: number;
+  rows: number;
+  cells: boolean[];
+}
+
+/**
+ * The pattern with a shape stitched in one color, its top-left corner at a stitch, cut off where it runs past the
+ * edge. A value of null takes the stitches out instead, cutting the shape out of what's there.
+ */
+export function stamp(pattern: Pattern, mask: Mask, column: number, row: number, value: number | null): Pattern {
+  const cells = pattern.cells.slice();
+  mask.cells.forEach((on, index) => {
+    const [x, y] = [column + (index % mask.columns), row + Math.floor(index / mask.columns)];
+    if (on && x >= 0 && y >= 0 && x < pattern.columns && y < pattern.rows) cells[y * pattern.columns + x] = value;
+  });
+  return cells.every((cell, index) => cell === pattern.cells[index]) ? pattern : { ...pattern, cells };
+}
+
 /** How many stitches use each color in the palette */
 export function stitchCounts(pattern: Pattern): number[] {
   const counts = pattern.palette.map(() => 0);

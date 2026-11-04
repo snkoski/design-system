@@ -177,6 +177,7 @@
 
   .cross-stitch__chart {
     display: grid;
+    grid-template-columns: minmax(0, 1fr); /* text wraps to the visible width; a wide canvas scrolls */
     gap: var(--space-3);
     min-width: 0;
   }
@@ -187,6 +188,9 @@
     max-width: none;
     touch-action: none; /* a finger drags stitches, not the page */
     cursor: crosshair;
+  }
+  .cross-stitch__canvas[data-floating] {
+    cursor: move;
   }
   .cross-stitch__chart:has(.cross-stitch__canvas) {
     overflow: auto;

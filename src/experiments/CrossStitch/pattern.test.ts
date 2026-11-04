@@ -10,6 +10,7 @@ import {
   rowsFor,
   sampleImage,
   setStitch,
+  stamp,
   stitchCounts,
   stitchesBetween,
   suggestColorCount,
@@ -49,6 +50,17 @@ describe("editing a pattern", () => {
     expect(larger.cells[0]).toBe(1);
     expect(larger.cells[2 * 4 + 2]).toBe(2);
     expect(larger.cells).toHaveLength(16);
+  });
+
+  it("stitches a shape in one color, cut off at the edge, or cuts it out with null", () => {
+    const pattern = blankPattern(3, 2);
+    const shape = { columns: 2, rows: 2, cells: [true, false, true, true] };
+    const stamped = stamp(pattern, shape, 2, 0, 1);
+    // Only the left column of the shape fits
+    expect(stamped.cells).toEqual([null, null, 1, null, null, 1]);
+    expect(pattern.cells.every((cell) => cell === null)).toBe(true);
+    expect(stamp(stamped, shape, 1, 0, null).cells).toEqual([null, null, 1, null, null, null]);
+    expect(stamp(pattern, shape, 0, 0, null)).toBe(pattern);
   });
 
   it("counts the stitches of each color", () => {

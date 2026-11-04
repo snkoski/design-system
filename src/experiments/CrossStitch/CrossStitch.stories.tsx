@@ -71,3 +71,25 @@ export const FromAPhoto: Story = {
     await waitFor(() => expect(canvas.getByText("(3 used, 1000 stitches)")).toBeInTheDocument());
   },
 };
+
+/**
+ * Words in a font, as stitches. Stitch alphabets land exactly on the grid; smooth fonts, such as the scripts, need
+ * more height. The text floats over the chart until it's added, so drag it or use the arrow keys to place it.
+ */
+export const Text: Story = {
+  args: { defaultColumns: 100, defaultRows: 40 },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByRole("textbox", { name: "Words" }), "Home{Enter}sweet home");
+    // Silkscreen 10 stitches tall: "sweet home" is wider than the chart. Tiny5's narrower letters fit.
+    await expect(await canvas.findByText(/^\d+ × 22 stitches, in color 1\. .*bigger than the chart/)).toBeInTheDocument();
+    await userEvent.selectOptions(canvas.getByRole("combobox", { name: "Font" }), "Tiny5");
+    await waitFor(() => expect(canvas.getByText(/^\d+ × \d+ stitches, in color 1\./)).not.toHaveTextContent(/bigger than the chart|off the chart/));
+    // Moved with the keyboard, then added: one step to undo
+    canvas.getByRole("application").focus();
+    await userEvent.keyboard("{ArrowUp}{Enter}");
+    await waitFor(() => expect(canvas.queryByRole("button", { name: "Add the text to the pattern" })).not.toBeInTheDocument());
+    await expect(canvas.getByText(/\(1 used, [1-9]\d* stitches\)/)).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Undo" }));
+    await expect(canvas.getByText("(0 used, 0 stitches)")).toBeInTheDocument();
+  },
+};

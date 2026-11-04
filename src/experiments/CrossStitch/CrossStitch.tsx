@@ -1,7 +1,9 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, HTMLAttributes, InputHTMLAttributes, KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { Button } from "../../components/Button";
+import { Segment, SegmentedControl } from "../../components/SegmentedControl";
 import { Switch } from "../../components/Switch";
+import { TextArea } from "../../components/TextArea";
 import { cx } from "../../internal/cx";
 import {
   blankPattern,
@@ -14,6 +16,7 @@ import {
   rowsFor,
   sampleImage,
   setStitch,
+  stamp,
   stitchCounts,
   stitchesBetween,
   suggestColorCount,
@@ -21,7 +24,9 @@ import {
   toCss,
   toHex,
 } from "./pattern";
-import type { Pattern, Pixels } from "./pattern";
+import type { Mask, Pattern, Pixels } from "./pattern";
+import { FONTS, heightStep, loadFont, snapHeight, textMask } from "./text";
+import type { Align, Thickness } from "./text";
 import "./cross-stitch.css";
 
 interface OwnProps {
@@ -83,7 +88,8 @@ async function readPhoto(file: File): Promise<Photo> {
 /**
  * A cross-stitch chart to design on: pick a size and a color, then click, drag, or use the keyboard to stitch. Or
  * load a photo, and it becomes a chart, with a slider for how many thread colors it uses. Each color has a symbol and
- * a stitch count, as printed charts do. An experiment: not exported from the package (see CLAUDE.md, Experiments).
+ * a stitch count, as printed charts do. Text is typed in, set in a font, and dragged into place before it's added. An
+ * experiment: not exported from the package (see CLAUDE.md, Experiments).
  */
 export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, ...rest }: CrossStitchProps) {
   const id = useId();
@@ -100,6 +106,61 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
   const [announcement, setAnnouncement] = useState("");
   const canvas = useRef<HTMLCanvasElement>(null);
   const stroke = useRef<{ last: [number, number] } | null>(null);
+
+  // Text floats over the chart, as a shape, until it's added to the pattern
+  const [text, setText] = useState("");
+  const [fontFamily, setFontFamily] = useState(FONTS[0]!.family);
+  const [letterHeight, setLetterHeight] = useState(10);
+  const [align, setAlign] = useState<Align>("center");
+  const [lineGap, setLineGap] = useState(2);
+  const [spacing, setSpacing] = useState(0);
+  const [thickness, setThickness] = useState<Thickness>("regular");
+  const [shape, setShape] = useState<Mask | null>(null);
+  const [fontFailed, setFontFailed] = useState(false);
+  /** Where the text's top center is, once it's been moved; until then it's centered on the chart */
+  const [textAt, setTextAt] = useState<[number, number] | null>(null);
+  const drag = useRef<{ start: [number, number]; from: [number, number] } | null>(null);
+  const font = FONTS.find((each) => each.family === fontFamily)!;
+
+  useEffect(() => {
+    if (!text.trim()) {
+      setShape(null);
+      return;
+    }
+    let current = true;
+    void loadFont(font, text).then((loaded) => {
+      if (!current) return;
+      setFontFailed(!loaded);
+      setShape(textMask(text, { font, height: letterHeight, align, lineGap, spacing, thickness }));
+    });
+    return () => {
+      current = false;
+    };
+  }, [text, font, letterHeight, align, lineGap, spacing, thickness]);
+
+  const floating = shape && text.trim() ? shape : null;
+  const textCenter: [number, number] = textAt ?? [Math.floor(pattern.columns / 2), Math.floor((pattern.rows - (floating?.rows ?? 0)) / 2)];
+  const textLeft = textCenter[0] - Math.floor((floating?.columns ?? 0) / 2);
+  const textTop = textCenter[1];
+  const textFits = floating !== null && textLeft >= 0 && textTop >= 0 && textLeft + floating.columns <= pattern.columns && textTop + floating.rows <= pattern.rows;
+
+  const moveText = (column: number, row: number) => {
+    setTextAt([column, row]);
+    setAnnouncement(`Text moved to row ${row + 1}, column ${column - Math.floor((floating?.columns ?? 0) / 2) + 1}.`);
+  };
+
+  const placeText = () => {
+    if (!floating) return;
+    commit(stamp(pattern, floating, textLeft, textTop, selected));
+    setText("");
+    setTextAt(null);
+    setAnnouncement(selected === null ? "Cut the text out of the pattern." : `Added the text in color ${selected + 1}.`);
+  };
+
+  const removeText = () => {
+    setText("");
+    setTextAt(null);
+  };
 
   const counts = stitchCounts(pattern);
   const total = counts.reduce((sum, count) => sum + count, 0);
@@ -189,12 +250,23 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
     if (event.button !== 0) return;
     event.currentTarget.setPointerCapture?.(event.pointerId);
     const at = stitchAt(event);
+    // While text floats, dragging anywhere on the chart moves it
+    if (floating) {
+      drag.current = { start: at, from: textCenter };
+      return;
+    }
     stroke.current = { last: at };
     setCursor([Math.min(Math.max(at[0], 0), pattern.columns - 1), Math.min(Math.max(at[1], 0), pattern.rows - 1)]);
     commit(setStitch(pattern, at[0], at[1], selected));
   };
 
   const continueStroke = (event: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (drag.current) {
+      const at = stitchAt(event);
+      const { start, from } = drag.current;
+      setTextAt([from[0] + at[0] - start[0], from[1] + at[1] - start[1]]);
+      return;
+    }
     if (!stroke.current) return;
     const at = stitchAt(event);
     const [last] = [stroke.current.last];
@@ -206,6 +278,7 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
 
   const endStroke = () => {
     stroke.current = null;
+    drag.current = null;
   };
 
   // --- Stitching with the keyboard ---
@@ -216,8 +289,25 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
   };
 
   const keyDown = (event: KeyboardEvent<HTMLCanvasElement>) => {
-    const [column, row] = cursor;
     const step = event.shiftKey ? 10 : 1;
+    if (floating) {
+      // While text floats, the arrow keys move it, Enter adds it, and Escape takes it away
+      const [x, y] = textCenter;
+      const nudges: Record<string, [number, number]> = { ArrowLeft: [x - step, y], ArrowRight: [x + step, y], ArrowUp: [x, y - step], ArrowDown: [x, y + step] };
+      if (nudges[event.key]) {
+        event.preventDefault();
+        moveText(...nudges[event.key]!);
+      } else if (event.key === "Enter") {
+        event.preventDefault();
+        placeText();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        removeText();
+        setAnnouncement("Removed the text.");
+      }
+      return;
+    }
+    const [column, row] = cursor;
     const moves: Record<string, [number, number]> = {
       ArrowLeft: [column - step, row],
       ArrowRight: [column + step, row],
@@ -266,15 +356,22 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
     context.font = `600 ${Math.round(stitchSize * 0.62)}px system-ui, sans-serif`;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    cells.forEach((cell, index) => {
-      if (cell === null) return;
-      const [x, y] = [(index % columns) * stitchSize, Math.floor(index / columns) * stitchSize];
-      context.fillStyle = toCss(palette[cell]!);
+    const drawStitch = (column: number, row: number, cell: number | null) => {
+      const [x, y] = [column * stitchSize, row * stitchSize];
+      context.fillStyle = cell === null ? FABRIC : toCss(palette[cell]!);
       context.fillRect(x, y, stitchSize, stitchSize);
-      if (symbols) {
+      if (symbols && cell !== null) {
         context.fillStyle = inkFor(palette[cell]!);
         context.fillText(SYMBOLS[cell]!, x + stitchSize / 2, y + stitchSize / 2 + 1);
       }
+    };
+    cells.forEach((cell, index) => {
+      if (cell !== null) drawStitch(index % columns, Math.floor(index / columns), cell);
+    });
+    // Floating text, drawn as it will be stitched
+    floating?.cells.forEach((on, index) => {
+      const [column, row] = [textLeft + (index % floating.columns), textTop + Math.floor(index / floating.columns)];
+      if (on && column >= 0 && row >= 0 && column < columns && row < rows) drawStitch(column, row, selected);
     });
 
     // Grid lines, with every tenth darker, as printed charts have, for counting
@@ -296,8 +393,21 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
       }
     }
 
+    // Floating text has a dashed edge, black over white, so it shows on any color
+    if (floating) {
+      const [x, y, w, h] = [textLeft * stitchSize, textTop * stitchSize, floating.columns * stitchSize, floating.rows * stitchSize];
+      context.lineWidth = 2;
+      context.setLineDash([]);
+      context.strokeStyle = "white";
+      context.strokeRect(x - 2, y - 2, w + 5, h + 5);
+      context.setLineDash([6, 4]);
+      context.strokeStyle = "black";
+      context.strokeRect(x - 2, y - 2, w + 5, h + 5);
+      context.setLineDash([]);
+    }
+
     // The keyboard's place: a black square inside a white one, so it shows on any color
-    if (focused) {
+    if (focused && !floating) {
       const [x, y] = [cursor[0] * stitchSize, cursor[1] * stitchSize];
       context.lineWidth = 2;
       context.strokeStyle = "white";
@@ -305,7 +415,7 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
       context.strokeStyle = "black";
       context.strokeRect(x - 1, y - 1, stitchSize + 3, stitchSize + 3);
     }
-  }, [pattern, showSymbols, stitchSize, cursor, focused]);
+  }, [pattern, showSymbols, stitchSize, cursor, focused, floating, textLeft, textTop, selected]);
 
   const inches = (stitches: number) => stitches / fabricCount;
   const used = counts.filter((count) => count > 0).length;
@@ -394,8 +504,90 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
         </fieldset>
 
         <fieldset className="cross-stitch__group">
+          <legend className="cross-stitch__legend">Text</legend>
+          <TextArea label="Words" description="Each line here is a line of stitches." rows={3} value={text} onValueChange={setText} />
+          <label className="cross-stitch__select">
+            <span>Font</span>
+            <select
+              value={fontFamily}
+              aria-describedby={`${id}-font`}
+              onChange={(event) => {
+                const next = FONTS.find((each) => each.family === event.target.value)!;
+                setFontFamily(next.family);
+                setLetterHeight((height) => snapHeight(next, height));
+              }}
+            >
+              {(["Stitch alphabets", "Smooth"] as const).map((group) => (
+                <optgroup key={group} label={group}>
+                  {FONTS.filter((each) => each.group === group).map((each) => (
+                    <option key={each.family} value={each.family}>
+                      {each.family}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+          <p id={`${id}-font`} className="cross-stitch__note">
+            {fontFailed
+              ? "This font couldn't be loaded, so the text is drawn in a fallback font. Check the internet connection."
+              : font.pixels
+                ? `A stitch alphabet: every letter lands exactly on the grid, so it's crisp at any size. Heights go up in steps of ${font.pixels.cap}.`
+                : "Smooth fonts look best at 12 stitches tall or more; smaller, their curves get rough."}
+          </p>
+          <Range
+            label="Letter height"
+            min={heightStep(font)}
+            max={heightStep(font) * Math.floor(60 / heightStep(font))}
+            step={heightStep(font)}
+            value={letterHeight}
+            shown={`${letterHeight} stitches`}
+            onChange={(event) => setLetterHeight(Number(event.target.value))}
+          />
+          <SegmentedControl label="Line up" value={align} onValueChange={(value) => setAlign(value as Align)}>
+            <Segment value="left">Left</Segment>
+            <Segment value="center">Center</Segment>
+            <Segment value="right">Right</Segment>
+          </SegmentedControl>
+          <Range label="Space between lines" min={0} max={20} value={lineGap} shown={`${lineGap} rows`} onChange={(event) => setLineGap(Number(event.target.value))} />
+          <Range label="Space between letters" min={0} max={6} value={spacing} shown={`${spacing} added`} onChange={(event) => setSpacing(Number(event.target.value))} />
+          {!font.pixels && (
+            <SegmentedControl label="Thickness" value={thickness} onValueChange={(value) => setThickness(value as Thickness)}>
+              <Segment value="thin">Thin</Segment>
+              <Segment value="regular">Regular</Segment>
+              <Segment value="thick">Thick</Segment>
+            </SegmentedControl>
+          )}
+          {floating && (
+            <>
+              <p className="cross-stitch__note">
+                {floating.columns} × {floating.rows} stitches, in {selected === null ? "bare fabric: the eraser cuts the letters out of what's under them" : `color ${selected + 1}`}. Drag it on the
+                chart, or use the arrow keys there, to move it.{" "}
+                {!textFits &&
+                  (floating.columns > pattern.columns || floating.rows > pattern.rows
+                    ? `It's bigger than the chart (${pattern.columns} × ${pattern.rows}), so make the letters smaller or the chart bigger.`
+                    : "Part of it is off the chart, and would be cut off.")}
+              </p>
+              <div className="cross-stitch__buttons">
+                <Button size="sm" onClick={placeText}>
+                  Add the text to the pattern
+                </Button>
+                {textAt && (
+                  <Button variant="secondary" size="sm" onClick={() => setTextAt(null)}>
+                    Center it
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" onClick={removeText}>
+                  Remove the text
+                </Button>
+              </div>
+            </>
+          )}
+        </fieldset>
+
+        <fieldset className="cross-stitch__group">
           <legend className="cross-stitch__legend">
-            Colors <span className="cross-stitch__meta">({used} used, {total} {total === 1 ? "stitch" : "stitches"})</span>
+            Colors<span className="cross-stitch__meta">({used} used, {total} {total === 1 ? "stitch" : "stitches"})</span>
           </legend>
           <div className="cross-stitch__palette">
             <label className="cross-stitch__swatch">
@@ -457,6 +649,7 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
           aria-roledescription="stitch chart"
           aria-label={`Pattern, ${pattern.columns} stitches across and ${pattern.rows} down`}
           aria-describedby={`${id}-help`}
+          data-floating={floating ? "" : undefined}
           onPointerDown={startStroke}
           onPointerMove={continueStroke}
           onPointerUp={endStroke}
@@ -469,8 +662,9 @@ export function CrossStitch({ defaultColumns = 40, defaultRows = 30, className, 
           onBlur={() => setFocused(false)}
         />
         <p id={`${id}-help`} className="cross-stitch__note">
-          Click or drag to stitch in the chosen color. With the keyboard: arrow keys move (with Shift, by 10), Space stitches or unstitches, Delete unstitches, and{" "}
-          {"Ctrl+Z"} undoes.
+          {floating
+            ? "The text floats over the chart until it's added. Drag it to move it. With the keyboard: arrow keys move it (with Shift, by 10), Enter adds it, and Escape removes it."
+            : "Click or drag to stitch in the chosen color. With the keyboard: arrow keys move (with Shift, by 10), Space stitches or unstitches, Delete unstitches, and Ctrl+Z undoes."}
         </p>
       </div>
       <p className="cross-stitch__live" aria-live="polite">
