@@ -46,8 +46,10 @@ export const Playground: Story = {
     const before = { width: button.getBoundingClientRect().width, date: date.getBoundingClientRect().left };
     await userEvent.click(button);
     await expect(canvas.getByRole("button", { name: "Play" })).toBe(button);
-    await expect(button.getBoundingClientRect().width).toBe(before.width);
-    await expect(date.getBoundingClientRect().left).toBe(before.date);
+    // Within a pixel: the date keeps ticking until the click lands, so its text can change width by a fraction of
+    // a pixel between the two readings. A shift anyone could see is still caught.
+    await expect(Math.abs(button.getBoundingClientRect().width - before.width)).toBeLessThanOrEqual(1);
+    await expect(Math.abs(date.getBoundingClientRect().left - before.date)).toBeLessThanOrEqual(1);
   },
 };
 
