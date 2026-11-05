@@ -195,6 +195,8 @@ const SIZE_TOKENS = ["target-min", "target-gap", "control-sm", "control-md", "co
 type SizeToken = { name: string; value: string; touch?: string; compact?: string };
 const sizeTokens = tokens.size.tokens as SizeToken[];
 const sizeToken = (name: string) => sizeTokens.find((t) => t.name === name)!;
+/** Every icon size token (icon-xs, icon-sm, …), in the order tokens.json lists them; the stroke tokens aren't sizes */
+const iconSizes = sizeTokens.filter((t) => t.name.startsWith("icon-") && !t.name.startsWith("icon-stroke"));
 /** A rem value from tokens.json in px, at the browser's default 16px */
 const px = (rem: string) => `${parseFloat(rem) * 16}px`;
 
@@ -314,11 +316,14 @@ export function Sizing() {
         <section className="fd-panel">
           <h3 className="fd-group">Icon sizes</h3>
           <div className="fd-row">
-            <span className="fd-icon-text sm"><svg className="fd-ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Saved</span>
-            <span className="fd-icon-text"><svg className="fd-ico md" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>See my work</span>
-            <span className="fd-icon-text lg"><svg className="fd-ico lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>Home</span>
+            {iconSizes.map((t) => (
+              <span key={t.name} className="fd-icon-text">
+                <svg className="fd-ico" style={{ width: `var(--${t.name})`, height: `var(--${t.name})` }} viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                {t.name}
+              </span>
+            ))}
           </div>
-          <code>{["icon-sm", "icon-md", "icon-lg"].map((n) => `${n} · ${sizeToken(n).value} (${px(sizeToken(n).value)})`).join(" · ")}</code>
+          <code>{iconSizes.map((t) => `${t.name} · ${t.value} (${px(t.value)})`).join(" · ")}</code>
         </section>
 
         <section className="fd-panel">

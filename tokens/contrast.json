@@ -5,7 +5,7 @@
     { "fg": "ink", "bg": "surface", "min": 4.5, "use": "Text on cards, menus, dialogs, inputs, and text areas, and a chosen segment's label, icons, and inner border" },
     { "fg": "ink", "bg": "surface-tint", "min": 4.5, "use": "Text on tinted panels" },
     { "fg": "ink", "bg": "surface-hover", "min": 4.5, "use": "Labels of hovered secondary and ghost buttons" },
-    { "fg": "ink", "bg": "track", "min": 4.5, "use": "Labels and icons of segments that aren't chosen, on the track" },
+    { "fg": "ink", "bg": "track", "min": 4.5, "use": "Labels and icons of segments that aren't chosen, on the track, and a neutral Badge's words and icon" },
     { "fg": "ink", "bg": "track-hover", "min": 4.5, "use": "Labels and icons of a hovered segment that isn't chosen" },
     { "fg": "ink", "bg": "success-soft", "min": 4.5, "use": "Message text on a success background" },
     { "fg": "ink", "bg": "warning-soft", "min": 4.5, "use": "Message text on a warning background" },
@@ -23,7 +23,7 @@
     { "fg": "on-action", "bg": "action", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, and the switch thumb when on, on the fill" },
     { "fg": "on-action", "bg": "action-hover", "min": 4.5, "use": "Primary button label, the checkbox tick, the radio dot, and the switch thumb when on, on hover" },
     { "fg": "on-brand", "bg": "brand", "min": 4.5, "use": "Text on a brand-colored band or panel in a layout" },
-    { "fg": "on-highlight", "bg": "highlight", "min": 4.5, "use": "Chip and badge text" },
+    { "fg": "on-highlight", "bg": "highlight", "min": 4.5, "use": "Text on a highlight marker in a layout" },
 
     { "fg": "success", "bg": "bg", "min": 4.5, "use": "Success text and icons on the page" },
     { "fg": "success", "bg": "surface", "min": 4.5, "use": "Success text and icons on cards" },
@@ -31,7 +31,9 @@
     { "fg": "warning", "bg": "surface", "min": 4.5, "use": "Warning text and icons on cards" },
     { "fg": "danger", "bg": "bg", "min": 4.5, "use": "Error text and icons on the page" },
     { "fg": "danger", "bg": "surface", "min": 4.5, "use": "Error text and icons on cards, and a danger button's label and icon" },
-    { "fg": "danger", "bg": "danger-soft", "min": 4.5, "use": "A hovered danger button's label and icon" },
+    { "fg": "danger", "bg": "danger-soft", "min": 4.5, "use": "A hovered danger button's label and icon, and a danger Badge's words and icon" },
+    { "fg": "success", "bg": "success-soft", "min": 4.5, "use": "A success Badge's words and icon" },
+    { "fg": "warning", "bg": "warning-soft", "min": 4.5, "use": "A warning Badge's words and icon" },
     { "fg": "danger", "bg": "surface-tint", "min": 4.5, "use": "Error text on tinted panels" },
 
     { "fg": "border-strong", "bg": "bg", "min": 3, "use": "Control edges on the page" },

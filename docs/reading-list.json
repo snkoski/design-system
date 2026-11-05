@@ -176,6 +176,11 @@
       "id": "separators",
       "name": "Separators",
       "group": "components"
+    },
+    {
+      "id": "badges",
+      "name": "Badges",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2271,6 +2276,95 @@
         "separators"
       ],
       "note": "Announce it by default; if you'd want it skipped, ask whether the line is needed at all."
+    },
+    {
+      "title": "Notifications (badging)",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/notifications",
+      "system": "apple",
+      "topics": [
+        "badges"
+      ],
+      "note": "Apple's badge is only the unread count on an app icon."
+    },
+    {
+      "title": "Badges (MDC-Android)",
+      "url": "https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md",
+      "system": "material",
+      "topics": [
+        "badges"
+      ],
+      "note": "Material's badge is a count or dot on navigation and icons."
+    },
+    {
+      "title": "Label",
+      "url": "https://primer.style/product/components/label/",
+      "system": "primer",
+      "topics": [
+        "badges"
+      ],
+      "note": "Ten variants, and a warning not to rely on the variant's color alone."
+    },
+    {
+      "title": "Lozenge",
+      "url": "https://atlassian.design/components/lozenge/usage",
+      "system": "atlassian",
+      "topics": [
+        "badges"
+      ],
+      "note": "Atlassian's status label (its Badge is a count): sentence case, never interactive."
+    },
+    {
+      "title": "Tag",
+      "url": "https://carbondesignsystem.com/components/tag/usage/",
+      "system": "carbon",
+      "topics": [
+        "badges"
+      ],
+      "note": "Twelve colors, under 20 characters, and long text cut off with a tooltip."
+    },
+    {
+      "title": "Badge",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/badge/usage",
+      "system": "fluent",
+      "topics": [
+        "badges"
+      ],
+      "note": "Eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts."
+    },
+    {
+      "title": "Badge",
+      "url": "https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx",
+      "system": "polaris",
+      "topics": [
+        "badges"
+      ],
+      "note": "One or two words, past tense; warning and critical only when really needed."
+    },
+    {
+      "title": "Tag",
+      "url": "https://design-system.service.gov.uk/components/tag/",
+      "system": "govuk",
+      "topics": [
+        "badges"
+      ],
+      "note": "Never a link or button; made lighter because tags were mistaken for buttons."
+    },
+    {
+      "title": "Tag",
+      "url": "https://designsystem.digital.gov/components/tag/",
+      "system": "uswds",
+      "topics": [
+        "badges"
+      ],
+      "note": "Static, and announced with a live region when loaded after the page."
+    },
+    {
+      "title": "Understanding Status Messages (WCAG 4.1.3)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+      "topics": [
+        "badges"
+      ],
+      "note": "When a change needs a live region: a badge already on the page doesn't."
     }
   ]
 }

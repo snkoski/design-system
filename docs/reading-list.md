@@ -52,6 +52,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Navigation](#navigation)
   - [Loading indicators](#loading-indicators)
   - [Separators](#separators)
+  - [Badges](#badges)
 
 ## Choosing and building colors
 
@@ -128,6 +129,7 @@ Everything we read from each system, grouped by topic.
 - **Navigation:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
 - **Loading indicators:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
 - **Separators:** [Divider (SwiftUI)](https://developer.apple.com/documentation/swiftui/divider) (no options: it runs across a stack, so it turns vertical inside a row)
+- **Badges:** [Notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications) (apple's badge is only the unread count on an app icon)
 
 ### Material Design 3 (Google)
 
@@ -146,6 +148,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
 - **Loading indicators:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
 - **Separators:** [Divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md) (inset variants; decorative unless you add role="separator")
+- **Badges:** [Badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md) (material's badge is a count or dot on navigation and icons)
 
 ### GitHub Primer
 
@@ -168,6 +171,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltip](https://primer.style/product/components/tooltip)
 - **Loading indicators:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), and [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second)
 - **Separators:** [ActionList dividers](https://primer.style/product/components/action-list/) (primer has no standalone divider; ActionList's is hidden from screen readers)
+- **Badges:** [Label](https://primer.style/product/components/label/) (ten variants, and a warning not to rely on the variant's color alone)
 
 ### Atlassian Design System
 
@@ -192,6 +196,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
 - **Loading indicators:** [Spinner](https://atlassian.design/components/spinner/usage)
 - **Separators:** [Menu sections with separators](https://atlassian.design/components/menu/code) (no standalone divider: a menu Section's hasSeparator draws a border)
+- **Badges:** [Lozenge](https://atlassian.design/components/lozenge/usage) (atlassian's status label (its Badge is a count): sentence case, never interactive)
 
 ### IBM Carbon
 
@@ -213,6 +218,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
 - **Tooltips:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
 - **Loading indicators:** [Loading](https://carbondesignsystem.com/components/loading/usage/) and [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/)
+- **Badges:** [Tag](https://carbondesignsystem.com/components/tag/usage/) (twelve colors, under 20 characters, and long text cut off with a tooltip)
 
 ### Microsoft Fluent 2
 
@@ -236,6 +242,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
 - **Loading indicators:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list)
 - **Separators:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
+- **Badges:** [Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage) (eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts)
 
 ### Shopify Polaris
 
@@ -257,6 +264,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
 - **Loading indicators:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)
 - **Separators:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
+- **Badges:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
 
 ### GOV.UK Design System
 
@@ -273,6 +281,7 @@ Everything we read from each system, grouped by topic.
 - **Text areas:** [Textarea](https://design-system.service.gov.uk/components/textarea/)
 - **Forms and errors:** [Question pages](https://design-system.service.gov.uk/patterns/question-pages) (where "mark optional fields, no asterisks" comes from), [Error message](https://design-system.service.gov.uk/components/error-message/), and [Error summary](https://design-system.service.gov.uk/components/error-summary/)
 - **Separators:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)
+- **Badges:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
 
 ### U.S. Web Design System
 
@@ -292,6 +301,7 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Form](https://designsystem.digital.gov/components/form/)
 - **Dialogs:** [Modal](https://designsystem.digital.gov/components/modal/)
 - **Tooltips:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
+- **Badges:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)
 
 ## Design systems, by topic
 
@@ -536,3 +546,15 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Microsoft Fluent 2:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
 - **Shopify Polaris:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
 - **GOV.UK Design System:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)
+
+### Badges
+
+- **Apple Human Interface Guidelines:** [Notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications) (apple's badge is only the unread count on an app icon)
+- **Material Design 3 (Google):** [Badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md) (material's badge is a count or dot on navigation and icons)
+- **GitHub Primer:** [Label](https://primer.style/product/components/label/) (ten variants, and a warning not to rely on the variant's color alone)
+- **Atlassian Design System:** [Lozenge](https://atlassian.design/components/lozenge/usage) (atlassian's status label (its Badge is a count): sentence case, never interactive)
+- **IBM Carbon:** [Tag](https://carbondesignsystem.com/components/tag/usage/) (twelve colors, under 20 characters, and long text cut off with a tooltip)
+- **Microsoft Fluent 2:** [Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage) (eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts)
+- **Shopify Polaris:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
+- **GOV.UK Design System:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
+- **U.S. Web Design System:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)

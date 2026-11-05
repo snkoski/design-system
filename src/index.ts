@@ -8,3 +8,4 @@ export * from "./components/TextArea";
 export * from "./components/SegmentedControl";
 export * from "./components/Spinner";
 export * from "./components/Separator";
+export * from "./components/Badge";

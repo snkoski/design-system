@@ -173,6 +173,23 @@ Most systems hide the words and say "Loading" by default. Sherbet makes the labe
 
 Systems split on whether screen readers should hear a separator. Polaris, GOV.UK, and Fluent announce it; Material and Primer hide it. Sherbet announces it: it's one word, and it's the only sign of a break when nothing else marks one. ARIA makes a separator's children presentational, so words placed inside one usually aren't read, and Sherbet hides them on purpose. Polaris and Fluent both warn against overusing lines: space and headings group content first.
 
+## Badges
+
+| System | Status label | Its "badge" | Tones | Sizes | Icon |
+| --- | --- | --- | --- | --- | --- |
+| Apple | None | The notification count on an app icon | System red | — | — |
+| Material 3 | None (chips are interactive) | A count or dot on navigation and icons | Any color | Small (dot) and large | — |
+| Primer | Label and StateLabel | — (CounterLabel for counts) | 10 variants; says not to rely on the color | Small and large | StateLabel has one |
+| Atlassian | Lozenge | A count | Status colors, subtle or bold, plus accent colors for labels with no meaning | Small and medium | Optional |
+| Carbon | Tag | — | 12 colors | Small, medium, and large | Optional |
+| Fluent 2 | Badge | Also CounterBadge for counts | 8 colors × 4 looks | 6 | Optional |
+| Polaris | Badge | — | 9 tones, with stronger versions | Small, medium, and large | Optional |
+| GOV.UK | Tag | — | 9 colors | One | No |
+| USWDS | Tag | — | One | Default and big | No |
+| **Sherbet** | **Badge** | **—** | **Neutral (default), success, warning, and danger: a soft fill with the words in the tone's color** | **`sm` and `md`** | **Optional, before the words** |
+
+Systems split on the word "badge": Apple, Material, Atlassian, and Fluent's CounterBadge use it for a count, and Polaris, Fluent, and shadcn for a status label, which GOV.UK, USWDS, and Carbon call a tag and Atlassian a lozenge. Sherbet's Badge is the status label; a count pinned to an icon would be a separate component. Every system with guidance says the color can't carry the meaning alone, and GOV.UK and Atlassian say a status label must never be a link or button; Sherbet's can't be. Most systems offer many colors. Sherbet keeps badges gray unless a status means something, as `color.md` asks, and has no color prop yet (`docs/revisit.md`). Atlassian and Carbon cut long text off with an ellipsis; Sherbet wraps it instead, so it stays readable, as Button's label does.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -221,3 +238,13 @@ Systems split on whether screen readers should hear a separator. Polaris, GOV.UK
 - [GOV.UK section break](https://design-system.service.gov.uk/styles/section-break/)
 - [Primer ActionList](https://primer.style/product/components/action-list/) and [Atlassian Menu](https://atlassian.design/components/menu/code)
 - [WAI-ARIA 1.2: the separator role](https://www.w3.org/TR/wai-aria-1.2/#separator)
+- [Apple notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications)
+- [Material badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md)
+- [Primer Label](https://primer.style/product/components/label/)
+- [Atlassian Lozenge](https://atlassian.design/components/lozenge/usage) and [Badge](https://atlassian.design/components/badge/usage)
+- [Carbon Tag](https://carbondesignsystem.com/components/tag/usage/)
+- [Fluent 2 Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage)
+- [Polaris Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx)
+- [GOV.UK Tag](https://design-system.service.gov.uk/components/tag/)
+- [USWDS Tag](https://designsystem.digital.gov/components/tag/)
+- [WCAG 2.2: Understanding Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html) and [Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
