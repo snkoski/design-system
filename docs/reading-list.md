@@ -51,6 +51,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Tooltips](#tooltips)
   - [Navigation](#navigation)
   - [Loading indicators](#loading-indicators)
+  - [Separators](#separators)
 
 ## Choosing and building colors
 
@@ -126,6 +127,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Offering help](https://developer.apple.com/design/human-interface-guidelines/offering-help) (help tags; there's no tooltip page)
 - **Navigation:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
 - **Loading indicators:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
+- **Separators:** [Divider (SwiftUI)](https://developer.apple.com/documentation/swiftui/divider) (no options: it runs across a stack, so it turns vertical inside a row)
 
 ### Material Design 3 (Google)
 
@@ -143,6 +145,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Dialogs](https://m3.material.io/components/dialogs/guidelines)
 - **Tooltips:** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
 - **Loading indicators:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
+- **Separators:** [Divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md) (inset variants; decorative unless you add role="separator")
 
 ### GitHub Primer
 
@@ -164,6 +167,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Dialog](https://primer.style/product/components/dialog)
 - **Tooltips:** [Tooltip](https://primer.style/product/components/tooltip)
 - **Loading indicators:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), and [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second)
+- **Separators:** [ActionList dividers](https://primer.style/product/components/action-list/) (primer has no standalone divider; ActionList's is hidden from screen readers)
 
 ### Atlassian Design System
 
@@ -187,6 +191,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Modal dialog](https://atlassian.design/components/modal-dialog/usage)
 - **Tooltips:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
 - **Loading indicators:** [Spinner](https://atlassian.design/components/spinner/usage)
+- **Separators:** [Menu sections with separators](https://atlassian.design/components/menu/code) (no standalone divider: a menu Section's hasSeparator draws a border)
 
 ### IBM Carbon
 
@@ -230,6 +235,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
 - **Tooltips:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
 - **Loading indicators:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list)
+- **Separators:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
 
 ### Shopify Polaris
 
@@ -250,6 +256,7 @@ Everything we read from each system, grouped by topic.
 - **Text areas:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **Tooltips:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
 - **Loading indicators:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)
+- **Separators:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
 
 ### GOV.UK Design System
 
@@ -265,6 +272,7 @@ Everything we read from each system, grouped by topic.
 - **Text fields:** [Text input](https://design-system.service.gov.uk/components/text-input/)
 - **Text areas:** [Textarea](https://design-system.service.gov.uk/components/textarea/)
 - **Forms and errors:** [Question pages](https://design-system.service.gov.uk/patterns/question-pages) (where "mark optional fields, no asterisks" comes from), [Error message](https://design-system.service.gov.uk/components/error-message/), and [Error summary](https://design-system.service.gov.uk/components/error-summary/)
+- **Separators:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)
 
 ### U.S. Web Design System
 
@@ -518,3 +526,13 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **IBM Carbon:** [Loading](https://carbondesignsystem.com/components/loading/usage/) and [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/)
 - **Microsoft Fluent 2:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list)
 - **Shopify Polaris:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)
+
+### Separators
+
+- **Apple Human Interface Guidelines:** [Divider (SwiftUI)](https://developer.apple.com/documentation/swiftui/divider) (no options: it runs across a stack, so it turns vertical inside a row)
+- **Material Design 3 (Google):** [Divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md) (inset variants; decorative unless you add role="separator")
+- **GitHub Primer:** [ActionList dividers](https://primer.style/product/components/action-list/) (primer has no standalone divider; ActionList's is hidden from screen readers)
+- **Atlassian Design System:** [Menu sections with separators](https://atlassian.design/components/menu/code) (no standalone divider: a menu Section's hasSeparator draws a border)
+- **Microsoft Fluent 2:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
+- **Shopify Polaris:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
+- **GOV.UK Design System:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)

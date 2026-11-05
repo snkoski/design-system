@@ -7,3 +7,4 @@ export * from "./components/Input";
 export * from "./components/TextArea";
 export * from "./components/SegmentedControl";
 export * from "./components/Spinner";
+export * from "./components/Separator";

@@ -1,0 +1,61 @@
+/* Separator: a line between groups of content. What it is (the line, its color, and its thickness) is here. The
+   space around it, and a width other than its container's, are the layout's job: use gap or Tailwind margin. */
+@layer components {
+  /* The line is a border, not a background, so forced colors draws it in the text color instead of hiding it.
+     The browser's own <hr> look (a gray inset border on all four sides, margins, overflow: hidden) is reset
+     property by property, so a site without a CSS reset gets the same line. */
+  .separator {
+    --separator-line: var(--border-thin) solid var(--border);
+    display: block;
+    flex: none;
+    align-self: stretch; /* fills a flex column's width, or a flex row's height when vertical */
+    box-sizing: content-box;
+    inline-size: auto;
+    block-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-block-start: var(--separator-line);
+    overflow: visible;
+    color: inherit;
+    background: none;
+  }
+
+  /* Vertical: a line down the inline-start side, as tall as its row. In plain text flow it has no height. */
+  .separator[data-orientation="vertical"] {
+    inline-size: 0;
+    block-size: auto;
+    border-block-start: 0;
+    border-inline-start: var(--separator-line);
+  }
+
+  /* With a label it's a <div>: the words in the middle, and a line on either side drawn by ::before and ::after.
+     The words are small muted text and wrap, centered, when there isn't room. */
+  .separator:has(> .separator__label) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    block-size: auto;
+    border-block-start: 0;
+    color: var(--ink-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--leading-control);
+  }
+  .separator:has(> .separator__label)::before,
+  .separator:has(> .separator__label)::after {
+    content: "";
+    flex: 1 1 0;
+    min-inline-size: var(--space-4);
+    border-block-start: var(--separator-line);
+  }
+  .separator__label {
+    flex: 0 1 auto;
+    text-align: center;
+  }
+
+  /* Hot dog mode: every border is a chunky ink one. */
+  [data-theme="hotdog"] .separator {
+    --separator-line: var(--border-thick) solid var(--ink);
+  }
+}

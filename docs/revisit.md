@@ -196,3 +196,13 @@ Raised while writing the components' How it works pages (2026-10-28).
 **To decide:** when Skeleton is built, update `loading.md` with when to pick a skeleton over a spinner. Optionally, note in the roadmap's migration order which job tracker pages get which. Then delete this entry.
 
 Raised while building Spinner (2026-11-05).
+
+## A separator screen readers skip
+
+**Today:** every `Separator` is announced as "separator", with no way to hide one. Its label's words are always hidden.
+
+**Why it's in question:** when the groups on both sides already have headings or are separate lists, the line adds nothing for a screen reader, and "separator" is a little extra noise. Fluent and Material hide a purely visual divider. We announce it because one extra word costs little, while hiding the only sign of a break loses it.
+
+**To decide:** if real pages show many separators between groups that are already marked, add a `decorative` prop that hides it (`aria-hidden`), off by default. Adding it doesn't break anything. If not, delete this entry.
+
+Raised while building Separator (2026-11-05).

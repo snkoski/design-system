@@ -1,0 +1,105 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SeparatorStories from "./Separator.stories";
+import { Code } from "../../how-it-works/Code";
+import { Kinds } from "../../how-it-works/components/Separator";
+
+<Meta of={SeparatorStories} name="How it works" />
+
+# How Separator works
+
+A separator is a line between groups of content: across a page, or down between two groups in a row. This page walks through the real code underneath it: which element it renders and why, what screen readers hear, and how the CSS draws the line. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+## What it's made of
+
+Separator is built on [Base UI](https://base-ui.com)'s `Separator`, which adds `role="separator"` and the orientation attributes. There's nothing to press or focus, so that's all Base UI has to do.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Separator.tsx</code></td><td>The component. It picks the element (an <code>&lt;hr&gt;</code>, or a <code>&lt;div&gt;</code> when there's a label) and passes your props to Base UI.</td></tr>
+    <tr><td><code>separator.css</code></td><td>The line: its color, its thickness, the two orientations, the label, and hot dog mode. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/cx.ts</code> and <code>warn.ts</code></td><td>A helper that joins class names, and <code>hasContent</code>, which treats an empty or blank label as no label. Not exported.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Separator</code> and the <code>SeparatorProps</code> and <code>SeparatorOrientation</code> types.</td></tr>
+    <tr><td><code>Separator.test.tsx</code> and <code>Separator.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real separator, and under it the HTML it has rendered right now. Switch between the three kinds and watch the element and its attributes change.
+
+<Unstyled>
+  <Kinds />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Attribute or part</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;hr&gt;</code></td><td>HTML's own element for a break between groups. A browser draws it as a line even with no CSS at all, and screen readers already know it as a separator.</td></tr>
+    <tr><td><code>class="separator"</code></td><td>The component's name, which <code>separator.css</code> styles. A <code>className</code> you pass is added after it, for layout such as margin.</td></tr>
+    <tr><td><code>role="separator"</code></td><td>Set by Base UI. An <code>&lt;hr&gt;</code> has this role already; on the <code>&lt;div&gt;</code> it's what makes it a separator at all.</td></tr>
+    <tr><td><code>aria-orientation</code></td><td>Set by Base UI from the <code>orientation</code> prop, so a screen reader knows which way the line runs.</td></tr>
+    <tr><td><code>data-orientation</code></td><td>Also set by Base UI. The CSS uses it to draw a vertical line instead of a horizontal one.</td></tr>
+    <tr><td><code>&lt;span class="separator__label" aria-hidden="true"&gt;</code></td><td>Only with a label. The words in the middle of the line, hidden from screen readers, as the next section explains.</td></tr>
+  </tbody>
+</table>
+
+## What screen readers hear
+
+A screen reader announces a separator as one word: NVDA says "separator", and VoiceOver on a Mac has been reported to say "horizontal splitter". It's always announced. For someone looking at the page, a line shows at a glance where one group ends and the next begins. For someone listening, that word is the same clue. When the groups already have headings, it's one extra word, which costs little; when nothing else marks the break, it's the only clue there is.
+
+A label's words are hidden from screen readers (`aria-hidden="true"`). ARIA says a separator's contents are *presentational*: screen readers treat the separator as one blank line and skip what's inside, so most wouldn't read the words anyway. Hiding them makes every screen reader behave the same. That's why a label is only for words like "or", which repeat what the page already shows. A section's name belongs in a heading.
+
+## How props become attributes
+
+The props type has two shapes. A horizontal separator may have a `label`; a vertical one may not, so `<Separator orientation="vertical" label="or" />` doesn't compile. `children`, `role`, and `render` aren't props at all: the element and its role are fixed.
+
+<Code file="components/Separator/Separator.tsx" name="SeparatorProps" />
+
+The component passes every other prop to Base UI's `Separator`, not to the `<hr>` itself, because props on a `render` element would override Base UI's own. TypeScript doesn't check hyphenated attributes such as `aria-hidden` against the props type, so the component also drops `role`, `aria-orientation`, and `aria-hidden` if they arrive anyway: otherwise a line drawn horizontally could be announced as vertical, or not at all. With a label it leaves `render` out, and Base UI renders its default `<div>`. An empty or blank label counts as none, and so does a label passed to a vertical separator from code the types don't check.
+
+<Code file="components/Separator/Separator.tsx" name="Separator" />
+
+## The CSS, rule by rule
+
+### The line
+
+The line is a top border, not a background. In Windows' forced colors mode, the browser replaces every background with the page color, which would hide the line; a border gets the text color instead, so it stays visible.
+
+An `<hr>` comes with the browser's own look: a gray, inset border on all four sides, margins, and `overflow: hidden`. Many sites remove that with a CSS reset, but the design system can't count on one, so this rule resets each of those properties itself. It also sets no margin: the space around the line is the layout's job, with `gap` or Tailwind's margin. `align-self: stretch` makes it fill a flex column's width.
+
+<Code file="components/Separator/separator.css" name=".separator" />
+
+The line's look is one custom property, `--separator-line`, so hot dog mode can change it in one place.
+
+### Vertical
+
+A vertical line swaps the top border for one on the inline-start side (the left, in English), and takes its height from its row. In a flex or grid row, `align-self: stretch` from the first rule makes it as tall as the row. In plain text, it has no row to fill, so it has no height.
+
+<Code file="components/Separator/separator.css" name='.separator[data-orientation="vertical"]' />
+
+### With a label
+
+With a label, the separator is a flex row: a line, the words, and a line. It drops its own border, and draws the two lines with `::before` and `::after`, which share the rest of the width equally. The words are small muted text.
+
+<Code file="components/Separator/separator.css" name=".separator:has(> .separator__label)" />
+
+<Code file="components/Separator/separator.css" name=".separator:has(> .separator__label)::before" />
+
+### Hot dog mode
+
+Hot dog mode draws every border thick and in ink. The separator only changes `--separator-line`, and every rule above picks it up.
+
+<Code file="components/Separator/separator.css" name='[data-theme="hotdog"] .separator' />
+
+### No touch, density, or motion rules
+
+Nothing about a separator can be pressed or focused, so it has no hit area, no focus ring, and nothing that changes with a touch screen or compact density. It doesn't move.
+
+## How it's tested
+
+The unit tests check the element, its attributes, the label, refs, and the props type. The stories check what needs real CSS: the line's thickness and margins, that a vertical line fills its row, and that hot dog mode draws thick ink lines. Storybook loads Tailwind's reset, which would hide a missing reset in `separator.css`, so the **Without CSS reset** story renders the real separator in a shadow root that holds only `separator.css`, and checks the line is still flat with no margin.

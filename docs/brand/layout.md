@@ -7,6 +7,15 @@
 - Page content is capped at `content-max`, running text at `measure`. Side gutters are at least `space-4` (16px).
 - **Component spacing stays the same at every width. Page spacing grows.** Gaps between sections, page padding, and gutters step up from phone to desktop (GOV.UK's responsive spacing and USWDS margins do the same). A good default: section gaps `space-12` on phones, `space-16` from `breakpoint-md`, and page side padding `space-4`, `space-6`, then `space-8`.
 
+## Separating content
+
+- **Space first.** A larger `gap` between groups than inside them usually shows the grouping on its own. Then headings. A line comes after both, and only where the break still isn't clear. Too many lines add clutter (Polaris and Fluent say the same).
+- **Use `Separator` for a line between groups**: across a page or a panel, or vertical between groups in a row, such as two sets of links. Its line is the light `border` color, so the space and headings must show the grouping without it. It adds no space of its own: the layout's `gap` or margin sets the space on each side.
+- **Put a line above a heading, never under one.** A line under a heading cuts it off from the content it names.
+- **Put it between lists, not inside one.** An `<hr>` can't sit in a `<ul>`. A list's rows, a table's rows, and a card's edges get their lines from List, Table, and Card.
+- **A vertical separator needs a row:** a flex or grid parent, whose height it fills.
+- **A label is for words like "or"**, between two ways to do the same thing. Screen readers hear "separator" but not the words, so they must only repeat what's already clear. A section's name is a heading.
+
 ## Breakpoints
 
 Min-width breakpoints in em, mobile-first. Start with one column and add layout as space allows.
