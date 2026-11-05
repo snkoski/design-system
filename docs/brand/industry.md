@@ -158,6 +158,21 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 
 Most systems hide the words and say "Loading" by default. Sherbet makes the label required and visible, because `voice.md` asks for loading text that says what's loading, and Fluent and Carbon's inline loader show it too. Carbon, Atlassian, and Polaris all say to show only one at a time; so does Sherbet's guidance. Every system with guidance agrees that a spinner is for short waits of unknown length: Primer shows nothing under one second and a determinate indicator over three, and Apple, Material, and Fluent prefer a progress bar whenever progress can be measured.
 
+## Separators
+
+| System | Name | Options | What screen readers hear | Space around it |
+| --- | --- | --- | --- | --- |
+| Apple | Divider (SwiftUI) | None; it turns vertical inside a row | Not documented | None |
+| Material 3 | Divider | Inset at the start, the end, or both | Nothing by default; add `role="separator"` when it means something | Not documented |
+| Fluent 2 | Divider | Vertical, four strengths, inset, and words in the middle | "Separator"; its guidance says to hide a purely visual one | None: "Margins aren't built into the component" |
+| Polaris | Divider | Color (base or strong) and direction | `<hr>`, so "separator" | None |
+| GOV.UK | Section break | Sizes m, l, and xl, which are its margin; the line is optional | `<hr>`, even when the line is hidden | The margin is the component |
+| Primer, Atlassian, Carbon | None | Lines only inside menus and lists | Primer's is hidden; Carbon's is a separator | — |
+| USWDS | None | Border utilities | — | — |
+| **Sherbet** | **Separator** | **Horizontal or vertical; a plain-text label in the middle of a horizontal one** | **Always "separator"; the label's words are hidden** | **None: the layout's `gap` or margin** |
+
+Systems split on whether screen readers should hear a separator. Polaris, GOV.UK, and Fluent announce it; Material and Primer hide it. Sherbet announces it: it's one word, and it's the only sign of a break when nothing else marks one. ARIA makes a separator's children presentational, so words placed inside one usually aren't read, and Sherbet hides them on purpose. Polaris and Fluent both warn against overusing lines: space and headings group content first.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -199,3 +214,10 @@ Most systems hide the words and say "Loading" by default. Sherbet makes the labe
 - [Material 3 progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [material-web's progress docs](https://github.com/material-components/material-web/blob/main/docs/components/progress.md)
 - [Apple progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
 - [shadcn/ui Spinner](https://ui.shadcn.com/docs/components/spinner)
+- [SwiftUI Divider](https://developer.apple.com/documentation/swiftui/divider)
+- [Material 3 divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md)
+- [Fluent 2 Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage)
+- [Polaris Divider](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider)
+- [GOV.UK section break](https://design-system.service.gov.uk/styles/section-break/)
+- [Primer ActionList](https://primer.style/product/components/action-list/) and [Atlassian Menu](https://atlassian.design/components/menu/code)
+- [WAI-ARIA 1.2: the separator role](https://www.w3.org/TR/wai-aria-1.2/#separator)

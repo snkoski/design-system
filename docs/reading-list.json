@@ -171,6 +171,11 @@
       "id": "loading-indicators",
       "name": "Loading indicators",
       "group": "components"
+    },
+    {
+      "id": "separators",
+      "name": "Separators",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2187,6 +2192,85 @@
       "topics": [
         "loading-indicators"
       ]
+    },
+    {
+      "title": "Divider (SwiftUI)",
+      "url": "https://developer.apple.com/documentation/swiftui/divider",
+      "system": "apple",
+      "topics": [
+        "separators"
+      ],
+      "note": "No options: it runs across a stack, so it turns vertical inside a row."
+    },
+    {
+      "title": "Divider (material-web)",
+      "url": "https://github.com/material-components/material-web/blob/main/docs/components/divider.md",
+      "system": "material",
+      "topics": [
+        "separators"
+      ],
+      "note": "Inset variants; decorative unless you add role=\"separator\"."
+    },
+    {
+      "title": "ActionList dividers",
+      "url": "https://primer.style/product/components/action-list/",
+      "system": "primer",
+      "topics": [
+        "separators"
+      ],
+      "note": "Primer has no standalone divider; ActionList's is hidden from screen readers."
+    },
+    {
+      "title": "Menu sections with separators",
+      "url": "https://atlassian.design/components/menu/code",
+      "system": "atlassian",
+      "topics": [
+        "separators"
+      ],
+      "note": "No standalone divider: a menu Section's hasSeparator draws a border."
+    },
+    {
+      "title": "Divider",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/divider/usage",
+      "system": "fluent",
+      "topics": [
+        "separators"
+      ],
+      "note": "Vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden."
+    },
+    {
+      "title": "Divider (web components)",
+      "url": "https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider",
+      "system": "polaris",
+      "topics": [
+        "separators"
+      ],
+      "note": "Whitespace often groups better than lines, and too many add clutter."
+    },
+    {
+      "title": "Section break",
+      "url": "https://design-system.service.gov.uk/styles/section-break/",
+      "system": "govuk",
+      "topics": [
+        "separators"
+      ],
+      "note": "An <hr> whose margin is the point; the line is optional."
+    },
+    {
+      "title": "WAI-ARIA 1.2: the separator role",
+      "url": "https://www.w3.org/TR/wai-aria-1.2/#separator",
+      "topics": [
+        "separators"
+      ],
+      "note": "A separator that can't be focused is a static structural element; its children are presentational, so words inside it aren't read."
+    },
+    {
+      "title": "Should an hr be read by screen readers? (freee)",
+      "url": "https://a11y-guidelines.freee.co.jp/en/faq/articles/p0005.html",
+      "topics": [
+        "separators"
+      ],
+      "note": "Announce it by default; if you'd want it skipped, ask whether the line is needed at all."
     }
   ]
 }
