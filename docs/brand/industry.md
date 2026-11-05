@@ -141,6 +141,23 @@ Some systems offer more than one button shape. Material 3's expressive update ha
 
 When a label doesn't fit, most systems let it wrap onto more lines: Carbon (which says not to truncate), Fluent, Polaris, GOV.UK, USWDS, Spectrum, and Base Web. Atlassian, and Material's web component, cut it off with an ellipsis. Primer keeps it on one line and relies on short labels. WCAG only allows a cut-off label when something else shows the full text. Sherbet wraps.
 
+## Loading
+
+| System | Name | What screen readers hear | Sizes | Delay before it shows |
+| --- | --- | --- | --- | --- |
+| Primer | Spinner | `srText`, "Loading" by default and hidden. No live region: the page adds one | Small, medium, and large | `delay`: off, 300ms, 1000ms, or any number |
+| Atlassian | Spinner | `label`, which its guidance says to always set | Five, from extra small to extra large, or a number | `delay` in ms, default 0. It fades in, so it's never seen in under about 150ms |
+| Fluent 2 | Spinner | A visible `label`, linked with `aria-labelledby`; `role="progressbar"` | Eight, 16 to 44px; 32px by default | `delay` in ms, default 0 |
+| Polaris | Spinner (React, now archived) and `s-spinner` | `accessibilityLabel`, no default; `role="status"` | Two or three | None. Its guidance: only show one when loading takes over 500ms |
+| Carbon | Loading, and InlineLoading for small actions | "loading" by default, hidden; InlineLoading has visible words ("Saving…"). Both use an assertive live region | Large and small | None |
+| Material 3 | Circular progress indicator, and a newer loading indicator | An `aria-label` the page sets | 48px on the web | Not documented |
+| Apple | Activity indicator | Not documented in the guidelines | Not documented | Not documented. Prefers a determinate indicator when possible |
+| shadcn/ui | Spinner | `role="status"` and `aria-label="Loading"` on the icon, not visible | One, resized with classes | None |
+| GOV.UK, USWDS | None | | | |
+| **Sherbet** | **Spinner** | **A required label, visible by default (`hideLabel` hides it), announced once through a polite status region** | **16, 20, and 24px** | **`delay` in ms, default 0, then a fade. Done in CSS, so it works before JavaScript runs** |
+
+Most systems hide the words and say "Loading" by default. Sherbet makes the label required and visible, because `voice.md` asks for loading text that says what's loading, and Fluent and Carbon's inline loader show it too. Carbon, Atlassian, and Polaris all say to show only one at a time; so does Sherbet's guidance. Every system with guidance agrees that a spinner is for short waits of unknown length: Primer shows nothing under one second and a determinate indicator over three, and Apple, Material, and Fluent prefer a progress bar whenever progress can be measured.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -174,3 +191,11 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 - [U.S. Web Design System](https://designsystem.digital.gov/components/typography/)
 - [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [WAI-ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/)
+- [Primer Spinner](https://primer.style/product/components/spinner/), its [accessibility notes](https://primer.style/product/components/spinner/accessibility), and the [loading pattern](https://primer.style/product/ui-patterns/loading/)
+- [Atlassian Spinner](https://atlassian.design/components/spinner/usage)
+- [Fluent 2 Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and its [source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner)
+- [Polaris Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)
+- [Carbon Loading](https://carbondesignsystem.com/components/loading/usage/) and [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/)
+- [Material 3 progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [material-web's progress docs](https://github.com/material-components/material-web/blob/main/docs/components/progress.md)
+- [Apple progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
+- [shadcn/ui Spinner](https://ui.shadcn.com/docs/components/spinner)

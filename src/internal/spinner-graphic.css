@@ -1,0 +1,14 @@
+/* The spinning drawing Spinner and a loading Button share. One turn per --duration-loop, at a steady speed. Reduced
+   motion makes --duration-loop longer, so it turns more slowly but never stops: a loading indicator stays visible. */
+@layer components {
+  .spinner-graphic {
+    flex: none;
+    animation: spinner-spin var(--duration-loop) linear infinite;
+  }
+
+  @keyframes spinner-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+}

@@ -97,6 +97,7 @@ Compared with the first version of this roadmap (2026-10-29), the design system 
 | An icon system | Decided: Lucide icons, passed in as `iconStart` and `iconEnd`. No wrapper component needed |
 | A headless layer | Decided: Base UI |
 | Button, IconButton, and a loading state | Done: `Button`, with `iconOnly` (its types require an `aria-label`) and `loading` |
+| Spinner | Done (2026-11-05): `Spinner`, with a required `label`, `hideLabel`, three sizes, and `delay`. Button's loading state shares its drawing |
 | Text links and router links | Partly done: `ButtonLink` renders a real `<a>`, and `base.css` styles plain links. See Q8 |
 | Input and Textarea | Done: `Input` and `TextArea` |
 | Label, FieldError, and a Field component | Done differently: each control takes `label`, `description`, and `error` props, so no separate Field component is needed |
@@ -126,7 +127,7 @@ Start only after the open questions are answered.
 
 ### Phase 1: small pieces
 
-1. **Spinner.** Move the private one out of `Button/shared.tsx` and export it. It uses `--duration-loop`.
+1. **Spinner.** Done (2026-11-05). The drawing moved out of `Button/shared.tsx` into `src/internal/`, and Button and the new `Spinner` share it. It has a required `label`, `hideLabel`, three sizes, and `delay`. See `docs/brand/loading.md`.
 2. **Separator**, on Base UI.
 3. **Badge**, with `data-tone`: `neutral` (default), `success`, `warning`, or `danger` (Q3, Q6). Look then at also taking a color (Q6).
 4. **Skeleton.**
@@ -208,9 +209,10 @@ These are specific to the job tracker and become thin pieces built from the desi
    - Competencies become a `CheckboxGroup`, until the chip group exists.
    - Base UI controls need react-hook-form's `Controller` instead of `register`. Only ApplicationForm uses react-hook-form, so this is small.
 4. **NativeSelect**, for all 33 selects.
-5. **Card, Badge, Table, Collapsible, Tabs, and Rating**, a page at a time.
-6. **AlertDialog** replaces `DeleteButton` and the other `window.confirm` calls. Then **Drawer and AppShell** replace `Layout.tsx`.
-7. **Turn on `tailwind-theme.css`.** Fix any Tailwind color classes that are left, then delete `apps/web/src/components/ui` and the job tracker's `cn()` and tailwind-merge.
+5. **Spinner**, for the 18 text-only `<Spinner />` placeholders. Each gets a `label` that says what's loading ("Loading applications…"), and the space around it keeps its padding and centering with Tailwind. Don't put it inside an `aria-busy` element (`docs/brand/loading.md`). Some list areas may suit Skeleton better once it exists (`docs/revisit.md`, "Loading guidance once Skeleton exists").
+6. **Card, Badge, Table, Collapsible, Tabs, and Rating**, a page at a time.
+7. **AlertDialog** replaces `DeleteButton` and the other `window.confirm` calls. Then **Drawer and AppShell** replace `Layout.tsx`.
+8. **Turn on `tailwind-theme.css`.** Fix any Tailwind color classes that are left, then delete `apps/web/src/components/ui` and the job tracker's `cn()` and tailwind-merge.
 
 ## Visual tests
 

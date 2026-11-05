@@ -166,6 +166,11 @@
       "id": "navigation",
       "name": "Navigation",
       "group": "components"
+    },
+    {
+      "id": "loading-indicators",
+      "name": "Loading indicators",
+      "group": "components"
     }
   ],
   "systems": [
@@ -216,236 +221,1972 @@
     }
   ],
   "links": [
-    { "title": "Refactoring UI: Building your color palette", "url": "https://refactoringui.com/previews/building-your-color-palette", "topics": [ "building-a-palette" ], "note": "The most practical short read. Grays, primary, and accent colors, and how to build 9 to 10 shades of each." },
-    { "title": "Stripe: Designing accessible color systems", "url": "https://stripe.com/blog/accessible-color-systems", "topics": [ "building-a-palette" ], "note": "Why HSL lightness doesn't match how bright a color looks, and how Stripe rebuilt its palette so every hue has the same contrast at each step." },
-    { "title": "Matt Strom: How to generate color palettes for design systems", "url": "https://mattstromawn.com/writing/generating-color-palettes/", "topics": [ "building-a-palette" ], "note": "Perceptual color spaces, shifting hue as colors get lighter or darker, and generating scales from formulas." },
-    { "title": "Radix Colors: Composing a palette", "url": "https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette", "topics": [ "building-a-palette" ], "note": "Choosing a brand color, a gray tinted toward it, and status colors." },
-    { "title": "Radix Colors: Understanding the scale", "url": "https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale", "topics": [ "building-a-palette" ], "note": "What each of 12 shades is for: backgrounds, borders, fills, and text." },
-    { "title": "OneSignal: 11 shades of gray", "url": "https://onesignal.com/blog/11-shades-of-gray-a-color-system-story/", "topics": [ "building-a-palette" ], "note": "A case study of building a gray scale." },
-    { "title": "The 60-30-10 rule for UI design", "url": "https://bootcamp.uxdesign.cc/the-60-30-10-color-rule-for-ui-design-32695d04a7c2", "topics": [ "building-a-palette" ], "note": "A rough guide to how much of a screen is neutral, supporting color, and accent." },
-    { "title": "Shopify: How to choose brand colors", "url": "https://www.shopify.com/blog/choose-brand-colors", "topics": [ "choosing-brand-colors" ], "note": "A general branding guide." },
-    { "title": "Adobe: Picking your brand colors", "url": "https://www.adobe.com/express/learn/blog/3-easy-steps-to-picking-your-brand-colors", "topics": [ "choosing-brand-colors" ], "note": "Another general guide, in three steps." },
-    { "title": "Color psychology: how colors influence the mind", "url": "https://www.psychologytoday.com/intl/blog/habits-not-hacks/201408/color-psychology-how-colors-influence-the-mind", "topics": [ "color-psychology" ], "note": "A skeptical, research-based take. Fit with the brand's personality and standing out matter more than what a hue \"means.\"" },
-    { "title": "Labrecque and Milne, \"Exciting red and competent blue\"", "url": "https://colab.ws/articles/10.1007/s11747-010-0245-y", "topics": [ "color-psychology" ], "note": "Research on how hue, saturation, and lightness shift a brand's perceived personality." },
-    { "title": "Singh, \"Impact of color on marketing\"", "url": "https://newion.uwinnipeg.ca/~ssingh5/x/color.pdf", "topics": [ "color-psychology" ], "note": "The source of the often-quoted \"up to 90% of snap judgments\" figure. Widely repeated, loosely sourced." },
-    { "title": "WCAG 2.2", "url": "https://www.w3.org/TR/WCAG22/", "topics": [ "wcag" ], "note": "The full standard." },
-    { "title": "WCAG 2.2 quick reference", "url": "https://www.w3.org/WAI/WCAG22/quickref/", "topics": [ "wcag" ], "note": "The easier way in: every criterion, filterable, with techniques." },
-    { "title": "What's new in WCAG 2.2", "url": "https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/", "topics": [ "wcag" ] },
-    { "title": "Understanding WCAG: Target size (minimum)", "url": "https://w3c.github.io/wcag/understanding/target-size-minimum.html", "topics": [ "wcag" ], "note": "Where the 24px minimum comes from." },
-    { "title": "Understanding WCAG: Focus not obscured", "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html", "topics": [ "wcag" ] },
-    { "title": "Understanding WCAG: Focus appearance", "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html", "topics": [ "wcag" ] },
-    { "title": "ARIA Authoring Practices Guide", "url": "https://www.w3.org/WAI/ARIA/apg/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Button", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Dialog (modal)", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Menu button", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Menu bar", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Tabs", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/", "topics": [ "aria-patterns" ] },
-    { "title": "APG pattern: Combobox", "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/", "topics": [ "aria-patterns" ] },
-    { "title": "Home", "url": "https://developer.apple.com/design/human-interface-guidelines/", "system": "apple", "topics": [ "getting-started" ] },
-    { "title": "Dark mode", "url": "https://developer.apple.com/design/human-interface-guidelines/dark-mode", "system": "apple", "topics": [ "color" ] },
-    { "title": "Typography", "url": "https://developer.apple.com/design/human-interface-guidelines/typography", "system": "apple", "topics": [ "typography" ] },
-    { "title": "Layout", "url": "https://developer.apple.com/design/human-interface-guidelines/layout", "system": "apple", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Motion", "url": "https://developer.apple.com/design/human-interface-guidelines/motion", "system": "apple", "topics": [ "motion" ] },
-    { "title": "Icons", "url": "https://developer.apple.com/design/human-interface-guidelines/icons", "system": "apple", "topics": [ "icons" ] },
-    { "title": "SF Symbols", "url": "https://developer.apple.com/design/human-interface-guidelines/sf-symbols", "system": "apple", "topics": [ "icons" ] },
-    { "title": "Pointing devices", "url": "https://developer.apple.com/design/human-interface-guidelines/pointing-devices", "system": "apple", "topics": [ "platforms-and-input" ] },
-    { "title": "Designing for macOS", "url": "https://developer.apple.com/design/human-interface-guidelines/designing-for-macos", "system": "apple", "topics": [ "platforms-and-input" ], "note": "Where the 28pt Mac target size comes from." },
-    { "title": "Accessibility", "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility", "system": "apple", "topics": [ "accessibility" ] },
-    { "title": "Buttons", "url": "https://developer.apple.com/design/human-interface-guidelines/buttons", "system": "apple", "topics": [ "buttons" ] },
-    { "title": "Toggles", "url": "https://developer.apple.com/design/human-interface-guidelines/toggles", "system": "apple", "topics": [ "checkboxes", "radio-buttons", "switches" ], "note": "Switches, plus checkboxes and radio buttons in its macOS section." },
-    { "title": "Segmented controls", "url": "https://developer.apple.com/design/human-interface-guidelines/segmented-controls", "system": "apple", "topics": [ "segmented-controls" ] },
-    { "title": "Text fields", "url": "https://developer.apple.com/design/human-interface-guidelines/text-fields", "system": "apple", "topics": [ "text-fields" ] },
-    { "title": "Text views", "url": "https://developer.apple.com/design/human-interface-guidelines/text-views", "system": "apple", "topics": [ "text-areas" ] },
-    { "title": "Alerts", "url": "https://developer.apple.com/design/human-interface-guidelines/alerts", "system": "apple", "topics": [ "dialogs" ] },
-    { "title": "Sheets", "url": "https://developer.apple.com/design/human-interface-guidelines/sheets", "system": "apple", "topics": [ "dialogs" ] },
-    { "title": "Modality", "url": "https://developer.apple.com/design/human-interface-guidelines/modality", "system": "apple", "topics": [ "dialogs" ] },
-    { "title": "Offering help", "url": "https://developer.apple.com/design/human-interface-guidelines/offering-help", "system": "apple", "topics": [ "tooltips" ], "note": "Help tags; there's no tooltip page." },
-    { "title": "Focus and selection", "url": "https://developer.apple.com/design/human-interface-guidelines/focus-and-selection", "system": "apple", "topics": [ "focus" ] },
-    { "title": "Sidebars", "url": "https://developer.apple.com/design/human-interface-guidelines/sidebars", "system": "apple", "topics": [ "navigation" ] },
-    { "title": "Home", "url": "https://m3.material.io/", "system": "material", "topics": [ "getting-started" ] },
-    { "title": "Structure", "url": "https://m3.material.io/foundations/designing/structure", "system": "material", "topics": [ "getting-started" ] },
-    { "title": "Window size classes", "url": "https://m3.material.io/foundations/layout/applying-layout/window-size-classes", "system": "material", "topics": [ "spacing-layout-and-grids" ], "note": "Material's breakpoints." },
-    { "title": "Window size classes (Android)", "url": "https://developer.android.com/guide/topics/ui/layout/window-size-classes", "system": "material", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Typography (Android)", "url": "https://github.com/material-components/material-components-android/blob/master/docs/theming/Typography.md", "system": "material", "topics": [ "typography" ] },
-    { "title": "Motion (Android)", "url": "https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md", "system": "material", "topics": [ "motion" ] },
-    { "title": "Buttons (Android)", "url": "https://github.com/material-components/material-components-android/blob/master/docs/components/Button.md", "system": "material", "topics": [ "buttons" ] },
-    { "title": "Checkbox", "url": "https://m3.material.io/components/checkbox/guidelines", "system": "material", "topics": [ "checkboxes" ] },
-    { "title": "Radio button", "url": "https://m3.material.io/components/radio-button/guidelines", "system": "material", "topics": [ "radio-buttons" ] },
-    { "title": "Switch", "url": "https://m3.material.io/components/switch/guidelines", "system": "material", "topics": [ "switches" ] },
-    { "title": "Segmented buttons", "url": "https://m3.material.io/components/segmented-buttons/overview", "system": "material", "topics": [ "segmented-controls" ] },
-    { "title": "Button groups", "url": "https://m3.material.io/components/button-groups/overview", "system": "material", "topics": [ "segmented-controls" ], "note": "The newer connected button group." },
-    { "title": "Text fields", "url": "https://m3.material.io/components/text-fields/guidelines", "system": "material", "topics": [ "text-fields", "text-areas" ], "note": "Multi-line text is part of text fields; there's no separate text area." },
-    { "title": "Dialogs", "url": "https://m3.material.io/components/dialogs/guidelines", "system": "material", "topics": [ "dialogs" ] },
-    { "title": "Tooltips", "url": "https://m3.material.io/components/tooltips/guidelines", "system": "material", "topics": [ "tooltips" ] },
-    { "title": "Home", "url": "https://primer.style/", "system": "primer", "topics": [ "getting-started" ] },
-    { "title": "Product foundations", "url": "https://primer.style/product", "system": "primer", "topics": [ "getting-started" ] },
-    { "title": "Primitives", "url": "https://primer.style/product/primitives", "system": "primer", "topics": [ "design-tokens" ] },
-    { "title": "Token names", "url": "https://primer.style/product/primitives/token-names/", "system": "primer", "topics": [ "design-tokens" ] },
-    { "title": "Color usage", "url": "https://primer.style/product/getting-started/foundations/color-usage/", "system": "primer", "topics": [ "color" ] },
-    { "title": "Color primitives", "url": "https://primer.style/product/primitives/color/", "system": "primer", "topics": [ "color" ] },
-    { "title": "Typography", "url": "https://primer.style/product/getting-started/foundations/typography/", "system": "primer", "topics": [ "typography" ] },
-    { "title": "Typography primitives", "url": "https://primer.style/product/primitives/typography/", "system": "primer", "topics": [ "typography" ] },
-    { "title": "Layout", "url": "https://primer.style/product/getting-started/foundations/layout/", "system": "primer", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Responsive", "url": "https://primer.style/product/getting-started/foundations/responsive/", "system": "primer", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Size primitives", "url": "https://primer.style/product/primitives/size/", "system": "primer", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Content", "url": "https://primer.style/product/getting-started/foundations/content/", "system": "primer", "topics": [ "writing-and-content" ] },
-    { "title": "Accessibility", "url": "https://primer.style/accessibility", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Color considerations", "url": "https://primer.style/accessibility/design-guidance/color-considerations/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Focus management", "url": "https://primer.style/accessibility/design-guidance/focus-management/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Links and buttons", "url": "https://primer.style/accessibility/design-guidance/links-and-buttons/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Motion and animation", "url": "https://primer.style/accessibility/design-guidance/motion-and-animation/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Text resize and spacing", "url": "https://primer.style/accessibility/design-guidance/text-resize-and-spacing/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Mobile checklist", "url": "https://primer.style/accessibility/tools-and-resources/checklists/mobile-checklist/", "system": "primer", "topics": [ "accessibility" ] },
-    { "title": "Button", "url": "https://primer.style/product/components/button/", "system": "primer", "topics": [ "buttons" ] },
-    { "title": "Button group", "url": "https://primer.style/product/components/button-group", "system": "primer", "topics": [ "buttons" ] },
-    { "title": "Checkbox", "url": "https://primer.style/product/components/checkbox", "system": "primer", "topics": [ "checkboxes" ] },
-    { "title": "RadioGroup", "url": "https://primer.style/product/components/radio-group", "system": "primer", "topics": [ "radio-buttons" ] },
-    { "title": "ToggleSwitch", "url": "https://primer.style/product/components/toggle-switch", "system": "primer", "topics": [ "switches" ] },
-    { "title": "SegmentedControl", "url": "https://primer.style/product/components/segmented-control", "system": "primer", "topics": [ "segmented-controls" ] },
-    { "title": "TextInput", "url": "https://primer.style/product/components/text-input", "system": "primer", "topics": [ "text-fields" ] },
-    { "title": "Textarea", "url": "https://primer.style/product/components/textarea", "system": "primer", "topics": [ "text-areas" ] },
-    { "title": "Forms", "url": "https://primer.style/product/ui-patterns/forms/", "system": "primer", "topics": [ "forms-and-errors" ] },
-    { "title": "Dialog", "url": "https://primer.style/product/components/dialog", "system": "primer", "topics": [ "dialogs" ] },
-    { "title": "Tooltip", "url": "https://primer.style/product/components/tooltip", "system": "primer", "topics": [ "tooltips" ] },
-    { "title": "Home", "url": "https://atlassian.design/", "system": "atlassian", "topics": [ "getting-started" ] },
-    { "title": "Components", "url": "https://atlassian.design/components", "system": "atlassian", "topics": [ "getting-started" ] },
-    { "title": "Design tokens", "url": "https://atlassian.design/foundations/tokens", "system": "atlassian", "topics": [ "design-tokens" ] },
-    { "title": "Color", "url": "https://atlassian.design/foundations/color", "system": "atlassian", "topics": [ "color" ] },
-    { "title": "Color (new)", "url": "https://atlassian.design/foundations/color-new", "system": "atlassian", "topics": [ "color" ] },
-    { "title": "Typography", "url": "https://atlassian.design/foundations/typography", "system": "atlassian", "topics": [ "typography" ] },
-    { "title": "Spacing", "url": "https://atlassian.design/foundations/spacing", "system": "atlassian", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Grid", "url": "https://atlassian.design/foundations/grid", "system": "atlassian", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Radius", "url": "https://atlassian.design/foundations/radius", "system": "atlassian", "topics": [ "shape-and-elevation" ] },
-    { "title": "Border", "url": "https://atlassian.design/foundations/border", "system": "atlassian", "topics": [ "shape-and-elevation" ] },
-    { "title": "Elevation", "url": "https://atlassian.design/foundations/elevation", "system": "atlassian", "topics": [ "shape-and-elevation" ] },
-    { "title": "Motion", "url": "https://atlassian.design/foundations/motion", "system": "atlassian", "topics": [ "motion" ] },
-    { "title": "Applying motion", "url": "https://atlassian.design/foundations/motion/applying-motion", "system": "atlassian", "topics": [ "motion" ] },
-    { "title": "Content", "url": "https://atlassian.design/foundations/content", "system": "atlassian", "topics": [ "writing-and-content" ] },
-    { "title": "Voice and tone", "url": "https://atlassian.design/foundations/content/voice-tone", "system": "atlassian", "topics": [ "writing-and-content" ] },
-    { "title": "Language and grammar", "url": "https://atlassian.design/foundations/content/language-and-grammar", "system": "atlassian", "topics": [ "writing-and-content" ] },
-    { "title": "Designing messages", "url": "https://atlassian.design/foundations/content/designing-messages", "system": "atlassian", "topics": [ "writing-and-content" ] },
-    { "title": "Accessibility", "url": "https://atlassian.design/foundations/accessibility", "system": "atlassian", "topics": [ "accessibility" ] },
-    { "title": "Button usage", "url": "https://atlassian.design/components/button/usage", "system": "atlassian", "topics": [ "buttons" ] },
-    { "title": "Button examples", "url": "https://atlassian.design/components/button/examples", "system": "atlassian", "topics": [ "buttons" ] },
-    { "title": "Evolving buttons and links", "url": "https://atlassian.design/whats-new/evolving-button-and-links", "system": "atlassian", "topics": [ "buttons" ] },
-    { "title": "Button (Forge UI Kit)", "url": "https://developer.atlassian.com/platform/forge/ui-kit/components/button", "system": "atlassian", "topics": [ "buttons" ], "note": "Default, primary, subtle, warning, and danger." },
-    { "title": "Checkbox", "url": "https://atlassian.design/components/checkbox/usage", "system": "atlassian", "topics": [ "checkboxes" ] },
-    { "title": "Radio", "url": "https://atlassian.design/components/radio/usage", "system": "atlassian", "topics": [ "radio-buttons" ] },
-    { "title": "Toggle", "url": "https://atlassian.design/components/toggle/usage", "system": "atlassian", "topics": [ "switches" ] },
-    { "title": "Text field usage", "url": "https://atlassian.design/components/textfield/usage", "system": "atlassian", "topics": [ "text-fields" ] },
-    { "title": "Text field examples", "url": "https://atlassian.design/components/textfield/examples", "system": "atlassian", "topics": [ "text-fields" ] },
-    { "title": "Text area", "url": "https://atlassian.design/components/textarea/usage", "system": "atlassian", "topics": [ "text-areas" ] },
-    { "title": "Form", "url": "https://atlassian.design/components/form/usage", "system": "atlassian", "topics": [ "forms-and-errors" ] },
-    { "title": "Modal dialog", "url": "https://atlassian.design/components/modal-dialog/usage", "system": "atlassian", "topics": [ "dialogs" ] },
-    { "title": "Tooltip", "url": "https://atlassian.design/components/tooltip/usage/", "system": "atlassian", "topics": [ "tooltips" ] },
-    { "title": "Focus ring", "url": "https://atlassian.design/components/focus-ring/usage", "system": "atlassian", "topics": [ "focus" ] },
-    { "title": "Focusable", "url": "https://atlassian.design/components/primitives/focusable", "system": "atlassian", "topics": [ "focus" ] },
-    { "title": "Home", "url": "https://carbondesignsystem.com/", "system": "carbon", "topics": [ "getting-started" ] },
-    { "title": "Color", "url": "https://carbondesignsystem.com/elements/color/overview/", "system": "carbon", "topics": [ "color" ] },
-    { "title": "Themes", "url": "https://carbondesignsystem.com/elements/themes/overview/", "system": "carbon", "topics": [ "color" ] },
-    { "title": "Typography", "url": "https://carbondesignsystem.com/elements/typography/overview/", "system": "carbon", "topics": [ "typography" ] },
-    { "title": "Type sets", "url": "https://carbondesignsystem.com/elements/typography/type-sets/", "system": "carbon", "topics": [ "typography" ] },
-    { "title": "Spacing", "url": "https://carbondesignsystem.com/elements/spacing/overview/", "system": "carbon", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "2x Grid", "url": "https://carbondesignsystem.com/elements/2x-grid/overview/", "system": "carbon", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Motion", "url": "https://carbondesignsystem.com/elements/motion/overview/", "system": "carbon", "topics": [ "motion" ] },
-    { "title": "Writing style", "url": "https://carbondesignsystem.com/guidelines/content/writing-style/", "system": "carbon", "topics": [ "writing-and-content" ] },
-    { "title": "Accessibility", "url": "https://carbondesignsystem.com/guidelines/accessibility/overview/", "system": "carbon", "topics": [ "accessibility" ] },
-    { "title": "Button usage", "url": "https://carbondesignsystem.com/components/button/usage/", "system": "carbon", "topics": [ "buttons" ], "note": "Emphasis levels, one primary per page, and danger buttons." },
-    { "title": "Button style", "url": "https://carbondesignsystem.com/components/button/style/", "system": "carbon", "topics": [ "buttons" ] },
-    { "title": "Checkbox", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/checkbox/guidelines", "system": "carbon", "topics": [ "checkboxes" ] },
-    { "title": "Radio button", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/radio-button", "system": "carbon", "topics": [ "radio-buttons" ] },
-    { "title": "Toggle", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/toggle", "system": "carbon", "topics": [ "switches" ] },
-    { "title": "Content switcher", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher", "system": "carbon", "topics": [ "segmented-controls" ] },
-    { "title": "Text input", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/text-input", "system": "carbon", "topics": [ "text-fields", "text-areas" ], "note": "Text areas are a section of this page." },
-    { "title": "Text input style", "url": "https://carbondesignsystem.com/components/text-input/style/", "system": "carbon", "topics": [ "text-fields" ] },
-    { "title": "Forms pattern", "url": "https://carbondesignsystem.com/patterns/forms-pattern/", "system": "carbon", "topics": [ "forms-and-errors" ] },
-    { "title": "Modal", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/modal", "system": "carbon", "topics": [ "dialogs" ] },
-    { "title": "Tooltip", "url": "https://www.carbondesignsystem.com/building-blocks/core/components/tooltip", "system": "carbon", "topics": [ "tooltips" ] },
-    { "title": "Home", "url": "https://fluent2.microsoft.design/", "system": "fluent", "topics": [ "getting-started" ] },
-    { "title": "Getting started", "url": "https://fluent2.microsoft.design/get-started/design", "system": "fluent", "topics": [ "getting-started" ] },
-    { "title": "Design tokens", "url": "https://fluent2.microsoft.design/design-tokens", "system": "fluent", "topics": [ "design-tokens" ] },
-    { "title": "Color", "url": "https://fluent2.microsoft.design/color", "system": "fluent", "topics": [ "color" ] },
-    { "title": "Typography", "url": "https://fluent2.microsoft.design/typography", "system": "fluent", "topics": [ "typography" ] },
-    { "title": "Layout", "url": "https://fluent2.microsoft.design/layout", "system": "fluent", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Shapes", "url": "https://fluent2.microsoft.design/shapes", "system": "fluent", "topics": [ "shape-and-elevation" ] },
-    { "title": "Elevation", "url": "https://fluent2.microsoft.design/elevation", "system": "fluent", "topics": [ "shape-and-elevation" ] },
-    { "title": "Motion", "url": "https://fluent2.microsoft.design/motion", "system": "fluent", "topics": [ "motion" ] },
-    { "title": "Content design", "url": "https://fluent2.microsoft.design/content-design", "system": "fluent", "topics": [ "writing-and-content" ] },
-    { "title": "Accessibility", "url": "https://fluent2.microsoft.design/accessibility", "system": "fluent", "topics": [ "accessibility" ] },
-    { "title": "Button (web)", "url": "https://fluent2.microsoft.design/components/web/react/core/button/usage", "system": "fluent", "topics": [ "buttons" ] },
-    { "title": "Button (iOS)", "url": "https://fluent2.microsoft.design/components/ios/core/button/usage", "system": "fluent", "topics": [ "buttons" ] },
-    { "title": "Button (Android)", "url": "https://fluent2.microsoft.design/components/android/core/button/usage", "system": "fluent", "topics": [ "buttons" ], "note": "How one system sizes a control per platform." },
-    { "title": "Checkbox", "url": "https://fluent2.microsoft.design/components/web/react/core/checkbox/usage", "system": "fluent", "topics": [ "checkboxes" ] },
-    { "title": "Radio group", "url": "https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage", "system": "fluent", "topics": [ "radio-buttons" ] },
-    { "title": "Switch", "url": "https://fluent2.microsoft.design/components/web/react/core/switch/usage", "system": "fluent", "topics": [ "switches" ] },
-    { "title": "Segmented control (iOS)", "url": "https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage", "system": "fluent", "topics": [ "segmented-controls" ], "note": "IOS only; the web has none." },
-    { "title": "Input", "url": "https://fluent2.microsoft.design/components/web/react/core/input/usage", "system": "fluent", "topics": [ "text-fields" ] },
-    { "title": "Field", "url": "https://fluent2.microsoft.design/components/web/react/core/field/usage", "system": "fluent", "topics": [ "text-fields" ] },
-    { "title": "Textarea", "url": "https://fluent2.microsoft.design/components/web/react/core/textarea/usage", "system": "fluent", "topics": [ "text-areas" ] },
-    { "title": "Dialog", "url": "https://fluent2.microsoft.design/components/web/react/core/dialog/usage", "system": "fluent", "topics": [ "dialogs" ] },
-    { "title": "Tooltip", "url": "https://fluent2.microsoft.design/components/web/react/core/tooltip/usage", "system": "fluent", "topics": [ "tooltips" ] },
-    { "title": "Polaris React", "url": "https://polaris-react.shopify.com/", "system": "polaris", "topics": [ "getting-started" ] },
-    { "title": "Polaris web components", "url": "https://shopify.dev/docs/api/polaris", "system": "polaris", "topics": [ "getting-started" ], "note": "The newer version." },
-    { "title": "App design guidelines", "url": "https://shopify.dev/docs/apps/design", "system": "polaris", "topics": [ "getting-started" ] },
-    { "title": "Space", "url": "https://polaris-react.shopify.com/tokens/space", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Font", "url": "https://polaris-react.shopify.com/tokens/font", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Text", "url": "https://polaris-react.shopify.com/tokens/text", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Breakpoints", "url": "https://polaris-react.shopify.com/tokens/breakpoints", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Border", "url": "https://polaris-react.shopify.com/tokens/border", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Shadow", "url": "https://polaris-react.shopify.com/tokens/shadow", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Motion", "url": "https://polaris-react.shopify.com/tokens/motion", "system": "polaris", "topics": [ "design-tokens" ] },
-    { "title": "Visual design", "url": "https://shopify.dev/docs/apps/design/visual-design", "system": "polaris", "topics": [ "color" ] },
-    { "title": "Font tokens", "url": "https://polaris-react.shopify.com/tokens/font", "system": "polaris", "topics": [ "typography" ] },
-    { "title": "Text tokens", "url": "https://polaris-react.shopify.com/tokens/text", "system": "polaris", "topics": [ "typography" ] },
-    { "title": "Space tokens", "url": "https://polaris-react.shopify.com/tokens/space", "system": "polaris", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Breakpoint tokens", "url": "https://polaris-react.shopify.com/tokens/breakpoints", "system": "polaris", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Layout", "url": "https://shopify.dev/docs/apps/design/layout", "system": "polaris", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Border tokens", "url": "https://polaris-react.shopify.com/tokens/border", "system": "polaris", "topics": [ "shape-and-elevation" ] },
-    { "title": "Shadow tokens", "url": "https://polaris-react.shopify.com/tokens/shadow", "system": "polaris", "topics": [ "shape-and-elevation" ] },
-    { "title": "Motion tokens", "url": "https://polaris-react.shopify.com/tokens/motion", "system": "polaris", "topics": [ "motion" ] },
-    { "title": "Grammar and mechanics", "url": "https://polaris-react.shopify.com/content/grammar-and-mechanics", "system": "polaris", "topics": [ "writing-and-content" ] },
-    { "title": "Actionable language", "url": "https://polaris-react.shopify.com/content/actionable-language", "system": "polaris", "topics": [ "writing-and-content" ] },
-    { "title": "Error messages", "url": "https://polaris-react.shopify.com/content/error-messages", "system": "polaris", "topics": [ "writing-and-content" ] },
-    { "title": "Accessibility", "url": "https://polaris-react.shopify.com/foundations/accessibility", "system": "polaris", "topics": [ "accessibility" ] },
-    { "title": "App accessibility", "url": "https://shopify.dev/docs/apps/build/accessibility", "system": "polaris", "topics": [ "accessibility" ] },
-    { "title": "Button", "url": "https://polaris-react.shopify.com/components/actions/button", "system": "polaris", "topics": [ "buttons" ] },
-    { "title": "Checkbox (web components)", "url": "https://shopify.dev/docs/api/app-home/latest/web-components/forms/checkbox", "system": "polaris", "topics": [ "checkboxes" ], "note": "The React page now redirects here." },
-    { "title": "Radio button", "url": "https://polaris-react.shopify.com/components/selection-and-input/radio-button", "system": "polaris", "topics": [ "radio-buttons" ] },
-    { "title": "Choice list", "url": "https://polaris-react.shopify.com/components/selection-and-input/choice-list", "system": "polaris", "topics": [ "radio-buttons" ] },
-    { "title": "Button group", "url": "https://polaris-react.shopify.com/components/actions/button-group", "system": "polaris", "topics": [ "segmented-controls" ], "note": "Its segmented variant." },
-    { "title": "Text field", "url": "https://polaris-react.shopify.com/components/selection-and-input/text-field", "system": "polaris", "topics": [ "text-fields", "text-areas" ], "note": "For a text area, use its multiline option." },
-    { "title": "Tooltip", "url": "https://polaris-react.shopify.com/components/overlays/tooltip", "system": "polaris", "topics": [ "tooltips" ] },
-    { "title": "Home", "url": "https://design-system.service.gov.uk/", "system": "govuk", "topics": [ "getting-started" ] },
-    { "title": "Colour", "url": "https://design-system.service.gov.uk/styles/colour/", "system": "govuk", "topics": [ "color" ] },
-    { "title": "Type scale", "url": "https://design-system.service.gov.uk/styles/type-scale/", "system": "govuk", "topics": [ "typography" ] },
-    { "title": "The new type scale", "url": "https://design-system.service.gov.uk/get-started/new-type-scale/", "system": "govuk", "topics": [ "typography" ] },
-    { "title": "Spacing", "url": "https://design-system.service.gov.uk/styles/spacing/", "system": "govuk", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Layout", "url": "https://design-system.service.gov.uk/styles/layout/", "system": "govuk", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Accessibility strategy", "url": "https://design-system.service.gov.uk/accessibility/accessibility-strategy/", "system": "govuk", "topics": [ "accessibility" ] },
-    { "title": "Button", "url": "https://design-system.service.gov.uk/components/button/", "system": "govuk", "topics": [ "buttons" ] },
-    { "title": "Checkboxes", "url": "https://design-system.service.gov.uk/components/checkboxes/", "system": "govuk", "topics": [ "checkboxes" ] },
-    { "title": "Radios", "url": "https://design-system.service.gov.uk/components/radios/", "system": "govuk", "topics": [ "radio-buttons" ] },
-    { "title": "Text input", "url": "https://design-system.service.gov.uk/components/text-input/", "system": "govuk", "topics": [ "text-fields" ] },
-    { "title": "Textarea", "url": "https://design-system.service.gov.uk/components/textarea/", "system": "govuk", "topics": [ "text-areas" ] },
-    { "title": "Question pages", "url": "https://design-system.service.gov.uk/patterns/question-pages", "system": "govuk", "topics": [ "forms-and-errors" ], "note": "Where \"mark optional fields, no asterisks\" comes from." },
-    { "title": "Error message", "url": "https://design-system.service.gov.uk/components/error-message/", "system": "govuk", "topics": [ "forms-and-errors" ] },
-    { "title": "Error summary", "url": "https://design-system.service.gov.uk/components/error-summary/", "system": "govuk", "topics": [ "forms-and-errors" ] },
-    { "title": "Focus states", "url": "https://design-system.service.gov.uk/get-started/focus-states/", "system": "govuk", "topics": [ "focus" ], "note": "The yellow focus style." },
-    { "title": "Home", "url": "https://designsystem.digital.gov/", "system": "uswds", "topics": [ "getting-started" ] },
-    { "title": "Settings", "url": "https://designsystem.digital.gov/documentation/settings/", "system": "uswds", "topics": [ "getting-started" ] },
-    { "title": "Color tokens", "url": "https://designsystem.digital.gov/design-tokens/color/overview/", "system": "uswds", "topics": [ "design-tokens", "color" ] },
-    { "title": "Spacing units", "url": "https://designsystem.digital.gov/design-tokens/spacing-units/", "system": "uswds", "topics": [ "design-tokens", "spacing-layout-and-grids" ] },
-    { "title": "Typography", "url": "https://designsystem.digital.gov/components/typography/", "system": "uswds", "topics": [ "typography" ] },
-    { "title": "Layout grid", "url": "https://designsystem.digital.gov/utilities/layout-grid/", "system": "uswds", "topics": [ "spacing-layout-and-grids" ] },
-    { "title": "Button accessibility tests", "url": "https://designsystem.digital.gov/components/button/accessibility-tests/", "system": "uswds", "topics": [ "accessibility" ], "note": "An example of publishing how each component was tested." },
-    { "title": "Button", "url": "https://designsystem.digital.gov/components/button/", "system": "uswds", "topics": [ "buttons" ] },
-    { "title": "Checkbox", "url": "https://designsystem.digital.gov/components/checkbox/", "system": "uswds", "topics": [ "checkboxes" ] },
-    { "title": "Radio buttons", "url": "https://designsystem.digital.gov/components/radio-buttons/", "system": "uswds", "topics": [ "radio-buttons" ] },
-    { "title": "Button group", "url": "https://designsystem.digital.gov/components/button-group/", "system": "uswds", "topics": [ "segmented-controls" ], "note": "Its segmented variant." },
-    { "title": "Text input", "url": "https://designsystem.digital.gov/components/text-input/", "system": "uswds", "topics": [ "text-fields", "text-areas" ], "note": "Text areas are a section of this page." },
-    { "title": "Form", "url": "https://designsystem.digital.gov/components/form/", "system": "uswds", "topics": [ "forms-and-errors" ] },
-    { "title": "Modal", "url": "https://designsystem.digital.gov/components/modal/", "system": "uswds", "topics": [ "dialogs" ] },
-    { "title": "Tooltip", "url": "https://designsystem.digital.gov/components/tooltip/", "system": "uswds", "topics": [ "tooltips" ] },
-    { "title": "Outline", "url": "https://designsystem.digital.gov/utilities/outline/", "system": "uswds", "topics": [ "focus" ], "note": "The 4px focus outline." }
+    {
+      "title": "Refactoring UI: Building your color palette",
+      "url": "https://refactoringui.com/previews/building-your-color-palette",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "The most practical short read. Grays, primary, and accent colors, and how to build 9 to 10 shades of each."
+    },
+    {
+      "title": "Stripe: Designing accessible color systems",
+      "url": "https://stripe.com/blog/accessible-color-systems",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "Why HSL lightness doesn't match how bright a color looks, and how Stripe rebuilt its palette so every hue has the same contrast at each step."
+    },
+    {
+      "title": "Matt Strom: How to generate color palettes for design systems",
+      "url": "https://mattstromawn.com/writing/generating-color-palettes/",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "Perceptual color spaces, shifting hue as colors get lighter or darker, and generating scales from formulas."
+    },
+    {
+      "title": "Radix Colors: Composing a palette",
+      "url": "https://www.radix-ui.com/colors/docs/palette-composition/composing-a-palette",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "Choosing a brand color, a gray tinted toward it, and status colors."
+    },
+    {
+      "title": "Radix Colors: Understanding the scale",
+      "url": "https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "What each of 12 shades is for: backgrounds, borders, fills, and text."
+    },
+    {
+      "title": "OneSignal: 11 shades of gray",
+      "url": "https://onesignal.com/blog/11-shades-of-gray-a-color-system-story/",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "A case study of building a gray scale."
+    },
+    {
+      "title": "The 60-30-10 rule for UI design",
+      "url": "https://bootcamp.uxdesign.cc/the-60-30-10-color-rule-for-ui-design-32695d04a7c2",
+      "topics": [
+        "building-a-palette"
+      ],
+      "note": "A rough guide to how much of a screen is neutral, supporting color, and accent."
+    },
+    {
+      "title": "Shopify: How to choose brand colors",
+      "url": "https://www.shopify.com/blog/choose-brand-colors",
+      "topics": [
+        "choosing-brand-colors"
+      ],
+      "note": "A general branding guide."
+    },
+    {
+      "title": "Adobe: Picking your brand colors",
+      "url": "https://www.adobe.com/express/learn/blog/3-easy-steps-to-picking-your-brand-colors",
+      "topics": [
+        "choosing-brand-colors"
+      ],
+      "note": "Another general guide, in three steps."
+    },
+    {
+      "title": "Color psychology: how colors influence the mind",
+      "url": "https://www.psychologytoday.com/intl/blog/habits-not-hacks/201408/color-psychology-how-colors-influence-the-mind",
+      "topics": [
+        "color-psychology"
+      ],
+      "note": "A skeptical, research-based take. Fit with the brand's personality and standing out matter more than what a hue \"means.\""
+    },
+    {
+      "title": "Labrecque and Milne, \"Exciting red and competent blue\"",
+      "url": "https://colab.ws/articles/10.1007/s11747-010-0245-y",
+      "topics": [
+        "color-psychology"
+      ],
+      "note": "Research on how hue, saturation, and lightness shift a brand's perceived personality."
+    },
+    {
+      "title": "Singh, \"Impact of color on marketing\"",
+      "url": "https://newion.uwinnipeg.ca/~ssingh5/x/color.pdf",
+      "topics": [
+        "color-psychology"
+      ],
+      "note": "The source of the often-quoted \"up to 90% of snap judgments\" figure. Widely repeated, loosely sourced."
+    },
+    {
+      "title": "WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "topics": [
+        "wcag"
+      ],
+      "note": "The full standard."
+    },
+    {
+      "title": "WCAG 2.2 quick reference",
+      "url": "https://www.w3.org/WAI/WCAG22/quickref/",
+      "topics": [
+        "wcag"
+      ],
+      "note": "The easier way in: every criterion, filterable, with techniques."
+    },
+    {
+      "title": "What's new in WCAG 2.2",
+      "url": "https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/",
+      "topics": [
+        "wcag"
+      ]
+    },
+    {
+      "title": "Understanding WCAG: Target size (minimum)",
+      "url": "https://w3c.github.io/wcag/understanding/target-size-minimum.html",
+      "topics": [
+        "wcag"
+      ],
+      "note": "Where the 24px minimum comes from."
+    },
+    {
+      "title": "Understanding WCAG: Focus not obscured",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html",
+      "topics": [
+        "wcag"
+      ]
+    },
+    {
+      "title": "Understanding WCAG: Focus appearance",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html",
+      "topics": [
+        "wcag"
+      ]
+    },
+    {
+      "title": "ARIA Authoring Practices Guide",
+      "url": "https://www.w3.org/WAI/ARIA/apg/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Button",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Dialog (modal)",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Menu button",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Menu bar",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Tabs",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "APG pattern: Combobox",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+      "topics": [
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/",
+      "system": "apple",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Dark mode",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/dark-mode",
+      "system": "apple",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/typography",
+      "system": "apple",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Layout",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/layout",
+      "system": "apple",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Motion",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/motion",
+      "system": "apple",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Icons",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/icons",
+      "system": "apple",
+      "topics": [
+        "icons"
+      ]
+    },
+    {
+      "title": "SF Symbols",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/sf-symbols",
+      "system": "apple",
+      "topics": [
+        "icons"
+      ]
+    },
+    {
+      "title": "Pointing devices",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/pointing-devices",
+      "system": "apple",
+      "topics": [
+        "platforms-and-input"
+      ]
+    },
+    {
+      "title": "Designing for macOS",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/designing-for-macos",
+      "system": "apple",
+      "topics": [
+        "platforms-and-input"
+      ],
+      "note": "Where the 28pt Mac target size comes from."
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
+      "system": "apple",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Buttons",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "system": "apple",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Toggles",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/toggles",
+      "system": "apple",
+      "topics": [
+        "checkboxes",
+        "radio-buttons",
+        "switches"
+      ],
+      "note": "Switches, plus checkboxes and radio buttons in its macOS section."
+    },
+    {
+      "title": "Segmented controls",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/segmented-controls",
+      "system": "apple",
+      "topics": [
+        "segmented-controls"
+      ]
+    },
+    {
+      "title": "Text fields",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/text-fields",
+      "system": "apple",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Text views",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/text-views",
+      "system": "apple",
+      "topics": [
+        "text-areas"
+      ]
+    },
+    {
+      "title": "Alerts",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/alerts",
+      "system": "apple",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Sheets",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/sheets",
+      "system": "apple",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Modality",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/modality",
+      "system": "apple",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Offering help",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/offering-help",
+      "system": "apple",
+      "topics": [
+        "tooltips"
+      ],
+      "note": "Help tags; there's no tooltip page."
+    },
+    {
+      "title": "Focus and selection",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/focus-and-selection",
+      "system": "apple",
+      "topics": [
+        "focus"
+      ]
+    },
+    {
+      "title": "Sidebars",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/sidebars",
+      "system": "apple",
+      "topics": [
+        "navigation"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://m3.material.io/",
+      "system": "material",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Structure",
+      "url": "https://m3.material.io/foundations/designing/structure",
+      "system": "material",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Window size classes",
+      "url": "https://m3.material.io/foundations/layout/applying-layout/window-size-classes",
+      "system": "material",
+      "topics": [
+        "spacing-layout-and-grids"
+      ],
+      "note": "Material's breakpoints."
+    },
+    {
+      "title": "Window size classes (Android)",
+      "url": "https://developer.android.com/guide/topics/ui/layout/window-size-classes",
+      "system": "material",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Typography (Android)",
+      "url": "https://github.com/material-components/material-components-android/blob/master/docs/theming/Typography.md",
+      "system": "material",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Motion (Android)",
+      "url": "https://github.com/material-components/material-components-android/blob/master/docs/theming/Motion.md",
+      "system": "material",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Buttons (Android)",
+      "url": "https://github.com/material-components/material-components-android/blob/master/docs/components/Button.md",
+      "system": "material",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://m3.material.io/components/checkbox/guidelines",
+      "system": "material",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radio button",
+      "url": "https://m3.material.io/components/radio-button/guidelines",
+      "system": "material",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Switch",
+      "url": "https://m3.material.io/components/switch/guidelines",
+      "system": "material",
+      "topics": [
+        "switches"
+      ]
+    },
+    {
+      "title": "Segmented buttons",
+      "url": "https://m3.material.io/components/segmented-buttons/overview",
+      "system": "material",
+      "topics": [
+        "segmented-controls"
+      ]
+    },
+    {
+      "title": "Button groups",
+      "url": "https://m3.material.io/components/button-groups/overview",
+      "system": "material",
+      "topics": [
+        "segmented-controls"
+      ],
+      "note": "The newer connected button group."
+    },
+    {
+      "title": "Text fields",
+      "url": "https://m3.material.io/components/text-fields/guidelines",
+      "system": "material",
+      "topics": [
+        "text-fields",
+        "text-areas"
+      ],
+      "note": "Multi-line text is part of text fields; there's no separate text area."
+    },
+    {
+      "title": "Dialogs",
+      "url": "https://m3.material.io/components/dialogs/guidelines",
+      "system": "material",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltips",
+      "url": "https://m3.material.io/components/tooltips/guidelines",
+      "system": "material",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://primer.style/",
+      "system": "primer",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Product foundations",
+      "url": "https://primer.style/product",
+      "system": "primer",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Primitives",
+      "url": "https://primer.style/product/primitives",
+      "system": "primer",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Token names",
+      "url": "https://primer.style/product/primitives/token-names/",
+      "system": "primer",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Color usage",
+      "url": "https://primer.style/product/getting-started/foundations/color-usage/",
+      "system": "primer",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Color primitives",
+      "url": "https://primer.style/product/primitives/color/",
+      "system": "primer",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://primer.style/product/getting-started/foundations/typography/",
+      "system": "primer",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Typography primitives",
+      "url": "https://primer.style/product/primitives/typography/",
+      "system": "primer",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Layout",
+      "url": "https://primer.style/product/getting-started/foundations/layout/",
+      "system": "primer",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Responsive",
+      "url": "https://primer.style/product/getting-started/foundations/responsive/",
+      "system": "primer",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Size primitives",
+      "url": "https://primer.style/product/primitives/size/",
+      "system": "primer",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Content",
+      "url": "https://primer.style/product/getting-started/foundations/content/",
+      "system": "primer",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://primer.style/accessibility",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Color considerations",
+      "url": "https://primer.style/accessibility/design-guidance/color-considerations/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Focus management",
+      "url": "https://primer.style/accessibility/design-guidance/focus-management/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Links and buttons",
+      "url": "https://primer.style/accessibility/design-guidance/links-and-buttons/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Motion and animation",
+      "url": "https://primer.style/accessibility/design-guidance/motion-and-animation/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Text resize and spacing",
+      "url": "https://primer.style/accessibility/design-guidance/text-resize-and-spacing/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Mobile checklist",
+      "url": "https://primer.style/accessibility/tools-and-resources/checklists/mobile-checklist/",
+      "system": "primer",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button",
+      "url": "https://primer.style/product/components/button/",
+      "system": "primer",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Button group",
+      "url": "https://primer.style/product/components/button-group",
+      "system": "primer",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://primer.style/product/components/checkbox",
+      "system": "primer",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "RadioGroup",
+      "url": "https://primer.style/product/components/radio-group",
+      "system": "primer",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "ToggleSwitch",
+      "url": "https://primer.style/product/components/toggle-switch",
+      "system": "primer",
+      "topics": [
+        "switches"
+      ]
+    },
+    {
+      "title": "SegmentedControl",
+      "url": "https://primer.style/product/components/segmented-control",
+      "system": "primer",
+      "topics": [
+        "segmented-controls"
+      ]
+    },
+    {
+      "title": "TextInput",
+      "url": "https://primer.style/product/components/text-input",
+      "system": "primer",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Textarea",
+      "url": "https://primer.style/product/components/textarea",
+      "system": "primer",
+      "topics": [
+        "text-areas"
+      ]
+    },
+    {
+      "title": "Forms",
+      "url": "https://primer.style/product/ui-patterns/forms/",
+      "system": "primer",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Dialog",
+      "url": "https://primer.style/product/components/dialog",
+      "system": "primer",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://primer.style/product/components/tooltip",
+      "system": "primer",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://atlassian.design/",
+      "system": "atlassian",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Components",
+      "url": "https://atlassian.design/components",
+      "system": "atlassian",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Design tokens",
+      "url": "https://atlassian.design/foundations/tokens",
+      "system": "atlassian",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Color",
+      "url": "https://atlassian.design/foundations/color",
+      "system": "atlassian",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Color (new)",
+      "url": "https://atlassian.design/foundations/color-new",
+      "system": "atlassian",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://atlassian.design/foundations/typography",
+      "system": "atlassian",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Spacing",
+      "url": "https://atlassian.design/foundations/spacing",
+      "system": "atlassian",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Grid",
+      "url": "https://atlassian.design/foundations/grid",
+      "system": "atlassian",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Radius",
+      "url": "https://atlassian.design/foundations/radius",
+      "system": "atlassian",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Border",
+      "url": "https://atlassian.design/foundations/border",
+      "system": "atlassian",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Elevation",
+      "url": "https://atlassian.design/foundations/elevation",
+      "system": "atlassian",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Motion",
+      "url": "https://atlassian.design/foundations/motion",
+      "system": "atlassian",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Applying motion",
+      "url": "https://atlassian.design/foundations/motion/applying-motion",
+      "system": "atlassian",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Content",
+      "url": "https://atlassian.design/foundations/content",
+      "system": "atlassian",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Voice and tone",
+      "url": "https://atlassian.design/foundations/content/voice-tone",
+      "system": "atlassian",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Language and grammar",
+      "url": "https://atlassian.design/foundations/content/language-and-grammar",
+      "system": "atlassian",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Designing messages",
+      "url": "https://atlassian.design/foundations/content/designing-messages",
+      "system": "atlassian",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://atlassian.design/foundations/accessibility",
+      "system": "atlassian",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button usage",
+      "url": "https://atlassian.design/components/button/usage",
+      "system": "atlassian",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Button examples",
+      "url": "https://atlassian.design/components/button/examples",
+      "system": "atlassian",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Evolving buttons and links",
+      "url": "https://atlassian.design/whats-new/evolving-button-and-links",
+      "system": "atlassian",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Button (Forge UI Kit)",
+      "url": "https://developer.atlassian.com/platform/forge/ui-kit/components/button",
+      "system": "atlassian",
+      "topics": [
+        "buttons"
+      ],
+      "note": "Default, primary, subtle, warning, and danger."
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://atlassian.design/components/checkbox/usage",
+      "system": "atlassian",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radio",
+      "url": "https://atlassian.design/components/radio/usage",
+      "system": "atlassian",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Toggle",
+      "url": "https://atlassian.design/components/toggle/usage",
+      "system": "atlassian",
+      "topics": [
+        "switches"
+      ]
+    },
+    {
+      "title": "Text field usage",
+      "url": "https://atlassian.design/components/textfield/usage",
+      "system": "atlassian",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Text field examples",
+      "url": "https://atlassian.design/components/textfield/examples",
+      "system": "atlassian",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Text area",
+      "url": "https://atlassian.design/components/textarea/usage",
+      "system": "atlassian",
+      "topics": [
+        "text-areas"
+      ]
+    },
+    {
+      "title": "Form",
+      "url": "https://atlassian.design/components/form/usage",
+      "system": "atlassian",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Modal dialog",
+      "url": "https://atlassian.design/components/modal-dialog/usage",
+      "system": "atlassian",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://atlassian.design/components/tooltip/usage/",
+      "system": "atlassian",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Focus ring",
+      "url": "https://atlassian.design/components/focus-ring/usage",
+      "system": "atlassian",
+      "topics": [
+        "focus"
+      ]
+    },
+    {
+      "title": "Focusable",
+      "url": "https://atlassian.design/components/primitives/focusable",
+      "system": "atlassian",
+      "topics": [
+        "focus"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://carbondesignsystem.com/",
+      "system": "carbon",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Color",
+      "url": "https://carbondesignsystem.com/elements/color/overview/",
+      "system": "carbon",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Themes",
+      "url": "https://carbondesignsystem.com/elements/themes/overview/",
+      "system": "carbon",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://carbondesignsystem.com/elements/typography/overview/",
+      "system": "carbon",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Type sets",
+      "url": "https://carbondesignsystem.com/elements/typography/type-sets/",
+      "system": "carbon",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Spacing",
+      "url": "https://carbondesignsystem.com/elements/spacing/overview/",
+      "system": "carbon",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "2x Grid",
+      "url": "https://carbondesignsystem.com/elements/2x-grid/overview/",
+      "system": "carbon",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Motion",
+      "url": "https://carbondesignsystem.com/elements/motion/overview/",
+      "system": "carbon",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Writing style",
+      "url": "https://carbondesignsystem.com/guidelines/content/writing-style/",
+      "system": "carbon",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://carbondesignsystem.com/guidelines/accessibility/overview/",
+      "system": "carbon",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button usage",
+      "url": "https://carbondesignsystem.com/components/button/usage/",
+      "system": "carbon",
+      "topics": [
+        "buttons"
+      ],
+      "note": "Emphasis levels, one primary per page, and danger buttons."
+    },
+    {
+      "title": "Button style",
+      "url": "https://carbondesignsystem.com/components/button/style/",
+      "system": "carbon",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/checkbox/guidelines",
+      "system": "carbon",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radio button",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/radio-button",
+      "system": "carbon",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Toggle",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/toggle",
+      "system": "carbon",
+      "topics": [
+        "switches"
+      ]
+    },
+    {
+      "title": "Content switcher",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/content-switcher",
+      "system": "carbon",
+      "topics": [
+        "segmented-controls"
+      ]
+    },
+    {
+      "title": "Text input",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/text-input",
+      "system": "carbon",
+      "topics": [
+        "text-fields",
+        "text-areas"
+      ],
+      "note": "Text areas are a section of this page."
+    },
+    {
+      "title": "Text input style",
+      "url": "https://carbondesignsystem.com/components/text-input/style/",
+      "system": "carbon",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Forms pattern",
+      "url": "https://carbondesignsystem.com/patterns/forms-pattern/",
+      "system": "carbon",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Modal",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/modal",
+      "system": "carbon",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/tooltip",
+      "system": "carbon",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://fluent2.microsoft.design/",
+      "system": "fluent",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Getting started",
+      "url": "https://fluent2.microsoft.design/get-started/design",
+      "system": "fluent",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Design tokens",
+      "url": "https://fluent2.microsoft.design/design-tokens",
+      "system": "fluent",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Color",
+      "url": "https://fluent2.microsoft.design/color",
+      "system": "fluent",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://fluent2.microsoft.design/typography",
+      "system": "fluent",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Layout",
+      "url": "https://fluent2.microsoft.design/layout",
+      "system": "fluent",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Shapes",
+      "url": "https://fluent2.microsoft.design/shapes",
+      "system": "fluent",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Elevation",
+      "url": "https://fluent2.microsoft.design/elevation",
+      "system": "fluent",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Motion",
+      "url": "https://fluent2.microsoft.design/motion",
+      "system": "fluent",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Content design",
+      "url": "https://fluent2.microsoft.design/content-design",
+      "system": "fluent",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://fluent2.microsoft.design/accessibility",
+      "system": "fluent",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button (web)",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/button/usage",
+      "system": "fluent",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Button (iOS)",
+      "url": "https://fluent2.microsoft.design/components/ios/core/button/usage",
+      "system": "fluent",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Button (Android)",
+      "url": "https://fluent2.microsoft.design/components/android/core/button/usage",
+      "system": "fluent",
+      "topics": [
+        "buttons"
+      ],
+      "note": "How one system sizes a control per platform."
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/checkbox/usage",
+      "system": "fluent",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radio group",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/radiogroup/usage",
+      "system": "fluent",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Switch",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/switch/usage",
+      "system": "fluent",
+      "topics": [
+        "switches"
+      ]
+    },
+    {
+      "title": "Segmented control (iOS)",
+      "url": "https://fluent2.microsoft.design/components/ios/core/segmentedcontrol/usage",
+      "system": "fluent",
+      "topics": [
+        "segmented-controls"
+      ],
+      "note": "IOS only; the web has none."
+    },
+    {
+      "title": "Input",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/input/usage",
+      "system": "fluent",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Field",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/field/usage",
+      "system": "fluent",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Textarea",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/textarea/usage",
+      "system": "fluent",
+      "topics": [
+        "text-areas"
+      ]
+    },
+    {
+      "title": "Dialog",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/dialog/usage",
+      "system": "fluent",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/tooltip/usage",
+      "system": "fluent",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Polaris React",
+      "url": "https://polaris-react.shopify.com/",
+      "system": "polaris",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Polaris web components",
+      "url": "https://shopify.dev/docs/api/polaris",
+      "system": "polaris",
+      "topics": [
+        "getting-started"
+      ],
+      "note": "The newer version."
+    },
+    {
+      "title": "App design guidelines",
+      "url": "https://shopify.dev/docs/apps/design",
+      "system": "polaris",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Space",
+      "url": "https://polaris-react.shopify.com/tokens/space",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Font",
+      "url": "https://polaris-react.shopify.com/tokens/font",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Text",
+      "url": "https://polaris-react.shopify.com/tokens/text",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Breakpoints",
+      "url": "https://polaris-react.shopify.com/tokens/breakpoints",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Border",
+      "url": "https://polaris-react.shopify.com/tokens/border",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Shadow",
+      "url": "https://polaris-react.shopify.com/tokens/shadow",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Motion",
+      "url": "https://polaris-react.shopify.com/tokens/motion",
+      "system": "polaris",
+      "topics": [
+        "design-tokens"
+      ]
+    },
+    {
+      "title": "Visual design",
+      "url": "https://shopify.dev/docs/apps/design/visual-design",
+      "system": "polaris",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Font tokens",
+      "url": "https://polaris-react.shopify.com/tokens/font",
+      "system": "polaris",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Text tokens",
+      "url": "https://polaris-react.shopify.com/tokens/text",
+      "system": "polaris",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Space tokens",
+      "url": "https://polaris-react.shopify.com/tokens/space",
+      "system": "polaris",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Breakpoint tokens",
+      "url": "https://polaris-react.shopify.com/tokens/breakpoints",
+      "system": "polaris",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Layout",
+      "url": "https://shopify.dev/docs/apps/design/layout",
+      "system": "polaris",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Border tokens",
+      "url": "https://polaris-react.shopify.com/tokens/border",
+      "system": "polaris",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Shadow tokens",
+      "url": "https://polaris-react.shopify.com/tokens/shadow",
+      "system": "polaris",
+      "topics": [
+        "shape-and-elevation"
+      ]
+    },
+    {
+      "title": "Motion tokens",
+      "url": "https://polaris-react.shopify.com/tokens/motion",
+      "system": "polaris",
+      "topics": [
+        "motion"
+      ]
+    },
+    {
+      "title": "Grammar and mechanics",
+      "url": "https://polaris-react.shopify.com/content/grammar-and-mechanics",
+      "system": "polaris",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Actionable language",
+      "url": "https://polaris-react.shopify.com/content/actionable-language",
+      "system": "polaris",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Error messages",
+      "url": "https://polaris-react.shopify.com/content/error-messages",
+      "system": "polaris",
+      "topics": [
+        "writing-and-content"
+      ]
+    },
+    {
+      "title": "Accessibility",
+      "url": "https://polaris-react.shopify.com/foundations/accessibility",
+      "system": "polaris",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "App accessibility",
+      "url": "https://shopify.dev/docs/apps/build/accessibility",
+      "system": "polaris",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button",
+      "url": "https://polaris-react.shopify.com/components/actions/button",
+      "system": "polaris",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkbox (web components)",
+      "url": "https://shopify.dev/docs/api/app-home/latest/web-components/forms/checkbox",
+      "system": "polaris",
+      "topics": [
+        "checkboxes"
+      ],
+      "note": "The React page now redirects here."
+    },
+    {
+      "title": "Radio button",
+      "url": "https://polaris-react.shopify.com/components/selection-and-input/radio-button",
+      "system": "polaris",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Choice list",
+      "url": "https://polaris-react.shopify.com/components/selection-and-input/choice-list",
+      "system": "polaris",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Button group",
+      "url": "https://polaris-react.shopify.com/components/actions/button-group",
+      "system": "polaris",
+      "topics": [
+        "segmented-controls"
+      ],
+      "note": "Its segmented variant."
+    },
+    {
+      "title": "Text field",
+      "url": "https://polaris-react.shopify.com/components/selection-and-input/text-field",
+      "system": "polaris",
+      "topics": [
+        "text-fields",
+        "text-areas"
+      ],
+      "note": "For a text area, use its multiline option."
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://polaris-react.shopify.com/components/overlays/tooltip",
+      "system": "polaris",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Home",
+      "url": "https://design-system.service.gov.uk/",
+      "system": "govuk",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Colour",
+      "url": "https://design-system.service.gov.uk/styles/colour/",
+      "system": "govuk",
+      "topics": [
+        "color"
+      ]
+    },
+    {
+      "title": "Type scale",
+      "url": "https://design-system.service.gov.uk/styles/type-scale/",
+      "system": "govuk",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "The new type scale",
+      "url": "https://design-system.service.gov.uk/get-started/new-type-scale/",
+      "system": "govuk",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Spacing",
+      "url": "https://design-system.service.gov.uk/styles/spacing/",
+      "system": "govuk",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Layout",
+      "url": "https://design-system.service.gov.uk/styles/layout/",
+      "system": "govuk",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Accessibility strategy",
+      "url": "https://design-system.service.gov.uk/accessibility/accessibility-strategy/",
+      "system": "govuk",
+      "topics": [
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Button",
+      "url": "https://design-system.service.gov.uk/components/button/",
+      "system": "govuk",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkboxes",
+      "url": "https://design-system.service.gov.uk/components/checkboxes/",
+      "system": "govuk",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radios",
+      "url": "https://design-system.service.gov.uk/components/radios/",
+      "system": "govuk",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Text input",
+      "url": "https://design-system.service.gov.uk/components/text-input/",
+      "system": "govuk",
+      "topics": [
+        "text-fields"
+      ]
+    },
+    {
+      "title": "Textarea",
+      "url": "https://design-system.service.gov.uk/components/textarea/",
+      "system": "govuk",
+      "topics": [
+        "text-areas"
+      ]
+    },
+    {
+      "title": "Question pages",
+      "url": "https://design-system.service.gov.uk/patterns/question-pages",
+      "system": "govuk",
+      "topics": [
+        "forms-and-errors"
+      ],
+      "note": "Where \"mark optional fields, no asterisks\" comes from."
+    },
+    {
+      "title": "Error message",
+      "url": "https://design-system.service.gov.uk/components/error-message/",
+      "system": "govuk",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Error summary",
+      "url": "https://design-system.service.gov.uk/components/error-summary/",
+      "system": "govuk",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Focus states",
+      "url": "https://design-system.service.gov.uk/get-started/focus-states/",
+      "system": "govuk",
+      "topics": [
+        "focus"
+      ],
+      "note": "The yellow focus style."
+    },
+    {
+      "title": "Home",
+      "url": "https://designsystem.digital.gov/",
+      "system": "uswds",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Settings",
+      "url": "https://designsystem.digital.gov/documentation/settings/",
+      "system": "uswds",
+      "topics": [
+        "getting-started"
+      ]
+    },
+    {
+      "title": "Color tokens",
+      "url": "https://designsystem.digital.gov/design-tokens/color/overview/",
+      "system": "uswds",
+      "topics": [
+        "design-tokens",
+        "color"
+      ]
+    },
+    {
+      "title": "Spacing units",
+      "url": "https://designsystem.digital.gov/design-tokens/spacing-units/",
+      "system": "uswds",
+      "topics": [
+        "design-tokens",
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Typography",
+      "url": "https://designsystem.digital.gov/components/typography/",
+      "system": "uswds",
+      "topics": [
+        "typography"
+      ]
+    },
+    {
+      "title": "Layout grid",
+      "url": "https://designsystem.digital.gov/utilities/layout-grid/",
+      "system": "uswds",
+      "topics": [
+        "spacing-layout-and-grids"
+      ]
+    },
+    {
+      "title": "Button accessibility tests",
+      "url": "https://designsystem.digital.gov/components/button/accessibility-tests/",
+      "system": "uswds",
+      "topics": [
+        "accessibility"
+      ],
+      "note": "An example of publishing how each component was tested."
+    },
+    {
+      "title": "Button",
+      "url": "https://designsystem.digital.gov/components/button/",
+      "system": "uswds",
+      "topics": [
+        "buttons"
+      ]
+    },
+    {
+      "title": "Checkbox",
+      "url": "https://designsystem.digital.gov/components/checkbox/",
+      "system": "uswds",
+      "topics": [
+        "checkboxes"
+      ]
+    },
+    {
+      "title": "Radio buttons",
+      "url": "https://designsystem.digital.gov/components/radio-buttons/",
+      "system": "uswds",
+      "topics": [
+        "radio-buttons"
+      ]
+    },
+    {
+      "title": "Button group",
+      "url": "https://designsystem.digital.gov/components/button-group/",
+      "system": "uswds",
+      "topics": [
+        "segmented-controls"
+      ],
+      "note": "Its segmented variant."
+    },
+    {
+      "title": "Text input",
+      "url": "https://designsystem.digital.gov/components/text-input/",
+      "system": "uswds",
+      "topics": [
+        "text-fields",
+        "text-areas"
+      ],
+      "note": "Text areas are a section of this page."
+    },
+    {
+      "title": "Form",
+      "url": "https://designsystem.digital.gov/components/form/",
+      "system": "uswds",
+      "topics": [
+        "forms-and-errors"
+      ]
+    },
+    {
+      "title": "Modal",
+      "url": "https://designsystem.digital.gov/components/modal/",
+      "system": "uswds",
+      "topics": [
+        "dialogs"
+      ]
+    },
+    {
+      "title": "Tooltip",
+      "url": "https://designsystem.digital.gov/components/tooltip/",
+      "system": "uswds",
+      "topics": [
+        "tooltips"
+      ]
+    },
+    {
+      "title": "Outline",
+      "url": "https://designsystem.digital.gov/utilities/outline/",
+      "system": "uswds",
+      "topics": [
+        "focus"
+      ],
+      "note": "The 4px focus outline."
+    },
+    {
+      "title": "Spinner",
+      "url": "https://primer.style/product/components/spinner/",
+      "system": "primer",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Spinner accessibility",
+      "url": "https://primer.style/product/components/spinner/accessibility",
+      "system": "primer",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "No built-in announcement: the page adds its own live region."
+    },
+    {
+      "title": "Loading",
+      "url": "https://primer.style/product/ui-patterns/loading/",
+      "system": "primer",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Which loading indicator for how long a wait: nothing under one second."
+    },
+    {
+      "title": "Spinner",
+      "url": "https://atlassian.design/components/spinner/usage",
+      "system": "atlassian",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Spinner",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/spinner/usage",
+      "system": "fluent",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Spinner source",
+      "url": "https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner",
+      "system": "fluent",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Sizes, role, and delay, which the usage page doesn't list."
+    },
+    {
+      "title": "Spinner",
+      "url": "https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner",
+      "system": "polaris",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Loading",
+      "url": "https://carbondesignsystem.com/components/loading/usage/",
+      "system": "carbon",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Inline loading",
+      "url": "https://carbondesignsystem.com/components/inline-loading/usage/",
+      "system": "carbon",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Progress indicators",
+      "url": "https://m3.material.io/components/progress-indicators/guidelines",
+      "system": "material",
+      "topics": [
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Progress (material-web)",
+      "url": "https://github.com/material-components/material-web/blob/main/docs/components/progress.md",
+      "system": "material",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "The web component's sizes and labelling."
+    },
+    {
+      "title": "Progress indicators",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators",
+      "system": "apple",
+      "topics": [
+        "loading-indicators"
+      ]
+    }
   ]
 }

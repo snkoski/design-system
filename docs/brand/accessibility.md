@@ -66,6 +66,7 @@ Under `@media (prefers-contrast: more)`: `ink-muted` becomes `ink`, `border` bec
 - Anything done by dragging also works with a single tap or click (WCAG 2.5.7).
 - Icon-only buttons have an `aria-label`. Decorative images and icons get `alt=""` or `aria-hidden="true"`.
 - Toasts and status updates use a polite live region and never disappear in under 5 seconds or while hovered or focused.
+- A live region is announced when its text changes, and many screen readers miss text that arrives together with the region. Put the region on the page empty, then add its text. Spinner does this, and keeps a visible copy of its label in the HTML so a page without JavaScript still shows it (see How Spinner works).
 - One `<h1>` per page and no skipped heading levels. Pages have `<header>`, `<nav>`, `<main>`, and `<footer>` landmarks and a "Skip to content" link.
 - Help (contact links, a help page) sits in the same place on every page (WCAG 3.2.6).
 
@@ -87,7 +88,7 @@ The full rules are on the **Forms** page. The accessibility essentials:
 
 ## Motion
 
-Respect `prefers-reduced-motion`, and pause anything that moves on its own for more than 5 seconds (WCAG 2.2.2). See the Motion page.
+Respect `prefers-reduced-motion`, and pause anything that moves on its own for more than 5 seconds (WCAG 2.2.2). Loading indicators are the exception: they keep moving for as long as the wait lasts, which WCAG allows, and reduced motion slows them down rather than stopping them. See the Motion page.
 
 ## Testing a component
 

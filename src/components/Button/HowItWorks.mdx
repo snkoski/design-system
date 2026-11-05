@@ -216,9 +216,13 @@ Both components put the same thing inside, from `shared.tsx`:
 - **With a label.** The start icon, the label, and the end icon, in that order. While loading, the spinner takes the start icon's place. The end icon stays, so the label doesn't move.
 - Every icon is wrapped in a span with `aria-hidden="true"`, so screen readers skip it whatever icon you pass.
 
-The spinner is a small SVG drawing: a faint full circle (`opacity="0.25"`) as the track, and a quarter of a circle on top, which the CSS spins. Both are drawn in `currentColor`, the text color, so the spinner matches the label in every variant and theme. `focusable="false"` stops old versions of Internet Explorer and Edge from adding the drawing to the Tab order.
+The spinner is the same drawing the [Spinner](?path=/docs/components-spinner--docs) component uses, kept in `src/internal/` so the two can't drift apart. `shared.tsx` adds Button's own class, `button__spinner`, next to the shared one:
 
 <Code file="components/Button/shared.tsx" name="Spinner" />
+
+It's a small SVG drawing: a faint full circle (`opacity="0.25"`) as the track, and a quarter of a circle on top, which the CSS spins. Both are drawn in `currentColor`, the text color, so the spinner matches the label in every variant and theme. `focusable="false"` stops old versions of Internet Explorer and Edge from adding the drawing to the Tab order.
+
+<Code file="internal/SpinnerGraphic.tsx" name="SpinnerGraphic" />
 
 ### ButtonLink
 
@@ -353,11 +357,11 @@ These work by **specificity**: when two rules set the same property, the one who
 
 Both states have `data-disabled`, so `:not([data-loading])` keeps the dimming for disabled buttons only. A disabled button is at half opacity, with a "not allowed" cursor. A loading button stays at full strength, so its label stays readable, and shows the "progress" cursor. The CSS uses `data-disabled` rather than the browser's `:disabled`, because a loading button isn't `:disabled`: it has `aria-disabled` instead.
 
-The spinner turns once every `--duration-loop`:
+The spinner turns once every `--duration-loop`. That rule is shared with Spinner too, in `src/internal/spinner-graphic.css`:
 
-<Code file="components/Button/button.css" name=".button__spinner" />
+<Code file="internal/spinner-graphic.css" name=".spinner-graphic" />
 
-<Code file="components/Button/button.css" name="@keyframes button-spin" />
+<Code file="internal/spinner-graphic.css" name="@keyframes spinner-spin" />
 
 ### The hit area
 

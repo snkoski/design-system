@@ -246,9 +246,11 @@ Each control renders it only when there's an `error` to show, with `{error && â€
 
 <Code file="internal/field-error.css" name=".field-error__icon" />
 
-<Code file="internal/field-error.css" name=".field-error__prefix" />
+The prefix has the shared `visually-hidden` class, which Spinner uses too:
 
-The prefix is clipped to nothing (`clip-path: inset(50%)`) and taken out of the flow, so it takes no room and no gap. `display: none` or `visibility: hidden` would hide it from screen readers too. It's placed at the start of the error, which is `position: relative`, so it can never stick out past it.
+<Code file="internal/visually-hidden.css" name=".visually-hidden" />
+
+It's clipped to nothing (`clip-path: inset(50%)`) and taken out of the flow, so it takes no room and no gap. `display: none` or `visibility: hidden` would hide it from screen readers too. It's placed at the start of the error, which is `position: relative`, so it can never stick out past it.
 
 The text is `--text-small`, in `--danger`, one of the status colors components may use because it carries meaning. The line is `--icon-md` tall, and the margin centers the smaller `--icon-sm` icon on that line.
 

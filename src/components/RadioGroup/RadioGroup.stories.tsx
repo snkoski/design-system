@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 import { Radio } from "./Radio";
 import { RadioGroup } from "./RadioGroup";
 
@@ -116,7 +116,8 @@ export const Required: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Continue" }));
     await expect(canvas.getByText("Choose a plan.")).toBeVisible();
     await userEvent.click(canvas.getByText("Team"));
-    await expect(canvas.queryByText("Choose a plan.")).toBeNull();
+    // Base UI takes the error away a render after the change, so wait for it rather than checking straight away
+    await waitFor(() => expect(canvas.queryByText("Choose a plan.")).toBeNull());
   },
 };
 
