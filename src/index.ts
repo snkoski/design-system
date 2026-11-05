@@ -6,3 +6,4 @@ export * from "./components/Switch";
 export * from "./components/Input";
 export * from "./components/TextArea";
 export * from "./components/SegmentedControl";
+export * from "./components/Spinner";

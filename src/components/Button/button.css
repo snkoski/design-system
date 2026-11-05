@@ -164,14 +164,7 @@
   .button[data-loading] {
     cursor: progress;
   }
-  .button__spinner {
-    animation: button-spin var(--duration-loop) linear infinite;
-  }
-  @keyframes button-spin {
-    to {
-      transform: rotate(1turn);
-    }
-  }
+  /* The spinner and its turn are shared with Spinner, in src/internal/spinner-graphic.css */
 
   /* Hot dog mode: chunky outlines and a hard shadow to press into */
   [data-theme="hotdog"] .button:not([data-variant="ghost"]) {

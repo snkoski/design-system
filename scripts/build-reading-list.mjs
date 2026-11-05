@@ -147,6 +147,8 @@ const tokensCss = readFileSync(join(root, "src/styles/tokens.css"), "utf8").repl
 const pageCss = [
   readFileSync(join(root, "scripts/reading-list-page.css"), "utf8"),
   readFileSync(join(root, "src/foundations/reading-list.css"), "utf8"),
+  // The shared class for text that only screen readers read, from the published stylesheet
+  readFileSync(join(root, "src/internal/visually-hidden.css"), "utf8"),
 ].join("\n");
 const pageJs = readFileSync(join(root, "scripts/reading-list-page.js"), "utf8");
 const json = JSON.stringify({ groups: data.groups, topics: data.topics, systems: data.systems, links: data.links }).replace(
@@ -211,7 +213,7 @@ ${pageCss.trim()}
     <details class="rl-systems">
       <summary><span class="rl-systems__label">Systems</span> <span class="rl-systems__value" id="rl-systems-value">All</span></summary>
       <fieldset class="rl-systems__options">
-        <legend class="rl-visually-hidden">Systems to show</legend>
+        <legend class="visually-hidden">Systems to show</legend>
         <label class="rl-check rl-check--all"><input type="checkbox" id="rl-systems-all" checked> All systems</label>
         ${data.systems
           .map((s) => `<label class="rl-check"><input type="checkbox" name="system" value="${escape(s.id)}" checked> ${escape(s.name)}</label>`)

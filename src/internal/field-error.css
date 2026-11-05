@@ -2,7 +2,7 @@
    words in the danger color. A component's own CSS adds only where it sits, such as lining up with its label text. */
 @layer components {
   .field-error {
-    position: relative; /* holds the hidden prefix */
+    position: relative; /* holds the visually hidden "Error:" (src/internal/visually-hidden.css) */
     display: flex;
     align-items: flex-start;
     gap: var(--space-2);
@@ -18,17 +18,6 @@
     height: var(--icon-sm);
     margin-block: calc((var(--icon-md) - var(--icon-sm)) / 2);
     stroke-width: var(--icon-stroke);
-  }
-
-  /* "Error:", for screen readers only. Clipped to nothing where it sits, but still read: display: none or
-     visibility: hidden would hide it from screen readers too. Out of the flow, so it takes no room or gap. */
-  .field-error__prefix {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   /* Windows Contrast themes: the words and the icon carry the meaning, in the system text color */

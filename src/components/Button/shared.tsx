@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { SpinnerGraphic } from "../../internal/SpinnerGraphic";
 
 /* Pieces Button and ButtonLink have in common. Not exported from the package. */
 
@@ -38,14 +39,8 @@ export type IconOnly =
 
 export { cx } from "../../internal/cx";
 
-function Spinner() {
-  return (
-    <svg className="button__spinner" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="3" opacity="0.25" />
-      <path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
+/** The drawing a loading button shows in place of its start icon, shared with Spinner. */
+const Spinner = () => <SpinnerGraphic className="button__spinner" />;
 
 export function Content({ iconStart, iconEnd, iconOnly, loading, children }: {
   iconStart?: ReactNode;

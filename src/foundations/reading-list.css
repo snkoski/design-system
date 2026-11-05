@@ -115,14 +115,6 @@
   .rl-systems .checkbox[data-parent] {
     grid-column: 1 / -1;
   }
-  .rl-visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
   .rl-field input::placeholder {
     color: var(--ink-muted);
   }

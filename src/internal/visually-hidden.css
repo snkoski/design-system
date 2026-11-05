@@ -1,0 +1,19 @@
+/* Text for screen readers only, such as FieldError's "Error:" and Spinner's announcement. It's clipped to nothing
+   where it sits but still read: display: none or visibility: hidden would hide it from screen readers too. It's out
+   of the flow, so it takes no room or gap; the element it sits in sets position: relative to hold it. 0.0625rem is
+   1px: a box of no size at all is skipped by some screen readers, and a long text left at its full width could
+   widen the page. Internal: components put it on a part next to the part's own class. */
+@layer components {
+  .visually-hidden {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 0.0625rem;
+    block-size: 0.0625rem;
+    padding: 0; /* a <legend> has its own, which would make it wider */
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

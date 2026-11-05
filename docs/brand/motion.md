@@ -45,7 +45,7 @@ To override the visitor's system setting for part of a page, for example a site'
 - Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
 - Movement that carries meaning is the exception. A switch's thumb moving to the other end is how it shows on and off, so it moves the full distance even with reduced motion, quickly and without bounce (the bounce token turns into a plain ease-out). Don't build it from `--motion-distance`, which becomes 0.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.
-- Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels.
+- Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels. The exception is a loading indicator (Spinner, and Skeleton's shimmer): it keeps moving for as long as the wait lasts, because a frozen one looks like something broke, and seeing it move is how people know it's still trying. WCAG 2.2.2 allows this, since the movement is the information.
 
 ## In components
 

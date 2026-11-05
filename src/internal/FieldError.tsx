@@ -46,7 +46,7 @@ export function FieldError({
       <ErrorIcon />
       {/* The space between them is its own text node: a space inside the prefix is trimmed when screen readers
           join the parts, which would read "Error:Enter". Between flex items it takes no room on screen. */}
-      <span className="field-error__prefix">Error:</span> <span>{children}</span>
+      <span className="visually-hidden field-error__prefix">Error:</span> <span>{children}</span>
     </Field.Error>
   );
 }

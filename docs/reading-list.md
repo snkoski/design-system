@@ -50,6 +50,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Dialogs](#dialogs)
   - [Tooltips](#tooltips)
   - [Navigation](#navigation)
+  - [Loading indicators](#loading-indicators)
 
 ## Choosing and building colors
 
@@ -124,6 +125,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts), [Sheets](https://developer.apple.com/design/human-interface-guidelines/sheets), and [Modality](https://developer.apple.com/design/human-interface-guidelines/modality)
 - **Tooltips:** [Offering help](https://developer.apple.com/design/human-interface-guidelines/offering-help) (help tags; there's no tooltip page)
 - **Navigation:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
+- **Loading indicators:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
 
 ### Material Design 3 (Google)
 
@@ -140,6 +142,7 @@ Everything we read from each system, grouped by topic.
 - **Text areas:** [Text fields](https://m3.material.io/components/text-fields/guidelines) (multi-line text is part of text fields; there's no separate text area)
 - **Dialogs:** [Dialogs](https://m3.material.io/components/dialogs/guidelines)
 - **Tooltips:** [Tooltips](https://m3.material.io/components/tooltips/guidelines)
+- **Loading indicators:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
 
 ### GitHub Primer
 
@@ -160,6 +163,7 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Forms](https://primer.style/product/ui-patterns/forms/)
 - **Dialogs:** [Dialog](https://primer.style/product/components/dialog)
 - **Tooltips:** [Tooltip](https://primer.style/product/components/tooltip)
+- **Loading indicators:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), and [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second)
 
 ### Atlassian Design System
 
@@ -182,6 +186,7 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Form](https://atlassian.design/components/form/usage)
 - **Dialogs:** [Modal dialog](https://atlassian.design/components/modal-dialog/usage)
 - **Tooltips:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
+- **Loading indicators:** [Spinner](https://atlassian.design/components/spinner/usage)
 
 ### IBM Carbon
 
@@ -202,6 +207,7 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Forms pattern](https://carbondesignsystem.com/patterns/forms-pattern/)
 - **Dialogs:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
 - **Tooltips:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
+- **Loading indicators:** [Loading](https://carbondesignsystem.com/components/loading/usage/) and [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/)
 
 ### Microsoft Fluent 2
 
@@ -223,6 +229,7 @@ Everything we read from each system, grouped by topic.
 - **Text areas:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
 - **Dialogs:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
 - **Tooltips:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
+- **Loading indicators:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list)
 
 ### Shopify Polaris
 
@@ -242,6 +249,7 @@ Everything we read from each system, grouped by topic.
 - **Text fields:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **Text areas:** [Text field](https://polaris-react.shopify.com/components/selection-and-input/text-field) (for a text area, use its multiline option)
 - **Tooltips:** [Tooltip](https://polaris-react.shopify.com/components/overlays/tooltip)
+- **Loading indicators:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)
 
 ### GOV.UK Design System
 
@@ -500,3 +508,13 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 ### Navigation
 
 - **Apple Human Interface Guidelines:** [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
+
+### Loading indicators
+
+- **Apple Human Interface Guidelines:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators)
+- **Material Design 3 (Google):** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
+- **GitHub Primer:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), and [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second)
+- **Atlassian Design System:** [Spinner](https://atlassian.design/components/spinner/usage)
+- **IBM Carbon:** [Loading](https://carbondesignsystem.com/components/loading/usage/) and [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/)
+- **Microsoft Fluent 2:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage) and [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list)
+- **Shopify Polaris:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner)

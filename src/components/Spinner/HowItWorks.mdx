@@ -1,0 +1,185 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SpinnerStories from "./Spinner.stories";
+import { Code } from "../../how-it-works/Code";
+import { Appearing } from "../../how-it-works/components/Spinner";
+
+<Meta of={SpinnerStories} name="How it works" />
+
+# How Spinner works
+
+A spinner shows that a page or section is loading, and says what's loading: "Loading applications…". This page walks through the real code underneath it: what HTML it renders, why its label is in that HTML twice, and how the CSS draws and turns it. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+## What it's made of
+
+Spinner doesn't use [Base UI](https://base-ui.com), the library most components are built on: Base UI has no spinner, and a spinner has no keyboard use or focus for a library to handle. It's a few `<span>`s, an SVG drawing, and a little React state.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Spinner.tsx</code></td><td>The component. It renders the drawing, the visible label, and the status region that screen readers announce, and decides when the region gets its words.</td></tr>
+    <tr><td><code>spinner.css</code></td><td>The spinner's own look: its color, the label's type, the three sizes, and the delay before it appears. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/SpinnerGraphic.tsx</code> and <code>spinner-graphic.css</code></td><td>The drawing and its turn, shared with Button's loading state, so the two spinners can't drift apart. Not exported.</td></tr>
+    <tr><td><code>src/internal/visually-hidden.css</code></td><td>The <code>visually-hidden</code> class: text for screen readers only. FieldError's hidden "Error:" uses it too. Part of the published stylesheet.</td></tr>
+    <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for an empty label, and a helper that joins class names. Not exported.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Spinner</code> and the <code>SpinnerProps</code> and <code>SpinnerSize</code> types.</td></tr>
+    <tr><td><code>Spinner.test.tsx</code> and <code>Spinner.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real spinner, and under it the HTML it has rendered right now. Press the button to show it again from the start, and watch the attributes and the text change.
+
+<Unstyled>
+  <Appearing />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;span class="spinner" data-size&gt;</code></td><td>Holds the whole spinner. <code>data-size</code> comes from the <code>size</code> prop. With a <code>delay</code>, it also gets <code>data-delayed</code> and an inline <code>--spinner-delay</code>. Any other prop you pass, such as an <code>id</code>, lands here.</td></tr>
+    <tr><td><code>&lt;svg class="spinner-graphic spinner__graphic" aria-hidden="true"&gt;</code></td><td>The drawing. <code>aria-hidden</code> keeps screen readers from finding it: the words say everything it does.</td></tr>
+    <tr><td><code>&lt;span class="spinner__label" aria-hidden="true"&gt;</code></td><td>The label you see. It's hidden from screen readers once JavaScript runs, for the reason in the next section. With <code>hideLabel</code>, it also has the <code>visually-hidden</code> class.</td></tr>
+    <tr><td><code>&lt;span class="visually-hidden spinner__status" role="status"&gt;</code></td><td>The label screen readers hear. Never seen. It starts empty and gets the label's words a moment later.</td></tr>
+  </tbody>
+</table>
+
+## Why the label is there twice
+
+A screen reader can't see a spinner turning, so the spinner has to say, in words, that something is loading. The way to make a screen reader say something without moving focus is a **live region**: an element marked `role="status"` (or `aria-live="polite"`). When the text inside a live region changes, the screen reader reads the new text out at the next pause.
+
+The catch is the word *changes*. Screen readers watch live regions that are already on the page. A spinner usually appears *with* its words, all at once, when a page starts loading, and many screen readers miss text that arrives together with its region. They only announce text that changes after the region is already there. So a spinner whose `role="status"` element already holds "Loading applications…" when it appears often says nothing at all.
+
+The usual fix is to put the region on the page empty, then add the words a moment later. That alone would leave the visible label empty too, until JavaScript runs. On a page rendered on a server, or one that never runs JavaScript (an Astro page with no client script), you'd see a spinner with no words, forever.
+
+So the label is rendered twice, each copy doing one job:
+
+1. **The visible label** is in the HTML from the start, with the words in it. Before JavaScript runs, it's what you see and what a screen reader finds if it reads the page. Nothing is lost without JavaScript.
+2. **The status region** is hidden from view and starts empty. As soon as JavaScript runs, React gives the visible label `aria-hidden="true"`, so screen readers stop finding it. At least 100ms later (or after the `delay`, if that's longer), the status region gets the same words, and the screen reader announces them.
+
+At any moment, a screen reader finds the words in exactly one place, so it reads them once. If the `label` changes after that, say to "Loading page 2…", both copies change, and the status region's change is announced again.
+
+The demo above shows both steps: press **Show it again**, and the `aria-hidden` mark lands on the label straight away, then the words appear inside the status region.
+
+## From props to HTML
+
+### The props
+
+<Code file="components/Spinner/Spinner.tsx" name="SpinnerProps" />
+
+- **`label` is a required string.** A spinner that doesn't say what's loading tells nobody anything, and `voice.md` asks for "Loading projects…", not "Please wait." It's plain text rather than any React content, because it's announced as words and copied into two places.
+- **Some props are left out** with `Omit`. `children` (the label is a prop), `role`, `aria-live`, and `aria-atomic` (the status region sets its own), `aria-label` and `aria-labelledby` (a status region reads out its text, not a name, so an `aria-label` would silently do nothing), and `aria-hidden`, which would silence the announcement. `className` is declared again with our own JSDoc, so it shows in the docs table.
+- **Everything else** a `<span>` takes, such as `id`, `style`, `data-*`, and event handlers, goes to the outer span.
+
+### The component
+
+<Code file="components/Spinner/Spinner.tsx" name="ANNOUNCE_AFTER" />
+
+<Code file="components/Spinner/Spinner.tsx" name="Spinner" />
+
+Reading it top to bottom:
+
+1. **The warning.** An empty string passes the type, such as a label from a content system that came back blank. `warn()` prints a development warning when the label has no words in it. It runs during render, so it also works when a page is rendered on a server. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains when the system warns and when it doesn't.
+2. **The delay** is read once, into state, when the spinner appears, so the CSS delay and the announcement's timer always use the same value. A negative `delay` counts as none.
+3. **The phase.** `phase` starts as `"server"`: that's the HTML a server sends, before any JavaScript. `useEffect` only runs in the browser, after React has put the spinner on the page. It moves to `"waiting"` straight away, and sets a timer for `"announced"`, after the delay or `ANNOUNCE_AFTER`, whichever is longer. If the spinner is removed first, the cleanup clears the timer.
+4. **Once.** The effect's list of dependencies is empty, so it runs once, when the spinner appears. The CSS delay works the same way: an animation runs once, when the element appears. Changing `delay` on a spinner that's already showing does nothing.
+5. **The outer span.** `rest` goes on first, then our own attributes, so nothing passed in can replace `className`, `data-size`, or the delay. The consumer's class is joined to ours with `cx()`, and their `style` is kept, with `--spinner-delay` added to it.
+6. **The label** gets `aria-hidden` in every phase but `"server"`.
+7. **The status region** gets the label's words only in `"announced"`.
+
+## How it looks
+
+Everything is in `@layer components`. The layer order is `theme, base, components, utilities`, so a Tailwind utility in the markup (in `utilities`) can override a component for a one-off, such as `p-8` to give a spinner room on a page.
+
+### The spinner
+
+<Code file="components/Spinner/spinner.css" name=".spinner" />
+
+- **`inline-flex`** lines the drawing and the label up in a row, centered, with a `--space-2` gap. It's inline, so it can sit in a line of text, and sets no margin or width: where it sits is the layout's job.
+- **`ink-muted`**, the color for secondary text, so it reads as "not here yet" rather than content. The drawing is drawn in `currentColor`, so it takes the same color. Set `color` on the spinner to change both.
+- **`position: relative`** holds the hidden status region, which is positioned inside it.
+- **`--spinner-delay`** is `0ms` unless the `delay` prop sets it in an inline style, which wins over any rule.
+
+### The drawing and its turn
+
+The drawing is shared with Button's loading state:
+
+<Code file="internal/SpinnerGraphic.tsx" name="SpinnerGraphic" />
+
+A faint full circle (`opacity="0.25"`) is the track, and a quarter of a circle on top is the part that moves. The faint track is decoration. The arc carries the meaning, in `ink-muted`, which has at least 4.5:1 contrast with the page in every theme, well over the 3:1 a meaningful graphic needs. `focusable="false"` stops old versions of Internet Explorer and Edge from adding the drawing to the Tab order.
+
+<Code file="internal/spinner-graphic.css" name=".spinner-graphic" />
+
+<Code file="internal/spinner-graphic.css" name="@keyframes spinner-spin" />
+
+It turns once every `--duration-loop`, at a steady speed (`linear`), forever. With reduced motion, the token goes from 700ms to 1600ms: the spinner turns more slowly, but never stops, because a frozen spinner looks like something broke. The `ReducedMotion` story checks both speeds.
+
+### Sizes
+
+<Code file="components/Spinner/spinner.css" name=".spinner__graphic" />
+
+<Code file="components/Spinner/spinner.css" name='.spinner[data-size="sm"]' />
+
+<Code file="components/Spinner/spinner.css" name='.spinner[data-size="sm"] .spinner__graphic' />
+
+<Code file="components/Spinner/spinner.css" name='.spinner[data-size="lg"] .spinner__graphic' />
+
+The drawing follows the icon sizes: `--icon-sm`, `--icon-md`, and `--icon-lg` (16, 20, and 24px). The label is `--text-small` at `sm`, with a tighter gap, and `--text-body` otherwise. Nothing changes with a touch screen or compact density: a spinner isn't something you press, so it needs no hit area, and text never changes size with the pointer.
+
+### Hidden text
+
+<Code file="internal/visually-hidden.css" name=".visually-hidden" />
+
+The status region always has this class, and the visible label has it with `hideLabel`. It's clipped to nothing (`clip-path: inset(50%)`), 1px square, and out of the flow, so it takes no room and adds no gap. `display: none` or `visibility: hidden` would hide it from screen readers too, which is the opposite of the point.
+
+### The delay
+
+<Code file="components/Spinner/spinner.css" name=".spinner[data-delayed]" />
+
+<Code file="components/Spinner/spinner.css" name="@keyframes spinner-appear" />
+
+An animation can wait before it starts (its delay, here `--spinner-delay`), and `backwards` holds its first keyframe, `opacity: 0`, during that wait. So the spinner is on the page but invisible until the delay is over, then fades in over `--duration-base`. It's done in CSS rather than by waiting in JavaScript to render it, so it works in a server's HTML before any JavaScript has run. The status region waits for the same delay before it gets its words, so a load that finishes sooner is never seen or heard.
+
+### Hot dog mode and Windows high contrast
+
+Hot dog mode needs nothing of its own: a spinner isn't a control, so it has no outline or shadow to press. In Windows high contrast (forced colors), the browser replaces `ink-muted` with the system text color, and `currentColor` follows it, so the label and the drawing both stay visible.
+
+## Screen readers and the keyboard
+
+**Keyboard.** Nothing. A spinner takes no focus and has nothing to press.
+
+**Screen readers** hear the label once, politely: after whatever they're reading now, without moving focus. There's no announcement when it's done; the content that replaces it is what's new. Don't put a spinner inside an element with `aria-busy="true"`: screen readers may hold back a busy element's announcements until it's no longer busy, and by then the spinner has gone.
+
+## The whole files
+
+<details>
+<summary><code>Spinner.tsx</code></summary>
+
+<Code file="components/Spinner/Spinner.tsx" />
+
+</details>
+
+<details>
+<summary><code>spinner.css</code></summary>
+
+<Code file="components/Spinner/spinner.css" />
+
+</details>
+
+<details>
+<summary><code>internal/SpinnerGraphic.tsx</code></summary>
+
+<Code file="internal/SpinnerGraphic.tsx" />
+
+</details>
+
+<details>
+<summary><code>internal/spinner-graphic.css</code></summary>
+
+<Code file="internal/spinner-graphic.css" />
+
+</details>

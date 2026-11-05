@@ -186,3 +186,13 @@ Raised while deciding date and number fields (Q7, 2026-11-04).
 **To decide:** whether to show live properties (`checked`, and maybe `value` for text fields) next to the attributes, marked so they can't be mistaken for HTML, or to keep the view to real HTML and leave the explanation to the pages.
 
 Raised while writing the components' How it works pages (2026-10-28).
+
+## Loading guidance once Skeleton exists
+
+**Today:** `docs/brand/loading.md` (Spinner's "Choosing a loading indicator" page) says to use a Spinner for a page or section that's waiting for its data, and that Skeleton is planned for content whose layout is known. Until Skeleton exists, every one of the job tracker's 18 loading placeholders would become a Spinner.
+
+**Why it's in question:** Skeleton is Phase 1, step 4 of `docs/proposed-roadmap-job-tracker.md`. Once it exists, some of those places (the list areas in applications, contacts, companies, search, documents, and prep questions) may be better as a skeleton, which shows the shape of what's coming.
+
+**To decide:** when Skeleton is built, update `loading.md` with when to pick a skeleton over a spinner. Optionally, note in the roadmap's migration order which job tracker pages get which. Then delete this entry.
+
+Raised while building Spinner (2026-11-05).

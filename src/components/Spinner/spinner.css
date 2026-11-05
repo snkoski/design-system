@@ -1,0 +1,47 @@
+/* Spinner: what it is (color, type, sizes, and the delay before it shows). Where it sits (centering it in a page
+   or section, padding around it) is the layout's job: use Tailwind in the markup. The drawing and its turn are in
+   src/internal/spinner-graphic.css, shared with Button. */
+@layer components {
+  .spinner {
+    position: relative; /* holds the visually hidden status region */
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink-muted); /* the drawing is currentColor, so it matches the label; set color to change both */
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-control);
+    --spinner-delay: 0ms; /* the delay prop sets it in an inline style, which wins */
+  }
+
+  .spinner__graphic {
+    width: var(--icon-md);
+    height: var(--icon-md);
+  }
+
+  /* Sizes: the drawing follows the icon sizes. Text never changes size with pointer or density. */
+  .spinner[data-size="sm"] {
+    gap: var(--space-1);
+    font-size: var(--text-small);
+  }
+  .spinner[data-size="sm"] .spinner__graphic {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+  .spinner[data-size="lg"] .spinner__graphic {
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+  }
+
+  /* Delay: invisible until --spinner-delay (set from the delay prop) is over, then it fades in. It's CSS, so it
+     works before JavaScript runs too. backwards holds the first keyframe through the delay. */
+  .spinner[data-delayed] {
+    animation: spinner-appear var(--duration-base) var(--ease-out) var(--spinner-delay) backwards;
+  }
+
+  @keyframes spinner-appear {
+    from {
+      opacity: 0;
+    }
+  }
+}
