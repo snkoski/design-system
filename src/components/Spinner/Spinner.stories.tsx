@@ -172,7 +172,8 @@ function LoadDemo(props: SpinnerProps) {
     return () => clearTimeout(timer);
   }, [state]);
   return (
-    <div className="grid justify-items-start gap-4">
+    // A fixed width, so the centered story doesn't shift sideways when "Loading applications…" turns into the shorter result
+    <div className="grid w-64 justify-items-start gap-4">
       <Button variant="secondary" onClick={() => setState("loading")}>Load applications</Button>
       {/* The spinner stays outside any aria-busy element, which could hold back its announcement */}
       <div className="min-h-12">
