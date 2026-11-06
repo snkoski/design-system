@@ -16,22 +16,19 @@ function seconds(token: string, parent: Element) {
   return value;
 }
 
-/** Three rows standing in for a list of applications: an avatar, a name, and a line of detail */
-function ListShapes() {
-  return (
-    <>
-      {[1, 2, 3].map((row) => (
-        <div key={row} className="flex items-center gap-3">
-          <SkeletonItem shape="circle" className="size-10" />
-          <div className="grid flex-1 gap-1">
-            <SkeletonItem className="text-body w-1/2" />
-            <SkeletonItem className="text-small" />
-          </div>
-        </div>
-      ))}
-    </>
-  );
-}
+/**
+ * One row of a list of applications: an avatar, a name, and a line of detail. Plain JSX rather than a component, so
+ * Storybook's code panel shows every shape and the example can be copied.
+ */
+const listRow = (
+  <div className="flex items-center gap-3">
+    <SkeletonItem shape="circle" className="size-10" />
+    <div className="grid flex-1 gap-1">
+      <SkeletonItem className="text-body w-1/2" />
+      <SkeletonItem className="text-small" />
+    </div>
+  </div>
+);
 
 const meta = {
   title: "Components/Skeleton",
@@ -40,7 +37,9 @@ const meta = {
   argTypes: { delay: { control: { type: "number", min: 0, step: 100 } } },
   render: (args) => (
     <Skeleton {...args} className="grid w-80 gap-4">
-      <ListShapes />
+      {listRow}
+      {listRow}
+      {listRow}
     </Skeleton>
   ),
 } satisfies Meta<typeof Skeleton>;
@@ -58,7 +57,10 @@ export const Playground: Story = {};
 export const States: Story = {
   render: (args) => (
     <Skeleton {...args} className="grid w-80 gap-4">
-      <Matrix />
+      <SkeletonItem className="text-heading-md w-2/3" />
+      <SkeletonItem lines={3} className="text-body" />
+      <SkeletonItem shape="box" className="h-24" />
+      <SkeletonItem shape="circle" className="size-12" />
     </Skeleton>
   ),
   play: async ({ canvasElement }) => {
@@ -170,11 +172,16 @@ export const AllThemes: Story = {
           <h2 className="text-label">{theme === "hotdog" ? "Hot dog" : theme}</h2>
           <div className="flex flex-wrap items-start gap-8">
             <Skeleton {...args} className="grid w-72 gap-4">
-              <Matrix />
+              <SkeletonItem className="text-heading-md w-2/3" />
+              <SkeletonItem lines={3} className="text-body" />
+              <SkeletonItem shape="box" className="h-24" />
+              <SkeletonItem shape="circle" className="size-12" />
             </Skeleton>
             <div className="w-72 rounded-lg p-4" style={{ background: "var(--surface)" }}>
               <Skeleton {...args} label="Loading contacts…" className="grid gap-4">
-                <ListShapes />
+                {listRow}
+                {listRow}
+                {listRow}
               </Skeleton>
             </div>
           </div>
@@ -200,17 +207,6 @@ export const AllThemes: Story = {
   },
 };
 
-function Matrix() {
-  return (
-    <>
-      <SkeletonItem className="text-heading-md w-2/3" />
-      <SkeletonItem lines={3} className="text-body" />
-      <SkeletonItem shape="box" className="h-24" />
-      <SkeletonItem shape="circle" className="size-12" />
-    </>
-  );
-}
-
 /** A list that takes two seconds to load, the way a page waits for its data */
 function LoadDemo(props: SkeletonProps) {
   const [state, setState] = useState<"idle" | "loading" | "done">("idle");
@@ -227,7 +223,9 @@ function LoadDemo(props: SkeletonProps) {
       <div className="min-h-44">
         {state === "loading" && (
           <Skeleton {...props} className="grid gap-4">
-            <ListShapes />
+            {listRow}
+            {listRow}
+            {listRow}
           </Skeleton>
         )}
         {state === "done" && (
