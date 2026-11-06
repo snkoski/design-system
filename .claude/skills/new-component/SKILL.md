@@ -1,19 +1,28 @@
 ---
 name: new-component
 description: Build a new design-system component start to finish (research, an API proposal for approval, tests first, implementation, stories, checks, screenshots, and an independent review), following CLAUDE.md. Use when the user asks for a new component.
-argument-hint: "[ComponentName]"
+argument-hint: "[ComponentName] [MoreNames...]"
 disable-model-invocation: true
 ---
 
 # New component
 
-Build the component the user named (`$0`) following `CLAUDE.md`. That file is the rulebook; this skill is the order of work. If they ever disagree, `CLAUDE.md` wins, and say so in the final report.
+Build the component or components the user named (`$ARGUMENTS`) following `CLAUDE.md`. That file is the rulebook; this skill is the order of work. If they ever disagree, `CLAUDE.md` wins, and say so in the final report.
 
-If `$0` is empty, ask which component to build and stop.
+If `$ARGUMENTS` is empty, ask which component to build and stop.
 
 **Normalize the name first.** Whatever casing the user typed, the component name is PascalCase (`switch` → `Switch`, `radio group` → `RadioGroup`). Below, `<Name>` means that PascalCase name and `<name>` means its kebab-case form (`Switch` → `switch`, `RadioGroup` → `radio-group`). Files: `src/components/<Name>/<Name>.tsx`, `<Name>.test.tsx`, `<Name>.stories.tsx`, `index.ts`, and `<name>.css`; classes: `.<name>`, `.<name>__part`.
 
 Work through the phases in order. **Phase 2 ends in a hard stop for the user's approval.** Don't write component files before it.
+
+**Several components at once.** When the user names more than one (`/new-component Meter Progress`), they're a set that must match, built in the order named. Everything below applies to each one, with these differences:
+
+- **Phase 1** researches all of them together: read the docs once, and render every primitive in the same throwaway test, so their DOM and attributes can be compared side by side.
+- **Phase 2** is one proposal. It opens with what they share: the look, the props that mean the same thing (same name, type, and default in each), and where the shared code goes. That last one is an open question for the user, with a recommendation: a sibling in the first component's folder sharing its CSS (`ButtonLink` beside `Button`), or a shared file in `src/internal/` that each one's parts carry next to their own class (`choice.css`). Then one section per component with the rest of the list, saying only where it differs from the shared part.
+- **Phases 3 to 8** run for the first component all the way through, including its screenshots and docs, before the next one's Phase 3 starts. A later component then builds on shared code that's already finished and tested. If a later one has to change shared code, rerun the earlier one's tests and screenshots afterwards.
+- **Phase 8**: one guidance page and one `industry.md` section can cover the set, when choosing between them is the main question (such as which of the two to use). Each still gets its own "How it works" page.
+- **Phase 9** runs one reviewer per component, in parallel, each told the names of the others, so it checks they match.
+- **Phase 10** is one report, with the test count and anything unverified given for each component. Commits: fixes to existing components first, then one commit per component in build order, then changes to this skill.
 
 **An experiment built to these rules.** When the user asks for an experiment in `src/experiments/<Name>/` to follow this skill anyway, every phase applies, with these differences, because an experiment never changes components, styles, or tokens and is never published: no `index.ts`, no export from `src/index.ts`, and no import in `src/styles/index.css` (the component imports its own CSS); no new tokens and no `tokens/contrast.json` pairs, so any color it needs is written in its CSS with a comment saying it becomes a token if the experiment graduates, and its contrast is checked by a `play` function on the `AllThemes` story (`pnpm check` doesn't look at experiments); new dependencies go in `devDependencies`; the story title is `Experiments/<Name>`, so screenshot ids start `experiments-<name>--`; and Phase 9 points the reviewer at `src/experiments/<Name>/`, naming the reference component.
 
@@ -58,7 +67,7 @@ Present this to the user and **stop**. Keep it to what they need to decide.
 - **How other systems do it:** a short table of what the major systems call it, the variants they offer, and where they differ, with what we chose. It becomes a section or row in `docs/brand/industry.md` in Phase 8.
 - **When to use each variant**, if it has variants or could be confused with another component (a segmented control or tabs, a switch or a checkbox). It becomes a guidance page in Phase 8.
 - **Tokens:** existing tokens it uses, and any new token it needs (name, value, usage note).
-- **Color pairs** it introduces, to add to `tokens/contrast.json`.
+- **Color pairs** it introduces, to add to `tokens/contrast.json`. Check each candidate before proposing it: copy `contrast.json` to the scratchpad, add the pairs with `"use": "PROBE"`, run `node scripts/check-contrast.mjs`, then copy the original back and confirm `git diff tokens/contrast.json` is empty.
 - **Motion:** what moves, with which tokens.
 - **Hot dog and forced-colors treatment.**
 - **Open questions:** decisions that are the user's, each with a recommendation.
@@ -106,7 +115,7 @@ pnpm check:tests
 
 If `pnpm test` fails in a file this component didn't touch, rerun that file alone (`pnpm exec vitest run --project storybook <file>`) a few times before acting on it. If it passes alone, report it to the user as possibly flaky, with the failing assertion; don't loosen its test without their OK.
 
-Then load every new story in the built Storybook (`storybook-static`, served as in "Looking at a component") and read each one's result with `page.evaluate(() => window.__STORYBOOK_PREVIEW__?.storyRenders?.[0]?.phase)`: it must be `finished`. `pnpm test` runs stories on the dev server, whose timing hides a `play` function that starts before something an effect creates is there (a shadow root, a portal, a listener). Create those in `useLayoutEffect`, and `waitFor` them in `play`.
+Then load every new story in the built Storybook (`storybook-static`, served as in "Looking at a component") and read each one's result with `page.evaluate(() => window.__STORYBOOK_PREVIEW__?.storyRenders?.[0]?.phase)`: it must be `finished`. A story whose state keeps changing on its own (a simulated upload counting up) reports `completing` until it stops; wait for it to settle before reading the phase, and don't count `completing` as a failure. `pnpm test` runs stories on the dev server, whose timing hides a `play` function that starts before something an effect creates is there (a shadow root, a portal, a listener). Create those in `useLayoutEffect`, and `waitFor` them in `play`.
 
 Then prove the tests can fail: break the component three ways that matter (for example, a state no longer reaching an ARIA attribute, a decorative icon losing `aria-hidden`, the label no longer naming the control). Back up the file first with `cp`, break it, run `pnpm test:unit`, and restore it from the backup with `cp`. **Don't use `git checkout` to restore**: the component is uncommitted, and that would discard it. Confirm with `diff` that the restored file matches the backup. Each break must make at least one test fail; if one doesn't, add the missing test.
 
