@@ -1,0 +1,57 @@
+/* The How it works demo: each measured shape outlined over the real content. Experiment CSS; the outline styles
+   tell the three kinds apart by line style as well as weight, never by color alone. */
+.explain-measured {
+  display: grid;
+  gap: 1rem;
+  max-inline-size: 34rem;
+  color: var(--ink);
+}
+
+.explain-measured__stage {
+  position: relative;
+  padding: 0.25rem; /* room for the outlines, which sit just outside each shape */
+}
+
+.explain-measured__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.explain-measured__shape {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.explain-measured__shape[data-kind="frame"],
+.explain-measured__swatch[data-kind="frame"] {
+  outline: var(--border-thick) dashed var(--ink);
+}
+
+.explain-measured__shape[data-kind="box"],
+.explain-measured__swatch[data-kind="box"] {
+  outline: var(--border-thick) solid var(--focus);
+}
+
+.explain-measured__shape[data-kind="line"],
+.explain-measured__swatch[data-kind="line"] {
+  outline: var(--border-thin) dotted var(--ink);
+}
+
+.explain-measured__key {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.explain-measured__key li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.explain-measured__swatch {
+  inline-size: 1.5rem;
+  block-size: 0.75rem;
+}

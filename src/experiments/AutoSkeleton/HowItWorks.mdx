@@ -1,0 +1,93 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as AutoSkeletonStories from "./AutoSkeleton.stories";
+import { Code } from "../../how-it-works/Code";
+import { Measured } from "./explain";
+
+<Meta of={AutoSkeletonStories} name="How it works" />
+
+# How Auto skeleton works
+
+A skeleton is gray shapes standing in for content while it loads. With `Skeleton`, you build those shapes by hand, as `SkeletonItem`s laid out like the content. Auto skeleton draws them for you: wrap the real content, give it placeholder data while it loads, and it measures what that content would look like and draws a skeleton of it.
+
+```tsx
+<AutoSkeleton loading={isLoading} label="Loading applications…">
+  <ApplicationList applications={isLoading ? placeholderApplications : applications} />
+</AutoSkeleton>
+```
+
+A wrapper can't read content that hasn't loaded yet, which is why it needs the placeholder data. The placeholder is never shown, only measured, so it only needs text of a typical length.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>AutoSkeleton.tsx</code></td><td>The wrapper: renders the content invisibly, measures it, and draws the shapes.</td></tr>
+    <tr><td><code>shapes.ts</code></td><td>The measuring: walks the content and decides what each piece becomes.</td></tr>
+    <tr><td><code>auto-skeleton.css</code></td><td>Hides the content and places the shapes.</td></tr>
+    <tr><td><code>sample.tsx</code></td><td>The sample list and form the stories and this page use: ordinary components.</td></tr>
+  </tbody>
+</table>
+
+Every code block on this page is read from those files when the page loads, so it's always the code that runs, and the demo calls the same measuring code.
+
+## 1. The wrapper
+
+When `loading` is false, the children render as they are, with nothing around them. While it's true, the content goes inside a real `Skeleton`, which announces the label to screen readers once and handles the `delay`. The content is there and laid out, but `inert`: nothing in it can be focused, clicked, or found by a screen reader. Beside it, an overlay holds the shapes.
+
+<Code file="experiments/AutoSkeleton/AutoSkeleton.tsx" name="AutoSkeleton" />
+
+<Code file="experiments/AutoSkeleton/AutoSkeleton.tsx" name="Loading" />
+
+The content is hidden with `opacity: 0` on its outer element, not `visibility: hidden`. It still takes exactly the room it will take once loaded, so nothing jumps when it arrives. And each element inside still reports its own look when it's measured: with `visibility: hidden`, every one would report itself hidden.
+
+<Code file="experiments/AutoSkeleton/auto-skeleton.css" />
+
+## 2. Measuring
+
+`measureShapes` walks everything inside the content in page order and sorts each element into one of four kinds:
+
+- **Not seen:** hidden, transparent, or clipped to nothing, like a form control's hidden input or text for screen readers only. Skipped, with everything inside it.
+- **Pictures and controls:** images, icons, buttons, text fields, checkboxes, and switches (by tag, or by role for Base UI's, which are spans). Each becomes one gray box, with its own corners.
+- **Elements with a look of their own:** a fill, a visible edge, or a shadow. A badge or an avatar is a token and becomes one gray box. A card is a container: its fill, edge, and shadow are copied as they are, and its content is read.
+- **Everything else** is read into, for its text.
+
+<Code file="experiments/AutoSkeleton/shapes.ts" name="classify" />
+
+What makes a token rather than a container isn't its size or display: a badge and an avatar sit in a flex row, where the browser reports every child as a block. It's what's inside. A token holds one line of text or an icon, and nothing that's a control or has a look of its own.
+
+<Code file="experiments/AutoSkeleton/shapes.ts" name="isToken" />
+
+Text has no element of its own to measure, so the browser's `Range` measures it: `getClientRects()` gives one rectangle per line the text wraps onto. Each becomes a bar as tall as the text's letters (`1em`), centered in its line, the way `Skeleton`'s text lines are drawn.
+
+<Code file="experiments/AutoSkeleton/shapes.ts" name="textBars" />
+
+A sentence with a bold word in it is three pieces of text, so bars that touch on one line are joined into one.
+
+<Code file="experiments/AutoSkeleton/shapes.ts" name="mergeBars" />
+
+<Code file="experiments/AutoSkeleton/shapes.ts" name="measureShapes" />
+
+Here's a real, loaded card with everything the measuring found outlined on top: the card itself as a container (dashed), the avatar, badge, and button as one shape each (thick), and each line of text as a bar (dotted).
+
+<Unstyled>
+  <Measured />
+</Unstyled>
+
+## 3. Drawing
+
+Containers are drawn as plain copies of their look, and don't pulse: they're the page's structure. Everything else is a real `SkeletonItem`, so it gets the same gray, pulse, hot dog edge, and forced-colors outline as a hand-built skeleton. Text bars take the small corner radius, and tokens and controls keep their own corners, so a pill button stays a pill.
+
+<Code file="experiments/AutoSkeleton/AutoSkeleton.tsx" name="Drawn" />
+
+## 4. Keeping it current
+
+The measuring runs before the first paint, in a layout effect, so the skeleton is never empty for a frame. It runs again when anything could move a shape: the content changes size (the window narrows and text wraps onto more lines), its DOM changes, the theme or density changes, a web font finishes loading, or an image loads. Each change waits for the next animation frame, so a burst of changes measures once, and the shapes only re-render when the measurements differ.
+
+## What it can't do yet
+
+- **It needs JavaScript.** Before JavaScript runs, the content is there but invisible, and there are no shapes yet, so a server-rendered page shows a blank space at first.
+- **Placeholder data is still yours to write**, for each list or card it wraps.
+- **It measures once per change.** Something that moves without changing size or DOM, such as an animation, isn't followed.
+- **Copied containers keep the colors they were measured in** until the next change. Switching theme on `<html>` re-measures; a theme set on some other element doesn't.
+- **Its guesses can be wrong.** A one-line card with no controls in it looks like a token, and becomes one gray box.
