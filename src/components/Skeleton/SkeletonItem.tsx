@@ -15,10 +15,8 @@ export type SkeletonItemProps = SharedProps &
     | {
         /**
          * The shape. `text` is one or more lines of the text around it: put it in the same text style as the text
-         * it stands in for. `box` is a rectangle as wide as its container, for an image or a card; set its height
-         * with a class such as `h-32`. `circle` is for an avatar; set its size with a class such as `size-10`. A
-         * box or circle with no size is one line tall. In a flex row, text and box have no width of their own: add
-         * `flex-1` or a width class. Default: `text`.
+         * it stands in for. In a flex row it has no width of its own: add `flex-1` or a width class. Default:
+         * `text`.
          */
         shape?: "text";
         /** How many lines of text. The last is shorter when there are two or more. Default: `1`. */
@@ -26,11 +24,9 @@ export type SkeletonItemProps = SharedProps &
       }
     | {
         /**
-         * The shape. `text` is one or more lines of the text around it: put it in the same text style as the text
-         * it stands in for. `box` is a rectangle as wide as its container, for an image or a card; set its height
-         * with a class such as `h-32`. `circle` is for an avatar; set its size with a class such as `size-10`. A
-         * box or circle with no size is one line tall. In a flex row, text and box have no width of their own: add
-         * `flex-1` or a width class. Default: `text`.
+         * `box` is a rectangle as wide as its container, for an image or a card; set its height with a class such as
+         * `h-32`. In a flex row it has no width of its own: add `flex-1` or a width class. `circle` is for an avatar;
+         * set its size with a class such as `size-10`. Either one with no size is one line tall.
          */
         shape: "box" | "circle";
         /** Only text has lines. */
