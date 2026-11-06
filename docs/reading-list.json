@@ -2365,6 +2365,77 @@
         "badges"
       ],
       "note": "When a change needs a live region: a badge already on the page doesn't."
+    },
+    {
+      "title": "Loading",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/loading",
+      "system": "apple",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Show placeholder text, graphics, or animations as content loads; a progress indicator for longer waits."
+    },
+    {
+      "title": "redacted(reason:) (SwiftUI)",
+      "url": "https://developer.apple.com/documentation/swiftui/view/redacted(reason:)",
+      "system": "apple",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Apple's skeleton: the real view, masked into placeholder shapes of the same size."
+    },
+    {
+      "title": "SkeletonText",
+      "url": "https://primer.style/product/components/skeleton-text",
+      "system": "primer",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Lines that follow the type styles, the last at 65%."
+    },
+    {
+      "title": "Skeleton",
+      "url": "https://atlassian.design/components/skeleton/usage",
+      "system": "atlassian",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "One shape with a width, height, and radius, and an optional shimmer."
+    },
+    {
+      "title": "Loading pattern",
+      "url": "https://carbondesignsystem.com/patterns/loading-pattern/",
+      "system": "carbon",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Skeletons only on containers and data, never on toasts, menus, or modals."
+    },
+    {
+      "title": "Skeleton",
+      "url": "https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton",
+      "system": "fluent",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "An area plus shapes, like Sherbet's; announces with aria-busy."
+    },
+    {
+      "title": "Skeleton body text",
+      "url": "https://polaris.shopify.com/components/feedback-indicators/skeleton-body-text",
+      "system": "polaris",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Match the number of lines; the last line is shorter."
+    },
+    {
+      "title": "More Accessible Skeletons (Adrian Roselli)",
+      "url": "https://adrianroselli.com/2020/11/more-accessible-skeletons.html",
+      "topics": [
+        "loading-indicators"
+      ],
+      "note": "Hide the shapes, announce loading in words, and why aria-busy alone isn't enough."
     }
   ]
 }

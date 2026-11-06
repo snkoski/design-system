@@ -34,7 +34,7 @@ Components are drawn in black, white, and grays. The brand colors belong to the 
 | `hotdog` | Ketchup and mustard, chunky | `mustard-400` / `char-950` / `ketchup-600` |
 
 - Light or dark follows the visitor's system setting until they choose. Hot dog mode is only ever an explicit choice.
-- Hot dog mode is a joke that is built properly: it passes the same contrast checks, and it swaps soft shadows for hard offset shadows and `border-thick` outlines. Its controls are black and white like everyone else's; the ketchup and mustard are in the page.
+- Hot dog mode is a joke that is built properly: it passes the same contrast checks, and it swaps soft shadows for hard offset shadows and `border-thick` outlines. The one exception is Skeleton's placeholder shapes, which get a thin ink edge, so they don't look like real controls. Its controls are black and white like everyone else's; the ketchup and mustard are in the page.
 
 ## Dark mode
 

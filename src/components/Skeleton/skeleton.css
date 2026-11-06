@@ -1,0 +1,77 @@
+/* Skeleton and SkeletonItem: what they are (the gray, the shapes, the pulse, and the delay before they show). The
+   layout of the shapes, and each box's or circle's size, are the layout's job: use Tailwind in the markup. */
+@layer components {
+  .skeleton {
+    position: relative; /* holds the visually hidden label and status region */
+    --skeleton-delay: 0ms; /* the delay prop sets it in an inline style, which wins */
+  }
+
+  /* Delay: invisible until --skeleton-delay is over, then it fades in, like Spinner. It's CSS, so it works before
+     JavaScript runs too. backwards holds the first keyframe through the delay. */
+  .skeleton[data-delayed] {
+    animation: skeleton-appear var(--duration-base) var(--ease-out) var(--skeleton-delay) backwards;
+  }
+
+  @keyframes skeleton-appear {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* A shape: a gray fill with a transparent edge. In forced colors the fill disappears and the edge outlines it.
+     A box is as wide as its container; a box or circle with no size is one line tall. */
+  .skeleton-item {
+    --skeleton-edge: var(--border-thin) solid transparent;
+    display: block;
+    box-sizing: border-box;
+    block-size: 1lh;
+    border: var(--skeleton-edge);
+    border-radius: var(--radius-md);
+    background: var(--track);
+    /* One pulse is two loops (1.4s, or 3.2s with reduced motion, which slows it rather than stopping it). Shapes
+       that appear together pulse together. */
+    animation: skeleton-pulse calc(var(--duration-loop) * 2) var(--ease-in-out) infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .skeleton-item[data-shape="circle"] {
+    inline-size: 1lh;
+    border-radius: var(--radius-full);
+  }
+
+  /* Text: the lines are the shapes. Each takes one line of the text around it (1lh), with a bar as tall as that
+     text's letters (1em) in the middle, so lines read as separate. A flex column keeps their margins apart. */
+  .skeleton-item[data-shape="text"] {
+    display: flex;
+    flex-direction: column;
+    block-size: auto;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .skeleton-item__line {
+    box-sizing: border-box;
+    block-size: 1em;
+    margin-block: calc((1lh - 1em) / 2);
+    border: var(--skeleton-edge);
+    border-radius: var(--radius-sm);
+    background: var(--track);
+  }
+
+  /* The last of several lines is shorter, the way a paragraph ends */
+  .skeleton-item__line:last-child:not(:first-child) {
+    inline-size: 60%;
+  }
+
+  /* Hot dog mode: a thin ink edge, since light gray on mustard is faint. Not the thick edge other components get,
+     which would make placeholders look like real controls. */
+  [data-theme="hotdog"] .skeleton-item {
+    --skeleton-edge: var(--border-thin) solid var(--ink);
+  }
+}

@@ -187,16 +187,6 @@ Raised while deciding date and number fields (Q7, 2026-11-04).
 
 Raised while writing the components' How it works pages (2026-10-28).
 
-## Loading guidance once Skeleton exists
-
-**Today:** `docs/brand/loading.md` (Spinner's "Choosing a loading indicator" page) says to use a Spinner for a page or section that's waiting for its data, and that Skeleton is planned for content whose layout is known. Until Skeleton exists, every one of the job tracker's 18 loading placeholders would become a Spinner.
-
-**Why it's in question:** Skeleton is Phase 1, step 4 of `docs/proposed-roadmap-job-tracker.md`. Once it exists, some of those places (the list areas in applications, contacts, companies, search, documents, and prep questions) may be better as a skeleton, which shows the shape of what's coming.
-
-**To decide:** when Skeleton is built, update `loading.md` with when to pick a skeleton over a spinner. Optionally, note in the roadmap's migration order which job tracker pages get which. Then delete this entry.
-
-Raised while building Spinner (2026-11-05).
-
 ## A separator screen readers skip
 
 **Today:** every `Separator` is announced as "separator", with no way to hide one. Its label's words are always hidden.
@@ -216,3 +206,13 @@ Raised while building Separator (2026-11-05).
 **To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd be the one place a component uses palette hues, so `CLAUDE.md` and `color.md` would need an exception. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
 
 Raised while building Badge (2026-11-05).
+
+## How faint Skeleton's shapes are
+
+**Today:** Skeleton's shapes are the light `track` gray, with no visible edge outside hot dog mode. Measured against the page, that's about 1.13:1 on `bg` and 1.19:1 on `surface` in light, 1.33:1 and 1.14:1 in dark, and 1.18:1 and 1.19:1 in hot dog (with a thin ink edge there), and lower at the pulse's faintest point (1.06–1.13:1). `tokens/contrast.json` has no pair for it, since the shapes are treated as decorative.
+
+**Why it's in question:** the label is only heard, never shown, so for someone who can see, the shapes are the only sign that something is loading. Someone with low vision may not see them at all, especially on `surface` in dark mode. Adrian Roselli argues for 3:1 (WCAG 1.4.11). Most systems (Polaris, shadcn, MUI) are as faint as this, and a page of 3:1 shapes would look heavy.
+
+**To decide:** look at real pages of skeletons in all three themes. If they're too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
+
+Raised while building Skeleton (2026-11-05).

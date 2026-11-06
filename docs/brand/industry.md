@@ -158,6 +158,22 @@ When a label doesn't fit, most systems let it wrap onto more lines: Carbon (whic
 
 Most systems hide the words and say "Loading" by default. Sherbet makes the label required and visible, because `voice.md` asks for loading text that says what's loading, and Fluent and Carbon's inline loader show it too. Carbon, Atlassian, and Polaris all say to show only one at a time; so does Sherbet's guidance. Every system with guidance agrees that a spinner is for short waits of unknown length: Primer shows nothing under one second and a determinate indicator over three, and Apple, Material, and Fluent prefer a progress bar whenever progress can be measured.
 
+## Skeletons
+
+| System | Parts | Text lines | Animation | Screen readers |
+| --- | --- | --- | --- | --- |
+| Apple | No component; SwiftUI's `.redacted(reason: .placeholder)` masks the real view | From the real text | None | Not documented |
+| Material 3 | None | — | — | — |
+| Primer | SkeletonBox, SkeletonText, SkeletonAvatar | `lines`; the last is 65%; sizes follow the type styles | A shimmer, static with reduced motion | The shapes say nothing; "a single loading announcement for a collection of skeleton loaders"; a `delay` |
+| Atlassian | One Skeleton (width, height, radius) | — | An optional shimmer | Not documented |
+| Carbon | SkeletonText, SkeletonPlaceholder, and a skeleton for most components | `lineCount`, widths vary | A 3s sweep, none with reduced motion | The shapes say nothing |
+| Fluent 2 | Skeleton (the area) and SkeletonItem (rectangle, square, circle) | Built from rectangles | A 3s wave or a 1s pulse, static with reduced motion | The area is `role="progressbar"` with `aria-busy` |
+| Polaris | SkeletonBodyText, DisplayText, Thumbnail, Tabs, and a whole SkeletonPage | `lines`; the last is 80% | None | SkeletonPage is a status, "Page loading" |
+| GOV.UK, USWDS | None | — | — | — |
+| **Sherbet** | **Skeleton (the area) and SkeletonItem (text, box, circle)** | **`lines`; the last is 60%; height from the text style it's in** | **A 1.4s pulse, slower with reduced motion** | **Shapes hidden; the area's required label announced once, the way Spinner is** |
+
+Most systems hide the shapes from screen readers, and few say how to announce the wait: Primer asks for one announcement per group of skeletons, and Fluent relies on `aria-busy`, which only JAWS supports. Sherbet makes the label required and announces it the way Spinner does, so a skeleton can't be silent. Primer, Carbon, and Fluent stop the animation under reduced motion; Sherbet slows it instead, as it does for Spinner, because a frozen loading indicator looks broken. Adrian Roselli argues for 3:1 contrast on the shapes; Sherbet's are faint, like Polaris's and Material's in MUI, since the words carry the message.
+
 ## Separators
 
 | System | Name | Options | What screen readers hear | Space around it |
@@ -248,3 +264,10 @@ Systems split on the word "badge": Apple, Material, Atlassian, and Fluent's Coun
 - [GOV.UK Tag](https://design-system.service.gov.uk/components/tag/)
 - [USWDS Tag](https://designsystem.digital.gov/components/tag/)
 - [WCAG 2.2: Understanding Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html) and [Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [Apple loading](https://developer.apple.com/design/human-interface-guidelines/loading) and [SwiftUI redacted](https://developer.apple.com/documentation/swiftui/view/redacted(reason:))
+- [Primer SkeletonText](https://primer.style/product/components/skeleton-text)
+- [Atlassian Skeleton](https://atlassian.design/components/skeleton/usage)
+- [Carbon loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/)
+- [Fluent 2 Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton)
+- [Polaris SkeletonBodyText](https://polaris.shopify.com/components/feedback-indicators/skeleton-body-text)
+- [Adrian Roselli, More Accessible Skeletons](https://adrianroselli.com/2020/11/more-accessible-skeletons.html)
