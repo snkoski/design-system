@@ -1,0 +1,118 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as SkeletonStories from "./Skeleton.stories";
+import { Code } from "../../how-it-works/Code";
+import { Appearing } from "../../how-it-works/components/Skeleton";
+
+<Meta of={SkeletonStories} name="How it works" />
+
+# How Skeleton works
+
+A skeleton is gray shapes that stand in for content while it loads: an avatar and two lines of text for each row of a list, say. This page walks through the real code underneath it: the HTML it renders, how a skeleton tells screen readers what's loading, and how the CSS draws, sizes, and pulses the shapes. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+## What it's made of
+
+Skeleton doesn't use [Base UI](https://base-ui.com), the library most components are built on: Base UI has no skeleton, and a skeleton has no keyboard use or focus for a library to handle. It's two components, a few elements, and the same small piece of timing code Spinner uses.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Skeleton.tsx</code></td><td>The loading area. It holds the shapes, and announces its label to screen readers.</td></tr>
+    <tr><td><code>SkeletonItem.tsx</code></td><td>One shape: lines of text, a box, or a circle. Always hidden from screen readers.</td></tr>
+    <tr><td><code>skeleton.css</code></td><td>The gray, the shapes, the pulse, the delay, and hot dog mode, for both. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/useLoadingAnnouncement.ts</code></td><td>When the status region gets its words, shared with Spinner. Not exported.</td></tr>
+    <tr><td><code>src/internal/visually-hidden.css</code></td><td>The <code>visually-hidden</code> class: text for screen readers only. Part of the published stylesheet.</td></tr>
+    <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for an empty label, and a helper that joins class names. Not exported.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Skeleton</code>, <code>SkeletonItem</code>, and the <code>SkeletonProps</code>, <code>SkeletonItemProps</code>, and <code>SkeletonShape</code> types.</td></tr>
+    <tr><td>The test and story files</td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real skeleton, and under it the HTML it has rendered right now. Press the button to show it again from the start, and watch the attributes and the text change.
+
+<Unstyled>
+  <Appearing />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="skeleton"&gt;</code></td><td>The loading area. Your layout classes go on it, so the shapes inside are laid out like the content that's coming. With a <code>delay</code>, it also gets <code>data-delayed</code> and an inline <code>--skeleton-delay</code>.</td></tr>
+    <tr><td><code>&lt;span class="visually-hidden skeleton__label"&gt;</code></td><td>The label, never seen. It's in the HTML from the start, so a page read before JavaScript runs still says what's loading. Once JavaScript runs, it gets <code>aria-hidden</code>.</td></tr>
+    <tr><td><code>&lt;span class="visually-hidden skeleton__status" role="status"&gt;</code></td><td>The label screen readers hear. It starts empty and gets the label's words a moment later.</td></tr>
+    <tr><td><code>&lt;span class="skeleton-item" data-shape aria-hidden="true"&gt;</code></td><td>One shape. <code>aria-hidden</code> keeps screen readers from finding it: gray shapes mean nothing to someone who can't see them. A text shape holds one <code>skeleton-item__line</code> per line.</td></tr>
+  </tbody>
+</table>
+
+## What screen readers hear
+
+Screen readers can't see gray shapes, so every shape is hidden from them, and the skeleton says what's loading in words instead: its `label`, "Loading applications…". It's announced exactly the way Spinner's label is, and [How Spinner works](?path=/docs/components-spinner--how-it-works) explains why in full. In short: a screen reader announces a `role="status"` region when its words change, and many miss words that arrive together with the region, so the region starts empty and gets the words a moment later. The other copy of the label, in the HTML from the start, covers a page read before JavaScript runs. Once JavaScript runs, it's hidden, so the words are heard once.
+
+Unlike Spinner, both copies are visually hidden: a skeleton shows shapes, not words.
+
+There's no `aria-busy`, the attribute meant to say an area is still loading. Only one screen reader (JAWS) supports it, and it can hold back what the area announces until it's no longer busy.
+
+## How props become attributes
+
+The label is required plain text, and the type leaves out the attributes that would change what screen readers hear, such as `role`, `aria-live`, and `aria-busy`.
+
+<Code file="components/Skeleton/Skeleton.tsx" name="Skeleton" />
+
+The timing, in the same hook Spinner uses:
+
+<Code file="internal/useLoadingAnnouncement.ts" name="useLoadingAnnouncement" />
+
+A shape takes `lines` only when it's text: `<SkeletonItem shape="box" lines={2} />` doesn't compile. Whatever `lines` arrives as, it's made a whole number of at least one. `aria-hidden` is set after your props, so nothing passed in can make a shape heard.
+
+<Code file="components/Skeleton/SkeletonItem.tsx" name="SkeletonItem" />
+
+## The CSS, rule by rule
+
+### A shape
+
+A gray `track` fill with a transparent edge. In Windows' forced colors mode, the browser removes every fill but draws the edge in the text color, so each shape still shows as an outline. A box is as wide as its container (in a flex row, which has no width to give it, add `flex-1` or a width class); its height, and a circle's size, come from Tailwind classes in your markup. With none, they're one line of text tall (`1lh`).
+
+<Code file="components/Skeleton/skeleton.css" name=".skeleton-item" />
+
+<Code file="components/Skeleton/skeleton.css" name='.skeleton-item[data-shape="circle"]' />
+
+### Lines of text
+
+A text shape has no fill of its own: its lines are the shapes. Each takes one line of the text around it (`1lh`, the line height), with a bar as tall as that text's letters (`1em`, the font size) in the middle, so separate lines read as separate. Give the shape the text style of the text it stands in for, and its lines match that text exactly. The last of several lines is shorter, the way a paragraph ends.
+
+<Code file="components/Skeleton/skeleton.css" name='.skeleton-item[data-shape="text"]' />
+
+<Code file="components/Skeleton/skeleton.css" name=".skeleton-item__line" />
+
+<Code file="components/Skeleton/skeleton.css" name=".skeleton-item__line:last-child:not(:first-child)" />
+
+### The pulse
+
+Every shape fades to half and back, once every two loops: 1.4 seconds, or 3.2 with reduced motion. Reduced motion slows it rather than stopping it, because a loading indicator that stops looks like something broke. It only animates `opacity`, as the motion rules ask, and shapes that appear together pulse together.
+
+<Code file="components/Skeleton/skeleton.css" name="@keyframes skeleton-pulse" />
+
+### The delay
+
+Like Spinner's: the skeleton is invisible until `--skeleton-delay` is over, then fades in. It's CSS, so it works before JavaScript runs.
+
+<Code file="components/Skeleton/skeleton.css" name=".skeleton[data-delayed]" />
+
+### Hot dog mode
+
+Light gray on mustard is faint, so every shape gets a thin ink edge. Not the thick edge other hot dog components get: that would make placeholders look like real controls.
+
+<Code file="components/Skeleton/skeleton.css" name='[data-theme="hotdog"] .skeleton-item' />
+
+### No touch, density, focus, or hover rules
+
+Nothing about a skeleton can be pressed or focused, so it has no hit area, no focus ring, and nothing that changes with a touch screen or compact density.
+
+## How it's tested
+
+The unit tests check the HTML before and after JavaScript runs (including that it hydrates without a mismatch), when the label is announced with and without a delay, that every shape is hidden from screen readers, the shapes and `lines`, refs, and the props types. The stories check what needs real CSS: that text lines are as tall as their text style, the shorter last line, box and circle sizes, the pulse's speed with and without reduced motion, the delay's fade, and hot dog's ink edge.

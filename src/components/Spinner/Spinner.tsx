@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
 import { cx } from "../../internal/cx";
 import { SpinnerGraphic } from "../../internal/SpinnerGraphic";
+import { useLoadingAnnouncement } from "../../internal/useLoadingAnnouncement";
 import { hasContent, warn } from "../../internal/warn";
 
 export type SpinnerSize = "sm" | "md" | "lg";
@@ -34,12 +34,6 @@ export type SpinnerProps = Omit<
 };
 
 /**
- * How long the status region waits, empty, before its text goes in. Screen readers announce a live region's text
- * when it changes, but many miss text that arrives together with the region itself.
- */
-const ANNOUNCE_AFTER = 100;
-
-/**
  * Shows that a page or section is loading, with words that say what's loading. For a button's own action, use
  * Button's `loading` instead.
  *
@@ -62,17 +56,8 @@ export function Spinner({
   if (!hasContent(label)) {
     warn("Spinner", 'has an empty label, so it doesn\'t say what\'s loading and screen readers announce nothing. Give it a label such as "Loading projects…".');
   }
-  // Read once, so the CSS delay and the announcement's timer always agree
-  const [wait] = useState(() => Math.max(delay, 0));
-  // "server": the HTML before JavaScript runs. "waiting": running, status region still empty. "announced": it has the label.
-  const [phase, setPhase] = useState<"server" | "waiting" | "announced">("server");
-
-  useEffect(() => {
-    setPhase("waiting");
-    const timer = setTimeout(() => setPhase("announced"), Math.max(wait, ANNOUNCE_AFTER));
-    return () => clearTimeout(timer);
-    // Runs once, when the spinner appears, like the CSS animation that hides it until the delay is over
-  }, []);
+  // The delay, read once, and the phase: "server" (the HTML before JavaScript), "waiting", then "announced"
+  const { wait, phase } = useLoadingAnnouncement(delay);
 
   return (
     <span

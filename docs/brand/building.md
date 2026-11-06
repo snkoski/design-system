@@ -82,6 +82,7 @@ Each job has exactly one convention. Never use two conventions for the same job.
 - **rem** for font sizes, spacing, radii, component sizes, icon sizes, and max widths, so everything scales with the reader's browser font setting.
 - **px** only for details that should stay crisp and not grow: `border-thin` (1px), `border-thick` (2px), `focus-width`, `focus-offset`, and shadow offsets.
 - **em** for media queries (`@media (min-width: 48em)`), so breakpoints follow the reader's font size too.
+- **lh** and **em** elsewhere only where a part must match the text around it: TextArea's padding and Badge's corners use `1lh` (one line height), and Skeleton's text lines are `1lh` tall with a `1em` bar.
 - Never set a px font size, and never set `html { font-size }` to a px value.
 
 ## Themes

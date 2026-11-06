@@ -5,8 +5,8 @@ Show that something is loading only when the wait is long enough to notice. Show
 ## Which one
 
 - **A button's own action** (saving, sending, deleting): the button's `loading` prop. It shows a spinner in the button, keeps the button focusable, and stops a second click. Don't put a Spinner beside it.
-- **A page or section waiting for its data**, when you don't know its layout yet: `Spinner`, with a label that says what's loading.
-- **A page or section whose layout you know** (a list, a table, a card): a skeleton, a gray outline of the content, is planned (Skeleton, in the roadmap). Until it exists, use a Spinner.
+- **A page or section waiting for its data**, when you don't know its layout: `Spinner`, with a label that says what's loading.
+- **A page or section whose layout you know** (a list, a table, a card): `Skeleton`, gray shapes in the content's layout, with a label that says what's loading. The page keeps its shape, and the content drops into place.
 - **A long task whose progress you can measure** (an upload, an import): a progress bar is planned (Progress, in the roadmap). A spinner can't say how much is left.
 
 ## Using a Spinner
@@ -21,3 +21,18 @@ Show that something is loading only when the wait is long enough to notice. Show
 ## Sizes
 
 `sm` (16px) sits inside small text, such as next to a heading or in a toolbar. `md` (20px) is the default, beside body text. `lg` (24px) is for a whole page or a large empty area. The label is small text at `sm` and body text otherwise.
+
+## Using a Skeleton
+
+- **Say what's loading.** Like a Spinner, a Skeleton has a required `label`: "Loading applications…". It's never shown. Screen readers can't see the shapes, so they're hidden, and the label is announced once instead.
+- **One per page or section.** Wrap the whole area in one `Skeleton` and put its shapes inside, as `SkeletonItem`s. Each Skeleton announces itself, so three side by side, or one inside another, is more than one announcement.
+- **Match the layout that's coming**, with Tailwind classes on the Skeleton and on `<div>`s inside it: `className="grid gap-4"`, a `flex` row for an avatar beside its text. In a `flex` row, a text shape or box has no width of its own: give it `flex-1` or a width class (`w-48`), or it shrinks to nothing. Use `<div>`s rather than a real list or table, which screen readers would announce, empty.
+- **Match the text.** A `text` shape takes the height of the text style it's in: give it the same class as the text it stands in for (`text-heading-md`, `text-body`), and set `lines` for a paragraph. The last of several lines is shorter, the way a paragraph ends. Make a short line narrower with a width class (`w-1/2`).
+- **Size boxes and circles** with Tailwind: `h-32` for an image, `size-10` for an avatar. A box is as wide as its container, except in a `flex` row (see above).
+- **Only for content.** Don't draw skeletons of buttons, fields, menus, dialogs, or messages: show those for real, or wait.
+- **Use `delay`** for loads that are often quick, as with a Spinner, and replace the whole Skeleton with the content (or what went wrong) when it's done.
+- **Don't add `aria-busy`.** Only one screen reader supports it, and it can hold back what's announced.
+
+## How it moves
+
+Spinners turn, and skeletons pulse: every shape fades to half and back, together, once every 1.4 seconds. With reduced motion both slow down rather than stop, so you can still tell something is happening. The skeleton's shapes are the light gray `track` color, faint on purpose so a page of them doesn't look heavy.
