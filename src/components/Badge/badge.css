@@ -1,0 +1,74 @@
+/* Badge: what it is (the pill, its type, the tones, and the two sizes). Where it sits (margin, its place in a row)
+   is the layout's job: use Tailwind in the markup. It only keeps itself inside its container and lines up with the
+   text around it. */
+@layer components {
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    max-inline-size: 100%; /* words that don't fit wrap instead of pushing out of the container */
+    padding-inline: var(--space-2);
+    --badge-edge: var(--border-thin);
+    border: var(--badge-edge) solid transparent; /* an outline in forced colors, where fills disappear */
+    /* A pill on one line: half its height, one line plus its two edges. A badge that wraps becomes a rounded
+       rectangle with the same corners, instead of a pill whose curve would cut into its first and last words. */
+    border-radius: calc(1lh / 2 + var(--badge-edge));
+    background: var(--track);
+    color: var(--ink); /* the icon is currentColor, so it matches the words */
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    font-weight: 600;
+    line-height: var(--leading-control);
+    vertical-align: middle;
+  }
+
+  /* The words stay on one line while they fit. A badge wider than its container wraps rather than spill out or be
+     cut off, so it stays readable on narrow screens and at 200% text (WCAG 1.4.4 and 1.4.10), as Button's label
+     does. Short words keep that from happening. */
+  .badge__label {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .badge__icon {
+    display: inline-flex;
+    flex: none;
+    inline-size: var(--icon-sm);
+    block-size: var(--icon-sm);
+  }
+  .badge__icon > svg {
+    inline-size: 100%;
+    block-size: 100%;
+    stroke-width: var(--icon-stroke);
+  }
+
+  /* Small: 12px text and icon, in sentence case (the label text style's size and weight, not its capitals) */
+  .badge[data-size="sm"] {
+    font-size: var(--text-label);
+  }
+  .badge[data-size="sm"] .badge__icon {
+    inline-size: var(--icon-xs);
+    block-size: var(--icon-xs);
+  }
+
+  /* Status tones: the soft fill, with the words and icon in the tone's color */
+  .badge[data-tone="success"] {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+  .badge[data-tone="warning"] {
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+  .badge[data-tone="danger"] {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  /* Hot dog mode: a chunky ink edge, like every hot dog component, and no shadow, since nothing presses. Its soft
+     fills are all white, so the colored words are what tell the tones apart. */
+  [data-theme="hotdog"] .badge {
+    --badge-edge: var(--border-thick);
+    border-color: var(--ink);
+  }
+}

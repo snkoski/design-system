@@ -206,3 +206,13 @@ Raised while building Spinner (2026-11-05).
 **To decide:** if real pages show many separators between groups that are already marked, add a `decorative` prop that hides it (`aria-hidden`), off by default. Adding it doesn't break anything. If not, delete this entry.
 
 Raised while building Separator (2026-11-05).
+
+## A color prop on Badge
+
+**Today:** Badge has four tones (`neutral`, `success`, `warning`, and `danger`) and no other colors. Components are neutral, and a status color is only for a status that means something.
+
+**Why it's in question:** some badges name kinds rather than states (a team, a category, a label someone made), and an app may want them told apart by color as well as words. Most systems offer this: Carbon has 12 colors, Atlassian's Lozenge has accent colors, and Primer's issue labels take any color.
+
+**To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd be the one place a component uses palette hues, so `CLAUDE.md` and `color.md` would need an exception. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
+
+Raised while building Badge (2026-11-05).

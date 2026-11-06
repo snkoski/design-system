@@ -129,7 +129,7 @@ Start only after the open questions are answered.
 
 1. **Spinner.** Done (2026-11-05). The drawing moved out of `Button/shared.tsx` into `src/internal/`, and Button and the new `Spinner` share it. It has a required `label`, `hideLabel`, three sizes, and `delay`. See `docs/brand/loading.md`.
 2. **Separator.** Done (2026-11-05). On Base UI, rendered as an `<hr>`: horizontal or vertical, always announced, with an optional plain-text label (such as "or") on a horizontal one. See "Separating content" in `docs/brand/layout.md`. The job tracker has no standalone separator, so it adds no migration step: its lines are list rows, card edges, and the app shell's borders, which List, Table, Card, and AppShell will draw.
-3. **Badge**, with `data-tone`: `neutral` (default), `success`, `warning`, or `danger` (Q3, Q6). Look then at also taking a color (Q6).
+3. **Badge.** Done (2026-11-05). A `tone` (`neutral`, the default, `success`, `warning`, or `danger`) as `data-tone`, an optional `icon` before the words, and two sizes (`sm` and `md`). A status tone is a soft fill with its words in the tone's color. No color prop yet: see `docs/revisit.md`. See `docs/brand/badges.md`.
 4. **Skeleton.**
 5. **Meter and Progress**, on Base UI.
 

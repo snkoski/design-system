@@ -104,6 +104,8 @@ pnpm build-storybook
 pnpm check:tests
 ```
 
+If `pnpm test` fails in a file this component didn't touch, rerun that file alone (`pnpm exec vitest run --project storybook <file>`) a few times before acting on it. If it passes alone, report it to the user as possibly flaky, with the failing assertion; don't loosen its test without their OK.
+
 Then load every new story in the built Storybook (`storybook-static`, served as in "Looking at a component") and read each one's result with `page.evaluate(() => window.__STORYBOOK_PREVIEW__?.storyRenders?.[0]?.phase)`: it must be `finished`. `pnpm test` runs stories on the dev server, whose timing hides a `play` function that starts before something an effect creates is there (a shadow root, a portal, a listener). Create those in `useLayoutEffect`, and `waitFor` them in `play`.
 
 Then prove the tests can fail: break the component three ways that matter (for example, a state no longer reaching an ARIA attribute, a decorative icon losing `aria-hidden`, the label no longer naming the control). Back up the file first with `cp`, break it, run `pnpm test:unit`, and restore it from the backup with `cp`. **Don't use `git checkout` to restore**: the component is uncommitted, and that would discard it. Confirm with `diff` that the restored file matches the backup. Each break must make at least one test fail; if one doesn't, add the missing test.
@@ -117,6 +119,8 @@ Then screenshot the light theme again with `data-pointer="coarse"` and with `dat
 For a text field, type a value into the fields before screenshotting, so browser-drawn pieces show up: search clear buttons, autofill colors, number spinners, and password reveal buttons. Each must be themed, hidden, or a deliberate choice written down.
 
 If the component renders an element the browser styles itself (`<hr>`, `<fieldset>`, `<legend>`), add a story that renders it in a shadow root holding only the component's CSS, and checks in `play` that the browser's own borders and margins are reset: Storybook's Tailwind reset hides them everywhere else (see Separator's `WithoutCssReset`).
+
+If the component's text can wrap, look at it wrapped at its smallest size, without an icon, and in hot dog (the thickest edge), and check in a story that every line sits inside its rounded edge: `Range.getClientRects()` on the text gives each line's box (see Badge's `Wrapping` story). A pill's curve, as tall as a badge that wrapped, cut into its first and last words, and an icon in the tested case hid it.
 
 If the component renders lists (`ul`, `ol`), check their bullets and numbers show: the base styles remove them. For any story that isn't `fullscreen`, Storybook centers the component on the page, so screenshot the `#storybook-root` element or the whole page, not a fixed area.
 

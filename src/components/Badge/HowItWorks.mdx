@@ -1,0 +1,96 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as BadgeStories from "./Badge.stories";
+import { Code } from "../../how-it-works/Code";
+import { Props } from "../../how-it-works/components/Badge";
+
+<Meta of={BadgeStories} name="How it works" />
+
+# How Badge works
+
+A badge is a short label about the item next to it: "Offer", "Needs review", "3 new". This page walks through the real code underneath it: the HTML it renders, how its props become attributes, and how the CSS draws each tone and size. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+## What it's made of
+
+Badge doesn't use [Base UI](https://base-ui.com), the library most components are built on. Base UI has no badge, and a badge has nothing a library would handle: no keyboard use, no focus, and no state. It's a `<span>` with the words inside, and an icon if you give it one.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Badge.tsx</code></td><td>The component. It renders the pill, the icon, and the words, and turns <code>tone</code> and <code>size</code> into attributes.</td></tr>
+    <tr><td><code>badge.css</code></td><td>The badge's look: the pill, its type, the four tones, the two sizes, wrapping, and hot dog mode. It only uses design tokens.</td></tr>
+    <tr><td><code>src/internal/cx.ts</code></td><td>A helper that joins class names. Not exported.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Badge</code> and the <code>BadgeProps</code>, <code>BadgeTone</code>, <code>BadgeSize</code>, and <code>BadgeText</code> types.</td></tr>
+    <tr><td><code>Badge.test.tsx</code> and <code>Badge.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real badge, and under it the HTML it has rendered right now. Change its tone, size, and icon, and watch the attributes change.
+
+<Unstyled>
+  <Props />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element or attribute</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;span class="badge"&gt;</code></td><td>The pill. A <code>&lt;span&gt;</code>, because a badge is just text: it has no role, can't be focused, and is read where it sits. Any other prop you pass, such as an <code>id</code>, lands here.</td></tr>
+    <tr><td><code>data-tone</code></td><td>From the <code>tone</code> prop, <code>neutral</code> unless you set one. The CSS colors the badge from it.</td></tr>
+    <tr><td><code>data-size</code></td><td>From the <code>size</code> prop, <code>md</code> unless you set one.</td></tr>
+    <tr><td><code>&lt;span class="badge__icon" aria-hidden="true"&gt;</code></td><td>Only with an <code>icon</code>. <code>aria-hidden</code> keeps screen readers from finding it: the words say everything it does.</td></tr>
+    <tr><td><code>&lt;span class="badge__label"&gt;</code></td><td>The words, in their own span so they can wrap when the badge is wider than its container.</td></tr>
+  </tbody>
+</table>
+
+## How props become attributes
+
+The words are plain text and numbers only. `{count} new` is really two pieces of text in JSX, a number and a string, so the type allows a list of them too. Elements aren't allowed, so nothing clickable, like a link, can end up inside a badge. The type also leaves out `role`, `tabIndex`, `aria-live`, and `aria-label`: a badge is plain text, so it's never focusable, never announced on its own when it changes, and named by its words.
+
+<Code file="components/Badge/Badge.tsx" name="BadgeProps" />
+
+<Code file="components/Badge/Badge.tsx" name="Badge" />
+
+## The CSS, rule by rule
+
+### The pill
+
+A pill with small, bold text, a gray `track` fill, and `ink` words. It's as tall as its line of text plus its edge above and below, 23px (25px in hot dog, whose edge is thicker), with no padding above or below. Its corners are half that height, `1lh / 2` (half of one line) plus the edge, which makes a one-line badge a pill. A badge that wraps keeps those corners and becomes a rounded rectangle: a pill's curve, as tall as the whole badge, would cut into its first and last words. The icon is drawn in `currentColor`, so it always matches the words. The edge is transparent: in Windows' forced colors mode, the browser removes every fill but draws the edge in the text color, so each badge still has an outline there.
+
+<Code file="components/Badge/badge.css" name=".badge" />
+
+### Wrapping
+
+The words stay on one line while they fit. A badge wider than its container wraps rather than spill out of it or be cut off with an ellipsis, so the words stay readable on a narrow screen or at 200% text. Button's label does the same. Short words keep it from happening.
+
+<Code file="components/Badge/badge.css" name=".badge__label" />
+
+### Sizes
+
+`sm` uses the 12px label text size, in sentence case rather than the label style's capitals, with a 12px icon from `icon-xs`. It's 20px tall, or 22px in hot dog.
+
+<Code file="components/Badge/badge.css" name='.badge[data-size="sm"]' />
+
+### Tones
+
+A status tone uses its soft color as the fill, and its full color for the words and icon. Every pair is checked for at least 4.5:1 contrast in all three themes by `pnpm check`.
+
+<Code file="components/Badge/badge.css" name='.badge[data-tone="success"]' />
+
+### Hot dog mode
+
+Hot dog mode gives every badge a thick ink edge, by changing `--badge-edge`, which also keeps the corners right, like the rest of its components, but no shadow, since nothing presses. All its soft colors are white, so the colored words are what tell the tones apart there.
+
+<Code file="components/Badge/badge.css" name='[data-theme="hotdog"] .badge' />
+
+### No touch, density, focus, or motion rules
+
+Nothing about a badge can be pressed or focused, so it has no hit area, no focus ring, and nothing that changes with a touch screen or compact density. It doesn't move.
+
+## How it's tested
+
+The unit tests check the element, its attributes and defaults, the icon's place and `aria-hidden`, refs, and the props type. The stories check what needs real CSS: each badge's height and icon size at both sizes, each tone's fill and words in all three themes, hot dog's thick ink edge, and that a long badge wraps inside a narrow container with every line inside its rounded edge.
