@@ -218,3 +218,13 @@ Raised while building Badge (2026-11-05).
 **To decide:** look at real pages of skeletons, meters, and progress bars in all three themes. If the shapes or tracks are too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
 
 Raised while building Skeleton (2026-11-05).
+
+## A done look for Progress
+
+**Today:** a Progress at its maximum looks the same as any other: a full gray bar. Base UI marks it `data-complete`, but nothing styles it. The page changes the label ("Uploaded resume.pdf"), which is announced, or replaces the bar with the result.
+
+**Why it's in question:** Carbon and Atlassian turn a finished bar green with a check, so it's clear at a glance that the task worked. Sherbet leaves that to the page for now, because a full bar can also mean "done, but something went wrong", and a success color shouldn't appear without words that say so.
+
+**To decide:** once a real app uses Progress, see whether pages keep adding their own "done" message. If they do, add a done look (a `success` fill and a check, with words), driven by `data-complete`. If not, delete this entry.
+
+Raised while building Progress (2026-11-06).

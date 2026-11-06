@@ -103,6 +103,7 @@ Compared with the first version of this roadmap (2026-10-29), the design system 
 | Label, FieldError, and a Field component | Done differently: each control takes `label`, `description`, and `error` props, so no separate Field component is needed |
 | Checkbox and Switch | Done, plus `CheckboxGroup` and `RadioGroup` |
 | SegmentedControl | Done. It covers the job tracker's Table and Kanban switch |
+| ProgressBar | Done (2026-11-06): `Meter` for "topics done", and `Progress` for tasks under way |
 
 ## Changes from the first version
 
@@ -131,7 +132,7 @@ Start only after the open questions are answered.
 2. **Separator.** Done (2026-11-05). On Base UI, rendered as an `<hr>`: horizontal or vertical, always announced, with an optional plain-text label (such as "or") on a horizontal one. See "Separating content" in `docs/brand/layout.md`. The job tracker has no standalone separator, so it adds no migration step: its lines are list rows, card edges, and the app shell's borders, which List, Table, Card, and AppShell will draw.
 3. **Badge.** Done (2026-11-05). A `tone` (`neutral`, the default, `success`, `warning`, or `danger`) as `data-tone`, an optional `icon` before the words, and two sizes (`sm` and `md`). A status tone is a soft fill with its words in the tone's color. No color prop yet: see `docs/revisit.md`. See `docs/brand/badges.md`.
 4. **Skeleton.** Done (2026-11-05). `Skeleton` is the loading area, with a required `label` (announced, never shown) and `delay`, like Spinner; `SkeletonItem` is one shape: `text` (with `lines`), `box`, or `circle`. The shapes pulse, chosen over a shimmer after comparing the two side by side (2026-11-06). See `docs/brand/loading.md`.
-5. **Meter and Progress**, on Base UI.
+5. **Meter and Progress.** Done (2026-11-06). Both on Base UI, sharing one look (`src/internal/bar.css`): a label and value over a rounded track, `sm` (4px) or `md` (8px). `Meter` is an amount ("Topics done, 12 of 20"), with a `tone`; `Progress` is a task, with `value={null}` for an unknown length, `hideLabel`, and `delay`, announced once like Spinner. See `docs/brand/meters.md` and `docs/brand/loading.md`.
 
 ### Phase 2: more form controls
 
@@ -210,7 +211,7 @@ These are specific to the job tracker and become thin pieces built from the desi
    - Base UI controls need react-hook-form's `Controller` instead of `register`. Only ApplicationForm uses react-hook-form, so this is small.
 4. **NativeSelect**, for all 33 selects.
 5. **Spinner**, for the 18 text-only `<Spinner />` placeholders. Each gets a `label` that says what's loading ("Loading applications…"), and the space around it keeps its padding and centering with Tailwind. Don't put it inside an `aria-busy` element (`docs/brand/loading.md`). Some list areas may suit Skeleton better: `docs/brand/loading.md` says when to use which.
-6. **Card, Badge, Table, Collapsible, Tabs, and Rating**, a page at a time.
+6. **Card, Badge, Meter, Table, Collapsible, Tabs, and Rating**, a page at a time. `ProgressBar` becomes a `Meter` with `valueText` ("12 of 20").
 7. **AlertDialog** replaces `DeleteButton` and the other `window.confirm` calls. Then **Drawer and AppShell** replace `Layout.tsx`.
 8. **Turn on `tailwind-theme.css`.** Fix any Tailwind color classes that are left, then delete `apps/web/src/components/ui` and the job tracker's `cn()` and tailwind-merge.
 

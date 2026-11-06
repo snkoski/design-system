@@ -11,3 +11,4 @@ export * from "./components/Separator";
 export * from "./components/Badge";
 export * from "./components/Skeleton";
 export * from "./components/Meter";
+export * from "./components/Progress";

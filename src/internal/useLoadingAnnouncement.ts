@@ -13,7 +13,7 @@ export const ANNOUNCE_AFTER = 100;
 export type AnnouncementPhase = "server" | "waiting" | "announced";
 
 /**
- * When a loading indicator (Spinner, Skeleton) announces itself. It reads `delay` once, when the indicator appears,
+ * When a loading indicator (Spinner, Skeleton, Progress) announces itself. It reads `delay` once, when the indicator appears,
  * so the CSS delay and the announcement's timer always agree, and a negative delay counts as none. The phase starts
  * at `"server"`, moves to `"waiting"` once JavaScript runs, and to `"announced"` after the delay or `ANNOUNCE_AFTER`,
  * whichever is longer. Not exported from the package.
