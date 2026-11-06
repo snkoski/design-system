@@ -1,0 +1,21 @@
+/* AutoSkeleton: the real content, invisible but still laid out, with the measured shapes drawn over it */
+@layer components {
+  /* Invisible, but it keeps its size, so the skeleton takes exactly the room the content will. Opacity on this one
+     element (not visibility: hidden) lets the measuring code still read each element's own look inside it. */
+  .auto-skeleton__content {
+    opacity: 0;
+  }
+
+  .auto-skeleton__overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* Each shape sits where its element was measured, set in an inline style */
+  .auto-skeleton__frame,
+  .auto-skeleton__shape {
+    position: absolute;
+    box-sizing: border-box;
+  }
+}
