@@ -64,7 +64,7 @@ scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
 src/internal/                pieces several components share (cx, FieldError and field-error.css, ReadOnlyNote and
-                             read-only-note.css, SpinnerGraphic and spinner-graphic.css, warn), with tests, the CSS
+                             read-only-note.css, SpinnerGraphic and spinner-graphic.css, useLoadingAnnouncement, warn), with tests, the CSS
                              form controls share (field.css, text-field.css, choice.css, choice-group.css), and
                              visually-hidden.css (the `.visually-hidden` class for screen-reader-only text). Not
                              exported from the package; the CSS is part of the published stylesheet.

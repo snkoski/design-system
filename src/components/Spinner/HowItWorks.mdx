@@ -22,6 +22,7 @@ Spinner doesn't use [Base UI](https://base-ui.com), the library most components 
     <tr><td><code>spinner.css</code></td><td>The spinner's own look: its color, the label's type, the three sizes, and the delay before it appears. It only uses design tokens.</td></tr>
     <tr><td><code>src/internal/SpinnerGraphic.tsx</code> and <code>spinner-graphic.css</code></td><td>The drawing and its turn, shared with Button's loading state, so the two spinners can't drift apart. Not exported.</td></tr>
     <tr><td><code>src/internal/visually-hidden.css</code></td><td>The <code>visually-hidden</code> class: text for screen readers only. FieldError's hidden "Error:" uses it too. Part of the published stylesheet.</td></tr>
+    <tr><td><code>src/internal/useLoadingAnnouncement.ts</code></td><td>When the status region gets its words, shared with Skeleton. Not exported.</td></tr>
     <tr><td><code>src/internal/warn.ts</code> and <code>cx.ts</code></td><td>A development warning for an empty label, and a helper that joins class names. Not exported.</td></tr>
     <tr><td><code>index.ts</code></td><td>What the package exports: <code>Spinner</code> and the <code>SpinnerProps</code> and <code>SpinnerSize</code> types.</td></tr>
     <tr><td><code>Spinner.test.tsx</code> and <code>Spinner.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
@@ -77,15 +78,19 @@ The demo above shows both steps: press **Show it again**, and the `aria-hidden` 
 
 ### The component
 
-<Code file="components/Spinner/Spinner.tsx" name="ANNOUNCE_AFTER" />
-
 <Code file="components/Spinner/Spinner.tsx" name="Spinner" />
+
+The timing is in a small shared hook, `useLoadingAnnouncement`, which Skeleton uses too, so the two announce the same way:
+
+<Code file="internal/useLoadingAnnouncement.ts" name="ANNOUNCE_AFTER" />
+
+<Code file="internal/useLoadingAnnouncement.ts" name="useLoadingAnnouncement" />
 
 Reading it top to bottom:
 
 1. **The warning.** An empty string passes the type, such as a label from a content system that came back blank. `warn()` prints a development warning when the label has no words in it. It runs during render, so it also works when a page is rendered on a server. [How Checkbox works](?path=/docs/components-checkbox--how-it-works) explains when the system warns and when it doesn't.
-2. **The delay** is read once, into state, when the spinner appears, so the CSS delay and the announcement's timer always use the same value. A negative `delay` counts as none.
-3. **The phase.** `phase` starts as `"server"`: that's the HTML a server sends, before any JavaScript. `useEffect` only runs in the browser, after React has put the spinner on the page. It moves to `"waiting"` straight away, and sets a timer for `"announced"`, after the delay or `ANNOUNCE_AFTER`, whichever is longer. If the spinner is removed first, the cleanup clears the timer.
+2. **The delay** is read once, into state, by `useLoadingAnnouncement` when the spinner appears, so the CSS delay and the announcement's timer always use the same value. A negative `delay` counts as none.
+3. **The phase**, also from the hook. `phase` starts as `"server"`: that's the HTML a server sends, before any JavaScript. `useEffect` only runs in the browser, after React has put the spinner on the page. It moves to `"waiting"` straight away, and sets a timer for `"announced"`, after the delay or `ANNOUNCE_AFTER`, whichever is longer. If the spinner is removed first, the cleanup clears the timer.
 4. **Once.** The effect's list of dependencies is empty, so it runs once, when the spinner appears. The CSS delay works the same way: an animation runs once, when the element appears. Changing `delay` on a spinner that's already showing does nothing.
 5. **The outer span.** `rest` goes on first, then our own attributes, so nothing passed in can replace `className`, `data-size`, or the delay. The consumer's class is joined to ours with `cx()`, and their `style` is kept, with `--spinner-delay` added to it.
 6. **The label** gets `aria-hidden` in every phase but `"server"`.
