@@ -206,6 +206,23 @@ Systems split on whether screen readers should hear a separator. Polaris, GOV.UK
 
 Systems split on the word "badge": Apple, Material, Atlassian, and Fluent's CounterBadge use it for a count, and Polaris, Fluent, and shadcn for a status label, which GOV.UK, USWDS, and Carbon call a tag and Atlassian a lozenge. Sherbet's Badge is the status label; a count pinned to an icon would be a separate component. Every system with guidance says the color can't carry the meaning alone, and GOV.UK and Atlassian say a status label must never be a link or button; Sherbet's can't be. Most systems offer many colors. Sherbet keeps badges gray unless a status means something, as `color.md` asks, and has no color prop yet (`docs/revisit.md`). Atlassian and Carbon cut long text off with an ellipsis; Sherbet wraps it instead, so it stays readable, as Button's label does.
 
+## Meters and progress bars
+
+| System | A meter (an amount) | A progress bar (a task) | Thickness | Colors | Screen readers |
+| --- | --- | --- | --- | --- | --- |
+| Apple | Gauges, and level indicators on macOS | Progress indicators: a bar or a circle, determinate or not | Not documented | Gauges may change color at thresholds | Not documented in the guidelines |
+| Material 3 | None | Linear and circular, determinate or not | 4dp, or 8dp thick | One | An `aria-label` the page sets |
+| Primer | The same ProgressBar, called "a simple chart" | ProgressBar, also segmented; not indeterminate | Small, medium, and large | Success by default | `aria-label` such as "4 of 12 tasks completed" |
+| Atlassian | None | Progress bar, determinate or not | One | Default, success, and inverse | `ariaLabel`, shown as text too |
+| Carbon | Only a chart (Meter chart) | Progress bar, with a label and helper text | 8px or 4px | Success and error, each with an icon | Helper text in a polite live region |
+| Fluent 2 | A "static" progress bar | ProgressBar, determinate or not | Medium and large | Not confirmed | Not documented on the usage page |
+| Polaris | None | ProgressBar | Small, medium, and large | Highlight, primary, success, and critical | `accessibilityLabel` |
+| Spectrum | Meter, with its own guidance | ProgressBar | Small to extra large | Meter: informative, positive, notice, and negative | A label is required |
+| GOV.UK, USWDS | None | None | — | — | — |
+| **Sherbet** | **Meter** | **Progress** | **`sm` 4px and `md` 8px** | **Meter: neutral, success, warning, and danger, always with words** | **The label is the name and the words are the value (`aria-valuetext`), in the first HTML** |
+
+Most systems stretch one progress bar to cover both jobs; only Spectrum and Apple give a measurement its own component. ARIA keeps them apart ("Authors SHOULD NOT use the meter role to indicate progress"), and Sherbet follows it with two components built on Base UI's Meter and Progress, which share one look. Screen readers are uneven with the meter role: some read it as a progress bar, and some read only its name. That's one more reason Sherbet's meters always show their amount in words, and set the same words as the value screen readers hear. Writing the amount as "12 of 20" rather than a percent comes up in Primer, Atlassian, Spectrum, and Polaris. Thickness settles on 4px and 8px (Carbon, Material), and Sherbet offers both.
+
 ## Forms
 
 | Rule | GOV.UK | Primer | Atlassian | Carbon | Polaris | USWDS | Sherbet |
@@ -271,3 +288,11 @@ Systems split on the word "badge": Apple, Material, Atlassian, and Fluent's Coun
 - [Fluent 2 Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton)
 - [Polaris SkeletonBodyText](https://polaris.shopify.com/components/feedback-indicators/skeleton-body-text)
 - [Adrian Roselli, More Accessible Skeletons](https://adrianroselli.com/2020/11/more-accessible-skeletons.html)
+- [Spectrum Meter](https://react-spectrum.adobe.com/react-spectrum/Meter.html) and [ProgressBar](https://react-spectrum.adobe.com/react-spectrum/ProgressBar.html)
+- [Apple gauges](https://developer.apple.com/design/human-interface-guidelines/gauges)
+- [Primer ProgressBar](https://primer.style/product/components/progress-bar/)
+- [Atlassian Progress bar](https://atlassian.design/components/progress-bar/usage)
+- [Carbon Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) and its [accessibility notes](https://carbondesignsystem.com/components/progress-bar/accessibility/)
+- [Fluent 2 ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
+- [WAI-ARIA 1.2: the meter role](https://www.w3.org/TR/wai-aria-1.2/#meter) and [the APG meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)
+- [Scott O'Hara, styled meter elements](https://scottaohara.github.io/a11y_styled_form_controls/src/meter/)

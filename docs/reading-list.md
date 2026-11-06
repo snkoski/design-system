@@ -53,6 +53,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Loading indicators](#loading-indicators)
   - [Separators](#separators)
   - [Badges](#badges)
+  - [Meters and progress bars](#meters-and-progress-bars)
 
 ## Choosing and building colors
 
@@ -101,6 +102,8 @@ How each kind of component should work with a keyboard and screen reader. Read t
 - [APG pattern: Menu bar](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
 - [APG pattern: Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)
 - [APG pattern: Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
+- [WAI-ARIA 1.2: the meter role](https://www.w3.org/TR/wai-aria-1.2/#meter)
+- [Meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)
 
 ## Design systems, by system
 
@@ -130,6 +133,7 @@ Everything we read from each system, grouped by topic.
 - **Loading indicators:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators), [Loading](https://developer.apple.com/design/human-interface-guidelines/loading) (show placeholder text, graphics, or animations as content loads; a progress indicator for longer waits), and [redacted(reason:) (SwiftUI)](https://developer.apple.com/documentation/swiftui/view/redacted(reason:)) (apple's skeleton: the real view, masked into placeholder shapes of the same size)
 - **Separators:** [Divider (SwiftUI)](https://developer.apple.com/documentation/swiftui/divider) (no options: it runs across a stack, so it turns vertical inside a row)
 - **Badges:** [Notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications) (apple's badge is only the unread count on an app icon)
+- **Meters and progress bars:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators) and [Gauges](https://developer.apple.com/design/human-interface-guidelines/gauges) (A value within a range, with its current value and both ends labelled)
 
 ### Material Design 3 (Google)
 
@@ -149,6 +153,7 @@ Everything we read from each system, grouped by topic.
 - **Loading indicators:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
 - **Separators:** [Divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md) (inset variants; decorative unless you add role="separator")
 - **Badges:** [Badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md) (material's badge is a count or dot on navigation and icons)
+- **Meters and progress bars:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines)
 
 ### GitHub Primer
 
@@ -169,9 +174,10 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Forms](https://primer.style/product/ui-patterns/forms/)
 - **Dialogs:** [Dialog](https://primer.style/product/components/dialog)
 - **Tooltips:** [Tooltip](https://primer.style/product/components/tooltip)
-- **Loading indicators:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second), and [SkeletonText](https://primer.style/product/components/skeleton-text) (lines that follow the type styles, the last at 65%)
+- **Loading indicators:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second), [SkeletonText](https://primer.style/product/components/skeleton-text) (lines that follow the type styles, the last at 65%), and [ProgressBar](https://primer.style/product/components/progress-bar/)
 - **Separators:** [ActionList dividers](https://primer.style/product/components/action-list/) (primer has no standalone divider; ActionList's is hidden from screen readers)
 - **Badges:** [Label](https://primer.style/product/components/label/) (ten variants, and a warning not to rely on the variant's color alone)
+- **Meters and progress bars:** [ProgressBar](https://primer.style/product/components/progress-bar/)
 
 ### Atlassian Design System
 
@@ -194,9 +200,10 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Form](https://atlassian.design/components/form/usage)
 - **Dialogs:** [Modal dialog](https://atlassian.design/components/modal-dialog/usage)
 - **Tooltips:** [Tooltip](https://atlassian.design/components/tooltip/usage/)
-- **Loading indicators:** [Spinner](https://atlassian.design/components/spinner/usage) and [Skeleton](https://atlassian.design/components/skeleton/usage) (one shape with a width, height, and radius, and an optional shimmer)
+- **Loading indicators:** [Spinner](https://atlassian.design/components/spinner/usage), [Skeleton](https://atlassian.design/components/skeleton/usage) (one shape with a width, height, and radius, and an optional shimmer), and [Progress bar](https://atlassian.design/components/progress-bar/usage)
 - **Separators:** [Menu sections with separators](https://atlassian.design/components/menu/code) (no standalone divider: a menu Section's hasSeparator draws a border)
 - **Badges:** [Lozenge](https://atlassian.design/components/lozenge/usage) (atlassian's status label (its Badge is a count): sentence case, never interactive)
+- **Meters and progress bars:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
 
 ### IBM Carbon
 
@@ -217,8 +224,9 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Forms pattern](https://carbondesignsystem.com/patterns/forms-pattern/)
 - **Dialogs:** [Modal](https://www.carbondesignsystem.com/building-blocks/core/components/modal)
 - **Tooltips:** [Tooltip](https://www.carbondesignsystem.com/building-blocks/core/components/tooltip)
-- **Loading indicators:** [Loading](https://carbondesignsystem.com/components/loading/usage/), [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/), and [Loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/) (skeletons only on containers and data, never on toasts, menus, or modals)
+- **Loading indicators:** [Loading](https://carbondesignsystem.com/components/loading/usage/), [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/), [Loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/) (skeletons only on containers and data, never on toasts, menus, or modals), [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead), and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 - **Badges:** [Tag](https://carbondesignsystem.com/components/tag/usage/) (twelve colors, under 20 characters, and long text cut off with a tooltip)
+- **Meters and progress bars:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 
 ### Microsoft Fluent 2
 
@@ -240,9 +248,10 @@ Everything we read from each system, grouped by topic.
 - **Text areas:** [Textarea](https://fluent2.microsoft.design/components/web/react/core/textarea/usage)
 - **Dialogs:** [Dialog](https://fluent2.microsoft.design/components/web/react/core/dialog/usage)
 - **Tooltips:** [Tooltip](https://fluent2.microsoft.design/components/web/react/core/tooltip/usage)
-- **Loading indicators:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage), [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list), and [Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton) (an area plus shapes, like Sherbet's; announces with aria-busy)
+- **Loading indicators:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage), [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list), [Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton) (an area plus shapes, like Sherbet's; announces with aria-busy), and [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 - **Separators:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
 - **Badges:** [Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage) (eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts)
+- **Meters and progress bars:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 
 ### Shopify Polaris
 
@@ -531,10 +540,10 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 
 - **Apple Human Interface Guidelines:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators), [Loading](https://developer.apple.com/design/human-interface-guidelines/loading) (show placeholder text, graphics, or animations as content loads; a progress indicator for longer waits), and [redacted(reason:) (SwiftUI)](https://developer.apple.com/documentation/swiftui/view/redacted(reason:)) (apple's skeleton: the real view, masked into placeholder shapes of the same size)
 - **Material Design 3 (Google):** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines) and [Progress (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/progress.md) (the web component's sizes and labelling)
-- **GitHub Primer:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second), and [SkeletonText](https://primer.style/product/components/skeleton-text) (lines that follow the type styles, the last at 65%)
-- **Atlassian Design System:** [Spinner](https://atlassian.design/components/spinner/usage) and [Skeleton](https://atlassian.design/components/skeleton/usage) (one shape with a width, height, and radius, and an optional shimmer)
-- **IBM Carbon:** [Loading](https://carbondesignsystem.com/components/loading/usage/), [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/), and [Loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/) (skeletons only on containers and data, never on toasts, menus, or modals)
-- **Microsoft Fluent 2:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage), [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list), and [Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton) (an area plus shapes, like Sherbet's; announces with aria-busy)
+- **GitHub Primer:** [Spinner](https://primer.style/product/components/spinner/), [Spinner accessibility](https://primer.style/product/components/spinner/accessibility) (no built-in announcement: the page adds its own live region), [Loading](https://primer.style/product/ui-patterns/loading/) (which loading indicator for how long a wait: nothing under one second), [SkeletonText](https://primer.style/product/components/skeleton-text) (lines that follow the type styles, the last at 65%), and [ProgressBar](https://primer.style/product/components/progress-bar/)
+- **Atlassian Design System:** [Spinner](https://atlassian.design/components/spinner/usage), [Skeleton](https://atlassian.design/components/skeleton/usage) (one shape with a width, height, and radius, and an optional shimmer), and [Progress bar](https://atlassian.design/components/progress-bar/usage)
+- **IBM Carbon:** [Loading](https://carbondesignsystem.com/components/loading/usage/), [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/), [Loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/) (skeletons only on containers and data, never on toasts, menus, or modals), [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead), and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
+- **Microsoft Fluent 2:** [Spinner](https://fluent2.microsoft.design/components/web/react/core/spinner/usage), [Spinner source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-spinner/library/src/components/Spinner) (sizes, role, and delay, which the usage page doesn't list), [Skeleton](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-skeleton/stories/src/Skeleton) (an area plus shapes, like Sherbet's; announces with aria-busy), and [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 - **Shopify Polaris:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner) and [Skeleton body text](https://polaris.shopify.com/components/feedback-indicators/skeleton-body-text) (match the number of lines; the last line is shorter)
 
 ### Separators
@@ -558,3 +567,12 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Shopify Polaris:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
 - **GOV.UK Design System:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
 - **U.S. Web Design System:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)
+
+### Meters and progress bars
+
+- **Apple Human Interface Guidelines:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators) and [Gauges](https://developer.apple.com/design/human-interface-guidelines/gauges) (A value within a range, with its current value and both ends labelled)
+- **Material Design 3 (Google):** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines)
+- **GitHub Primer:** [ProgressBar](https://primer.style/product/components/progress-bar/)
+- **Atlassian Design System:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
+- **IBM Carbon:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
+- **Microsoft Fluent 2:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)

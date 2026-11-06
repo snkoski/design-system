@@ -1,0 +1,124 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as MeterStories from "./Meter.stories";
+import { Code } from "../../how-it-works/Code";
+import { Props } from "../../how-it-works/components/Meter";
+
+<Meta of={MeterStories} name="How it works" />
+
+# How Meter works
+
+A meter shows how much of something there is, out of a known amount: "Topics done, 12 of 20". This page walks through the real code underneath it: the HTML it renders, how its props become attributes, and how the CSS draws the bar. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+## What it's made of
+
+Meter is built on [Base UI](https://base-ui.com)'s Meter, which gives it the `meter` role and the value attributes screen readers read. Its look is shared with Progress: both carry the classes in `bar.css`, next to their own.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Meter.tsx</code></td><td>The component. It renders Base UI's Meter parts, links the label and description, works out where the fill sits, and turns <code>tone</code> and <code>size</code> into attributes.</td></tr>
+    <tr><td><code>src/internal/bar.ts</code></td><td>Shared with Progress: where the fill sits (a percent of the range), and the default words for the value. Not exported.</td></tr>
+    <tr><td><code>src/internal/bar.css</code></td><td>Shared with Progress: the label row, the track, the fill, the description, the two sizes, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>meter.css</code></td><td>Only what's Meter's own: the tones.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Meter</code> and the <code>MeterProps</code>, <code>MeterTone</code>, and <code>MeterSize</code> types.</td></tr>
+    <tr><td><code>Meter.test.tsx</code> and <code>Meter.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real meter, and under it the HTML it has rendered right now. Move the value, change the tone and size, and watch the attributes change.
+
+<Unstyled>
+  <Props />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element or attribute</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="bar meter"&gt;</code></td><td>The outer element. <code>className</code>, <code>ref</code>, and any other prop you pass land here, with <code>data-tone</code> and <code>data-size</code>.</td></tr>
+    <tr><td><code>role="meter"</code></td><td>From Base UI, on the element that holds the label, value, and track. Screen readers announce it as a meter (some say "progress bar" or "level indicator").</td></tr>
+    <tr><td><code>aria-labelledby</code></td><td>Points at the label, so the label is the meter's name. Base UI only adds this once JavaScript runs, so Meter sets it itself, with an id it makes: then it's in the first HTML the server sends.</td></tr>
+    <tr><td><code>aria-valuenow</code>, <code>aria-valuemin</code>, <code>aria-valuemax</code></td><td>The value and the range, from Base UI. A value outside the range is clamped to its nearest end.</td></tr>
+    <tr><td><code>aria-valuetext</code></td><td>The words screen readers read as the value: your <code>valueText</code>, or the percent.</td></tr>
+    <tr><td><code>aria-describedby</code></td><td>Only with a <code>description</code>: points at it.</td></tr>
+    <tr><td><code>&lt;span class="bar__value" aria-hidden="true"&gt;</code></td><td>The same words, shown. Hidden from screen readers, which already hear them as the value.</td></tr>
+    <tr><td><code>--bar-value</code></td><td>On the fill: how far along the range the value is, from 0 to 100. The CSS places the fill from it.</td></tr>
+    <tr><td><code>&lt;p class="bar__description"&gt;</code></td><td>Beside the meter, not inside it. A meter's children are "presentational" in ARIA, so screen readers may skip text inside one; the link from <code>aria-describedby</code> still reads it.</td></tr>
+    <tr><td><code>&lt;span role="presentation"&gt;x&lt;/span&gt;</code></td><td>Added by Base UI at the end of every meter, visually hidden. Its source doesn't say why. It's marked <code>presentation</code> inside an element whose children screen readers don't read on their own, so it isn't heard.</td></tr>
+  </tbody>
+</table>
+
+## How props become attributes
+
+The props leave out everything the meter sets itself: `role`, the `aria-value*` attributes, and the naming and describing attributes. The words go in `valueText` and `description` instead, so they're always shown as well as read.
+
+<Code file="components/Meter/Meter.tsx" name="MeterProps" />
+
+<Code file="components/Meter/Meter.tsx" name="Meter" />
+
+The fill's place and the default words come from two small functions Progress uses too. The percent is clamped and guarded the way Base UI does it, so the fill always matches what screen readers hear. The words are written in English whatever the language of the server or the reader: a server in France would write "60 %" and an English browser "60%", and React reports any difference between the server's HTML and the browser's as an error.
+
+<Code file="internal/bar.ts" name="barPercent" />
+
+<Code file="internal/bar.ts" name="percentText" />
+
+## The CSS, rule by rule
+
+### The label row
+
+The outer element is a grid: the meter, then the description. Inside the meter, the label and value share a row, the label taking the room and the value only what it needs. A long label wraps; the value never does, so the amount stays in one piece.
+
+<Code file="internal/bar.css" name=".bar" />
+
+<Code file="internal/bar.css" name=".bar__bar" />
+
+<Code file="internal/bar.css" name=".bar__value" />
+
+### The track and its sizes
+
+A rounded `track`-gray bar, 8px thick at `md` and 4px at `sm`. The size is the fill's height: the track uses `content-box`, so an edge (hot dog's, or forced colors') goes around the outside and never covers the fill. The track is faint against the page on purpose, like Skeleton's shapes: the words carry the exact amount.
+
+<Code file="internal/bar.css" name=".bar__track" />
+
+<Code file="internal/bar.css" name='.bar[data-size="sm"] .bar__track' />
+
+### The fill
+
+The fill is as wide as the whole track and slides in from the start: `--bar-value` says how far. It moves with `transform`, never by changing its width, so a change glides smoothly over `--duration-base` without the browser redrawing the layout, and the track clips it with its own rounded edge, so the fill's leading end stays round. On a right-to-left page it slides in from the right. Base UI sets a `width` on the fill for its own way of drawing it; Meter replaces it with `100%`.
+
+<Code file="internal/bar.css" name=".bar__fill" />
+
+<Code file="internal/bar.css" name=".bar__fill:dir(rtl)" />
+
+### Tones
+
+A tone colors the fill with a status color. Every fill is checked by `pnpm check` for 3:1 against the track in all three themes, the contrast a meaningful graphic needs. The words always say the status too.
+
+<Code file="components/Meter/meter.css" name='.meter[data-tone="success"] .meter__fill' />
+
+### Hot dog mode
+
+A thick ink edge around the track, outside the fill, like hot dog's other components. No shadow: nothing here can be pressed.
+
+<Code file="internal/bar.css" name='[data-theme="hotdog"] .bar__track' />
+
+### Forced colors
+
+Windows' forced colors mode removes background colors, which would leave no track and no fill. The track gets an edge in the text color, and the fill stays a solid block of it. Meter's tone rules are more specific than the shared rule, so meter.css repeats it for them.
+
+<Code file="internal/bar.css" name="@media (forced-colors: active)" />
+
+<Code file="components/Meter/meter.css" name="@media (forced-colors: active)" />
+
+### No touch, density, or focus rules
+
+Nothing about a meter can be pressed or focused, so it has no hit area, no focus ring, and nothing that changes with a touch screen or compact density.
+
+## How it's tested
+
+The unit tests check the role, name, and description, the value attributes and words, the default percent, clamping, where the fill sits, the tones and sizes, that the server's HTML already has the name and value, that it hydrates without a mismatch, refs, the empty-label warning, and the props type. The stories check what needs real CSS: that each fill covers its value's share of the track (also from the right, in a right-to-left page), each size's height with a mouse and on touch, each tone's color in all three themes, hot dog's edge, and that a long label wraps while the value stays on one line.

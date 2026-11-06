@@ -12,6 +12,7 @@
 @import "../internal/read-only-note.css";
 @import "../internal/visually-hidden.css";
 @import "../internal/spinner-graphic.css";
+@import "../internal/bar.css";
 @import "../components/Button/button.css";
 @import "../components/Checkbox/checkbox.css";
 @import "../components/CheckboxGroup/checkbox-group.css";
@@ -24,3 +25,4 @@
 @import "../components/Separator/separator.css";
 @import "../components/Badge/badge.css";
 @import "../components/Skeleton/skeleton.css";
+@import "../components/Meter/meter.css";

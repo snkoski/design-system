@@ -213,6 +213,8 @@ Raised while building Badge (2026-11-05).
 
 **Why it's in question:** the label is only heard, never shown, so for someone who can see, the shapes are the only sign that something is loading. Someone with low vision may not see them at all, especially on `surface` in dark mode. Adrian Roselli argues for 3:1 (WCAG 1.4.11). Most systems (Polaris, shadcn, MUI) are as faint as this, and a page of 3:1 shapes would look heavy.
 
-**To decide:** look at real pages of skeletons in all three themes. If they're too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
+**Also the track of Meter and Progress:** the same `track` gray, under a fill that does meet 3:1 against it (`contrast.json` checks that). A Meter always shows its amount in words, so the track's faint far end doesn't hide anything. A Progress with `hideLabel` has only the bar to show how far along it is, and its far end is as faint as a skeleton.
+
+**To decide:** look at real pages of skeletons, meters, and progress bars in all three themes. If the shapes or tracks are too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
 
 Raised while building Skeleton (2026-11-05).
