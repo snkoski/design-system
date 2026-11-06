@@ -93,7 +93,7 @@ export const States: Story = {
  */
 export const MatchingText: Story = {
   render: (args) => (
-    <Skeleton {...args} className="grid w-[36rem] grid-cols-2 items-start gap-x-6 gap-y-4">
+    <Skeleton {...args} className="grid w-[36rem] grid-cols-[max-content_1fr] items-start gap-x-6 gap-y-4">
       <p className="text-heading-md">Frontend engineer</p>
       <SkeletonItem className="text-heading-md" />
       <p className="text-body">Applied on 3 November</p>
