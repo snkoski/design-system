@@ -64,7 +64,8 @@ scripts/copy-css.mjs         writes the published CSS into dist/
 src/styles/                  index.css (layer order and imports), base.css, fonts.css, generated CSS
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
 src/internal/                pieces several components share (cx, FieldError and field-error.css, ReadOnlyNote and
-                             read-only-note.css, SpinnerGraphic and spinner-graphic.css, useLoadingAnnouncement, warn), with tests, the CSS
+                             read-only-note.css, SpinnerGraphic and spinner-graphic.css, bar.ts and bar.css for the look Meter and
+                             Progress share, useLoadingAnnouncement, warn), with tests, the CSS
                              form controls share (field.css, text-field.css, choice.css, choice-group.css), and
                              visually-hidden.css (the `.visually-hidden` class for screen-reader-only text). Not
                              exported from the package; the CSS is part of the published stylesheet.
@@ -154,7 +155,7 @@ One convention per job. Never mix them.
 
 - Durations 100–320ms using the motion tokens. Exits are faster than entrances and use `--ease-in`.
 - Movement, entrances, and exits animate only `transform` and `opacity`. A control's state change (hover, press, checked, invalid) may also fade `color`, `background-color`, `border-color`, and `box-shadow` over `--duration-fast`. List the properties; never `transition: all`. Never animate layout properties (width, height, top, left, margin, padding).
-- Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Looping animations (spinner, skeleton) use `--duration-loop` (a skeleton's pulse is two loops), which gets slower under reduced motion. They are the one thing allowed to move on their own for more than 5 seconds with no pause control, since they last as long as the wait (`docs/brand/motion.md`). Under `prefers-reduced-motion` slides and pops become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
+- Slides and shifts use `--motion-distance` and pops use `--motion-scale`. Looping animations (spinner, skeleton, a progress bar of unknown length) use `--duration-loop` (a skeleton's pulse and a progress bar's slide are two loops), which gets slower under reduced motion. They are the one thing allowed to move on their own for more than 5 seconds with no pause control, since they last as long as the wait (`docs/brand/motion.md`). Under `prefers-reduced-motion` slides and pops become `0` and `1`, so movement turns into fades without component changes. Never write a separate reduced-motion rule when a token can do it.
 - Movement that shows state (a switch thumb sliding to "on") is not decoration: give it a fixed distance, not `--motion-distance`, so it still moves under reduced motion. `--ease-bounce` turns into a plain ease-out there; `--duration-fast` stays the same, and is already short.
 - `data-motion="full"` or `data-motion="reduced"` on any element overrides the system setting for that subtree (generated in `tokens.css`).
 - `--ease-bounce` only for chips, toggles, and success states.

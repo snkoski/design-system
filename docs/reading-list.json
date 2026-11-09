@@ -181,6 +181,11 @@
       "id": "badges",
       "name": "Badges",
       "group": "components"
+    },
+    {
+      "id": "meters",
+      "name": "Meters and progress bars",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2178,7 +2183,8 @@
       "url": "https://m3.material.io/components/progress-indicators/guidelines",
       "system": "material",
       "topics": [
-        "loading-indicators"
+        "loading-indicators",
+        "meters"
       ]
     },
     {
@@ -2195,7 +2201,8 @@
       "url": "https://developer.apple.com/design/human-interface-guidelines/progress-indicators",
       "system": "apple",
       "topics": [
-        "loading-indicators"
+        "loading-indicators",
+        "meters"
       ]
     },
     {
@@ -2436,6 +2443,87 @@
         "loading-indicators"
       ],
       "note": "Hide the shapes, announce loading in words, and why aria-busy alone isn't enough."
+    },
+    {
+      "title": "Gauges",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/gauges",
+      "system": "apple",
+      "topics": [
+        "meters"
+      ],
+      "note": "A value within a range, with its current value and both ends labelled."
+    },
+    {
+      "title": "ProgressBar",
+      "url": "https://primer.style/product/components/progress-bar/",
+      "system": "primer",
+      "topics": [
+        "meters",
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Progress bar",
+      "url": "https://atlassian.design/components/progress-bar/usage",
+      "system": "atlassian",
+      "topics": [
+        "meters",
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "Progress bar",
+      "url": "https://carbondesignsystem.com/components/progress-bar/usage/",
+      "system": "carbon",
+      "topics": [
+        "meters",
+        "loading-indicators"
+      ],
+      "note": "Under 5 seconds, use a loading spinner instead."
+    },
+    {
+      "title": "Progress bar accessibility",
+      "url": "https://carbondesignsystem.com/components/progress-bar/accessibility/",
+      "system": "carbon",
+      "topics": [
+        "meters",
+        "loading-indicators"
+      ],
+      "note": "Announces its helper text in a polite live region."
+    },
+    {
+      "title": "ProgressBar",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/progressbar/usage",
+      "system": "fluent",
+      "topics": [
+        "meters",
+        "loading-indicators"
+      ]
+    },
+    {
+      "title": "WAI-ARIA 1.2: the meter role",
+      "url": "https://www.w3.org/TR/wai-aria-1.2/#meter",
+      "topics": [
+        "meters",
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "Meter pattern",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/",
+      "topics": [
+        "meters",
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "Styled meter elements (Scott O'Hara)",
+      "url": "https://scottaohara.github.io/a11y_styled_form_controls/src/meter/",
+      "topics": [
+        "meters",
+        "accessibility"
+      ],
+      "note": "How screen readers handled meters when tested; don't rely on the role alone."
     }
   ]
 }

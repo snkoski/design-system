@@ -1,0 +1,51 @@
+/* Progress: only what's different from the shared look in src/internal/bar.css: the slide while it doesn't know
+   how long, and the delay before it shows. */
+@layer components {
+  .progress {
+    position: relative; /* holds the visually hidden label, value, and status region */
+    --progress-delay: 0ms; /* the delay prop sets it in an inline style, which wins */
+  }
+
+  /* Doesn't know how long: a fill 40% wide slides from just off the start edge to just off the end, over and over.
+     Always forwards, never back and forth: going backwards would look like the task undoing itself. It moves with
+     transform only, and slows down under reduced motion (--duration-loop), like Spinner and Skeleton. */
+  .progress__fill[data-indeterminate] {
+    inline-size: 40%;
+    transition: none;
+    animation: progress-slide calc(var(--duration-loop) * 2) var(--ease-in-out) infinite;
+  }
+
+  .progress__fill[data-indeterminate]:dir(rtl) {
+    animation-name: progress-slide-rtl;
+  }
+
+  @keyframes progress-slide {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
+  }
+
+  @keyframes progress-slide-rtl {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(-250%);
+    }
+  }
+
+  /* Delay: invisible until --progress-delay (set from the delay prop) is over, then it fades in. It's CSS, so it
+     works before JavaScript runs too. backwards holds the first keyframe through the delay. */
+  .progress[data-delayed] {
+    animation: progress-appear var(--duration-base) var(--ease-out) var(--progress-delay) backwards;
+  }
+
+  @keyframes progress-appear {
+    from {
+      opacity: 0;
+    }
+  }
+}

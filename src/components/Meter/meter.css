@@ -1,0 +1,22 @@
+/* Meter: only what's different from the shared look in src/internal/bar.css, its tones. A tone's color always comes
+   with words that say the status (valueText or the description), never on its own. */
+@layer components {
+  .meter[data-tone="success"] .meter__fill {
+    background: var(--success);
+  }
+
+  .meter[data-tone="warning"] .meter__fill {
+    background: var(--warning);
+  }
+
+  .meter[data-tone="danger"] .meter__fill {
+    background: var(--danger);
+  }
+
+  /* The tone rules outrank bar.css's forced-colors fill, so repeat it here. The words carry the tone. */
+  @media (forced-colors: active) {
+    .meter[data-tone] .meter__fill {
+      background: CanvasText;
+    }
+  }
+}

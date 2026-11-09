@@ -7,7 +7,7 @@ Show that something is loading only when the wait is long enough to notice. Show
 - **A button's own action** (saving, sending, deleting): the button's `loading` prop. It shows a spinner in the button, keeps the button focusable, and stops a second click. Don't put a Spinner beside it.
 - **A page or section waiting for its data**, when you don't know its layout: `Spinner`, with a label that says what's loading.
 - **A page or section whose layout you know** (a list, a table, a card): `Skeleton`, gray shapes in the content's layout, with a label that says what's loading. The page keeps its shape, and the content drops into place.
-- **A long task whose progress you can measure** (an upload, an import): a progress bar is planned (Progress, in the roadmap). A spinner can't say how much is left.
+- **A long task whose progress you can measure** (an upload, an import): `Progress`, a bar that fills as it goes, with a label that says what's under way. A spinner can't say how much is left. For an amount that isn't a task, such as storage used, use a Meter (see "Choosing a meter").
 
 ## Using a Spinner
 
@@ -33,6 +33,19 @@ Show that something is loading only when the wait is long enough to notice. Show
 - **Use `delay`** for loads that are often quick, as with a Spinner, and replace the whole Skeleton with the content (or what went wrong) when it's done.
 - **Don't add `aria-busy`.** Only one screen reader supports it, and it can hold back what's announced.
 
+## Using a Progress
+
+- **Say what's under way.** "Uploading resume.pdf…", "Importing contacts…". The label is required, shown above the bar, and announced once when the bar appears. When the task finishes, change the label ("Uploaded resume.pdf") and the new words are announced too; or replace the bar with the result.
+- **Say how far along it is in words** when a count means more than a percent: `valueText="3 of 10 files"`. Without it, the bar shows a percent. Changes to the value aren't announced, so a screen reader user isn't interrupted at every step; they can find the bar to hear where it's got to.
+- **Use `value={null}` while it doesn't know how long,** and a short fill slides across. Switch to a number as soon as there is one: a bar that fills says more than one that slides. For a short wait you'll never be able to measure, use a Spinner instead.
+- **One bar for one task.** Each Progress announces itself, so for several files at once, show one bar for the whole batch ("Uploading 3 files…", `valueText="1 of 3 files"`), not a bar per file.
+- **Never let it go backwards.** If a task starts over, show a new bar with a new label.
+- **Add a description for anything else worth knowing,** such as the time left: "About a minute left." Screen readers read it as the bar's description.
+- **`hideLabel` only where there's no room for words,** such as a thin bar along the top edge of a card. Screen readers still hear the label.
+- **Use `delay` for tasks that are often quick,** as with a Spinner: a bar that flashes for a moment is noise.
+- **Give it a width.** A progress bar is as wide as its container, but in a `flex` row it shrinks to the width of its label and value: add `flex-1` or a width class.
+- **When it's done, show the result, or say what went wrong.** A full bar on its own isn't a confirmation, and a failed task needs an error in words, not a stopped bar.
+
 ## How it moves
 
-Spinners turn, and skeletons pulse: every shape fades to half and back, together, once every 1.4 seconds. With reduced motion both slow down rather than stop, so you can still tell something is happening. The skeleton's shapes are the light gray `track` color, faint on purpose so a page of them doesn't look heavy.
+Spinners turn, and skeletons pulse: every shape fades to half and back, together, once every 1.4 seconds. A Progress that doesn't know how long slides a short fill from the start to the end, also once every 1.4 seconds, always forwards; one that does glides from step to step. With reduced motion all three slow down rather than stop, so you can still tell something is happening. The skeleton's shapes are the light gray `track` color, faint on purpose so a page of them doesn't look heavy.

@@ -1,0 +1,97 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as ProgressStories from "./Progress.stories";
+import { Code } from "../../how-it-works/Code";
+import { Props } from "../../how-it-works/components/Progress";
+
+<Meta of={ProgressStories} name="How it works" />
+
+# How Progress works
+
+A progress bar shows a task that's under way and will finish, such as an upload: it fills as the task goes, or slides while it doesn't know how long. This page walks through the real code underneath it. Every code block is read from the source files when the page loads, so it's always the code that ships, and the demo is the real component.
+
+Progress shares its look and most of its code with Meter, whose "How it works" page explains the shared parts in full: the label row, the track, the fill and how it slides into place, the sizes, hot dog mode, and forced colors. This page covers what's different.
+
+## What it's made of
+
+Progress is built on [Base UI](https://base-ui.com)'s Progress, which gives it the `progressbar` role, the value attributes, and three states. It announces itself the way Spinner does, with the same shared timing.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Progress.tsx</code></td><td>The component. It renders Base UI's Progress parts, links the label and description, works out where the fill sits, and announces the label.</td></tr>
+    <tr><td><code>src/internal/bar.ts</code> and <code>bar.css</code></td><td>Shared with Meter: where the fill sits, the default words for the value, and the whole look. Not exported.</td></tr>
+    <tr><td><code>src/internal/useLoadingAnnouncement.ts</code></td><td>Shared with Spinner and Skeleton: when the status region gets its words, and the delay.</td></tr>
+    <tr><td><code>progress.css</code></td><td>Only what's Progress's own: the slide while it doesn't know how long, and the fade after a delay.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>Progress</code> and the <code>ProgressProps</code> and <code>ProgressSize</code> types.</td></tr>
+    <tr><td><code>Progress.test.tsx</code> and <code>Progress.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+## What it renders
+
+Here's a real progress bar, and under it the HTML it has rendered right now.
+
+<Unstyled>
+  <Props />
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element or attribute</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="bar progress"&gt;</code></td><td>The outer element. <code>className</code>, <code>ref</code>, <code>style</code>, and any other prop you pass land here, with <code>data-size</code>, and <code>data-delayed</code> when there's a delay.</td></tr>
+    <tr><td><code>role="progressbar"</code></td><td>From Base UI. It's named by the label (<code>aria-labelledby</code>, set by Progress itself so it's in the server's HTML) and holds the value attributes, as on Meter.</td></tr>
+    <tr><td><code>data-progressing</code>, <code>data-complete</code>, <code>data-indeterminate</code></td><td>From Base UI, on every part: under way, at its maximum, or not knowing how long. ARIA has no attribute for these (a bar that doesn't know how long just has no <code>aria-valuenow</code>), so the CSS uses Base UI's.</td></tr>
+    <tr><td><code>aria-valuetext</code></td><td>Your <code>valueText</code>, or the percent. While it doesn't know how long and you've given no words, there's none: Base UI would otherwise say "indeterminate progress", in English, after the label.</td></tr>
+    <tr><td><code>&lt;span role="status" class="visually-hidden"&gt;</code></td><td>The announcement: beside the bar, not inside it, because a progress bar's children are presentational. It starts empty and gets the label a moment later, since screen readers announce a live region when its text changes.</td></tr>
+  </tbody>
+</table>
+
+## How props become attributes
+
+<Code file="components/Progress/Progress.tsx" name="ProgressProps" />
+
+`value` can be `null`, which is how Base UI says "doesn't know how long". Anything else that isn't a finite number counts the same, as it does in Base UI, so the fill and the attributes always agree. Then there's no value to show and no position for the fill, and progress.css slides it instead.
+
+The label is announced through the same hook as Spinner's: it reads `delay` once, so the CSS fade and the announcement agree, and fills the status region after the delay or 100ms, whichever is longer. The region holds the label from then on, so a new label (such as "Uploaded resume.pdf" when the task is done) is announced as well. The value isn't in the region, so its changes aren't announced: a screen reader would otherwise be interrupted at every step.
+
+<Code file="components/Progress/Progress.tsx" name="Progress" />
+
+<Code file="internal/useLoadingAnnouncement.ts" name="useLoadingAnnouncement" />
+
+## The CSS, rule by rule
+
+### When it doesn't know how long
+
+The fill shrinks to 40% of the track and slides from just off the start edge to just off the end, over and over, once every 1.4 seconds. It always goes forwards, never back and forth, which would look like the task undoing itself. It moves only with `transform`, and its speed comes from `--duration-loop`, which slows down under reduced motion rather than stopping, like Spinner's turn and Skeleton's pulse: a frozen loading indicator looks broken. On a right-to-left page it slides from right to left.
+
+<Code file="components/Progress/progress.css" name=".progress__fill[data-indeterminate]" />
+
+<Code file="components/Progress/progress.css" name="@keyframes progress-slide" />
+
+When the bar gets a number, the slide stops and the fill glides to its place, with the transition from bar.css.
+
+<Code file="internal/bar.css" name=".bar__fill" />
+
+### The delay
+
+With a `delay`, the bar is invisible until the delay is over, then fades in. It's CSS, so it works before JavaScript runs too. The same delay holds back the announcement.
+
+<Code file="components/Progress/progress.css" name=".progress[data-delayed]" />
+
+### The hidden label
+
+`hideLabel` puts the shared `.visually-hidden` class on the label and the value, so screen readers still have them but they take no room: the bar is just its track. The outer element is `position: relative`, which keeps them, and the status region, inside it.
+
+<Code file="components/Progress/progress.css" name=".progress" />
+
+### No touch, density, or focus rules
+
+Nothing about a progress bar can be pressed or focused, so it has no hit area, no focus ring, and nothing that changes with a touch screen or compact density.
+
+## How it's tested
+
+The unit tests check the role, name, and description, the value attributes and words, the default percent, clamping, the three states, not knowing how long (no value, no English words, and a value that isn't a finite number), `hideLabel`, the announcement (empty first, then the label, a changed label, never a changed value), the delay, that the server's HTML has the name and value with the status region empty, that it hydrates without a mismatch, refs, the empty-label warning, and the props type. The stories check what needs real CSS: that each fill covers its value's share of the track, each size's height with a mouse and on touch, that a sliding fill starts off the start edge and moves toward the end (and the other way on a right-to-left page), that a hidden label takes no room, the colors in all three themes, and hot dog's edge.

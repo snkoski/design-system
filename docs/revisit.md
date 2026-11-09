@@ -213,6 +213,18 @@ Raised while building Badge (2026-11-05).
 
 **Why it's in question:** the label is only heard, never shown, so for someone who can see, the shapes are the only sign that something is loading. Someone with low vision may not see them at all, especially on `surface` in dark mode. Adrian Roselli argues for 3:1 (WCAG 1.4.11). Most systems (Polaris, shadcn, MUI) are as faint as this, and a page of 3:1 shapes would look heavy.
 
-**To decide:** look at real pages of skeletons in all three themes. If they're too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
+**Also the track of Meter and Progress:** the same `track` gray, under a fill that does meet 3:1 against it (`contrast.json` checks that). A Meter always shows its amount in words, so the track's faint far end doesn't hide anything. A Progress with `hideLabel` has only the bar to show how far along it is, and its far end is as faint as a skeleton.
+
+**To decide:** look at real pages of skeletons, meters, and progress bars in all three themes. If the shapes or tracks are too easy to miss, give the shapes a visible edge (`border-strong` reaches 3:1) or a darker fill, add the pairs to `contrast.json`, and update `loading.md`. If not, delete this entry.
 
 Raised while building Skeleton (2026-11-05).
+
+## A done look for Progress
+
+**Today:** a Progress at its maximum looks the same as any other: a full gray bar. Base UI marks it `data-complete`, but nothing styles it. The page changes the label ("Uploaded resume.pdf"), which is announced, or replaces the bar with the result.
+
+**Why it's in question:** Carbon and Atlassian turn a finished bar green with a check, so it's clear at a glance that the task worked. Sherbet leaves that to the page for now, because a full bar can also mean "done, but something went wrong", and a success color shouldn't appear without words that say so.
+
+**To decide:** once a real app uses Progress, see whether pages keep adding their own "done" message. If they do, add a done look (a `success` fill and a check, with words), driven by `data-complete`. If not, delete this entry.
+
+Raised while building Progress (2026-11-06).

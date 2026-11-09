@@ -39,13 +39,13 @@ To override the visitor's system setting for part of a page, for example a site'
 ## Rules
 
 - Interface motion runs 100–320ms. Exits are faster than entrances: an element leaves with `--ease-in` at the next shorter duration.
-- Looping animations use `--duration-loop`: a spinner turns once per loop, and a skeleton pulses once every two, since a pulse as fast as a turn flickers. Reduced motion slows them down rather than stopping them, so a loading indicator stays visible.
+- Looping animations use `--duration-loop`: a spinner turns once per loop, and a skeleton pulses, and a progress bar that doesn't know how long slides across, once every two, since a pulse or slide as fast as a turn flickers. Reduced motion slows them down rather than stopping them, so a loading indicator stays visible.
 - Things that move, appear, or disappear animate only `transform` and `opacity`. The browser can do both without redrawing the page. Never animate width, height, top, left, margin, or padding.
 - The one exception is a state change on a control: hover, press, focus, checked, chosen, or invalid. Its `color`, `background-color`, `border-color`, and `box-shadow` may fade over `--duration-fast` with `--ease-out`, so states don't snap. A short fade on a small control costs very little to redraw. Keep these fades to the properties that changed, never `transition: all`.
 - Slides and shifts use `--motion-distance`, and pops use `--motion-scale`, so reduced motion turns them into fades with no component changes.
 - Movement that carries meaning is the exception. A switch's thumb moving to the other end is how it shows on and off, so it moves the full distance even with reduced motion, quickly and without bounce (the bounce token turns into a plain ease-out). Don't build it from `--motion-distance`, which becomes 0.
 - `--ease-bounce` is Sherbet's one playful flourish: chips, toggles, and success states only, never dialogs, menus, or anything that blocks the reader.
-- Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels. The exception is a loading indicator (Spinner, and Skeleton's pulse): it keeps moving for as long as the wait lasts, because a frozen one looks like something broke, and seeing it move is how people know it's still trying. WCAG 2.2.2 allows this, since the movement is the information.
+- Nothing moves by itself for more than 5 seconds without a pause control. No parallax, no autoplaying carousels. The exception is a loading indicator (Spinner, Skeleton's pulse, and the slide of a Progress that doesn't know how long): it keeps moving for as long as the wait lasts, because a frozen one looks like something broke, and seeing it move is how people know it's still trying. WCAG 2.2.2 allows this, since the movement is the information.
 
 ## In components
 

@@ -1,0 +1,85 @@
+/* The look Meter and Progress share: a label and its value on one row, a rounded track under them with a fill for
+   the amount, and an optional description under the track. A part carries the shared class next to its own
+   (`bar__fill meter__fill`), and each component's CSS keeps only what's different: Meter's tones, Progress's slide
+   and delay. Where it sits and how wide it is (a width class, or flex-1 in a flex row) is the layout's job. */
+@layer components {
+  .bar {
+    display: grid;
+    gap: var(--space-1);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--leading-control);
+  }
+
+  /* The element screen readers hear as the meter or progress bar: the label and value, then the track */
+  .bar__bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .bar__label {
+    min-width: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .bar__value {
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* The size is the fill's height. Edges (hot dog, forced colors) sit outside it, so they never cover the fill. */
+  .bar__track {
+    grid-column: 1 / -1;
+    box-sizing: content-box;
+    block-size: var(--space-2);
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--track);
+  }
+
+  .bar[data-size="sm"] .bar__track {
+    block-size: var(--space-1);
+  }
+
+  /* The fill is as wide as the track and slides in from the start edge: --bar-value (0 to 100, set inline from the
+     value) says how far. Moving it with transform, never width, keeps a change smooth and cheap to draw, and the
+     track's rounded, clipped edge keeps its leading end round. */
+  .bar__fill {
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(--action);
+    transform: translateX(calc((var(--bar-value, 0) - 100) * 1%));
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  .bar__fill:dir(rtl) {
+    transform: translateX(calc((100 - var(--bar-value, 0)) * 1%));
+  }
+
+  .bar__description {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  [data-theme="hotdog"] .bar__track {
+    border: var(--border-thick) solid var(--ink);
+  }
+
+  /* Forced colors drops backgrounds, which would leave no track and no fill: give the track an edge, and keep the
+     fill as a solid block of the text color */
+  @media (forced-colors: active) {
+    .bar__track {
+      border: var(--border-thin) solid CanvasText;
+    }
+
+    .bar__fill {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+}
