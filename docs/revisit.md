@@ -228,3 +228,16 @@ Raised while building Skeleton (2026-11-05).
 **To decide:** once a real app uses Progress, see whether pages keep adding their own "done" message. If they do, add a done look (a `success` fill and a check, with words), driven by `data-complete`. If not, delete this entry.
 
 Raised while building Progress (2026-11-06).
+
+## One stylesheet for every component
+
+**Today:** apps import the whole `styles.css`: the tokens, base styles, and every component's CSS in one file (66 KB, about 15 KB gzipped, with 14 components). JavaScript is tree-shaken: an app that imports only Button bundles only Button's code and the Base UI parts it uses (about 4 to 5 KB gzipped with Vite or esbuild, against about 25 KB for everything), because the package is one ES module marked side-effect free. CSS isn't, so an app that uses only Button still loads Meter's styles.
+
+**Why it's in question:** the stylesheet grows with every component, and a small app pays for all of them. One file is simple, though: one import, and the layer order is always right.
+
+**To decide:** when the system has many more components, or an app's CSS size starts to matter, measure `styles.css` again and choose:
+- **Keep one file**, if it's still small next to the app's own CSS.
+- **A file per component** (`design-system/button.css`), imported by the app next to the component, plus a shared file for the tokens, base styles, and `src/internal/` CSS. Smaller, but the app has to remember each import, and the `@layer` order still has to be declared first.
+- **Each component imports its own CSS** from its JavaScript, so the CSS comes with the component automatically. The app's bundler has to handle CSS imported from `node_modules`, which server-rendered setups often need extra configuration for.
+
+Raised after checking tree shaking (2026-11-12).
