@@ -25,7 +25,7 @@ type Labelled =
     };
 
 interface OwnProps {
-  /** The kind of text it takes. Text-like types only; use a number field for numbers. Default: `text`. */
+  /** The kind of text it takes. Text-like types only; use NumberField for amounts and quantities. Default: `text`. */
   type?: InputType;
   /** Height and type size. Both meet target-min: 40px or 48px with a mouse, 44px or 52px on touch. Default: `md`. */
   size?: InputSize;
@@ -79,8 +79,8 @@ export type InputProps = Labelled &
 /**
  * A single-line text field with its label, an optional description, and an error. Built on Base UI's
  * Input and Field, so the label, description, and error are linked to the input for screen readers,
- * and it takes part in forms. For longer text, use TextArea. For numbers or picking from options, use a
- * number field or a select instead.
+ * and it takes part in forms. For longer text, use TextArea. For amounts and quantities, use NumberField;
+ * for picking from options, a select.
  */
 export function Input({
   label,

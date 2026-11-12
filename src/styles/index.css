@@ -21,6 +21,7 @@
 @import "@/components/Input/input.css";
 @import "@/components/TextArea/text-area.css";
 @import "@/components/NativeSelect/native-select.css";
+@import "@/components/NumberField/number-field.css";
 @import "@/components/SegmentedControl/segmented-control.css";
 @import "@/components/Spinner/spinner.css";
 @import "@/components/Separator/separator.css";
