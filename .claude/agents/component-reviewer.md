@@ -18,8 +18,9 @@ You review one component in this design system. You did not write it, and you ha
 1. `CLAUDE.md`, all of it. It is the rulebook.
 2. `docs/brand/accessibility.md`, `docs/brand/building.md`, `docs/brand/motion.md`, `docs/brand/platforms.md`, `docs/brand/iconography.md`, and `docs/brand/voice.md`; for a form control, also `docs/brand/forms.md`. Any guidance page for the component (a `<Name>.mdx` in its folder renders one).
 3. Every file in `src/components/<Name>/`.
-4. The closest existing component as the reference for consistency: `src/components/Checkbox/` for form controls, `src/components/Button/` for actions. Compare prop names, defaults, JSDoc style, CSS structure, and test structure.
+4. The closest existing component as the reference for consistency: `src/components/Checkbox/` for choice controls (checkboxes, switches, radios), `src/components/Input/` for text fields (`TextArea/` or `NativeSelect/` if it renders `Field.Control` as another element), `src/components/Button/` for actions, and `src/components/Spinner/` for anything with nothing to press or focus. Compare prop names, defaults, JSDoc style, CSS structure, and test structure.
 5. `git status` and `git diff` to see what is new or changed, including `src/index.ts`, `src/styles/index.css`, `tokens/tokens.json`, and `tokens/contrast.json`.
+6. `.claude/skills/new-component/checks.md`: the checks that depend on what a component is or does, one row each, each from a bug a past build shipped or nearly shipped.
 
 ## Run
 
@@ -32,14 +33,7 @@ pnpm check:tests    # removed, skipped, or weakened tests compared with HEAD
 
 Report any failure as a Must fix.
 
-To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, serve it read-only and inspect it with Playwright from the repo folder:
-
-```sh
-python3 -m http.server 6107 -d storybook-static &   # stop it afterwards: pkill -f "http.server 6107"; in a worktree, use another port
-node --input-type=module -e "import { chromium } from 'playwright'; /* open http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story */"
-```
-
-Check that it's current first: if any file in `src/components/<Name>/` is newer than `storybook-static/index.html`, say the build is stale and judge from the source instead. Use real hover (`locator.hover()`) and `page.emulateMedia({ forcedColors: 'active' })` to check states that screenshots can't show, and save screenshots to the scratchpad, not the repo. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
+To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, run `pnpm look <Name> --out <scratchpad>/<name>`: it reads the build, writes only to that folder, and leaves nothing running (`CLAUDE.md`, "Looking at a component"). Report any story it fails as a Must fix, open its screenshots, and read its state colors. If it warns that the build is stale, say so and judge from the source instead. For anything it doesn't check, write your own Playwright script as `CLAUDE.md` describes there, with real hover (`locator.hover()`) and `page.emulateMedia({ forcedColors: 'active' })`, saving screenshots to the scratchpad, not the repo. `pnpm check:contrast --probe` checks a pair that isn't in `tokens/contrast.json`, or one dimmed with `--opacity`, without touching the file. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
 
 ## What to check
 
@@ -77,6 +71,9 @@ Check that it's current first: if any file in `src/components/<Name>/` is newer 
 - `play` functions are short demos; exhaustive cases live in the test file.
 - Size and hit-area checks run with a mouse and again with `data-pointer="coarse"`, measure tokens rather than hard-coding px, and assert the `--target-min` floor. A check that only runs with a mouse, where `--target-min` is 24px, can pass with a broken touch hit area: flag it.
 - Story copy (labels, descriptions, and errors) follows `docs/brand/voice.md`: no periods in labels and buttons, and errors say what went wrong and how to fix it, without "invalid" or "oops".
+
+**Checks by kind of component** (`checks.md`)
+- Go through every row whose first column describes this component, in all three tables. For each, find the evidence it was done: the test or story the row calls for, and whether it would fail if the behavior broke, or the result in `pnpm look`'s output and screenshots. A row that applies with no evidence is a Should fix; one whose bug is actually present is a Must fix. Name each row you checked under "Checked and fine", and each you couldn't under "Could not verify".
 
 **Docs**
 - If the component introduces a new pattern or rule, it is in `CLAUDE.md` or the right `docs/brand/` page.
