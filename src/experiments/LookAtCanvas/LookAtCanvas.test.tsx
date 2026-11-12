@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { approach, barAngle, catchUp, fadeAlpha, nearestHalfTurn, step } from "./field";
-import { LookAtCanvas } from "./LookAtCanvas";
+import { approach, barAngle, catchUp, fadeAlpha, nearestHalfTurn, step } from "@/experiments/LookAtCanvas/field";
+import { LookAtCanvas } from "@/experiments/LookAtCanvas/LookAtCanvas";
 
 describe("field math", () => {
   it("stands a bar on end toward the pointer, clockwise from up", () => {

@@ -1,4 +1,4 @@
-import "./demo.css";
+import "@/how-it-works/demo.css";
 
 /* Pieces the live demos on "How it works" pages share. Lay a demo out in a <div className="explain"> (see demo.css). */
 

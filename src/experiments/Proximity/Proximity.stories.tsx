@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect } from "storybook/test";
-import { Proximity } from "./Proximity";
+import { Proximity } from "@/experiments/Proximity/Proximity";
 
 // Plain blue, green, and red, rather than the palette's tokens: the point is to see the colors mix
 const BLUE = "hsl(220 90% 55%)";

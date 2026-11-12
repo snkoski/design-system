@@ -2,10 +2,10 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { expect, waitFor } from "storybook/test";
-import { Button } from "../Button";
-import { Input } from "../Input";
-import { Separator } from "./Separator";
-import separatorCss from "./separator.css?inline";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Separator } from "@/components/Separator/Separator";
+import separatorCss from "@/components/Separator/separator.css?inline";
 
 /** The px value of a length token, measured in the browser */
 function measure(token: string, parent: HTMLElement) {

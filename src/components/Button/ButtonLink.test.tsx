@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { ButtonLink } from "./ButtonLink";
-import type { ButtonLinkProps } from "./ButtonLink";
+import { takeWarnings } from "@tests/warnings";
+import { ButtonLink } from "@/components/Button/ButtonLink";
+import type { ButtonLinkProps } from "@/components/Button/ButtonLink";
 
 describe("ButtonLink", () => {
   it("renders a real link, not a button", () => {

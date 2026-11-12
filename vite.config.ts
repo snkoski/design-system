@@ -8,7 +8,14 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: { "@": resolve(import.meta.dirname, "src") },
+    // Every import starts from one of these, never with ./ or ../ (`pnpm check` enforces it). Keep tsconfig.json's
+    // `paths` in step.
+    alias: {
+      "@": resolve(import.meta.dirname, "src"),
+      "@docs": resolve(import.meta.dirname, "docs"),
+      "@tokens": resolve(import.meta.dirname, "tokens"),
+      "@tests": resolve(import.meta.dirname, "tests"),
+    },
   },
   build: {
     lib: {

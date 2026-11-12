@@ -1,10 +1,10 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Input } from "../../components/Input";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Slider } from "../../how-it-works/demo";
-import { clampSize, cursorValue, drawText, hotspotFor } from "./cursorImage";
-import type { Hotspot } from "./cursorImage";
-import "./explain.css";
+import { Input } from "@/components/Input";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Slider } from "@/how-it-works/demo";
+import { clampSize, cursorValue, drawText, hotspotFor } from "@/experiments/CustomCursor/cursorImage";
+import type { Hotspot } from "@/experiments/CustomCursor/cursorImage";
+import "@/experiments/CustomCursor/explain.css";
 
 /* A live demo for the "How it works" page. It calls the real functions in cursorImage.ts, the same way
    CustomCursor.tsx does for an emoji, so what it shows is what runs. */

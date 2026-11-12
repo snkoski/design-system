@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import { expect } from "storybook/test";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Switch } from "../../components/Switch";
-import { LookAt } from "../LookAt/LookAt";
-import { Proximity } from "../Proximity/Proximity";
-import { FrameMeter } from "./FrameMeter";
-import { LookAtCanvas } from "./LookAtCanvas";
-import { useSweep } from "./sweep";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Switch } from "@/components/Switch";
+import { LookAt } from "@/experiments/LookAt/LookAt";
+import { Proximity } from "@/experiments/Proximity/Proximity";
+import { FrameMeter } from "@/experiments/LookAtCanvas/FrameMeter";
+import { LookAtCanvas } from "@/experiments/LookAtCanvas/LookAtCanvas";
+import { useSweep } from "@/experiments/LookAtCanvas/sweep";
 
 /** Turns the mouse position into a pointermove the page sees, as a real mouse would */
 function movePointer(x: number, y: number) {

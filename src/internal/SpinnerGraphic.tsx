@@ -1,4 +1,4 @@
-import { cx } from "./cx";
+import { cx } from "@/internal/cx";
 
 /**
  * The spinning drawing Spinner and a loading Button share: a faint full circle as the track, and a quarter of a

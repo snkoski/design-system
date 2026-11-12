@@ -1,8 +1,8 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { LayoutGrid, List, Sparkles } from "lucide-react";
 import { expect } from "storybook/test";
-import { Segment } from "./Segment";
-import { SegmentedControl } from "./SegmentedControl";
+import { Segment } from "@/components/SegmentedControl/Segment";
+import { SegmentedControl } from "@/components/SegmentedControl/SegmentedControl";
 
 /** A Segment only works inside a SegmentedControl, so stories render one around it, unless they bring their own. */
 const inControl: Decorator = (Story, { parameters }) =>

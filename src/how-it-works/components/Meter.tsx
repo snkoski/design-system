@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Checkbox } from "../../components/Checkbox";
-import { Meter } from "../../components/Meter";
-import type { MeterSize, MeterTone } from "../../components/Meter";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Slider } from "../demo";
-import { Inspect } from "../Inspect";
+import { Checkbox } from "@/components/Checkbox";
+import { Meter } from "@/components/Meter";
+import type { MeterSize, MeterTone } from "@/components/Meter";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Slider } from "@/how-it-works/demo";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Meter's "How it works" page. Every one renders the real Meter, styled by the real CSS. */
 

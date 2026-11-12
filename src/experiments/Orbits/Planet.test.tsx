@@ -1,12 +1,12 @@
 import { act, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Bounce } from "../Bounce/Bounce";
-import { collide, G, orbitVelocity, pulls } from "./gravity";
-import { Planet } from "./Planet";
-import type { PlanetProps } from "./Planet";
-import { Star } from "./Star";
-import type { StarProps } from "./Star";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import { collide, G, orbitVelocity, pulls } from "@/experiments/Orbits/gravity";
+import { Planet } from "@/experiments/Orbits/Planet";
+import type { PlanetProps } from "@/experiments/Orbits/Planet";
+import { Star } from "@/experiments/Orbits/Star";
+import type { StarProps } from "@/experiments/Orbits/Star";
 
 describe("pulls", () => {
   const thing = (x: number, mass: number, size = 0) => ({ x, y: 0, width: size, height: size, mass });

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect } from "storybook/test";
-import { Button } from "../../components/Button";
-import { Bounce } from "./Bounce";
+import { Button } from "@/components/Button";
+import { Bounce } from "@/experiments/Bounce/Bounce";
 
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to bounce around in: positioned, so Bounce measures it, with an edge you can see */

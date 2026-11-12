@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Heart, Plus, Send } from "lucide-react";
-import { Button } from "../../components/Button";
-import type { ButtonShape, ButtonSize, ButtonVariant } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Switch } from "../../components/Switch";
-import { Inspect } from "../Inspect";
-import "./button.css";
+import { Button } from "@/components/Button";
+import type { ButtonShape, ButtonSize, ButtonVariant } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Switch } from "@/components/Switch";
+import { Inspect } from "@/how-it-works/Inspect";
+import "@/how-it-works/components/button.css";
 
 /* Live demos for Button's "How it works" page. Every one renders the real Button, styled by the real button.css. */
 

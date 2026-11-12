@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { SkeletonItem } from "./SkeletonItem";
-import type { SkeletonItemProps, SkeletonShape } from "./SkeletonItem";
+import { SkeletonItem } from "@/components/Skeleton/SkeletonItem";
+import type { SkeletonItemProps, SkeletonShape } from "@/components/Skeleton/SkeletonItem";
 
 /** The item's element */
 function item(container: HTMLElement) {

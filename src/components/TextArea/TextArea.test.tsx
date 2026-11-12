@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import type { ChangeEvent, Ref } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { TextArea } from "./TextArea";
-import type { TextAreaProps, TextAreaResize, TextAreaSize } from "./TextArea";
+import { takeWarnings } from "@tests/warnings";
+import { TextArea } from "@/components/TextArea/TextArea";
+import type { TextAreaProps, TextAreaResize, TextAreaSize } from "@/components/TextArea/TextArea";
 
 const getTextArea = () => screen.getByRole("textbox") as HTMLTextAreaElement;
 

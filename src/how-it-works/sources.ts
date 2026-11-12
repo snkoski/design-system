@@ -5,17 +5,17 @@
  */
 const files = import.meta.glob<string>(
   [
-    "../{components,internal,experiments}/**/*.{ts,tsx,css}",
-    "../styles/*.css",
-    "!../**/*.test.{ts,tsx}",
-    "!../**/*.stories.tsx",
-    "!../styles/{tokens,tailwind-theme}.css",
+    "@/{components,internal,experiments}/**/*.{ts,tsx,css}",
+    "@/styles/*.css",
+    "!@/**/*.test.{ts,tsx}",
+    "!@/**/*.stories.tsx",
+    "!@/styles/{tokens,tailwind-theme}.css",
   ],
   { query: "?raw", import: "default", eager: true },
 );
 
 export const sources: Record<string, string> = Object.fromEntries(
-  Object.entries(files).map(([path, text]) => [path.replace(/^\.\.\//, ""), text]),
+  Object.entries(files).map(([path, text]) => [path.replace(/^\/src\//, ""), text]),
 );
 
 /** The whole text of one source file */

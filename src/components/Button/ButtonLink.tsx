@@ -1,7 +1,7 @@
 import type { AnchorHTMLAttributes, Ref } from "react";
-import { warnIfUnnamed } from "../../internal/warn";
-import { Content, cx } from "./shared";
-import type { IconOnly, SharedProps } from "./shared";
+import { warnIfUnnamed } from "@/internal/warn";
+import { Content, cx } from "@/components/Button/shared";
+import type { IconOnly, SharedProps } from "@/components/Button/shared";
 
 export type ButtonLinkProps = SharedProps &
   IconOnly &

@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { colorAt } from "../Proximity/tracker";
-import "./explain.css";
-import { catchUp, fadeAlpha, step } from "./field";
-import { LEVELS } from "./LookAtCanvas";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { colorAt } from "@/experiments/Proximity/tracker";
+import "@/experiments/LookAtCanvas/explain.css";
+import { catchUp, fadeAlpha, step } from "@/experiments/LookAtCanvas/field";
+import { LEVELS } from "@/experiments/LookAtCanvas/LookAtCanvas";
 
 /* Live demos for the "How it works" page. They call the real catchUp(), step(), and fadeAlpha() from field.ts, and
    colorAt() from Proximity, so what they show is what runs. */

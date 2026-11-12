@@ -5,9 +5,9 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, onTestFinished, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Progress } from "./Progress";
-import type { ProgressProps } from "./Progress";
+import { takeWarnings } from "@tests/warnings";
+import { Progress } from "@/components/Progress/Progress";
+import type { ProgressProps } from "@/components/Progress/Progress";
 
 const label = "Uploading resume.pdf…";
 

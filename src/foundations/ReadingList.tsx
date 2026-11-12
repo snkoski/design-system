@@ -1,10 +1,10 @@
 import { useId, useMemo, useState } from "react";
-import list from "../../docs/reading-list.json";
-import { Checkbox } from "../components/Checkbox";
-import { CheckboxGroup } from "../components/CheckboxGroup";
-import { Input } from "../components/Input";
-import { Segment, SegmentedControl } from "../components/SegmentedControl";
-import "./reading-list.css";
+import list from "@docs/reading-list.json";
+import { Checkbox } from "@/components/Checkbox";
+import { CheckboxGroup } from "@/components/CheckboxGroup";
+import { Input } from "@/components/Input";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import "@/foundations/reading-list.css";
 
 /* The reading list as a page you can search and filter, from docs/reading-list.json. The standalone page
    (docs/reading-list.html, scripts/reading-list-page.js) does the same without React; keep the two in step. */

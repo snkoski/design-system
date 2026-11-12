@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { declaration, excerpt, file, rule, snippet, sources } from "./sources";
+import { declaration, excerpt, file, rule, snippet, sources } from "@/how-it-works/sources";
 
-const source = `import { thing } from "./thing";
+const source = `import { thing } from "@/how-it-works/thing";
 
 /** How far it can go */
 export interface Room {

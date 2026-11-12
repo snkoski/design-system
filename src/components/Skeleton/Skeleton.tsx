@@ -1,7 +1,7 @@
 import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { useLoadingAnnouncement } from "../../internal/useLoadingAnnouncement";
-import { hasContent, warn } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { useLoadingAnnouncement } from "@/internal/useLoadingAnnouncement";
+import { hasContent, warn } from "@/internal/warn";
 
 export type SkeletonProps = Omit<
   HTMLAttributes<HTMLDivElement>,

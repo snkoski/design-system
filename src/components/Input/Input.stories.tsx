@@ -2,8 +2,8 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { AtSign, Search } from "lucide-react";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { Button } from "../Button";
-import { Input } from "./Input";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input/Input";
 
 /** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
 function measure(token: string, parent: HTMLElement = document.body) {

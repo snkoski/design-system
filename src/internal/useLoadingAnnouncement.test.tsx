@@ -1,7 +1,7 @@
 import { act, render } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ANNOUNCE_AFTER, useLoadingAnnouncement } from "./useLoadingAnnouncement";
+import { ANNOUNCE_AFTER, useLoadingAnnouncement } from "@/internal/useLoadingAnnouncement";
 
 /** Shows the hook's result as attributes, so the tests can read it */
 function Probe({ delay }: { delay: number }) {

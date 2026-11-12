@@ -1,9 +1,9 @@
 import { act, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Proximity } from "./Proximity";
-import type { ProximityProps } from "./Proximity";
-import { closeness, colorAt, forgetPointer } from "./tracker";
+import { Proximity } from "@/experiments/Proximity/Proximity";
+import type { ProximityProps } from "@/experiments/Proximity/Proximity";
+import { closeness, colorAt, forgetPointer } from "@/experiments/Proximity/tracker";
 
 afterEach(forgetPointer);
 

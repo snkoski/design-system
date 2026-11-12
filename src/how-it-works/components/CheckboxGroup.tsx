@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
-import { Button } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { CheckboxGroup } from "../../components/CheckboxGroup";
-import { Entries, useSubmitted } from "./Checkbox";
-import "../demo.css";
-import "./checkbox.css";
+import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { CheckboxGroup } from "@/components/CheckboxGroup";
+import { Entries, useSubmitted } from "@/how-it-works/components/Checkbox";
+import "@/how-it-works/demo.css";
+import "@/how-it-works/components/checkbox.css";
 
 /* Live demos for Checkbox group's "How it works" page. They render the real components, so what they show is what
    runs. */

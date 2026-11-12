@@ -1,8 +1,8 @@
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { SpinnerGraphic } from "../../internal/SpinnerGraphic";
-import { useLoadingAnnouncement } from "../../internal/useLoadingAnnouncement";
-import { hasContent, warn } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { SpinnerGraphic } from "@/internal/SpinnerGraphic";
+import { useLoadingAnnouncement } from "@/internal/useLoadingAnnouncement";
+import { hasContent, warn } from "@/internal/warn";
 
 export type SpinnerSize = "sm" | "md" | "lg";
 

@@ -1,4 +1,4 @@
-export { Skeleton } from "./Skeleton";
-export type { SkeletonProps } from "./Skeleton";
-export { SkeletonItem } from "./SkeletonItem";
-export type { SkeletonItemProps, SkeletonShape } from "./SkeletonItem";
+export { Skeleton } from "@/components/Skeleton/Skeleton";
+export type { SkeletonProps } from "@/components/Skeleton/Skeleton";
+export { SkeletonItem } from "@/components/Skeleton/SkeletonItem";
+export type { SkeletonItemProps, SkeletonShape } from "@/components/Skeleton/SkeletonItem";

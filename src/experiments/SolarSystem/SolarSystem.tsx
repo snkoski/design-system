@@ -1,17 +1,17 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { HTMLAttributes, Ref } from "react";
-import { Button } from "../../components/Button";
-import { cx } from "../../internal/cx";
-import "../decoration.css";
-import { MOONS, PLANETS, SUN } from "./bodies";
-import type { Moon } from "./bodies";
-import { orbitPath, positionAt } from "./kepler";
-import type { Position } from "./kepler";
-import { moonAngle, shownPeriod } from "./moons";
-import { scaleDistance } from "./scale";
-import type { DistanceScale } from "./scale";
-import "./solar-system.css";
+import { Button } from "@/components/Button";
+import { cx } from "@/internal/cx";
+import "@/experiments/decoration.css";
+import { MOONS, PLANETS, SUN } from "@/experiments/SolarSystem/bodies";
+import type { Moon } from "@/experiments/SolarSystem/bodies";
+import { orbitPath, positionAt } from "@/experiments/SolarSystem/kepler";
+import type { Position } from "@/experiments/SolarSystem/kepler";
+import { moonAngle, shownPeriod } from "@/experiments/SolarSystem/moons";
+import { scaleDistance } from "@/experiments/SolarSystem/scale";
+import type { DistanceScale } from "@/experiments/SolarSystem/scale";
+import "@/experiments/SolarSystem/solar-system.css";
 
 export type { DistanceScale };
 

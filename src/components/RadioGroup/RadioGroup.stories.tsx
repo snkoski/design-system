@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { Radio } from "./Radio";
-import { RadioGroup } from "./RadioGroup";
+import { Radio } from "@/components/RadioGroup/Radio";
+import { RadioGroup } from "@/components/RadioGroup/RadioGroup";
 
 const options = (
   <>

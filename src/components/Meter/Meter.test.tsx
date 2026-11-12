@@ -5,9 +5,9 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { describe, expect, expectTypeOf, it, onTestFinished, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Meter } from "./Meter";
-import type { MeterProps } from "./Meter";
+import { takeWarnings } from "@tests/warnings";
+import { Meter } from "@/components/Meter/Meter";
+import type { MeterProps } from "@/components/Meter/Meter";
 
 const label = "Topics done";
 

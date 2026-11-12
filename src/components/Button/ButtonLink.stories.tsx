@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, ExternalLink, Heart } from "lucide-react";
 import { expect } from "storybook/test";
-import { ButtonLink } from "./ButtonLink";
+import { ButtonLink } from "@/components/Button/ButtonLink";
 
 /** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
 function measure(token: string, parent: HTMLElement = document.body) {

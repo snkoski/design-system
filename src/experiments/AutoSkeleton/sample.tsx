@@ -1,8 +1,8 @@
-import { Badge } from "../../components/Badge";
-import type { BadgeTone } from "../../components/Badge";
-import { Button } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { Input } from "../../components/Input";
+import { Badge } from "@/components/Badge";
+import type { BadgeTone } from "@/components/Badge";
+import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Input } from "@/components/Input";
 
 /** Sample content for the stories and the How it works page: ordinary components, nothing skeleton-specific */
 

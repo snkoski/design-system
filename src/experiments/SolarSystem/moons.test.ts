@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { MOONS, PLANETS } from "./bodies";
-import { positionAt } from "./kepler";
-import { MIN_PERIOD, moonAngle, moonLongitude, shownPeriod } from "./moons";
+import { MOONS, PLANETS } from "@/experiments/SolarSystem/bodies";
+import { positionAt } from "@/experiments/SolarSystem/kepler";
+import { MIN_PERIOD, moonAngle, moonLongitude, shownPeriod } from "@/experiments/SolarSystem/moons";
 
 const DAY = 86_400_000;
 const moon = (name: string) => MOONS.find((other) => other.name === name)!;

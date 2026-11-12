@@ -1,9 +1,9 @@
 import { Field } from "@base-ui/react/field";
 import type { ReactNode, Ref, TextareaHTMLAttributes } from "react";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
 
 export type TextAreaSize = "md" | "lg";
 export type TextAreaResize = "vertical" | "none";

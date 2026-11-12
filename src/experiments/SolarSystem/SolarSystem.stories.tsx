@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { SolarSystem } from "./SolarSystem";
+import { SolarSystem } from "@/experiments/SolarSystem/SolarSystem";
 
 const page = { background: "var(--bg)", color: "var(--ink)", minHeight: "100vh" };
 

@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Switch } from "./Switch";
-import type { SwitchProps } from "./Switch";
+import { takeWarnings } from "@tests/warnings";
+import { Switch } from "@/components/Switch/Switch";
+import type { SwitchProps } from "@/components/Switch/Switch";
 
 const getSwitch = () => screen.getByRole("switch");
 const getInput = (container: HTMLElement) => container.querySelector<HTMLInputElement>("input[type=checkbox]")!;

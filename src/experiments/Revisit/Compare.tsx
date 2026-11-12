@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import "./compare.css";
+import "@/experiments/Revisit/compare.css";
 
 const themes = [
   ["light", "Light"],

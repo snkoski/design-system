@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Segment } from "./Segment";
-import { SegmentedControl } from "./SegmentedControl";
-import type { SegmentedControlProps } from "./SegmentedControl";
+import { takeWarnings } from "@tests/warnings";
+import { Segment } from "@/components/SegmentedControl/Segment";
+import { SegmentedControl } from "@/components/SegmentedControl/SegmentedControl";
+import type { SegmentedControlProps } from "@/components/SegmentedControl/SegmentedControl";
 
 const options = (
   <>

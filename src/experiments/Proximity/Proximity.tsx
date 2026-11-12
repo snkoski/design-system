@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import "./proximity.css";
-import { refresh, watch } from "./tracker";
-import type { ColorSpace, Watcher } from "./tracker";
+import { cx } from "@/internal/cx";
+import "@/experiments/Proximity/proximity.css";
+import { refresh, watch } from "@/experiments/Proximity/tracker";
+import type { ColorSpace, Watcher } from "@/experiments/Proximity/tracker";
 
 export type { ColorSpace };
 export type ProximityFade = "in" | "out";

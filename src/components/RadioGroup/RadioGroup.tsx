@@ -2,10 +2,10 @@ import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import type { ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
 
 /** A group needs a name a screen reader can announce: a visible label, or an `aria-label`. */
 type Labelled =

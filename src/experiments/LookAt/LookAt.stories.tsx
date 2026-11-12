@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowUp } from "lucide-react";
 import type { ReactNode } from "react";
 import { expect } from "storybook/test";
-import { LookAt } from "./LookAt";
+import { LookAt } from "@/experiments/LookAt/LookAt";
 
 /** A rounded bar, drawn pointing up, so LookAt stands it on end toward the mouse */
 function Bar({ width = "0.375rem", height = "2rem" }: { width?: string; height?: string }) {

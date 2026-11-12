@@ -1,6 +1,6 @@
 import { Editor } from "@tiptap/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { isAllowedHref, normalizeHref, richTextExtensions, toMarkdown } from "./markdown";
+import { isAllowedHref, normalizeHref, richTextExtensions, toMarkdown } from "@/experiments/RichText/markdown";
 
 let editor: Editor | undefined;
 

@@ -1,9 +1,9 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, spyOn, waitFor } from "storybook/test";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { RichText } from "./RichText";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { RichText } from "@/experiments/RichText/RichText";
 
 // Fields fill their container, so give single stories a realistic width: wide enough for the toolbar on one row.
 // (Defined outside meta: written inline, its context argument breaks Storybook's inference of the story args.)

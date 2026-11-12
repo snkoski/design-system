@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { CanvasHTMLAttributes, Ref } from "react";
-import { cx } from "../../internal/cx";
-import type { ProximityFade } from "../Proximity/Proximity";
-import { colorAt } from "../Proximity/tracker";
-import type { ColorSpace } from "../Proximity/tracker";
-import "../decoration.css";
-import "./look-at-canvas.css";
-import { approach, catchUp, fadeAlpha, step } from "./field";
+import { cx } from "@/internal/cx";
+import type { ProximityFade } from "@/experiments/Proximity/Proximity";
+import { colorAt } from "@/experiments/Proximity/tracker";
+import type { ColorSpace } from "@/experiments/Proximity/tracker";
+import "@/experiments/decoration.css";
+import "@/experiments/LookAtCanvas/look-at-canvas.css";
+import { approach, catchUp, fadeAlpha, step } from "@/experiments/LookAtCanvas/field";
 
 /**
  * How many steps of closeness the colors and fading are drawn in. Every bar at the same step is drawn together,

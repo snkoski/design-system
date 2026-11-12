@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { takeWarnings } from "../../tests/warnings";
-import { hasContent, warn, warnIfUnnamed } from "./warn";
+import { takeWarnings } from "@tests/warnings";
+import { hasContent, warn, warnIfUnnamed } from "@/internal/warn";
 
 describe("warn", () => {
   it("prints the message with the package and component name", () => {

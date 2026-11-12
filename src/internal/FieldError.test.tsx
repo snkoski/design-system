@@ -1,7 +1,7 @@
 import { Field } from "@base-ui/react/field";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { FieldError } from "./FieldError";
+import { FieldError } from "@/internal/FieldError";
 
 function Email({ invalid, className }: { invalid?: boolean; className?: string }) {
   return (

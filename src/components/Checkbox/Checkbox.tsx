@@ -2,11 +2,11 @@ import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { Field } from "@base-ui/react/field";
 import { useContext } from "react";
 import type { ReactNode, Ref } from "react";
-import { CheckboxGroupContext } from "../CheckboxGroup/context";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { hasContent, warn, warnIfUnnamed } from "../../internal/warn";
+import { CheckboxGroupContext } from "@/components/CheckboxGroup/context";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { hasContent, warn, warnIfUnnamed } from "@/internal/warn";
 
 /** A checkbox needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =

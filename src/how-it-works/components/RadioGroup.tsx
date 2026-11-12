@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Button } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { Radio, RadioGroup } from "../../components/RadioGroup";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import "../demo.css";
-import { Inspect } from "../Inspect";
-import "./radio-group.css";
+import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Radio, RadioGroup } from "@/components/RadioGroup";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import "@/how-it-works/demo.css";
+import { Inspect } from "@/how-it-works/Inspect";
+import "@/how-it-works/components/radio-group.css";
 
 /* Live demos for RadioGroup's "How it works" page, built from the real components. SegmentedControl's page uses the
    shared pieces too (FormReadout, PointerStage, and StateSwitch). */

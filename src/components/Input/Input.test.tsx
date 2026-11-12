@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Input } from "./Input";
-import type { InputProps, InputSize, InputType } from "./Input";
+import { takeWarnings } from "@tests/warnings";
+import { Input } from "@/components/Input/Input";
+import type { InputProps, InputSize, InputType } from "@/components/Input/Input";
 
 const getInput = () => screen.getByRole("textbox");
 const getBox = (container: HTMLElement) => container.querySelector<HTMLElement>(".input__box")!;

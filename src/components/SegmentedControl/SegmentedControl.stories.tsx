@@ -2,10 +2,10 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { LayoutGrid, List, Monitor, Moon, Sparkles, Sun } from "lucide-react";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { Button } from "../Button";
-import { Input } from "../Input";
-import { Segment } from "./Segment";
-import { SegmentedControl } from "./SegmentedControl";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Segment } from "@/components/SegmentedControl/Segment";
+import { SegmentedControl } from "@/components/SegmentedControl/SegmentedControl";
 
 const options = (
   <>

@@ -1,9 +1,9 @@
 import { useId, useMemo, useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, Slider } from "../../how-it-works/demo";
-import { forces, PULL, separate } from "./forces";
-import "./explain.css";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, Slider } from "@/how-it-works/demo";
+import { forces, PULL, separate } from "@/experiments/Magnets/forces";
+import "@/experiments/Magnets/explain.css";
 
 /* Live demos for Magnets' "How it works" page. They call the real forces() and separate() from forces.ts, so what
    they show is what runs. */

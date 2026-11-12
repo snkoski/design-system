@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { Separator } from "./Separator";
-import type { SeparatorProps } from "./Separator";
+import { Separator } from "@/components/Separator/Separator";
+import type { SeparatorProps } from "@/components/Separator/Separator";
 
 /** The one separator on the page, found the way a screen reader finds it. */
 function separator() {

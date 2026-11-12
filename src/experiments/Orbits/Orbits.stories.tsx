@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Sun } from "lucide-react";
 import { expect } from "storybook/test";
-import { Planet } from "./Planet";
-import type { PlanetProps } from "./Planet";
-import { Star } from "./Star";
+import { Planet } from "@/experiments/Orbits/Planet";
+import type { PlanetProps } from "@/experiments/Orbits/Planet";
+import { Star } from "@/experiments/Orbits/Star";
 
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to orbit in: positioned, so the planets measure it, with an edge you can see */

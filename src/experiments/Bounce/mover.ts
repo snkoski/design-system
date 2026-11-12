@@ -1,5 +1,5 @@
-import { step } from "./physics";
-import type { Body, Edge, Physics, Room } from "./physics";
+import { step } from "@/experiments/Bounce/physics";
+import type { Body, Edge, Physics, Room } from "@/experiments/Bounce/physics";
 
 /**
  * One shared animation frame loop moves every Bounce on the page. Each frame it measures every one first, then

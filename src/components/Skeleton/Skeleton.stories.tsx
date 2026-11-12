@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import { Button } from "../Button";
-import { Skeleton } from "./Skeleton";
-import type { SkeletonProps } from "./Skeleton";
-import { SkeletonItem } from "./SkeletonItem";
+import { Button } from "@/components/Button";
+import { Skeleton } from "@/components/Skeleton/Skeleton";
+import type { SkeletonProps } from "@/components/Skeleton/Skeleton";
+import { SkeletonItem } from "@/components/Skeleton/SkeletonItem";
 
 /** A time token in seconds, as the browser reads it, from a probe inside `parent` (so data-motion reaches it) */
 function seconds(token: string, parent: Element) {

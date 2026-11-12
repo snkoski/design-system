@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { Bounce } from "../Bounce/Bounce";
-import { Connections } from "./Connections";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import { Connections } from "@/experiments/Connections/Connections";
 
 const page = { background: "var(--bg)", color: "var(--ink)" };
 const emoji = ["🌭", "🦄", "👀", "✨", "🍕", "🐱", "🍩", "⭐"];

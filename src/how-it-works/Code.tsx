@@ -1,6 +1,6 @@
 import { Source } from "@storybook/addon-docs/blocks";
-import { snippet } from "./sources";
-import "./how-it-works.css";
+import { snippet } from "@/how-it-works/sources";
+import "@/how-it-works/how-it-works.css";
 
 interface CodeProps {
   /** The file, from src, such as "components/Switch/Switch.tsx" or "experiments/Bounce/physics.ts" */

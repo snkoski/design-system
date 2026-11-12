@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { barPercent, percentText } from "./bar";
+import { barPercent, percentText } from "@/internal/bar";
 
 describe("barPercent", () => {
   it("gives how far the value is between min and max, from 0 to 100", () => {

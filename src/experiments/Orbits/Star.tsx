@@ -1,5 +1,5 @@
-import { Planet } from "./Planet";
-import type { PlanetProps } from "./Planet";
+import { Planet } from "@/experiments/Orbits/Planet";
+import type { PlanetProps } from "@/experiments/Orbits/Planet";
 
 /** A star never moves by itself, so the props for moving don't apply */
 export type StarProps = Omit<

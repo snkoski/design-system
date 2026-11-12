@@ -10,14 +10,14 @@ import { Bold, Code, Italic, Link, List, ListOrdered, SquareCode, Strikethrough,
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, HTMLAttributes, ReactNode, Ref } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
-import { markSelection, normalizeHref, richTextExtensions, toMarkdown, unmarkSelection } from "./markdown";
-import "./rich-text.css";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
+import { markSelection, normalizeHref, richTextExtensions, toMarkdown, unmarkSelection } from "@/experiments/RichText/markdown";
+import "@/experiments/RichText/rich-text.css";
 
 export type RichTextSize = "md" | "lg";
 

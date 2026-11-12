@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import { cx } from "../../internal/cx";
-import "../decoration.css";
-import "./focus-sheen.css";
+import { cx } from "@/internal/cx";
+import "@/experiments/decoration.css";
+import "@/experiments/FocusSheen/focus-sheen.css";
 
 export interface FocusSheenProps extends HTMLAttributes<HTMLDivElement> {
   /** The controls that get the sheen when they're focused: any of our Buttons, Checkboxes, Switches, Radios, and Inputs. */

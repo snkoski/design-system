@@ -47,7 +47,7 @@ pnpm test:unit        # unit tests only, fast
 pnpm test:watch       # unit tests in watch mode
 pnpm test:stories     # story tests only (play functions and axe)
 pnpm test:coverage
-pnpm check            # contrast of every color pair in all themes, and the rules in this file (CSS, structure)
+pnpm check            # contrast of every color pair in all themes, and the rules in this file (CSS, structure, imports)
 pnpm check:tests      # fails if tests were deleted, skipped, or weakened compared with HEAD (or --base <ref>)
 pnpm tokens           # regenerate CSS from tokens/tokens.json (the other scripts do this first)
 pnpm reading-list     # regenerate docs/reading-list.md and .html from docs/reading-list.json
@@ -72,7 +72,7 @@ src/internal/                pieces several components share (cx, FieldError and
 tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanup, fail on unexpected warnings)
 tests/warnings.ts            takeWarnings(), for tests that expect a dev warning
 tokens/contrast.json         every foreground and background color pair the components use, with its minimum ratio
-scripts/check-*.mjs          pnpm check (contrast, rules) and pnpm check:tests
+scripts/check-*.mjs          pnpm check (contrast, rules), pnpm check:tests, and check-dist (run by pnpm build)
 .claude/settings.json        a hook that warns when tests are removed, skipped, or weakened
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
@@ -87,6 +87,22 @@ src/how-it-works/            the pieces of every "How it works" page: <Code> (re
                              <Inspect> (a component's live HTML), and the demos components' pages use. Not published.
 .storybook/                  config and the Light / Dark / Hot dog theme switch
 ```
+
+## Imports
+
+Every import, in TypeScript, MDX, and CSS alike, starts from an alias, never with `./` or `../`, even for a file in the same folder: `import { cx } from "@/internal/cx"`, `@import "@/components/Meter/meter.css"`.
+
+| Alias | Folder | Example |
+| --- | --- | --- |
+| `@/` | `src/` | `@/components/Progress/Progress` |
+| `@docs/` | `docs/` | `@docs/brand/loading.md?raw` |
+| `@tokens/` | `tokens/` | `@tokens/tokens.json` |
+| `@tests/` | `tests/` | `@tests/warnings` |
+
+- The aliases are defined twice, in `vite.config.ts` (`resolve.alias`) and `tsconfig.json` (`paths`). Keep them in step.
+- The one exception: a docs page (`.mdx`) imports the stories it's attached to as `./Name.stories`. Storybook finds the stories behind `<Meta of={…}>` by following that path itself, and it only understands a relative one there.
+- `pnpm check` fails on any other relative import in `src/` or `tests/` (rule `relative-import`).
+- The aliases only mean something inside this repo. `pnpm build` runs `tsc-alias` to turn them back into relative paths in the published `.d.ts` files, `scripts/copy-css.mjs` inlines the CSS imports into one `styles.css`, and `scripts/check-dist.mjs` fails the build if any alias is left in `dist/`.
 
 ## Tokens
 

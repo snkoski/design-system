@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Button } from "./Button";
-import type { ButtonProps } from "./Button";
+import { takeWarnings } from "@tests/warnings";
+import { Button } from "@/components/Button/Button";
+import type { ButtonProps } from "@/components/Button/Button";
 
 describe("Button", () => {
   describe("rendering", () => {

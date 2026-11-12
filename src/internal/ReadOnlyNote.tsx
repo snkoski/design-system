@@ -1,4 +1,4 @@
-import { cx } from "./cx";
+import { cx } from "@/internal/cx";
 
 /** A padlock, drawn as Lucide's lock. Its line width comes from the CSS. */
 function LockIcon() {

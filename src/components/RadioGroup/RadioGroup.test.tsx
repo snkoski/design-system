@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Radio } from "./Radio";
-import { RadioGroup } from "./RadioGroup";
-import type { RadioGroupProps } from "./RadioGroup";
+import { takeWarnings } from "@tests/warnings";
+import { Radio } from "@/components/RadioGroup/Radio";
+import { RadioGroup } from "@/components/RadioGroup/RadioGroup";
+import type { RadioGroupProps } from "@/components/RadioGroup/RadioGroup";
 
 const options = (
   <>

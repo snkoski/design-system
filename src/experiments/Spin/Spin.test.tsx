@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Spin } from "./Spin";
-import type { SpinProps } from "./Spin";
+import { Spin } from "@/experiments/Spin/Spin";
+import type { SpinProps } from "@/experiments/Spin/Spin";
 
 const getSpin = (name = "Spin") => screen.getByRole("button", { name });
 const angleOf = (element: HTMLElement) => element.style.getPropertyValue("--spin-angle");

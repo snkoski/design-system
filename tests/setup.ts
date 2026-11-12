@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, expect, vi } from "vitest";
-import { resetWarnings } from "../src/internal/warn";
-import { takeWarnings } from "./warnings";
+import { resetWarnings } from "@/internal/warn";
+import { takeWarnings } from "@tests/warnings";
 
 // Every warning must be expected: a test that causes one takes it with takeWarnings() and asserts on it.
 // Anything left over fails the test, so warnings from us, Base UI, or React can't creep in unnoticed.

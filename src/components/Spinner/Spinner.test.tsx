@@ -4,9 +4,9 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, onTestFinished, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Spinner } from "./Spinner";
-import type { SpinnerProps } from "./Spinner";
+import { takeWarnings } from "@tests/warnings";
+import { Spinner } from "@/components/Spinner/Spinner";
+import type { SpinnerProps } from "@/components/Spinner/Spinner";
 
 const label = "Loading applications…";
 

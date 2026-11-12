@@ -4,10 +4,10 @@ import type { ReactElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, onTestFinished, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Skeleton } from "./Skeleton";
-import type { SkeletonProps } from "./Skeleton";
-import { SkeletonItem } from "./SkeletonItem";
+import { takeWarnings } from "@tests/warnings";
+import { Skeleton } from "@/components/Skeleton/Skeleton";
+import type { SkeletonProps } from "@/components/Skeleton/Skeleton";
+import { SkeletonItem } from "@/components/Skeleton/SkeletonItem";
 
 const label = "Loading applications…";
 

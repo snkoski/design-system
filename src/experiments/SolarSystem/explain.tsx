@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import type { PointerEvent } from "react";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { PLANETS } from "./bodies";
-import "./explain.css";
-import { placeOnOrbit, solveKepler } from "./kepler";
-import type { Elements } from "./kepler";
-import { scaleDistance } from "./scale";
-import type { DistanceScale } from "./scale";
-import { OUTERMOST, RINGS } from "./SolarSystem";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { PLANETS } from "@/experiments/SolarSystem/bodies";
+import "@/experiments/SolarSystem/explain.css";
+import { placeOnOrbit, solveKepler } from "@/experiments/SolarSystem/kepler";
+import type { Elements } from "@/experiments/SolarSystem/kepler";
+import { scaleDistance } from "@/experiments/SolarSystem/scale";
+import type { DistanceScale } from "@/experiments/SolarSystem/scale";
+import { OUTERMOST, RINGS } from "@/experiments/SolarSystem/SolarSystem";
 
 /* Live demos for the "How it works" page. They call the real solveKepler(), placeOnOrbit(), and scaleDistance(), so what they show is what runs. */
 

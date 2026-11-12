@@ -3,10 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import type { ReactElement } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Segment } from "./Segment";
-import type { SegmentProps } from "./Segment";
-import { SegmentedControl } from "./SegmentedControl";
+import { takeWarnings } from "@tests/warnings";
+import { Segment } from "@/components/SegmentedControl/Segment";
+import type { SegmentProps } from "@/components/SegmentedControl/Segment";
+import { SegmentedControl } from "@/components/SegmentedControl/SegmentedControl";
 
 const getOption = (name: string) => screen.getByRole("radio", { name });
 const getInput = (container: HTMLElement, value: string) =>
