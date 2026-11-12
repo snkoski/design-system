@@ -20,6 +20,7 @@
 @import "@/components/Switch/switch.css";
 @import "@/components/Input/input.css";
 @import "@/components/TextArea/text-area.css";
+@import "@/components/NativeSelect/native-select.css";
 @import "@/components/SegmentedControl/segmented-control.css";
 @import "@/components/Spinner/spinner.css";
 @import "@/components/Separator/separator.css";

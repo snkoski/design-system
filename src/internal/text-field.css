@@ -1,7 +1,7 @@
-/* What Input and TextArea share: the wrapper, the field's edge, every state, hot dog mode, and forced colors. Each part
-   carries a shared class next to its own (`text-field__control input__control`), and each component's own CSS keeps
-   only what's different: heights, icons, padding, and resizing. Imported before the components' CSS, so at equal
-   specificity a component's own rule wins. */
+/* What Input, TextArea, and NativeSelect share: the wrapper, the field's edge, every state, hot dog mode, and forced
+   colors. Each part carries a shared class next to its own (`text-field__control input__control`), and each
+   component's own CSS keeps only what's different: heights, icons, padding, and resizing. Imported before the
+   components' CSS, so at equal specificity a component's own rule wins. */
 @layer components {
   .text-field {
     display: grid;
@@ -72,7 +72,8 @@
     color: transparent;
   }
 
-  /* Hot dog mode: chunky ink edge and a hard shadow. Text fields don't press: you type in them. */
+  /* Hot dog mode: chunky ink edge and a hard shadow. Text fields don't press: you type in them. A select doesn't either:
+     it sits among fields, and its list opens anchored to it. */
   [data-theme="hotdog"] .text-field__control {
     --text-field-edge: var(--border-thick);
     box-shadow: var(--shadow-sm);

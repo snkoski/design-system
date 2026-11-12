@@ -234,6 +234,24 @@ Most systems stretch one progress bar to cover both jobs; only Spectrum and Appl
 | Disable submit button | No | No | No | Short forms only | — | — | **No** |
 | Placeholder as label | No | No | — | — | No essential info | — | **No** |
 
+## Selects
+
+| System | A native `<select>` | Custom-drawn | Native options passed as | Read-only native select | A select instead of radios when |
+| --- | --- | --- | --- | --- | --- |
+| Apple | Pop-up button (the platform's own) | Pull-down button, for actions | — | Not stated | A flat list of mutually exclusive options, with a useful default |
+| Material 3 | None | Material Web's select, built on a menu | — | — | Not stated |
+| Primer | Select | ActionMenu, SelectPanel | Children (`Select.Option`, `Select.OptGroup`) | Not stated | More than 6 options, or vertical space is tight |
+| Atlassian | None | Select (react-select), with many variants | — | — | Not stated; enable search for long lists |
+| Carbon | Select | Dropdown, Multiselect, Combo box | Children | Yes: focusable and announced, and the list won't open | 3 options or more |
+| Fluent 2 | Select | Dropdown, Combobox | Children (`<option>`) | Not stated | 4 options or more |
+| Polaris | Select | An option list in a popover | `options` array, with groups | Not stated | 4 options or more |
+| GOV.UK | Select | — | `items` array | Not stated | Only as a last resort |
+| USWDS | Select | Combo box | Children (`<option>`) | Not stated | About 7 to 15 options; a combo box beyond that |
+| Spectrum | None | Picker (a tray on phones) | — | Not stated | Space is limited |
+| **Sherbet** | **NativeSelect** | **Select, later, only for options that need more than text** | **`options` array, with groups** | **Not yet (`docs/revisit.md`)** | **6 options or more, or space is tight (`choices.md`)** |
+
+Most systems with a web form component keep a native select for forms, because the browser and the phone draw the open list and the keyboard works as everywhere else, and add a custom-drawn one for richer options. Sherbet does the same, and builds the native one first. Every system with guidance prefers radios for a few options, but they disagree on how few: from fewer than 3 (Carbon) to fewer than 7 (USWDS), with GOV.UK avoiding selects whenever it can. Sherbet follows Primer's line of 6, close to the middle. Polaris and GOV.UK take options as an array, as Sherbet does; the others take `<option>` children. Only Carbon has a read-only select, by stopping the list from opening; it doesn't stop every way the value can change, and browsers ignore `readonly` on a select, so Sherbet leaves read-only out until it can be done properly.
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -296,3 +314,13 @@ Most systems stretch one progress bar to cover both jobs; only Spectrum and Appl
 - [Fluent 2 ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 - [WAI-ARIA 1.2: the meter role](https://www.w3.org/TR/wai-aria-1.2/#meter) and [the APG meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)
 - [Scott O'Hara, styled meter elements](https://scottaohara.github.io/a11y_styled_form_controls/src/meter/)
+- [Primer Select guidelines](https://primer.style/product/components/select/guidelines/), [SelectPanel](https://primer.style/product/components/select-panel/), and [ActionMenu](https://primer.style/product/components/action-menu/)
+- [Carbon Select](https://carbondesignsystem.com/components/select/usage/), [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/), and [Select's React source](https://github.com/carbon-design-system/carbon/blob/main/packages/react/src/components/Select/Select.tsx)
+- [Fluent 2 Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
+- [Polaris Select docs source](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx) and [component source](https://github.com/Shopify/polaris-react/blob/main/polaris-react/src/components/Select/Select.tsx) (the Polaris React site now redirects to shopify.dev)
+- [GOV.UK Select](https://design-system.service.gov.uk/components/select/)
+- [USWDS Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
+- [Atlassian components for LLMs (Select)](https://atlassian.design/llms-components.txt)
+- [Material Web select](https://material-web.dev/components/select/)
+- [Apple pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
+- [React Spectrum Picker](https://react-spectrum.adobe.com/react-spectrum/Picker.html)

@@ -45,7 +45,7 @@ Raised while building TextArea (2026-10-21). RichText added (2026-10-21).
 
 **Why it's in question:** in every other theme the edge itself changes, so this is the one combination where it doesn't. It's rare: hot dog is a joke theme, and forced colors replaces its colors anyway.
 
-**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), which would be one change in `src/internal/text-field.css` now that Input and TextArea share it.
+**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), which would be one change in `src/internal/text-field.css` now that Input, TextArea, and NativeSelect share it.
 
 Raised while building TextArea (2026-10-21).
 
@@ -241,3 +241,23 @@ Raised while building Progress (2026-11-06).
 - **Each component imports its own CSS** from its JavaScript, so the CSS comes with the component automatically. The app's bundler has to handle CSS imported from `node_modules`, which server-rendered setups often need extra configuration for.
 
 Raised after checking tree shaking (2026-11-12).
+
+## A read-only NativeSelect
+
+**Today:** NativeSelect has no `readOnly` prop, and drops it if passed anyway. To show a value that can't be changed, a page uses `disabled` (dimmed, skipped by Tab, and not submitted) or shows the value as text. Every other form control has a read-only state, with the "Read only" note beside its label.
+
+**Why it's in question:** browsers ignore `readonly` on a `<select>`: the value still changes and is submitted. Chromium doesn't expose `aria-readonly` on a select either, so screen readers wouldn't hear it. Blocking the keys and clicks ourselves (Carbon's way) hand-rolls keyboard handling, misses typing a letter and phones' pickers, and still isn't announced.
+
+**To decide:** when an app needs a read-only select, build it by rendering a read-only text field in its place: the chosen option's words in the same box, with no arrow, the "Read only" note, and a hidden input that submits the value. The design was worked out on 2026-11-12: the component keeps its own copy of an uncontrolled value, so turning read-only on shows what was last picked; `ref` points at the hidden input, so form libraries read the value, not the words; and `Field.Root` doesn't get `name` while read-only, because Base UI copies it onto the control and the words would be submitted too. Or wait, if browsers start honoring `readonly` on a select.
+
+Raised while building NativeSelect (2026-11-12).
+
+## Styling a select's open list
+
+**Today:** NativeSelect styles the closed field and leaves the open list to the browser: the system's own menu on macOS and phones, and the select's colors on Windows and Linux. In hot dog mode, the open list isn't ketchup and mustard.
+
+**Why it's in question:** Chromium supports `appearance: base-select`, which lets CSS style the open list and its options so they match the system. Safari and Firefox don't support it yet, so the list would look different in each browser.
+
+**To decide:** when Safari and Firefox support `base-select`, try it on NativeSelect in a Revisit comparison story, and check the keyboard, screen readers, and phones still behave as a native select does.
+
+Raised while building NativeSelect (2026-11-12).

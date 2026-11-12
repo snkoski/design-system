@@ -54,6 +54,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Separators](#separators)
   - [Badges](#badges)
   - [Meters and progress bars](#meters-and-progress-bars)
+  - [Selects](#selects)
 
 ## Choosing and building colors
 
@@ -134,6 +135,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Divider (SwiftUI)](https://developer.apple.com/documentation/swiftui/divider) (no options: it runs across a stack, so it turns vertical inside a row)
 - **Badges:** [Notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications) (apple's badge is only the unread count on an app icon)
 - **Meters and progress bars:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators) and [Gauges](https://developer.apple.com/design/human-interface-guidelines/gauges) (A value within a range, with its current value and both ends labelled)
+- **Selects:** [Pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [Pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
 
 ### Material Design 3 (Google)
 
@@ -154,6 +156,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Divider (material-web)](https://github.com/material-components/material-web/blob/main/docs/components/divider.md) (inset variants; decorative unless you add role="separator")
 - **Badges:** [Badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md) (material's badge is a count or dot on navigation and icons)
 - **Meters and progress bars:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines)
+- **Selects:** [Material Web select](https://material-web.dev/components/select/)
 
 ### GitHub Primer
 
@@ -178,6 +181,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [ActionList dividers](https://primer.style/product/components/action-list/) (primer has no standalone divider; ActionList's is hidden from screen readers)
 - **Badges:** [Label](https://primer.style/product/components/label/) (ten variants, and a warning not to rely on the variant's color alone)
 - **Meters and progress bars:** [ProgressBar](https://primer.style/product/components/progress-bar/)
+- **Selects:** [Select guidelines](https://primer.style/product/components/select/guidelines/) and [SelectPanel](https://primer.style/product/components/select-panel/)
 
 ### Atlassian Design System
 
@@ -204,6 +208,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Menu sections with separators](https://atlassian.design/components/menu/code) (no standalone divider: a menu Section's hasSeparator draws a border)
 - **Badges:** [Lozenge](https://atlassian.design/components/lozenge/usage) (atlassian's status label (its Badge is a count): sentence case, never interactive)
 - **Meters and progress bars:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
+- **Selects:** [Components for LLMs (Select)](https://atlassian.design/llms-components.txt)
 
 ### IBM Carbon
 
@@ -227,6 +232,7 @@ Everything we read from each system, grouped by topic.
 - **Loading indicators:** [Loading](https://carbondesignsystem.com/components/loading/usage/), [Inline loading](https://carbondesignsystem.com/components/inline-loading/usage/), [Loading pattern](https://carbondesignsystem.com/patterns/loading-pattern/) (skeletons only on containers and data, never on toasts, menus, or modals), [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead), and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 - **Badges:** [Tag](https://carbondesignsystem.com/components/tag/usage/) (twelve colors, under 20 characters, and long text cut off with a tooltip)
 - **Meters and progress bars:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
+- **Selects:** [Select](https://carbondesignsystem.com/components/select/usage/) and [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/)
 
 ### Microsoft Fluent 2
 
@@ -252,6 +258,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Divider](https://fluent2.microsoft.design/components/web/react/core/divider/usage) (vertical, four strengths, inset, and words in the middle. No built-in margin; hide a purely visual one with aria-hidden)
 - **Badges:** [Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage) (eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts)
 - **Meters and progress bars:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
+- **Selects:** [Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
 
 ### Shopify Polaris
 
@@ -274,6 +281,7 @@ Everything we read from each system, grouped by topic.
 - **Loading indicators:** [Spinner](https://shopify.dev/docs/api/app-home/polaris-web-components/feedback-and-status-indicators/spinner) and [Skeleton body text](https://polaris.shopify.com/components/feedback-indicators/skeleton-body-text) (match the number of lines; the last line is shorter)
 - **Separators:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
 - **Badges:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
+- **Selects:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
 
 ### GOV.UK Design System
 
@@ -291,6 +299,7 @@ Everything we read from each system, grouped by topic.
 - **Forms and errors:** [Question pages](https://design-system.service.gov.uk/patterns/question-pages) (where "mark optional fields, no asterisks" comes from), [Error message](https://design-system.service.gov.uk/components/error-message/), and [Error summary](https://design-system.service.gov.uk/components/error-summary/)
 - **Separators:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)
 - **Badges:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
+- **Selects:** [Select](https://design-system.service.gov.uk/components/select/)
 
 ### U.S. Web Design System
 
@@ -311,6 +320,7 @@ Everything we read from each system, grouped by topic.
 - **Dialogs:** [Modal](https://designsystem.digital.gov/components/modal/)
 - **Tooltips:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
 - **Badges:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)
+- **Selects:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
 
 ## Design systems, by topic
 
@@ -576,3 +586,15 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Atlassian Design System:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
 - **IBM Carbon:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 - **Microsoft Fluent 2:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
+
+### Selects
+
+- **Apple Human Interface Guidelines:** [Pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [Pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
+- **Material Design 3 (Google):** [Material Web select](https://material-web.dev/components/select/)
+- **GitHub Primer:** [Select guidelines](https://primer.style/product/components/select/guidelines/) and [SelectPanel](https://primer.style/product/components/select-panel/)
+- **Atlassian Design System:** [Components for LLMs (Select)](https://atlassian.design/llms-components.txt)
+- **IBM Carbon:** [Select](https://carbondesignsystem.com/components/select/usage/) and [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/)
+- **Microsoft Fluent 2:** [Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
+- **Shopify Polaris:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
+- **GOV.UK Design System:** [Select](https://design-system.service.gov.uk/components/select/)
+- **U.S. Web Design System:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
