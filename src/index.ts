@@ -5,6 +5,7 @@ export * from "@/components/RadioGroup";
 export * from "@/components/Switch";
 export * from "@/components/Input";
 export * from "@/components/TextArea";
+export * from "@/components/NativeSelect";
 export * from "@/components/SegmentedControl";
 export * from "@/components/Spinner";
 export * from "@/components/Separator";

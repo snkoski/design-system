@@ -186,6 +186,11 @@
       "id": "meters",
       "name": "Meters and progress bars",
       "group": "components"
+    },
+    {
+      "id": "selects",
+      "name": "Selects",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2524,6 +2529,118 @@
         "accessibility"
       ],
       "note": "How screen readers handled meters when tested; don't rely on the role alone."
+    },
+    {
+      "title": "Select guidelines",
+      "url": "https://primer.style/product/components/select/guidelines/",
+      "system": "primer",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "SelectPanel",
+      "url": "https://primer.style/product/components/select-panel/",
+      "system": "primer",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Select",
+      "url": "https://carbondesignsystem.com/components/select/usage/",
+      "system": "carbon",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Dropdown",
+      "url": "https://carbondesignsystem.com/components/dropdown/usage/",
+      "system": "carbon",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Select",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/select/usage",
+      "system": "fluent",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Dropdown",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/dropdown/usage",
+      "system": "fluent",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Select (docs source)",
+      "url": "https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx",
+      "system": "polaris",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Select",
+      "url": "https://design-system.service.gov.uk/components/select/",
+      "system": "govuk",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Select",
+      "url": "https://designsystem.digital.gov/components/select/",
+      "system": "uswds",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Combo box",
+      "url": "https://designsystem.digital.gov/components/combo-box/",
+      "system": "uswds",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Components for LLMs (Select)",
+      "url": "https://atlassian.design/llms-components.txt",
+      "system": "atlassian",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Material Web select",
+      "url": "https://material-web.dev/components/select/",
+      "system": "material",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Pop-up buttons",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons",
+      "system": "apple",
+      "topics": [
+        "selects"
+      ]
+    },
+    {
+      "title": "Pull-down buttons",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons",
+      "system": "apple",
+      "topics": [
+        "selects"
+      ]
     }
   ]
 }

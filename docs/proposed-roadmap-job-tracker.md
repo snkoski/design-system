@@ -81,7 +81,7 @@ Recorded in `CLAUDE.md` (the Base UI rule now allows a well-tested library where
 
 ### Q11. How read-only fields look
 
-**Decided (2026-11-04):** a "Read only" note with a lock beside the label, and nothing dims. It says it in words, works the same on every control (RichText included), and keeps every value at full contrast. It's hidden from screen readers, which already announce read-only. A group shows it once, beside its label; a whole read-only form repeats it on every field, which is fine for now. Every form control and the RichText experiment do this through the shared `ReadOnlyNote`. Recorded in `docs/brand/accessibility.md` and `CLAUDE.md`. The job tracker has no read-only fields yet, so look at it again when one is needed.
+**Decided (2026-11-04):** a "Read only" note with a lock beside the label, and nothing dims. It says it in words, works the same on every control (RichText included), and keeps every value at full contrast. It's hidden from screen readers, which already announce read-only. A group shows it once, beside its label; a whole read-only form repeats it on every field, which is fine for now. Every form control and the RichText experiment do this through the shared `ReadOnlyNote`. Recorded in `docs/brand/accessibility.md` and `CLAUDE.md`. The job tracker has no read-only fields yet, so look at it again when one is needed. **Exception (2026-11-12):** NativeSelect has no read-only state yet, because browsers ignore `readonly` on a `<select>` and screen readers aren't told; see `docs/revisit.md`.
 
 ### Q12. A field that re-checks on blur
 
@@ -104,6 +104,7 @@ Compared with the first version of this roadmap (2026-10-29), the design system 
 | Checkbox and Switch | Done, plus `CheckboxGroup` and `RadioGroup` |
 | SegmentedControl | Done. It covers the job tracker's Table and Kanban switch |
 | ProgressBar | Done (2026-11-06): `Meter` for "topics done", and `Progress` for tasks under way |
+| Select | Done (2026-11-12): `NativeSelect`, a real `<select>` with its options as an `options` array. No read-only yet (see Q11). A custom-drawn `Select` comes later, only if options need more than text |
 
 ## Changes from the first version
 
@@ -136,7 +137,7 @@ Start only after the open questions are answered.
 
 ### Phase 2: more form controls
 
-1. **NativeSelect** (Q10). It renders a `<select>` through `Field.Control`, like TextArea. The job tracker has 33 selects, so this is the biggest single step in its migration.
+1. **NativeSelect** (Q10). Done (2026-11-12). It renders a `<select>` through `Field.Control`, like TextArea, with the shared text-field look, our own arrow, and Input's two sizes. Options are an `options` array of `{ value, label }` and groups; `placeholder` adds an empty first option that stays choosable. No `readOnly` or `multiple`. A dev warning fires when the value matches no option. See `docs/brand/choices.md`. The job tracker has 33 selects, so this is the biggest single step in its migration.
 2. **NumberField**, on Base UI (Q7).
 3. **DatePicker**: a text field and a calendar button, the calendar from React DayPicker in Base UI's Popover, following shadcn's Base UI date picker (Q7).
 4. **FileInput**: a real `<input type="file">` with a label.

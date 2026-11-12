@@ -1,0 +1,204 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as NativeSelectStories from "./NativeSelect.stories";
+import { NativeSelect } from "@/components/NativeSelect/NativeSelect";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+import { StatusForm } from "@/how-it-works/components/NativeSelect";
+
+<Meta of={NativeSelectStories} name="How it works" />
+
+# How Native select works
+
+A native select is a field for choosing one option from a list, drawn by the browser's own `<select>`. The browser opens the list (on a phone, its own picker), handles the keyboard, and submits the value with the form. Around it, it's a text field like [Input](?path=/docs/components-input--how-it-works) and [Text area](?path=/docs/components-text-area--how-it-works): the same label, help text, error, edge, states, and themes. This page covers what's different, and links to the Input page for the rest. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>NativeSelect.tsx</code></td><td>The component. It renders Base UI's field control as a <code>&lt;select&gt;</code>, turns the <code>options</code> array into <code>&lt;option&gt;</code> and <code>&lt;optgroup&gt;</code> elements, draws the arrow, and warns when the value matches no option.</td></tr>
+    <tr><td><code>native-select.css</code></td><td>The look that's its own: the height, the arrow and the room for it, the muted placeholder, and the options' colors.</td></tr>
+    <tr><td><code>src/internal/text-field.css</code> and <code>field.css</code></td><td>The look it shares with Input and TextArea (<code>text-field.css</code>: the field, its edge, every state, hot dog mode, and Windows high contrast) and with every form control (<code>field.css</code>: the label and description). Part of the published stylesheet.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>NativeSelect</code> and the <code>NativeSelectProps</code>, <code>NativeSelectSize</code>, <code>NativeSelectOption</code>, and <code>NativeSelectGroup</code> types.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code>, <code>warn.ts</code>, and <code>cx.ts</code></td><td>The shared error message, the development warnings, and the class name helper. Not exported.</td></tr>
+    <tr><td><code>NativeSelect.test.tsx</code> and <code>NativeSelect.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+It uses the same Base UI parts as TextArea: `Field.Root`, `Field.Label`, `Field.Description`, `Field.Error` (through `FieldError`), and `Field.Control`. [Base UI](https://base-ui.com), the unstyled library underneath, handles linking labels and help text, ARIA attributes, and forms. Base UI's own `Select` is a different thing: a list it draws itself, for options that need more than text. This one is the browser's.
+
+## What it renders
+
+Here's a real select in a real form. It's required, has a placeholder and a description, and checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then, after a failed submit, again each time it changes.
+
+<Unstyled>
+  <Inspect hint="Select Save status while the placeholder is chosen. Then choose a status, and watch the error go. Then save it.">
+    <StatusForm />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="text-field native-select" data-size&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our classes</td><td>Holds the whole field. <code>data-size</code> comes from the <code>size</code> prop. Base UI adds the field's state, such as <code>data-invalid</code>, <code>data-disabled</code>, <code>data-filled</code>, and <code>data-touched</code>.</td></tr>
+    <tr><td><code>&lt;label class="native-select__label" id for&gt;</code></td><td>Base UI's <code>Field.Label</code></td><td><code>for</code> points at the select, so clicking the label focuses it.</td></tr>
+    <tr><td><code>&lt;p class="native-select__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code></td><td>Help text between the label and the field, read before choosing.</td></tr>
+    <tr><td><code>&lt;div class="native-select__box"&gt;</code></td><td>Us</td><td>Holds the select and the arrow, so the arrow can sit over the select's end.</td></tr>
+    <tr><td><code>&lt;select class="native-select__control"&gt;</code></td><td>Base UI's <code>Field.Control</code>, rendering our <code>&lt;select&gt;</code></td><td>The field. <code>aria-labelledby</code>, <code>aria-describedby</code>, <code>aria-invalid</code>, <code>required</code>, and the <code>data-*</code> state come from Base UI.</td></tr>
+    <tr><td><code>&lt;option class="native-select__placeholder" value=""&gt;</code></td><td>The <code>placeholder</code> prop</td><td>An empty first choice. It submits an empty value, so a required select fails the form's check while it's chosen.</td></tr>
+    <tr><td><code>&lt;optgroup label&gt;</code> and <code>&lt;option value&gt;</code></td><td>The <code>options</code> prop</td><td>The choices. A group becomes a heading in the open list.</td></tr>
+    <tr><td><code>&lt;svg class="native-select__icon" aria-hidden="true"&gt;</code></td><td>Us</td><td>The arrow. Decorative: screen readers already announce the select as something that opens.</td></tr>
+  </tbody>
+</table>
+
+The chosen option doesn't show in the HTML: like a text field's text, it lives in the select's `value` property. `selected` isn't written onto an `<option>` either, because React sets it as a property.
+
+## From props to HTML
+
+### The options
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="NativeSelectOption" />
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="NativeSelectGroup" />
+
+The options are data, not children. An `<option>` can only show plain text, so a `label` string is all it needs, and the component can see every option: that's how it can warn about a value that matches none of them. RadioGroup and CheckboxGroup take their options as children, because each one is a whole component with its own label, which can hold anything.
+
+### The props
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="Labelled" />
+
+The same union as Input's and TextArea's: a `label`, or an `aria-label`, or the code doesn't compile.
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="OwnProps" />
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="NativeSelectProps" />
+
+The type is built from React's `SelectHTMLAttributes`, so it takes exactly a select's attributes, and its events are typed for a `<select>`. Five are left out:
+
+- `className` goes on the wrapper, as on every form control.
+- `children`, because the options come from `options`.
+- `size`, because the select's own `size` is a number that turns it into an always-open list box. Our `size` is `md` or `lg`.
+- `multiple`, which would make the value a list. To choose several, use a CheckboxGroup.
+- `readOnly`, because browsers ignore it on a select: the value still changes and is submitted, and screen readers aren't told. A read-only select is an open question in `docs/revisit.md`.
+
+### The component
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="NativeSelect" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart.** The props declared in `OwnProps` are taken out, with `size = "md"`. Then `readOnly`, `multiple`, and `children` are taken out of what's left and thrown away. TypeScript already refuses them, but JavaScript can still pass them, and each would break something: a do-nothing `readonly`, a value that's suddenly a list, or options replaced by whatever was passed.
+2. **Warnings.** `warnIfUnnamed` catches an empty label, as in every form control, and `warnIfNoMatch` (below) catches a value that matches no option.
+3. **The options** become `<option>` and `<optgroup>` elements, keyed by their value (a group by its label), so when the list changes, React moves each element rather than rewriting it in place. Rewritten in place, an uncontrolled select's choice would jump to whichever option now sat there, and the form would send a value nobody picked. A repeated value gets a count added to its key.
+4. **The wrapper, label, description, and error**, as in TextArea.
+5. **The field.** `Field.Control` renders our `<select>`, exactly as TextArea's renders a `<textarea>`: every prop goes through `Field.Control`, so Base UI can merge a page's `aria-describedby` with the field's own description and error, and only the `<option>`s go on the `render` element. [How Text area works](?path=/docs/components-text-area--how-it-works) explains why that split matters.
+
+### A value that matches no option
+
+<Code file="components/NativeSelect/NativeSelect.tsx" name="warnIfNoMatch" />
+
+If `value` is `"hired"` and no option has that value, React doesn't show an empty select: it quietly chooses the first option it can. The page thinks the value is "hired", the screen shows "Saved", and the form sends "saved". Nothing on the page looks broken, so this prints a development warning, once per value, saying what's wrong and how to fix it. It stays quiet before any options have arrived, because options are often still loading, and it counts a disabled option as a match, because React still chooses that one.
+
+Loading has a catch of its own. React applies `defaultValue` once, when the select first appears. If the options arrive later, the browser chooses the first one, whatever `defaultValue` said. So a second warning fires when the options arrive after a `defaultValue` was set: pass `value` while they load, or render the select once they have. A controlled `value` doesn't have this problem, because React applies it on every render.
+
+## How it looks
+
+The look is in two files, inside `@layer components`. The label, description, edge, hover, focus, invalid, disabled, hot dog, and forced colors rules are shared with Input and TextArea in `internal/text-field.css` and `internal/field.css`: the select carries the shared class next to its own (`class="text-field__control native-select__control"`). [How Input works](?path=/docs/components-input--how-it-works) walks through each shared rule. `native-select.css` has only what's different.
+
+### The field
+
+<Code file="components/NativeSelect/native-select.css" name=".native-select__control" />
+
+The height is `--control-md`, the same as an Input, so a select and a text field line up side by side. `appearance: none` removes the browser's own arrow and look, and the end padding leaves room for ours: the inset, the arrow, and a gap. A long option is cut off at that padding, so its words never run under the arrow.
+
+<Code file="components/NativeSelect/native-select.css" name='.native-select[data-size="lg"] .native-select__control' />
+
+Large works the same way with `--control-lg` and the larger inset. Because both read the size tokens, they follow touch screens (44px and 52px) and compact density (32px and 40px) with no rules of their own.
+
+### The arrow
+
+<Code file="components/NativeSelect/native-select.css" name=".native-select__icon" />
+
+The arrow is Lucide's chevron, drawn inline in the component, as the error's and read-only note's icons are, so the package doesn't depend on an icon library. It sits over the select's end, the same distance in as an Input's end icon, and `pointer-events: none` lets a click on it through to the select. `inset-inline-end` is a logical property: on a right-to-left page it's the left end. The [Right to left](?path=/story/components-native-select--right-to-left) and [Long options](?path=/story/components-native-select--long-options) stories check both, with a real click test on the arrow.
+
+<Code file="components/NativeSelect/native-select.css" name=".native-select[data-disabled] .native-select__icon" />
+
+A disabled select dims to 50% from the shared rules, and the arrow, which sits outside the `<select>`, dims with it from the wrapper's `data-disabled`.
+
+### The placeholder and the options
+
+<Code file="components/NativeSelect/native-select.css" name=".native-select__control:has(.native-select__placeholder:checked)" />
+
+While the placeholder is chosen, its words are muted, like a text field's placeholder. `:checked` matches the chosen `<option>`, and `:has()` lets the select ask whether its chosen option is the placeholder. Only the placeholder has that class, so an option of the page's own whose value is empty (an "Any" filter) stays at full strength.
+
+<Code file="components/NativeSelect/native-select.css" name=".native-select__control option" />
+
+The open list is the browser's. On macOS and phones, the system draws it and ignores these colors. On Windows and Linux, Chromium draws it with the select's own colors, so without this rule every option would turn muted while the placeholder is chosen. Each theme sets `color-scheme`, so the browser's list is dark in dark mode; in hot dog mode it's the light list, not ketchup and mustard. Styling the open list itself is an open question in `docs/revisit.md`.
+
+### Windows high contrast
+
+<Code file="components/NativeSelect/native-select.css" name="@media (forced-colors: active)" />
+
+The shared rules give the field the system's field colors. The arrow takes the field's text color, or the system's disabled color, at full strength.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** It's the browser's own `<select>`, so it works the way selects do everywhere: Tab moves to it; Space, Enter, or Alt+Down open the list, depending on the system; the arrow keys move through the options (on Windows and Linux they change the value without opening the list); and typing a letter jumps to the next option starting with it. A disabled select is skipped by Tab.
+
+**Screen readers** announce the label as its name, that it's a pop-up button or combo box (the words depend on the screen reader), the chosen option, then the description and any error. If it's `required` or `invalid`, they say so too.
+
+**Forms.** What `FormData` gets:
+
+<table>
+  <thead>
+    <tr><th>The select is</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Changed, with <code>name="status"</code></td><td><code>status=</code> and the chosen option's value</td></tr>
+    <tr><td>Untouched, with a <code>defaultValue</code></td><td>The <code>defaultValue</code></td></tr>
+    <tr><td>Untouched, with a placeholder</td><td>An empty value: <code>status=</code></td></tr>
+    <tr><td>Untouched, with no placeholder</td><td>The first option's value</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required, with the placeholder chosen</td><td>The form doesn't submit, unless it has <code>noValidate</code>: the browser's own validation stops it</td></tr>
+  </tbody>
+</table>
+
+<Unstyled>
+  <Inspect hint="A select with no visible label, named by aria-label, such as a sort order in a toolbar.">
+    <NativeSelect aria-label="Sort by" options={[{ value: "newest", label: "Newest first" }, { value: "oldest", label: "Oldest first" }]} />
+  </Inspect>
+</Unstyled>
+
+## The whole files
+
+<details>
+<summary><code>NativeSelect.tsx</code></summary>
+
+<Code file="components/NativeSelect/NativeSelect.tsx" />
+
+</details>
+
+<details>
+<summary><code>native-select.css</code></summary>
+
+<Code file="components/NativeSelect/native-select.css" />
+
+</details>
+
+<details>
+<summary><code>internal/text-field.css</code></summary>
+
+<Code file="internal/text-field.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/NativeSelect/index.ts" />
+
+</details>

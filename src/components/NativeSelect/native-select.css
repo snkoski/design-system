@@ -1,0 +1,82 @@
+/* NativeSelect: what's its own. The label, description, edge, hover, focus, invalid, disabled, hot dog, and forced colors
+   rules are shared with Input and TextArea in internal/text-field.css and field.css (.field-label, .field-description,
+   .text-field, .text-field__control). Where it sits and how wide it is is the layout's job: the field fills the
+   wrapper, so set the width with a class on the wrapper. */
+@layer components {
+  /* align-content: start keeps it at its own height when a grid or flex layout stretches it */
+  .native-select {
+    align-content: start;
+  }
+
+  /* Positions the arrow over the select */
+  .native-select__box {
+    position: relative;
+  }
+  /* A little more room between the text above and the field than between the label and its description */
+  .native-select__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  /* One line, as tall as an Input of the same size. The browser's own arrow is hidden, and the end padding keeps a long
+     option's words clear of ours. */
+  .native-select__control {
+    height: var(--control-md);
+    appearance: none;
+    padding-inline-end: calc(var(--space-3) + var(--icon-md) + var(--space-2));
+  }
+
+  /* Large: the text size and start padding are shared */
+  .native-select[data-size="lg"] .native-select__control {
+    height: var(--control-lg);
+    padding-inline-end: calc(var(--space-4) + var(--icon-md) + var(--space-2));
+  }
+
+  /* While the placeholder is chosen, its words are muted, like a text field's placeholder */
+  .native-select__control:has(.native-select__placeholder:checked) {
+    color: var(--ink-muted);
+  }
+
+  /* Windows and Linux draw the open list with the select's own colors, so set the options' colors themselves: otherwise
+     every option would turn muted while the placeholder is chosen. macOS and phones draw their own list. */
+  .native-select__control option,
+  .native-select__control optgroup {
+    background-color: var(--surface);
+    color: var(--ink);
+  }
+  .native-select__control option:disabled,
+  .native-select__control optgroup:disabled {
+    color: var(--ink-muted);
+  }
+
+  /* The arrow sits over the end of the select and lets clicks through to it */
+  .native-select__icon {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: calc(var(--space-3) + var(--border-thin));
+    width: var(--icon-md);
+    height: var(--icon-md);
+    margin-block: auto;
+    color: var(--ink-muted);
+    stroke-width: var(--icon-stroke);
+    pointer-events: none;
+  }
+  .native-select[data-size="lg"] .native-select__icon {
+    inset-inline-end: calc(var(--space-4) + var(--border-thin));
+  }
+
+  /* Disabled: the arrow dims with the field */
+  .native-select[data-disabled] .native-select__icon {
+    opacity: 0.5;
+  }
+
+  /* Windows Contrast themes: the arrow takes the field's text color, or the disabled one */
+  @media (forced-colors: active) {
+    .native-select__icon {
+      color: FieldText;
+    }
+    .native-select[data-disabled] .native-select__icon {
+      opacity: 1;
+      color: GrayText;
+    }
+  }
+}
