@@ -97,11 +97,7 @@ Set the theme with `data-theme="light" | "dark" | "hotdog"` on `<html>`. With no
 
 ## Adding a component
 
-1. If Base UI has a matching primitive (dialog, menu, tabs, popover…), build on it. shadcn's version of the component is a good starting point for structure; swap its Tailwind styling for a CSS file that follows the rules above.
-2. Create `src/components/<Name>/` with the component, its CSS, a test file, stories, and an `index.ts`.
-3. Import its CSS in `src/styles/index.css` and export it from `src/index.ts`.
-4. Add an `AllThemes` story so Chromatic snapshots it in every theme.
-5. Run `pnpm typecheck` and `pnpm test`. Copy the structure of `Button.test.tsx`.
+In Claude Code, run `/new-component <Name>`. It researches the component, proposes its API for your approval, and then builds, tests, screenshots, and reviews it. "Adding a component" in `CLAUDE.md` lists what every finished component has, whoever builds it.
 
 ## Contributing
 
