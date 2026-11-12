@@ -32,14 +32,7 @@ pnpm check:tests    # removed, skipped, or weakened tests compared with HEAD
 
 Report any failure as a Must fix.
 
-To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, serve it read-only and inspect it with Playwright from the repo folder:
-
-```sh
-python3 -m http.server 6107 -d storybook-static &   # stop it afterwards: pkill -f "http.server 6107"; in a worktree, use another port
-node --input-type=module -e "import { chromium } from 'playwright'; /* open http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story */"
-```
-
-Check that it's current first: if any file in `src/components/<Name>/` is newer than `storybook-static/index.html`, say the build is stale and judge from the source instead. Use real hover (`locator.hover()`) and `page.emulateMedia({ forcedColors: 'active' })` to check states that screenshots can't show, and save screenshots to the scratchpad, not the repo. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
+To see the real stories in a browser, don't build Storybook (that writes files). If `storybook-static/` exists, run `pnpm look <Name> --out <scratchpad>/<name>`: it reads the build, writes only to that folder, and leaves nothing running (`CLAUDE.md`, "Looking at a component"). Report any story it fails as a Must fix, open its screenshots, and read its state colors. If it warns that the build is stale, say so and judge from the source instead. For anything it doesn't check, write your own Playwright script as `CLAUDE.md` describes there, with real hover (`locator.hover()`) and `page.emulateMedia({ forcedColors: 'active' })`, saving screenshots to the scratchpad, not the repo. `pnpm check:contrast --probe` checks a pair that isn't in `tokens/contrast.json`, or one dimmed with `--opacity`, without touching the file. The scripts cover hex and named colors, primitive tokens, px units, raw durations, modifier classes, missing files, and contrast pairs that are listed. Don't repeat what they already enforce; spend your attention on what they can't see.
 
 ## What to check
 

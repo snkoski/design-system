@@ -49,6 +49,8 @@ pnpm test:stories     # story tests only (play functions and axe)
 pnpm test:coverage
 pnpm check            # contrast of every color pair in all themes, and the rules in this file (CSS, structure, imports)
 pnpm check:tests      # fails if tests were deleted, skipped, or weakened compared with HEAD (or --base <ref>)
+pnpm check:contrast --probe ink-muted:track:4.5   # try color pairs without adding them; --opacity 0.5 for dimmed parts
+pnpm look <Name>      # in the built Storybook: every story's result, screenshots, and state colors (see "Looking at a component")
 pnpm tokens           # regenerate CSS from tokens/tokens.json (the other scripts do this first)
 pnpm reading-list     # regenerate docs/reading-list.md and .html from docs/reading-list.json
 ```
@@ -73,6 +75,7 @@ tests/setup.ts               setup for the unit tests (jest-dom matchers, cleanu
 tests/warnings.ts            takeWarnings(), for tests that expect a dev warning
 tokens/contrast.json         every foreground and background color pair the components use, with its minimum ratio
 scripts/check-*.mjs          pnpm check (contrast, rules), pnpm check:tests, and check-dist (run by pnpm build)
+scripts/look.mjs             pnpm look: a component's stories, screenshots, and state colors in the built Storybook
 .claude/settings.json        a hook that warns when tests are removed, skipped, or weakened
 vitest.config.ts             two projects: `unit` (jsdom) and `storybook` (Chromium)
 docs/brand/                  the brand book, one Markdown file per topic
@@ -214,7 +217,7 @@ Build a new component with `/new-component <Name>` (`.claude/skills/new-componen
 5. Stories: a `Playground` with controls, a `States` story with every state side by side, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it). Checks of sizes and hit areas run with a mouse and on touch (see Testing). Labels, descriptions, and errors in stories follow `docs/brand/voice.md`, like real copy.
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
 7. Every new foreground and background color pair is in `tokens/contrast.json`, and focus is checked in all three themes.
-8. Someone has looked at it. Passing tests don't show whether it looks right: screenshot the `AllThemes` story in each theme (recipe below) and check alignment, every state, and hot dog mode by eye, and again with `data-pointer="coarse"` and inside `data-density="compact"`.
+8. Someone has looked at it. Passing tests don't show whether it looks right: run `pnpm look` (below) and check the `AllThemes` screenshots for alignment, every state, and hot dog mode by eye, and again with `data-pointer="coarse"` and inside `data-density="compact"`.
 9. A new rule or pattern it introduces is on the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, a guidance page, `docs/brand/<topic>.md`, is rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, `docs/brand/industry.md` has a section or row with what Sherbet chose.
 10. A "How it works" page, `HowItWorks.mdx`, beside the stories (see "How it works pages").
 
@@ -222,45 +225,20 @@ Build a new component with `/new-component <Name>` (`.claude/skills/new-componen
 
 ```sh
 pnpm build-storybook
-python3 -m http.server 6107 -d storybook-static &     # stop it afterwards: pkill -f "http.server 6107"
-node --input-type=module -e "
-import { chromium } from 'playwright';
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 700, height: 900 } });
-for (const theme of ['light', 'dark', 'hotdog']) {
-  await page.goto('http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story');
-  await page.waitForSelector('[data-theme=' + theme + ']');
-  await page.locator('section[data-theme=' + theme + ']').screenshot({ path: '<scratchpad>/<name>-' + theme + '.png' });
-}
-await browser.close();
-"
+pnpm look <Name> --out <scratchpad>/<name>     # <Name> is the stories file's name: Switch, ButtonLink, LookAt
 ```
 
-Then check what the theme screenshots can't show: focus, forced colors, and hover in forced colors. Same server, a second script:
+`scripts/look.mjs` serves `storybook-static` on a free port while it runs (so worktrees don't collide, and nothing is left running), and warns if the build is older than the source. It:
 
-```sh
-node --input-type=module -e "
-import { chromium } from 'playwright';
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 700, height: 900 } });
-await page.goto('http://localhost:6107/iframe.html?id=components-<name>--states&viewMode=story');
-await page.keyboard.press('Tab');
-await page.locator('#storybook-root').screenshot({ path: '<scratchpad>/<name>-focus.png' });
-await page.emulateMedia({ forcedColors: 'active' });
-await page.goto('http://localhost:6107/iframe.html?id=components-<name>--all-themes&viewMode=story');
-await page.locator('section[data-theme=light]').screenshot({ path: '<scratchpad>/<name>-forced.png' });
-// Repeat for every state that changes an edge or fill: [aria-checked=true], [aria-invalid=true], [aria-selected=true], ...
-const on = page.locator('[aria-checked=true]').first();
-const look = () => on.evaluate((el) => getComputedStyle(el).backgroundColor + ' ' + getComputedStyle(el).borderTopColor);
-const rest = await look(); await on.hover(); await page.waitForTimeout(300);
-console.log('at rest', rest, '| hovered', await look());   // hover must not cover up the state; check without forced colors too
-await browser.close();
-"
-```
+- Loads every story of the component and reports its phase and any page or console error. Each must reach `finished` with no error. A `play` function that throws still reaches `finished`, but logs an error. A story that keeps changing on its own (a simulated upload) reports `completing`, which isn't a failure.
+- Screenshots the `AllThemes` story in each theme, the light theme with `data-pointer="coarse"` and with `data-density="compact"`, the light theme in forced colors, and the first focusable control in each theme with keyboard focus.
+- Prints the fill and top edge of each state (`aria-checked`, `aria-invalid`, `aria-selected`, `data-disabled`, and so on) in the light theme, at rest and hovered, in normal mode and forced colors, beside forced colors' `Canvas`. It flags a state that hover changes and one that matches `Canvas` at rest, for you to judge.
 
-Run scripts from the repo folder with `node --input-type=module` (piping a file in with `<` works too). A script file saved elsewhere can't find `playwright`. Port 6107 is for this folder: in a worktree, use another port for the server and the URLs, so two sessions' screenshots don't collide.
+Exit code 1 means a story failed or logged an error. The script finds things to look at; it doesn't decide what looks right. Open every screenshot with the Read tool, and keep them in a scratch folder, not the repo.
 
-Story ids are the title and story name in kebab case (`Components/Button link` and `AllThemes` become `components-button-link--all-themes`). Put the screenshots in a scratch folder, not the repo, and open them with the Read tool.
+For a check it doesn't make, write a Playwright script and run it from the repo folder with `node --input-type=module` (a script saved elsewhere can't find `playwright`), against a server you start yourself: `python3 -m http.server <port> -d storybook-static`, on a port no other session uses, stopped afterwards. Story ids are the title and story name in kebab case (`Components/Button link` and `AllThemes` become `components-button-link--all-themes`).
+
+To try a color pair before adding it to `tokens/contrast.json`, or to check a part dimmed with `opacity`, use the probe, which doesn't touch the file: `pnpm check:contrast --probe ink-muted:track:4.5 border-strong:surface-hover:3`, adding `--opacity 0.5 --page bg` for a dimmed part.
 
 ## Testing
 
@@ -284,7 +262,7 @@ Every component has a thorough `Name.test.tsx` next to it, and every story is al
 - Sizes depend on the pointer, and story tests run with a mouse. There `--target-min` is 24px, smaller than most controls, so a size or hit-area check that only runs with a mouse passes even when the touch hit area is broken. Check both: mouse first, then set `canvasElement.dataset.pointer = "coarse"`, check again inside `try`, and delete it in `finally` (see Radio's `WithoutVisibleLabel`). Measure tokens with a probe element inside `canvasElement`, so `data-pointer` reaches it, rather than hard-coding px, and also assert the floor (`--target-min` at least 24px with a mouse and 44px on touch), so a token mistake can't make the check pass by default.
 - Define a story decorator that uses its context argument (`(Story, { parameters }) => …`) as a typed `const` outside `meta`, with the `Decorator` type. Written inline inside `meta`, it breaks Storybook's inference and every story's args become `never`.
 - Keep `play` functions in stories short, to show the main interaction. Put exhaustive cases in the test file so nothing is tested twice.
-- Anything that listens for an event a `play` function sends straight after rendering (a pointer move, say) subscribes in `useLayoutEffect`, not `useEffect`. In a built Storybook, as on Chromatic, the passive effect runs after the play function has started, so the first event is lost; the dev server's timing hides this. Check those stories in a built Storybook (`pnpm build-storybook`, served as in "Looking at a component"), not only with `pnpm test`. LookAt and LookAtCanvas both hit this.
+- Anything that listens for an event a `play` function sends straight after rendering (a pointer move, say) subscribes in `useLayoutEffect`, not `useEffect`. In a built Storybook, as on Chromatic, the passive effect runs after the play function has started, so the first event is lost; the dev server's timing hides this. Check those stories in a built Storybook (`pnpm build-storybook`, then `pnpm look <Name>`), not only with `pnpm test`. LookAt and LookAtCanvas both hit this.
 - When fixing a bug, add the test that would have caught it first.
 - Check that a new test can fail: break the code on purpose and confirm the test catches it.
 - A test that only asserts something is absent (`not.toBeInTheDocument`, an empty `FormData`, `not.toMatch`) also passes when nothing renders at all. Assert a positive precondition first, such as the control or hidden input existing. Writing tests against a stub that renders `null` exposes these: every runtime test should fail there.

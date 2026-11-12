@@ -57,7 +57,7 @@ Write the proposal. Keep it to what the user needs to decide.
 - **How other systems do it:** what the major systems call it, their variants, and where they differ, with what we chose. Check each cell against the system's own docs, not memory: a research agent with web access can read them in parallel while you write the rest, returning the URL behind each fact and "Not stated" where a page doesn't say. (NativeSelect's draft guessed two systems wrong.) It becomes `industry.md` content in Phase 8, with those URLs as sources.
 - **When to use each variant**, if it has variants or could be confused with another component. It becomes a guidance page in Phase 8.
 - **Tokens:** existing ones it uses, and any new one (name, value, and usage note).
-- **Color pairs** for `tokens/contrast.json`. Check each before proposing it: copy `contrast.json` to the scratchpad, add the pairs with `"use": "PROBE"`, run `node scripts/check-contrast.mjs`, copy the original back, and confirm `git diff tokens/contrast.json` is empty.
+- **Color pairs** for `tokens/contrast.json`. Check each before proposing it with `pnpm check:contrast --probe fg:bg:min ...`, which doesn't touch the file.
 - **Motion:** what moves, with which tokens.
 - **Hot dog and forced-colors treatment.**
 - **Open questions:** decisions that are the user's, each with a recommendation.
@@ -85,7 +85,7 @@ Write the proposal. Keep it to what the user needs to decide.
 
 ## Phase 5: Stories
 
-Write `<Name>.stories.tsx` with the stories `CLAUDE.md` requires ("Adding a component", step 5). The first Tab on the `States` story must land in it, because Phase 7's focus check opens it. Add the CSS-dependent checks listed in Phase 3 as `play` functions, each run with a mouse and on touch. Story copy is real copy: follow `docs/brand/voice.md`.
+Write `<Name>.stories.tsx` with the stories `CLAUDE.md` requires ("Adding a component", step 5). Add the CSS-dependent checks listed in Phase 3 as `play` functions, each run with a mouse and on touch. Story copy is real copy: follow `docs/brand/voice.md`.
 
 ## Phase 6: Verify
 
@@ -100,16 +100,15 @@ pnpm check:tests
 
 Fix what they report.
 
-Then load every new story in the built Storybook (`storybook-static`, served as in `CLAUDE.md`'s "Looking at a component") and read each one's result with `page.evaluate(() => window.__STORYBOOK_PREVIEW__?.storyRenders?.[0]?.phase)`. It must be `finished`. `pnpm test` uses the dev server, whose timing hides a `play` function that starts too early.
+Then run `pnpm look <Name> --out <scratchpad>/<name>` (`CLAUDE.md`, "Looking at a component") and fix any story it reports as failed. `pnpm test` uses the dev server, whose timing hides a `play` function that starts too early; the built Storybook doesn't. Phase 7 uses the same run's screenshots.
 
 Then prove the tests can fail. Break the component three ways that matter (a state no longer reaching its ARIA attribute, a decorative icon losing `aria-hidden`, the label no longer naming the control), one at a time: back up the file with `cp`, break it, run `pnpm test:unit`, restore it with `cp`, and confirm with `diff` that it matches the backup. **Never restore with `git checkout`**: the component is uncommitted, and that would discard it. Each break must fail at least one test; if one doesn't, add the missing test.
 
 ## Phase 7: Look at it
 
-1. Screenshot the `AllThemes` story in all three themes with the first recipe under "Looking at a component" in `CLAUDE.md`, saving to the scratchpad, and open each with the Read tool. Check alignment, every state, focus, hot dog, and dark mode.
-2. Screenshot the light theme again with `data-pointer="coarse"`, then with `data-density="compact"`, set on the section (`page.locator('section[data-theme=light]').evaluate((el) => el.dataset.pointer = 'coarse')`). It must grow or shrink with the tokens, keep icons and labels centered, and overlap nothing.
-3. Run the second recipe: focus, forced colors, and hover.
-4. Go through the "Look" table in `checks.md` and do every row that applies.
+1. Open every screenshot from Phase 6's `pnpm look` with the Read tool (rerun it after any fix). In each theme, check alignment, every state, the focus ring, hot dog, and dark mode. In the coarse and compact shots, it must grow or shrink with the tokens, keep icons and labels centered, and overlap nothing. In the forced-colors shot, every state and label must still show.
+2. Read its state colors. For each state hover changes, check the hovered look still shows the state; for each it flags as matching `Canvas`, find it in the forced-colors shot.
+3. Go through the "Look" table in `checks.md` and do every row that applies.
 
 Fix what looks wrong and check again.
 

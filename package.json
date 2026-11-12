@@ -46,7 +46,8 @@
     "check": "node scripts/check-contrast.mjs && node scripts/check-rules.mjs && node scripts/build-reading-list.mjs --check",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:rules": "node scripts/check-rules.mjs",
-    "check:tests": "node scripts/check-tests-kept.mjs"
+    "check:tests": "node scripts/check-tests-kept.mjs",
+    "look": "node scripts/look.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",
