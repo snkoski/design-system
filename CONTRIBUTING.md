@@ -5,7 +5,7 @@ Read `CLAUDE.md` first. It has the rules for tokens, CSS, accessibility, motion,
 ## Workflow
 
 1. Branch from `main`, for example `add-input` or `fix-button-focus`.
-2. Make the change. Follow the "Adding a component" steps in `CLAUDE.md` for a new component.
+2. Make the change. For a new component, run `/new-component <Name>` in Claude Code, and check it against "Adding a component" in `CLAUDE.md`.
 3. Run `pnpm typecheck`, `pnpm check`, `pnpm test`, `pnpm build`, and `pnpm build-storybook`. All five must pass. Run `pnpm check:tests --base main` too, and explain any removed test in the pull request.
 4. Open a pull request. The template pre-fills a checklist; fill it in honestly.
 5. Wait for the checks, address review comments, and merge once approved.

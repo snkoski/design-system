@@ -203,20 +203,20 @@ Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
 
 ## Adding a component
 
-0. Check that every question in `docs/proposed-roadmap-job-tracker.md` is answered (see "Open questions block new components"). If any is still open, stop and say which.
-1. If Base UI has a matching primitive, build on it. shadcn's version is a good reference for structure; replace its Tailwind styling with a CSS file that follows the rules above.
-   Read Base UI's docs for it first: `node_modules/@base-ui/react/docs/react/components/<name>.md` ships with the package and is authoritative. Before writing CSS, render the primitive in a throwaway Vitest test and print the DOM, to see exactly which ARIA and `data-*` attributes it sets (Checkbox's `aria-checked="mixed"`, `aria-invalid`, and `data-disabled` came from this). Delete the throwaway test afterwards.
-2. Create `src/components/<Name>/` with `Name.tsx`, `name.css`, `Name.test.tsx`, `Name.stories.tsx`, and `index.ts`.
-   Write the test file for every component; it is not optional (see Testing).
+Build a new component with `/new-component <Name>` (`.claude/skills/new-component/`). The skill holds the order of work, the proposal the user approves before any code, and the checks for each kind of component. This list is what a finished component has, however it was built:
+
+0. Every question in `docs/proposed-roadmap-job-tracker.md` was answered before it was started (see "Open questions block new components").
+1. It's built on Base UI's matching primitive, if there is one, and styled from the attributes that primitive actually renders. Base UI's docs ship with the package at `node_modules/@base-ui/react/docs/react/components/<name>.md` and are authoritative. shadcn's version is a reference for structure only; its Tailwind styling is replaced with a CSS file that follows the rules above.
+2. Its folder, `src/components/<Name>/`, has `Name.tsx`, `name.css`, `Name.test.tsx`, `Name.stories.tsx`, and `index.ts`. The test file is not optional (see Testing).
    A closely related sibling that shares the folder's CSS (such as `ButtonLink` next to `Button`) gets its own `.tsx`, test file, and stories, and any code the two share goes in `shared.tsx`. Everything else gets its own folder.
-3. Write JSDoc on the component and every prop. It becomes the Storybook docs.
-4. Import the CSS in `src/styles/index.css` and export the component and its types from `src/index.ts`.
+3. JSDoc on the component and every prop. It becomes the Storybook docs.
+4. Its CSS is imported in `src/styles/index.css`, and the component and its types are exported from `src/index.ts`.
 5. Stories: a `Playground` with controls, a `States` story with every state side by side, one story per variant group and state, and an `AllThemes` story that renders every variant and state in all three themes side by side (Chromatic snapshots it). Checks of sizes and hit areas run with a mouse and on touch (see Testing). Labels, descriptions, and errors in stories follow `docs/brand/voice.md`, like real copy.
 6. Interaction tests in stories use the `canvas` and `userEvent` passed into `play`, not `within`, `screen`, or an imported `userEvent`.
-7. Add any new foreground and background color pair to `tokens/contrast.json`, check focus in all three themes, then run typecheck, check, test, build, and build-storybook.
-8. Look at it. Passing tests don't show whether it looks right. Build Storybook and screenshot the `AllThemes` story in each theme (recipe under "Looking at a component"), then check alignment, every state, and hot dog mode by eye. Also look at it with `data-pointer="coarse"` and inside `data-density="compact"`.
-9. If the component introduces a new rule or pattern, add it to the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, write a guidance page, `docs/brand/<topic>.md`, rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, add a section or row to `docs/brand/industry.md` with what Sherbet chose.
-10. Write its "How it works" page, `HowItWorks.mdx` beside the stories (see "How it works pages").
+7. Every new foreground and background color pair is in `tokens/contrast.json`, and focus is checked in all three themes.
+8. Someone has looked at it. Passing tests don't show whether it looks right: screenshot the `AllThemes` story in each theme (recipe below) and check alignment, every state, and hot dog mode by eye, and again with `data-pointer="coarse"` and inside `data-density="compact"`.
+9. A new rule or pattern it introduces is on the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, a guidance page, `docs/brand/<topic>.md`, is rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, `docs/brand/industry.md` has a section or row with what Sherbet chose.
+10. A "How it works" page, `HowItWorks.mdx`, beside the stories (see "How it works pages").
 
 ### Looking at a component
 
