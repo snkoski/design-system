@@ -1,10 +1,10 @@
 import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import type { InputHTMLAttributes, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
 
 export type InputType = "text" | "email" | "password" | "search" | "tel" | "url";
 export type InputSize = "md" | "lg";

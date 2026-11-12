@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Radio } from "./Radio";
-import type { RadioProps } from "./Radio";
-import { RadioGroup } from "./RadioGroup";
+import { takeWarnings } from "@tests/warnings";
+import { Radio } from "@/components/RadioGroup/Radio";
+import type { RadioProps } from "@/components/RadioGroup/Radio";
+import { RadioGroup } from "@/components/RadioGroup/RadioGroup";
 
 const getRadio = (name: string) => screen.getByRole("radio", { name });
 const getInput = (container: HTMLElement, value: string) =>

@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { afterAll, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { RichText } from "./RichText";
-import type { RichTextProps, RichTextSize } from "./RichText";
+import { takeWarnings } from "@tests/warnings";
+import { RichText } from "@/experiments/RichText/RichText";
+import type { RichTextProps, RichTextSize } from "@/experiments/RichText/RichText";
 
 // ProseMirror measures the page to place the caret and scroll to it. jsdom has no layout, so these return empty
 // boxes. Stubbed here rather than in tests/setup.ts, so the experiment changes nothing outside its folder.

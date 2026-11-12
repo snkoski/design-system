@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, Heart, Plus, Trash2 } from "lucide-react";
 import { expect, fn } from "storybook/test";
-import { Button } from "./Button";
+import { Button } from "@/components/Button/Button";
 
 /** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
 function measure(token: string, parent: HTMLElement = document.body) {

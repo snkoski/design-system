@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Separator } from "../../components/Separator";
-import { Inspect } from "../Inspect";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Separator } from "@/components/Separator";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Separator's "How it works" page. Every one renders the real Separator, styled by the real separator.css. */
 

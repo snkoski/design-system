@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import "../decoration.css";
-import "./spin.css";
+import { cx } from "@/internal/cx";
+import "@/experiments/decoration.css";
+import "@/experiments/Spin/spin.css";
 
 export type SpinDirection = "clockwise" | "counterclockwise";
 

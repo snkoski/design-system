@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRight, Download, Heart, LayoutGrid, List, Rows3 } from "lucide-react";
 import { expect } from "storybook/test";
-import { Button } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Option, Options, Themes } from "./Compare";
-import "./icon-size.css";
+import { Button } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Option, Options, Themes } from "@/experiments/Revisit/Compare";
+import "@/experiments/Revisit/icon-size.css";
 
 const meta = {
   title: "Revisit/Icon size in large controls",

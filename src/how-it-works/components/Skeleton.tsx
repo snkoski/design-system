@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Skeleton, SkeletonItem } from "../../components/Skeleton";
-import { Inspect } from "../Inspect";
+import { Button } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Skeleton, SkeletonItem } from "@/components/Skeleton";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Skeleton's "How it works" page. Every one renders the real Skeleton, styled by the real skeleton.css. */
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { PLANETS } from "./bodies";
-import { centuriesSince2000, orbitPath, positionAt, solveKepler } from "./kepler";
-import { scaleDistance } from "./scale";
+import { PLANETS } from "@/experiments/SolarSystem/bodies";
+import { centuriesSince2000, orbitPath, positionAt, solveKepler } from "@/experiments/SolarSystem/kepler";
+import { scaleDistance } from "@/experiments/SolarSystem/scale";
 
 const planet = (name: string) => PLANETS.find((body) => body.name === name)!.orbit;
 const distance = ({ x, y, z }: { x: number; y: number; z: number }) => Math.hypot(x, y, z);

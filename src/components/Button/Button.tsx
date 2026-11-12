@@ -1,8 +1,8 @@
 import { Button as BaseButton } from "@base-ui/react/button";
 import type { Ref } from "react";
-import { warnIfUnnamed } from "../../internal/warn";
-import { Content, cx } from "./shared";
-import type { ButtonVariant, IconOnly, SharedProps } from "./shared";
+import { warnIfUnnamed } from "@/internal/warn";
+import { Content, cx } from "@/components/Button/shared";
+import type { ButtonVariant, IconOnly, SharedProps } from "@/components/Button/shared";
 
 /**
  * Danger is only for a secondary or ghost button with a visible label: a primary button keeps its neutral fill, and an

@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
-import { Checkbox } from "../../components/Checkbox";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, Slider } from "../../how-it-works/demo";
-import { Spin } from "./Spin";
-import type { SpinDirection } from "./Spin";
+import { Checkbox } from "@/components/Checkbox";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, Slider } from "@/how-it-works/demo";
+import { Spin } from "@/experiments/Spin/Spin";
+import type { SpinDirection } from "@/experiments/Spin/Spin";
 
 /* A live demo for the "How it works" page. It's the real Spin, so what it shows is what runs. */
 

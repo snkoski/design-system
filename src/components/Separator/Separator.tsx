@@ -1,7 +1,7 @@
 import { Separator as BaseSeparator } from "@base-ui/react/separator";
 import type { HTMLAttributes, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { hasContent } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { hasContent } from "@/internal/warn";
 
 export type SeparatorOrientation = "horizontal" | "vertical";
 

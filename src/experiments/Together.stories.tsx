@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowUp } from "lucide-react";
-import { Button } from "../components/Button";
-import { Checkbox } from "../components/Checkbox";
-import { Input } from "../components/Input";
-import { FocusSheen } from "./FocusSheen/FocusSheen";
-import { LookAt } from "./LookAt/LookAt";
+import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Input } from "@/components/Input";
+import { FocusSheen } from "@/experiments/FocusSheen/FocusSheen";
+import { LookAt } from "@/experiments/LookAt/LookAt";
 
 const meta = {
   title: "Experiments/Together",

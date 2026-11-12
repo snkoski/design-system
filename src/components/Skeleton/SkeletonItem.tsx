@@ -1,5 +1,5 @@
 import type { HTMLAttributes, Ref } from "react";
-import { cx } from "../../internal/cx";
+import { cx } from "@/internal/cx";
 
 export type SkeletonShape = "text" | "box" | "circle";
 

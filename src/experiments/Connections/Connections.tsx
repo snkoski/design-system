@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import "./connections.css";
-import { lines, toPixels } from "./lines";
-import type { Box, Distance } from "./lines";
-import { mixPaint, parseRgb, toCss } from "./paint";
-import type { Rgb } from "./paint";
+import { cx } from "@/internal/cx";
+import "@/experiments/Connections/connections.css";
+import { lines, toPixels } from "@/experiments/Connections/lines";
+import type { Box, Distance } from "@/experiments/Connections/lines";
+import { mixPaint, parseRgb, toCss } from "@/experiments/Connections/paint";
+import type { Rgb } from "@/experiments/Connections/paint";
 
 export type { Distance };
 export type ConnectionsBlend = "paint" | "light";

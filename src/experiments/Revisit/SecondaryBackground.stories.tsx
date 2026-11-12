@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Download } from "lucide-react";
 import { expect } from "storybook/test";
-import { Button } from "../../components/Button";
-import { Option, Options, Themes } from "./Compare";
-import "./secondary-background.css";
+import { Button } from "@/components/Button";
+import { Option, Options, Themes } from "@/experiments/Revisit/Compare";
+import "@/experiments/Revisit/secondary-background.css";
 
 const meta = {
   title: "Revisit/Secondary button background",

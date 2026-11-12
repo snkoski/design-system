@@ -1,11 +1,11 @@
 import { useId, useMemo, useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { step } from "../Bounce/physics";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { collide, G, orbitVelocity, pulls, REST } from "./gravity";
-import type { OrbitDirection } from "./gravity";
-import "./explain.css";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { step } from "@/experiments/Bounce/physics";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { collide, G, orbitVelocity, pulls, REST } from "@/experiments/Orbits/gravity";
+import type { OrbitDirection } from "@/experiments/Orbits/gravity";
+import "@/experiments/Orbits/explain.css";
 
 /* Live demos for Orbits' "How it works" page. They call the real orbitVelocity(), pulls(), and collide() from
    gravity.ts, and Bounce's step(), so what they show is what runs. */

@@ -4,8 +4,8 @@
  * Mars three times a day), so each planet's moons are slowed until the fastest takes MIN_PERIOD days, keeping the
  * inner ones faster than the outer. Their directions are for show, and every moon's orbit is drawn flat and round.
  */
-import type { Moon } from "./bodies";
-import { centuriesSince2000 } from "./kepler";
+import type { Moon } from "@/experiments/SolarSystem/bodies";
+import { centuriesSince2000 } from "@/experiments/SolarSystem/kepler";
 
 /** The shortest time a moon takes to go round, as shown, in days: half a second at a month a second */
 export const MIN_PERIOD = 15;

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { Checkbox } from "../Checkbox";
-import { CheckboxGroup } from "./CheckboxGroup";
+import { Checkbox } from "@/components/Checkbox";
+import { CheckboxGroup } from "@/components/CheckboxGroup/CheckboxGroup";
 
 const options = (
   <>

@@ -1,9 +1,9 @@
 import { isValidElement, useLayoutEffect, useRef, useState } from "react";
 import type { HTMLAttributes, ReactElement, ReactNode } from "react";
-import { cx } from "../../internal/cx";
-import { clampSize, cursorValue, drawText, hotspotFor, isImageUrl, svgToDataUrl } from "./cursorImage";
-import type { Hotspot } from "./cursorImage";
-import "./custom-cursor.css";
+import { cx } from "@/internal/cx";
+import { clampSize, cursorValue, drawText, hotspotFor, isImageUrl, svgToDataUrl } from "@/experiments/CustomCursor/cursorImage";
+import type { Hotspot } from "@/experiments/CustomCursor/cursorImage";
+import "@/experiments/CustomCursor/custom-cursor.css";
 
 export type { Hotspot };
 

@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef } from "react";
-import { Bounce } from "../Bounce/Bounce";
-import type { BounceProps } from "../Bounce/Bounce";
-import { interact } from "../Bounce/mover";
-import type { Interaction, Member } from "../Bounce/mover";
-import { forces, separate } from "./forces";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import type { BounceProps } from "@/experiments/Bounce/Bounce";
+import { interact } from "@/experiments/Bounce/mover";
+import type { Interaction, Member } from "@/experiments/Bounce/mover";
+import { forces, separate } from "@/experiments/Magnets/forces";
 
 export type MagnetProps = BounceProps & {
   /**

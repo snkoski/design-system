@@ -1,8 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { measureShapes } from "./shapes";
-import type { Shape } from "./shapes";
-import { ApplicationList, applications } from "./sample";
-import "./explain.css";
+import { measureShapes } from "@/experiments/AutoSkeleton/shapes";
+import type { Shape } from "@/experiments/AutoSkeleton/shapes";
+import { ApplicationList, applications } from "@/experiments/AutoSkeleton/sample";
+import "@/experiments/AutoSkeleton/explain.css";
 
 const names = { frame: "Container, kept as it is", box: "Token or control, one gray shape", line: "Line of text, one bar" };
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { Skeleton } from "./Skeleton";
-import { SkeletonItem } from "./SkeletonItem";
+import { Skeleton } from "@/components/Skeleton/Skeleton";
+import { SkeletonItem } from "@/components/Skeleton/SkeletonItem";
 
 const meta = {
   title: "Components/Skeleton item",

@@ -1,9 +1,9 @@
 import { act, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { LookAt } from "./LookAt";
-import type { LookAtProps } from "./LookAt";
-import { forgetPointer } from "./tracker";
+import { LookAt } from "@/experiments/LookAt/LookAt";
+import type { LookAtProps } from "@/experiments/LookAt/LookAt";
+import { forgetPointer } from "@/experiments/LookAt/tracker";
 
 afterEach(forgetPointer);
 

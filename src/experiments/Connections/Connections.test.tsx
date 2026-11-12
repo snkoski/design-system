@@ -1,11 +1,11 @@
 import { act, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Connections } from "./Connections";
-import type { ConnectionsProps } from "./Connections";
-import { gap, lines, toPixels } from "./lines";
-import { mixPaint, parseRgb, rgbFromRyb, rybFromRgb, toCss } from "./paint";
-import type { Rgb } from "./paint";
+import { Connections } from "@/experiments/Connections/Connections";
+import type { ConnectionsProps } from "@/experiments/Connections/Connections";
+import { gap, lines, toPixels } from "@/experiments/Connections/lines";
+import { mixPaint, parseRgb, rgbFromRyb, rybFromRgb, toCss } from "@/experiments/Connections/paint";
+import type { Rgb } from "@/experiments/Connections/paint";
 
 const scale = { width: 1000, height: 500, rem: 16 };
 const box = (left: number, top: number, size = 10) => ({ left, top, width: size, height: size });

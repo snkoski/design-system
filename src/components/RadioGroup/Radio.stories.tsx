@@ -1,7 +1,7 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { Radio } from "./Radio";
-import { RadioGroup } from "./RadioGroup";
+import { Radio } from "@/components/RadioGroup/Radio";
+import { RadioGroup } from "@/components/RadioGroup/RadioGroup";
 
 /** A Radio only works inside a RadioGroup, so stories render one around it, unless they bring their own. */
 const inGroup: Decorator = (Story, { parameters }) =>

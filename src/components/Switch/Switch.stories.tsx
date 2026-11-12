@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { Button } from "../Button";
-import { Switch } from "./Switch";
+import { Button } from "@/components/Button";
+import { Switch } from "@/components/Switch/Switch";
 
 const meta = {
   title: "Components/Switch",

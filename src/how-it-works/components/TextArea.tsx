@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Button } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { TextArea } from "../../components/TextArea";
-import type { TextAreaResize } from "../../components/TextArea";
-import { fixed, Slider } from "../demo";
-import "./text-area.css";
+import { Button } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { TextArea } from "@/components/TextArea";
+import type { TextAreaResize } from "@/components/TextArea";
+import { fixed, Slider } from "@/how-it-works/demo";
+import "@/how-it-works/components/text-area.css";
 
 /* Live demos for TextArea's "How it works" page. They render the real TextArea, so what they show is what ships. */
 

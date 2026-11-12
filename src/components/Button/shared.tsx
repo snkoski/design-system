@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SpinnerGraphic } from "../../internal/SpinnerGraphic";
+import { SpinnerGraphic } from "@/internal/SpinnerGraphic";
 
 /* Pieces Button and ButtonLink have in common. Not exported from the package. */
 
@@ -37,7 +37,7 @@ export type IconOnly =
       "aria-label": string;
     };
 
-export { cx } from "../../internal/cx";
+export { cx } from "@/internal/cx";
 
 /** The drawing a loading button shows in place of its start icon, shared with Spinner. */
 const Spinner = () => <SpinnerGraphic className="button__spinner" />;

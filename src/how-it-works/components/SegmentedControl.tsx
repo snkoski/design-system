@@ -1,12 +1,12 @@
 import { LayoutGrid, List, Moon, Sun } from "lucide-react";
 import { useState } from "react";
 import type { CSSProperties } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Slider } from "../demo";
-import { Inspect } from "../Inspect";
-import { FormReadout, FormSwitches, PointerStage, px, StateSwitch } from "./RadioGroup";
-import type { DemoState } from "./RadioGroup";
-import "./segmented-control.css";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Slider } from "@/how-it-works/demo";
+import { Inspect } from "@/how-it-works/Inspect";
+import { FormReadout, FormSwitches, PointerStage, px, StateSwitch } from "@/how-it-works/components/RadioGroup";
+import type { DemoState } from "@/how-it-works/components/RadioGroup";
+import "@/how-it-works/components/segmented-control.css";
 
 /* Live demos for SegmentedControl's "How it works" page, built from the real components. The state switch, form
    readout, and pointer stage are RadioGroup's (./RadioGroup.tsx). */

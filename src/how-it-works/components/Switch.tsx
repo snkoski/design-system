@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
-import { Button } from "../../components/Button";
-import { Switch } from "../../components/Switch";
-import { fixed, Slider } from "../demo";
-import "./switch.css";
+import { Button } from "@/components/Button";
+import { Switch } from "@/components/Switch";
+import { fixed, Slider } from "@/how-it-works/demo";
+import "@/how-it-works/components/switch.css";
 
 /* Live demos for Switch's "How it works" page. They render the real Switch, so what they show is what ships. */
 

@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { CheckboxGroup } from "../CheckboxGroup";
-import { Checkbox } from "./Checkbox";
-import type { CheckboxProps } from "./Checkbox";
+import { takeWarnings } from "@tests/warnings";
+import { CheckboxGroup } from "@/components/CheckboxGroup";
+import { Checkbox } from "@/components/Checkbox/Checkbox";
+import type { CheckboxProps } from "@/components/Checkbox/Checkbox";
 
 const getBox = () => screen.getByRole("checkbox");
 const getInput = (container: HTMLElement) => container.querySelector<HTMLInputElement>("input[type=checkbox]")!;

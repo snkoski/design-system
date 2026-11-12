@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Check, LayoutGrid, List, Monitor, Moon, Rows3, Sun } from "lucide-react";
 import { useState } from "react";
 import { expect } from "storybook/test";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Option, Options, Themes } from "./Compare";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Option, Options, Themes } from "@/experiments/Revisit/Compare";
 
 const meta = {
   title: "Revisit/How a chosen segment stands out",

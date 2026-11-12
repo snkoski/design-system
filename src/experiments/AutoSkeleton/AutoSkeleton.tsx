@@ -1,10 +1,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
-import { Skeleton, SkeletonItem } from "../../components/Skeleton";
-import { cx } from "../../internal/cx";
-import { measureShapes } from "./shapes";
-import type { Shape } from "./shapes";
-import "./auto-skeleton.css";
+import { Skeleton, SkeletonItem } from "@/components/Skeleton";
+import { cx } from "@/internal/cx";
+import { measureShapes } from "@/experiments/AutoSkeleton/shapes";
+import type { Shape } from "@/experiments/AutoSkeleton/shapes";
+import "@/experiments/AutoSkeleton/auto-skeleton.css";
 
 export interface AutoSkeletonProps {
   /**

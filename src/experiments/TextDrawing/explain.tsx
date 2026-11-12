@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { TextArea } from "../../components/TextArea";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { closeness, colorAt } from "../Proximity/tracker";
-import { parseDrawing } from "./drawing";
-import "./explain.css";
+import { TextArea } from "@/components/TextArea";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { closeness, colorAt } from "@/experiments/Proximity/tracker";
+import { parseDrawing } from "@/experiments/TextDrawing/drawing";
+import "@/experiments/TextDrawing/explain.css";
 
 /* Live demos for the "How it works" page. They call the real parseDrawing(), and Proximity's real closeness() and
    colorAt(), so what they show is what runs. */

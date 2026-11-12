@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Option, Options, Themes } from "./Compare";
-import "./full-width-segments.css";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Option, Options, Themes } from "@/experiments/Revisit/Compare";
+import "@/experiments/Revisit/full-width-segments.css";
 
 const meta = {
   title: "Revisit/Full-width segmented control",

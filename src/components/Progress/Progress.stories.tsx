@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import { Button } from "../Button";
-import { Progress } from "./Progress";
+import { Button } from "@/components/Button";
+import { Progress } from "@/components/Progress/Progress";
 
 /** The px value of a length token, measured in the browser, from a probe inside `parent` so its pointer mode applies */
 function measure(token: string, parent: HTMLElement) {

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Checkbox } from "../../components/Checkbox";
-import { Progress } from "../../components/Progress";
-import type { ProgressSize } from "../../components/Progress";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Slider } from "../demo";
-import { Inspect } from "../Inspect";
+import { Checkbox } from "@/components/Checkbox";
+import { Progress } from "@/components/Progress";
+import type { ProgressSize } from "@/components/Progress";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Slider } from "@/how-it-works/demo";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Progress's "How it works" page. Every one renders the real Progress, styled by the real CSS. */
 

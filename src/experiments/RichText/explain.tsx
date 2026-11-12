@@ -3,13 +3,13 @@ import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import type { JSONContent, MarkdownToken } from "@tiptap/react";
 import { useEffect, useId, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { TextArea } from "../../components/TextArea";
-import "../../how-it-works/demo.css";
-import { ALLOWED_SCHEMES, EMAIL, isAllowedHref, normalizeHref, richTextExtensions, SCHEME, toMarkdown } from "./markdown";
-import { RichText, TOOLS } from "./RichText";
-import "./explain.css";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { TextArea } from "@/components/TextArea";
+import "@/how-it-works/demo.css";
+import { ALLOWED_SCHEMES, EMAIL, isAllowedHref, normalizeHref, richTextExtensions, SCHEME, toMarkdown } from "@/experiments/RichText/markdown";
+import { RichText, TOOLS } from "@/experiments/RichText/RichText";
+import "@/experiments/RichText/explain.css";
 
 /* Live demos for the "How it works" page. They use the real extensions, toMarkdown(), normalizeHref(),
    isAllowedHref(), and the toolbar's TOOLS, so what they show is what runs. */

@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, Slider } from "../../how-it-works/demo";
-import { PAINT_STOPS } from "./Connections";
-import "./explain.css";
-import { gap, lines } from "./lines";
-import type { Box } from "./lines";
-import { gray, mixPaint, rgbFromRyb, rybFromRgb, toCss } from "./paint";
-import type { Rgb, Ryb } from "./paint";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, Slider } from "@/how-it-works/demo";
+import { PAINT_STOPS } from "@/experiments/Connections/Connections";
+import "@/experiments/Connections/explain.css";
+import { gap, lines } from "@/experiments/Connections/lines";
+import type { Box } from "@/experiments/Connections/lines";
+import { gray, mixPaint, rgbFromRyb, rybFromRgb, toCss } from "@/experiments/Connections/paint";
+import type { Rgb, Ryb } from "@/experiments/Connections/paint";
 
 /* Live demos for the "How it works" page. They call the real gap(), lines(), and mixPaint(), so what they show is what runs. */
 

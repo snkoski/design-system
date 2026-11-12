@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import { takeWarnings } from "../../../tests/warnings";
-import { Checkbox } from "../Checkbox";
-import { CheckboxGroup } from "./CheckboxGroup";
-import type { CheckboxGroupProps } from "./CheckboxGroup";
+import { takeWarnings } from "@tests/warnings";
+import { Checkbox } from "@/components/Checkbox";
+import { CheckboxGroup } from "@/components/CheckboxGroup/CheckboxGroup";
+import type { CheckboxGroupProps } from "@/components/CheckboxGroup/CheckboxGroup";
 
 const options = (
   <>

@@ -1,8 +1,8 @@
 import { Field } from "@base-ui/react/field";
 import { Radio as BaseRadio } from "@base-ui/react/radio";
 import type { ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { warnIfUnnamed } from "@/internal/warn";
 
 /** A radio needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =

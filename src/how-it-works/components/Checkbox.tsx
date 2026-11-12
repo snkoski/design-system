@@ -1,10 +1,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
-import { Button } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import "../demo.css";
-import "./checkbox.css";
+import { Button } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import "@/how-it-works/demo.css";
+import "@/how-it-works/components/checkbox.css";
 
 /* Live demos for Checkbox's "How it works" page, also used by Checkbox group's. They render the real components, so
    what they show is what runs. */

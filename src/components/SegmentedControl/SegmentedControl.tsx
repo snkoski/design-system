@@ -2,10 +2,10 @@ import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import type { ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
 
 export type SegmentedControlSize = "md" | "lg";
 

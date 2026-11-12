@@ -1,9 +1,9 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
-import { Button } from "../Button";
-import { Input } from "../Input";
-import { TextArea } from "./TextArea";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { TextArea } from "@/components/TextArea/TextArea";
 
 // Fields fill their container, so give single stories a realistic width. (Defined outside meta: written
 // inline, its context argument breaks Storybook's inference of the story args.)

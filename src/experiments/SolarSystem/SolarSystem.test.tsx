@@ -2,8 +2,8 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { formatDate, SolarSystem } from "./SolarSystem";
-import type { SolarSystemProps } from "./SolarSystem";
+import { formatDate, SolarSystem } from "@/experiments/SolarSystem/SolarSystem";
+import type { SolarSystemProps } from "@/experiments/SolarSystem/SolarSystem";
 
 const DAY = 86_400_000;
 const PLUTO_CLOSEST = Date.UTC(1989, 8, 5);

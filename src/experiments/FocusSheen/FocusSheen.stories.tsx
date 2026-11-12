@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
 import { expect } from "storybook/test";
-import { Button, ButtonLink } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { Input } from "../../components/Input";
-import { Radio, RadioGroup } from "../../components/RadioGroup";
-import { Switch } from "../../components/Switch";
-import { FocusSheen } from "./FocusSheen";
+import { Button, ButtonLink } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Input } from "@/components/Input";
+import { Radio, RadioGroup } from "@/components/RadioGroup";
+import { Switch } from "@/components/Switch";
+import { FocusSheen } from "@/experiments/FocusSheen/FocusSheen";
 
 const eases = {
   "ease-in-out (now)": "var(--ease-in-out)",

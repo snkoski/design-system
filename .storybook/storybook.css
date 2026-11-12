@@ -1,8 +1,8 @@
 /* Storybook's own stylesheet: the design system, plus Tailwind for story layout only. */
 @import "tailwindcss";
-@import "../src/styles/tailwind-theme.css";
-@import "../src/styles/fonts.css";
-@import "../src/styles/index.css";
+@import "@/styles/tailwind-theme.css";
+@import "@/styles/fonts.css";
+@import "@/styles/index.css";
 
 @source "../src";
 

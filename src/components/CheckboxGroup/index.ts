@@ -1,2 +1,2 @@
-export { CheckboxGroup } from "./CheckboxGroup";
-export type { CheckboxGroupProps } from "./CheckboxGroup";
+export { CheckboxGroup } from "@/components/CheckboxGroup/CheckboxGroup";
+export type { CheckboxGroupProps } from "@/components/CheckboxGroup/CheckboxGroup";

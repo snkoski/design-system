@@ -1,10 +1,10 @@
 import { act, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Bounce } from "../Bounce/Bounce";
-import { forces, separate } from "./forces";
-import { Magnet } from "./Magnet";
-import type { MagnetProps } from "./Magnet";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import { forces, separate } from "@/experiments/Magnets/forces";
+import { Magnet } from "@/experiments/Magnets/Magnet";
+import type { MagnetProps } from "@/experiments/Magnets/Magnet";
 
 describe("forces", () => {
   const thing = (x: number, charge: number, size = 0) => ({ x, y: 0, width: size, height: size, charge });

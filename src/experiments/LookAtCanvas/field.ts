@@ -2,8 +2,8 @@
  * The math for a field of bars that stand on end toward the pointer, kept apart from the canvas so it can be
  * tested. Angles are in degrees, clockwise from pointing up, and never wrap, so each turn takes the short way.
  */
-import { closeness } from "../Proximity/tracker";
-import type { ProximityFade } from "../Proximity/Proximity";
+import { closeness } from "@/experiments/Proximity/tracker";
+import type { ProximityFade } from "@/experiments/Proximity/Proximity";
 
 /** Where the bars sit, in CSS px from the canvas's top left: a grid of cells, each bar in the middle of its cell */
 export interface Layout {

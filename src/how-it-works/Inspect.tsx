@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import "./demo.css";
+import "@/how-it-works/demo.css";
 
 /* A live view of the HTML a real component renders, for "How it works" pages: use the component, and every attribute it
    or Base UI changes is marked as it changes. */

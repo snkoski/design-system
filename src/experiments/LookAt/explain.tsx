@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
-import { Button } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, Slider } from "../../how-it-works/demo";
-import "./explain.css";
-import { nearest, targetAngle } from "./tracker";
+import { Button } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, Slider } from "@/how-it-works/demo";
+import "@/experiments/LookAt/explain.css";
+import { nearest, targetAngle } from "@/experiments/LookAt/tracker";
 
 /* Live demos for the "How it works" page. They call the real targetAngle() and nearest() from tracker.ts, so what
    they show is what runs. */

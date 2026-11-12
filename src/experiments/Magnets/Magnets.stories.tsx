@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import { expect } from "storybook/test";
-import { Bounce } from "../Bounce/Bounce";
-import { Magnet } from "./Magnet";
-import type { MagnetProps } from "./Magnet";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import { Magnet } from "@/experiments/Magnets/Magnet";
+import type { MagnetProps } from "@/experiments/Magnets/Magnet";
 
 const page = { background: "var(--bg)", color: "var(--ink)" };
 /** A box to move around in: positioned, so the magnets measure it, with an edge you can see */

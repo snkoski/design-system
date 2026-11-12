@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import { Button } from "../Button";
-import { Spinner } from "./Spinner";
-import type { SpinnerProps } from "./Spinner";
+import { Button } from "@/components/Button";
+import { Spinner } from "@/components/Spinner/Spinner";
+import type { SpinnerProps } from "@/components/Spinner/Spinner";
 
 /** The px value of a length token, measured in the browser */
 function measure(token: string, parent: HTMLElement) {

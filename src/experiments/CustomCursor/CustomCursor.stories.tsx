@@ -3,12 +3,12 @@ import { Crosshair, Ghost, Heart, MousePointer2, Star, Wand2 } from "lucide-reac
 import { useState } from "react";
 import type { ReactElement } from "react";
 import { expect } from "storybook/test";
-import { Button, ButtonLink } from "../../components/Button";
-import { Checkbox } from "../../components/Checkbox";
-import { Input } from "../../components/Input";
-import { Radio, RadioGroup } from "../../components/RadioGroup";
-import { CustomCursor } from "./CustomCursor";
-import type { Hotspot } from "./CustomCursor";
+import { Button, ButtonLink } from "@/components/Button";
+import { Checkbox } from "@/components/Checkbox";
+import { Input } from "@/components/Input";
+import { Radio, RadioGroup } from "@/components/RadioGroup";
+import { CustomCursor } from "@/experiments/CustomCursor/CustomCursor";
+import type { Hotspot } from "@/experiments/CustomCursor/CustomCursor";
 
 const meta = {
   title: "Experiments/Custom cursor",

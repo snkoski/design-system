@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "../../components/Button";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Spinner } from "../../components/Spinner";
-import { Inspect } from "../Inspect";
+import { Button } from "@/components/Button";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Spinner } from "@/components/Spinner";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Spinner's "How it works" page. Every one renders the real Spinner, styled by the real spinner.css. */
 

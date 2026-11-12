@@ -1,11 +1,11 @@
 import { useState } from "react";
 import type { CSSProperties, HTMLAttributes } from "react";
-import { TextArea } from "../../components/TextArea";
-import { cx } from "../../internal/cx";
-import { Proximity } from "../Proximity/Proximity";
-import { parseDrawing } from "./drawing";
-import type { Cell } from "./drawing";
-import "./text-drawing.css";
+import { TextArea } from "@/components/TextArea";
+import { cx } from "@/internal/cx";
+import { Proximity } from "@/experiments/Proximity/Proximity";
+import { parseDrawing } from "@/experiments/TextDrawing/drawing";
+import type { Cell } from "@/experiments/TextDrawing/drawing";
+import "@/experiments/TextDrawing/text-drawing.css";
 
 /** A heart of `=` in a frame of `-`, so there's something to move the mouse over straight away */
 export const HEART = [

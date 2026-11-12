@@ -1,10 +1,10 @@
 import { Check, Clock, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "../../components/Badge";
-import type { BadgeSize, BadgeTone } from "../../components/Badge";
-import { Checkbox } from "../../components/Checkbox";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { Inspect } from "../Inspect";
+import { Badge } from "@/components/Badge";
+import type { BadgeSize, BadgeTone } from "@/components/Badge";
+import { Checkbox } from "@/components/Checkbox";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { Inspect } from "@/how-it-works/Inspect";
 
 /* Live demos for Badge's "How it works" page. Every one renders the real Badge, styled by the real badge.css. */
 

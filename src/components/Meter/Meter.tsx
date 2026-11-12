@@ -1,9 +1,9 @@
 import { Meter as BaseMeter } from "@base-ui/react/meter";
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
 import { useId } from "react";
-import { barPercent, percentText } from "../../internal/bar";
-import { cx } from "../../internal/cx";
-import { hasContent, warn } from "../../internal/warn";
+import { barPercent, percentText } from "@/internal/bar";
+import { cx } from "@/internal/cx";
+import { hasContent, warn } from "@/internal/warn";
 
 export type MeterTone = "neutral" | "success" | "warning" | "danger";
 export type MeterSize = "sm" | "md";

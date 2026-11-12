@@ -1,2 +1,2 @@
-export { TextArea } from "./TextArea";
-export type { TextAreaProps, TextAreaResize, TextAreaSize } from "./TextArea";
+export { TextArea } from "@/components/TextArea/TextArea";
+export type { TextAreaProps, TextAreaResize, TextAreaSize } from "@/components/TextArea/TextArea";

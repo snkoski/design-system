@@ -1,10 +1,10 @@
 import { useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, Slider } from "../../how-it-works/demo";
-import "./explain.css";
-import { closeness, colorAt } from "./tracker";
-import type { ColorSpace } from "./tracker";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, Slider } from "@/how-it-works/demo";
+import "@/experiments/Proximity/explain.css";
+import { closeness, colorAt } from "@/experiments/Proximity/tracker";
+import type { ColorSpace } from "@/experiments/Proximity/tracker";
 
 /* Live demos for the "How it works" page. They call the real closeness() and colorAt() from tracker.ts, so what
    they show is what runs. */

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowUp } from "lucide-react";
 import { expect } from "storybook/test";
-import { Spin } from "./Spin";
+import { Spin } from "@/experiments/Spin/Spin";
 
 function Bar() {
   return (

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { TextDrawing } from "./TextDrawing";
+import { TextDrawing } from "@/experiments/TextDrawing/TextDrawing";
 
 const PRESETS: Record<string, string[] | undefined> = {
   "border to brand": undefined,

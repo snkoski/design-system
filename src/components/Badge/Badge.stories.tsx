@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Check, Clock, TriangleAlert, X } from "lucide-react";
 import { expect } from "storybook/test";
-import { Badge } from "./Badge";
+import { Badge } from "@/components/Badge/Badge";
 
 /** The px value of a length token, measured in the browser */
 function measure(token: string, parent: HTMLElement) {

@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import type { CSSProperties } from "react";
-import { Bounce } from "../Bounce/Bounce";
-import type { BounceProps } from "../Bounce/Bounce";
-import { interact } from "../Bounce/mover";
-import type { Interaction, Member } from "../Bounce/mover";
-import { collide, orbitVelocity, pulls } from "./gravity";
-import type { Moving, OrbitDirection } from "./gravity";
-import "./orbits.css";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import type { BounceProps } from "@/experiments/Bounce/Bounce";
+import { interact } from "@/experiments/Bounce/mover";
+import type { Interaction, Member } from "@/experiments/Bounce/mover";
+import { collide, orbitVelocity, pulls } from "@/experiments/Orbits/gravity";
+import type { Moving, OrbitDirection } from "@/experiments/Orbits/gravity";
+import "@/experiments/Orbits/orbits.css";
 
 export type { OrbitDirection };
 

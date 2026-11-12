@@ -1,8 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { FocusSheen } from "./FocusSheen";
-import "./explain.css";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { FocusSheen } from "@/experiments/FocusSheen/FocusSheen";
+import "@/experiments/FocusSheen/explain.css";
 
 /* A live demo for the "How it works" page. It's the real FocusSheen wrapper, focus-sheen.css's real ::before and
    @keyframes sheen, held still at a moment you choose, and the values the browser computes there. */

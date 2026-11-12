@@ -139,11 +139,11 @@ for (const name of listDir(componentsDir)) {
     if (!files.includes(required)) report(join(dir, required), 0, "missing-file", `every component needs ${required}`);
   }
   if (!cssName) report(join(dir, `${kebab(name)}.css`), 0, "missing-file", "every component needs its CSS file");
-  else if (!stylesIndex.includes(`../components/${name}/${cssName}`)) {
-    report(join(root, "src/styles/index.css"), 0, "css-import", `import ../components/${name}/${cssName}`);
+  else if (!stylesIndex.includes(`"@/components/${name}/${cssName}"`)) {
+    report(join(root, "src/styles/index.css"), 0, "css-import", `import @/components/${name}/${cssName}`);
   }
-  if (!packageIndex.includes(`./components/${name}`)) {
-    report(join(root, "src/index.ts"), 0, "export", `export ./components/${name}`);
+  if (!packageIndex.includes(`"@/components/${name}"`)) {
+    report(join(root, "src/index.ts"), 0, "export", `export @/components/${name}`);
   }
 
   // A sibling component in the same folder (such as ButtonLink) needs its own tests and stories
@@ -170,7 +170,21 @@ for (const name of listDir(componentsDir)) {
   }
 }
 
-// --- 3. Palette name in file names ---------------------------------------------------------------
+// --- 3. Imports start from an alias ----------------------------------------------------------------
+// Every import names its file from src (@/), docs (@docs/), tokens (@tokens/), or tests (@tests/), never with ./ or
+// ../, so it reads the same wherever it's written and doesn't break when a file moves. The one exception: a docs page
+// (.mdx) attached to its own stories imports them as ./Name.stories, because Storybook only follows a relative path
+// there to find the stories it belongs to.
+const IMPORT = /(?:\bfrom|\bimport|@import)\s*\(?\s*["'](\.{1,2}\/[^"'\n]*)["']/g;
+for (const file of [...walk(join(root, "src")), ...walk(join(root, "tests"))].filter((file) => /\.(ts|tsx|mdx|css)$/.test(file))) {
+  const text = read(file);
+  for (const match of text.matchAll(IMPORT)) {
+    if (file.endsWith(".mdx") && /^\.\/[A-Za-z]+\.stories$/.test(match[1])) continue;
+    report(file, lineOf(text, match.index), "relative-import", `${match[1]}: start the path with @/ (src), @docs/, @tokens/, or @tests/`);
+  }
+}
+
+// --- 4. Palette name in file names ---------------------------------------------------------------
 for (const file of [...walk(join(root, "src")), ...walk(join(root, "scripts"))]) {
   if (/sherbet/i.test(file)) report(file, 0, "palette-name", "never put the palette name in file names");
 }

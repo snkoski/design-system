@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { Meter } from "./Meter";
-import type { MeterProps } from "./Meter";
+import { Meter } from "@/components/Meter/Meter";
+import type { MeterProps } from "@/components/Meter/Meter";
 
 /** The px value of a length token, measured in the browser, from a probe inside `parent` so its pointer mode applies */
 function measure(token: string, parent: HTMLElement) {

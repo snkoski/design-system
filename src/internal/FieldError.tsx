@@ -1,6 +1,6 @@
 import { Field } from "@base-ui/react/field";
 import type { ReactNode } from "react";
-import { cx } from "./cx";
+import { cx } from "@/internal/cx";
 
 /** A warning triangle with an exclamation mark, drawn as Lucide's triangle-alert. Its line width comes from the CSS. */
 function ErrorIcon() {

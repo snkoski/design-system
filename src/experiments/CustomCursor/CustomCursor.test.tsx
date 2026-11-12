@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CustomCursor } from "./CustomCursor";
+import { CustomCursor } from "@/experiments/CustomCursor/CustomCursor";
 
 // jsdom has no canvas: stand one in that records what's drawn. And say image-set isn't supported, unless a
 // test says it is, so the expected cursor values don't depend on jsdom's version.

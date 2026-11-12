@@ -1,10 +1,10 @@
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
 import { useId } from "react";
-import { barPercent, percentText } from "../../internal/bar";
-import { cx } from "../../internal/cx";
-import { useLoadingAnnouncement } from "../../internal/useLoadingAnnouncement";
-import { hasContent, warn } from "../../internal/warn";
+import { barPercent, percentText } from "@/internal/bar";
+import { cx } from "@/internal/cx";
+import { useLoadingAnnouncement } from "@/internal/useLoadingAnnouncement";
+import { hasContent, warn } from "@/internal/warn";
 
 export type ProgressSize = "sm" | "md";
 

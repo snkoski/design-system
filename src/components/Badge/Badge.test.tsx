@@ -3,8 +3,8 @@ import { Check } from "lucide-react";
 import { createRef } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { Badge } from "./Badge";
-import type { BadgeProps, BadgeSize, BadgeTone } from "./Badge";
+import { Badge } from "@/components/Badge/Badge";
+import type { BadgeProps, BadgeSize, BadgeTone } from "@/components/Badge/Badge";
 
 /** The badge's own element, found by its words */
 function badge(words = "Offer") {

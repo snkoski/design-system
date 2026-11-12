@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { PointerEvent } from "react";
-import { Segment, SegmentedControl } from "../../components/SegmentedControl";
-import { fixed, percent, Slider } from "../../how-it-works/demo";
-import { REST, step } from "./physics";
+import { Segment, SegmentedControl } from "@/components/SegmentedControl";
+import { fixed, percent, Slider } from "@/how-it-works/demo";
+import { REST, step } from "@/experiments/Bounce/physics";
 
 /* Live demos for the "How it works" page. Both call the real step() from physics.ts, so what they show is what runs. */
 

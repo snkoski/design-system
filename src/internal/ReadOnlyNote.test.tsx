@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { ReadOnlyNote } from "./ReadOnlyNote";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
 
 describe("ReadOnlyNote", () => {
   it("says \"Read only\" in words", () => {

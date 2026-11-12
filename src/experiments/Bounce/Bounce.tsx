@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { HTMLAttributes, PointerEvent, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import "../decoration.css";
-import "./bounce.css";
-import { move, place, room } from "./mover";
-import type { Mover } from "./mover";
-import { velocity } from "./physics";
-import type { Edge } from "./physics";
+import { cx } from "@/internal/cx";
+import "@/experiments/decoration.css";
+import "@/experiments/Bounce/bounce.css";
+import { move, place, room } from "@/experiments/Bounce/mover";
+import type { Mover } from "@/experiments/Bounce/mover";
+import { velocity } from "@/experiments/Bounce/physics";
+import type { Edge } from "@/experiments/Bounce/physics";
 
 export type { Edge };
 export type BounceBounds = "parent" | "viewport";

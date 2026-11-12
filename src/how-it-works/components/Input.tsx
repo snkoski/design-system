@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
-import { fixed } from "../demo";
-import "./input.css";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { fixed } from "@/how-it-works/demo";
+import "@/how-it-works/components/input.css";
 
 /* Live demos for Input's "How it works" page. They render the real Input, so what they show is what ships. */
 

@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { SpinnerGraphic } from "./SpinnerGraphic";
+import { SpinnerGraphic } from "@/internal/SpinnerGraphic";
 
 describe("SpinnerGraphic", () => {
   it("draws a faint track and an arc in the text color", () => {

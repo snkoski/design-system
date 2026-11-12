@@ -1,10 +1,10 @@
 import { Field } from "@base-ui/react/field";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import type { ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import { FieldError } from "../../internal/FieldError";
-import { ReadOnlyNote } from "../../internal/ReadOnlyNote";
-import { warnIfUnnamed } from "../../internal/warn";
+import { cx } from "@/internal/cx";
+import { FieldError } from "@/internal/FieldError";
+import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { warnIfUnnamed } from "@/internal/warn";
 
 /** A switch needs a name a screen reader can announce: visible label text, or an `aria-label`. */
 type Labelled =

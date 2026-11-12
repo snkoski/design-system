@@ -1,11 +1,11 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import { Bounce } from "./Bounce";
-import type { BounceProps } from "./Bounce";
-import { interact } from "./mover";
-import type { Member } from "./mover";
-import { step, velocity } from "./physics";
+import { Bounce } from "@/experiments/Bounce/Bounce";
+import type { BounceProps } from "@/experiments/Bounce/Bounce";
+import { interact } from "@/experiments/Bounce/mover";
+import type { Member } from "@/experiments/Bounce/mover";
+import { step, velocity } from "@/experiments/Bounce/physics";
 
 const float = { gravity: 0, bounciness: 1 };
 const room = { width: 100, height: 50 };

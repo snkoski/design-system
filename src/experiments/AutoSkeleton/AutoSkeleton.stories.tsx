@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import { Button } from "../../components/Button";
-import { AutoSkeleton } from "./AutoSkeleton";
-import type { AutoSkeletonProps } from "./AutoSkeleton";
-import { ApplicationList, ProfileForm, applications, placeholderApplications, placeholderProfile, profile } from "./sample";
+import { Button } from "@/components/Button";
+import { AutoSkeleton } from "@/experiments/AutoSkeleton/AutoSkeleton";
+import type { AutoSkeletonProps } from "@/experiments/AutoSkeleton/AutoSkeleton";
+import { ApplicationList, ProfileForm, applications, placeholderApplications, placeholderProfile, profile } from "@/experiments/AutoSkeleton/sample";
 
 /**
  * Wrap content in `<AutoSkeleton loading={…}>`, and while it loads it's drawn as a skeleton automatically: a gray bar

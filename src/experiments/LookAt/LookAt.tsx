@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
-import { cx } from "../../internal/cx";
-import "../decoration.css";
-import "./look-at.css";
-import { reaim, watch } from "./tracker";
-import type { Watcher } from "./tracker";
+import { cx } from "@/internal/cx";
+import "@/experiments/decoration.css";
+import "@/experiments/LookAt/look-at.css";
+import { reaim, watch } from "@/experiments/LookAt/tracker";
+import type { Watcher } from "@/experiments/LookAt/tracker";
 
 export type LookAtDirection = "toward" | "away";
 

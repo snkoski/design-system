@@ -1,4 +1,4 @@
-import type { Elements, Orbit } from "./kepler";
+import type { Elements, Orbit } from "@/experiments/SolarSystem/kepler";
 
 export interface Body {
   name: string;

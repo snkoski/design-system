@@ -1,9 +1,9 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
-import { forgetPointer } from "../Proximity/tracker";
-import { parseDrawing } from "./drawing";
-import { HEART, TextDrawing } from "./TextDrawing";
+import { forgetPointer } from "@/experiments/Proximity/tracker";
+import { parseDrawing } from "@/experiments/TextDrawing/drawing";
+import { HEART, TextDrawing } from "@/experiments/TextDrawing/TextDrawing";
 
 afterEach(forgetPointer);
 

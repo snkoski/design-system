@@ -1,9 +1,9 @@
 // Visual blocks for the Foundations docs pages. Everything is drawn from tokens/tokens.json,
 // so a token change updates these pages automatically. Not part of the published package.
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import tokens from "../../tokens/tokens.json";
-import { Button } from "../components/Button";
-import "./foundations.css";
+import tokens from "@tokens/tokens.json";
+import { Button } from "@/components/Button";
+import "@/foundations/foundations.css";
 
 type Theme = "light" | "dark" | "hotdog";
 const THEMES: Array<{ id: Theme; name: string }> = [

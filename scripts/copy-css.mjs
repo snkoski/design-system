@@ -12,14 +12,16 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 mkdirSync(dist, { recursive: true });
 
-// Inline relative @imports so the published styles.css is a single file
+// Inline the @imports of our own files ("@/internal/field.css", from src) so the published styles.css is a single
+// file. A relative one would be left in as it is and break in the app, so it stops the build.
 function flatten(file, seen = new Set()) {
   const abs = resolve(file);
   if (seen.has(abs)) return "";
   seen.add(abs);
-  return readFileSync(abs, "utf8").replace(/^@import\s+"(\.{1,2}\/[^"]+)";\s*$/gm, (_, rel) =>
-    flatten(join(dirname(abs), rel), seen),
-  );
+  const css = readFileSync(abs, "utf8");
+  const relative = css.match(/^@import\s+"\.{1,2}\/[^"]+";/m);
+  if (relative) throw new Error(`${abs}: ${relative[0]} — import from src with @/ instead`);
+  return css.replace(/^@import\s+"@\/([^"]+)";\s*$/gm, (_, path) => flatten(join(root, "src", path), seen));
 }
 
 writeFileSync(join(dist, "styles.css"), flatten(join(root, "src/styles/index.css")));
