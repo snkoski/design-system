@@ -191,6 +191,11 @@
       "id": "selects",
       "name": "Selects",
       "group": "components"
+    },
+    {
+      "id": "number-fields",
+      "name": "Number fields",
+      "group": "components"
     }
   ],
   "systems": [
@@ -933,7 +938,8 @@
       "url": "https://primer.style/product/components/text-input",
       "system": "primer",
       "topics": [
-        "text-fields"
+        "text-fields",
+        "number-fields"
       ]
     },
     {
@@ -1174,7 +1180,8 @@
       "url": "https://atlassian.design/components/textfield/usage",
       "system": "atlassian",
       "topics": [
-        "text-fields"
+        "text-fields",
+        "number-fields"
       ]
     },
     {
@@ -1928,7 +1935,8 @@
       "url": "https://design-system.service.gov.uk/components/text-input/",
       "system": "govuk",
       "topics": [
-        "text-fields"
+        "text-fields",
+        "number-fields"
       ]
     },
     {
@@ -2071,7 +2079,8 @@
       "system": "uswds",
       "topics": [
         "text-fields",
-        "text-areas"
+        "text-areas",
+        "number-fields"
       ],
       "note": "Text areas are a section of this page."
     },
@@ -2640,6 +2649,47 @@
       "system": "apple",
       "topics": [
         "selects"
+      ]
+    },
+    {
+      "title": "Steppers",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/steppers",
+      "system": "apple",
+      "topics": [
+        "number-fields"
+      ]
+    },
+    {
+      "title": "Text field",
+      "url": "https://material-web.dev/components/text-field/",
+      "system": "material",
+      "topics": [
+        "number-fields"
+      ],
+      "note": "Material Web's text field, which takes type=\"number\"."
+    },
+    {
+      "title": "Number input usage",
+      "url": "https://carbondesignsystem.com/components/number-input/usage/",
+      "system": "carbon",
+      "topics": [
+        "number-fields"
+      ]
+    },
+    {
+      "title": "Spin button usage",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/spin/usage",
+      "system": "fluent",
+      "topics": [
+        "number-fields"
+      ]
+    },
+    {
+      "title": "Number field",
+      "url": "https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field",
+      "system": "polaris",
+      "topics": [
+        "number-fields"
       ]
     }
   ]

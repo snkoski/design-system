@@ -1,0 +1,241 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as NumberFieldStories from "./NumberField.stories";
+import { NumberField } from "@/components/NumberField/NumberField";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+import { ScoreForm } from "@/how-it-works/components/NumberField";
+
+<Meta of={NumberFieldStories} name="How it works" />
+
+# How Number field works
+
+A number field is a text field for amounts and quantities. Its value is a number, or `null` when it's empty. It reads what people type as they type it ("$1,234.5" is 1234.5), formats it when they leave the field ("$1,234.50"), and steps it with the arrow keys and two buttons, called steppers, at the end of the field. Around that, it's a text field like [Input](?path=/docs/components-input--how-it-works): the same label, help text, error, edge, states, and themes. This page covers what's different, and links to the Input page for the rest. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>NumberField.tsx</code></td><td>The component. It puts Base UI's number field inside a field with a label, help text, and an error, draws the two steppers' icons, drops the props that would break it, and keeps <code>step</code> from limiting what can be typed.</td></tr>
+    <tr><td><code>number-field.css</code></td><td>The look that's its own: the height, the digits, and the steppers.</td></tr>
+    <tr><td><code>src/internal/text-field.css</code> and <code>field.css</code></td><td>The look it shares with Input, TextArea, and NativeSelect (<code>text-field.css</code>: the field, its edge, every state, hot dog mode, and Windows high contrast) and with every form control (<code>field.css</code>: the label and description). Part of the published stylesheet.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>NumberField</code> and the <code>NumberFieldProps</code> and <code>NumberFieldSize</code> types.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code>, <code>ReadOnlyNote.tsx</code>, <code>warn.ts</code>, and <code>cx.ts</code></td><td>The shared error message, the "Read only" note, the development warnings, and the class name helper. Not exported.</td></tr>
+    <tr><td><code>NumberField.test.tsx</code> and <code>NumberField.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+[Base UI](https://base-ui.com), the unstyled library underneath, does the work: reading and formatting the number, the keyboard, the steppers, and the form. It comes in two sets of parts. `Field.Root`, `Field.Label`, `Field.Description`, and `Field.Error` (through `FieldError`) link the label, help text, and error to the input, as in every form control. `NumberField.Root`, `NumberField.Group`, `NumberField.Input`, `NumberField.Decrement`, and `NumberField.Increment` are the number field itself.
+
+## What it renders
+
+Here's a real number field in a real form. It's required, steps by 5 from 0 to 100, and checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then, after a failed submit, again each time it changes.
+
+<Unstyled>
+  <Inspect hint="Select Save score while it's empty. Then type 150, and watch the error change. Then press the Decrease button, which goes to 100, and save it.">
+    <ScoreForm />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="text-field number-field" data-size&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our classes</td><td>Holds the whole field. <code>data-size</code> comes from the <code>size</code> prop. Base UI adds the field's state, such as <code>data-invalid</code> and <code>data-disabled</code>.</td></tr>
+    <tr><td><code>&lt;label class="number-field__label" id for&gt;</code></td><td>Base UI's <code>Field.Label</code></td><td><code>for</code> points at the input, so clicking the label focuses it.</td></tr>
+    <tr><td><code>&lt;p class="number-field__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code></td><td>Help text between the label and the field, read before typing. A good place for the range.</td></tr>
+    <tr><td><code>&lt;div class="number-field__root"&gt;</code></td><td>Base UI's <code>NumberField.Root</code></td><td>Holds the number's state. No look of its own.</td></tr>
+    <tr><td><code>&lt;div role="group" class="number-field__box" data-steppers&gt;</code></td><td>Base UI's <code>NumberField.Group</code></td><td>Holds the input and the steppers, so the steppers can sit over the input's end. <code>data-steppers</code> is ours: it's there when the steppers are, and the input makes room for them.</td></tr>
+    <tr><td><code>&lt;input type="text" class="number-field__control" aria-roledescription="Number field" inputmode autocomplete="off"&gt;</code></td><td>Base UI's <code>NumberField.Input</code></td><td>The field you type in. It's a text input, not <code>type="number"</code>, so it can show "$1,234.50", and the scroll wheel can't change it. <code>aria-roledescription</code> tells screen readers it's a number field. <code>inputmode</code> asks a phone for its number keyboard: <code>numeric</code>, or on iOS, whose number keyboard has no minus or decimal key, <code>decimal</code> when <code>min</code> is 0 or more and <code>text</code> otherwise.</td></tr>
+    <tr><td><code>&lt;button class="number-field__step" aria-label="Decrease" tabindex="-1" aria-controls&gt;</code> and its Increase twin</td><td>Base UI's <code>NumberField.Decrement</code> and <code>Increment</code></td><td>The steppers. Out of the Tab order, because the arrow keys do the same from the input. Not hidden from screen readers, so someone using one on a touch screen can find and press them. <code>aria-controls</code> says which input they change. At a limit, the one that can't go further gets <code>disabled</code> and <code>data-disabled</code>.</td></tr>
+    <tr><td><code>&lt;svg class="number-field__icon" aria-hidden="true"&gt;</code></td><td>Us</td><td>A minus and a plus. Decorative: the buttons' names are already "Decrease" and "Increase".</td></tr>
+    <tr><td><code>&lt;input type="number" name step="any" aria-hidden="true"&gt;</code></td><td>Base UI's <code>NumberField.Root</code></td><td>Hidden. This is the one the form submits: the plain number, "85000", not "$85,000". Its <code>step</code> is ours (see below).</td></tr>
+  </tbody>
+</table>
+
+The typed text doesn't show in the HTML: like any text field's, it lives in the input's `value` property.
+
+## From props to HTML
+
+### The props
+
+<Code file="components/NumberField/NumberField.tsx" name="Labelled" />
+
+The same union as Input's: a `label`, or an `aria-label`, or the code doesn't compile.
+
+<Code file="components/NumberField/NumberField.tsx" name="OwnProps" />
+
+The value is a number. `onValueChange` gets a number on every keystroke that reads as one, on each step, and when the field is formatted on leaving it, and `null` when the field is emptied. `onValueCommitted` waits until a change is finished.
+
+`smallStep` and `largeStep` change Base UI's defaults. Base UI's Alt step is 0.1 and its Shift step is 10, whatever `step` is: so Alt+Up turned 15 guests into 15.1, and in a salary field that steps by 1,000, Shift+Up added only 10. Here Alt steps by `step` and Shift by ten of them.
+
+<Code file="components/NumberField/NumberField.tsx" name="NumberFieldProps" />
+
+The rest of the props are the input's, from Base UI's `NumberField.Input`, minus some that would break a number field:
+
+- `type` and `inputMode`, because the input must stay a text input, and Base UI picks the keyboard.
+- `pattern`, `maxLength`, and `minLength`, because they'd check the formatted text: "$1,000" fails `pattern="[0-9]*"`, and the browser would stop the form. `min`, `max`, and `step` are the number's limits.
+- `list` and `multiple`, which mean nothing for a number, and `size`, because ours is `md` or `lg`.
+- `className`, which goes on the wrapper, as on every form control, and `children` and `render`.
+
+### Props it drops
+
+<Code file="components/NumberField/NumberField.tsx" name="dropped" />
+
+<Code file="components/NumberField/NumberField.tsx" name="withoutDropped" />
+
+TypeScript refuses all of these, but JavaScript can still pass them. Each would quietly do the wrong thing, so the component removes them before anything else. Three are Base UI props this component decides for itself:
+
+- `allowWheelScrub` stays off: scrolling the page past a focused field must never change the number.
+- `allowOutOfRange` stays on: a number typed outside `min` and `max` is kept as typed, so the page can say what's wrong, rather than being changed when you leave the field. The steppers and arrow keys still stop at the limits.
+- `inputRef` is the component's own (below).
+
+### The component
+
+<Code file="components/NumberField/NumberField.tsx" name="NumberField" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart.** The dropped props go first. Then the component's own props are taken out, with `size = "md"`, `step = 1`, `smallStep` defaulting to `step`, and `largeStep` to ten of them. Base UI rounds each stepped value, so a step of 0.07 takes Shift+Up to exactly 0.7.
+2. **Warnings.** `warnIfUnnamed` catches an empty label, as in every form control. If `min` is greater than `max`, no number can be within both: Base UI would quietly turn every step, and every typed number on leaving the field, into `min`. Nothing on the page would look wrong, so this prints a development warning saying to swap them.
+3. **`step` is only how far a press moves.** Base UI copies `step` onto the hidden input the form submits, as the browser's own `step`. With `min={0} step={1000}`, the browser would then refuse 85,500 and stop the form. So after every render, a layout effect sets the hidden input's `step` back to `"any"`. React only writes the attribute again when `step` changes, and the effect runs after that too. The steppers still move 85,500 to 86,500.
+4. **The steppers** are left out when `steppers` is `false`, and always when the field is read-only, since they couldn't be used. `data-steppers` goes with them.
+5. **The wrapper, label, description, and error**, as in Input. `name` and `disabled` go to both `Field.Root` and `NumberField.Root`, so the label dims and the hidden input is named.
+6. **The field.** `NumberField.Root` gets the number props. `form` goes to the hidden input (through the root) and to the visible one, so pressing Enter in a field outside its form submits that form. Every other prop goes to `NumberField.Input`, where Base UI merges a page's `aria-describedby` with the field's own description and error.
+
+### The icons
+
+<Code file="components/NumberField/NumberField.tsx" name="PlusIcon" />
+
+Lucide's plus and minus, drawn inline, as the error's and read-only note's icons are, so the package doesn't depend on an icon library. Their line width comes from the CSS.
+
+## How it looks
+
+The look is in two files, inside `@layer components`. The label, description, edge, hover, focus, invalid, disabled, read-only, hot dog, and forced colors rules are shared with Input in `internal/text-field.css` and `internal/field.css`: the input carries the shared class next to its own (`class="text-field__control number-field__control"`). [How Input works](?path=/docs/components-input--how-it-works) walks through each shared rule. `number-field.css` has only what's different.
+
+### The field
+
+<Code file="components/NumberField/number-field.css" name=".number-field" />
+
+<Code file="components/NumberField/number-field.css" name='.number-field[data-size="lg"]' />
+
+One custom property holds the field's height: `--control-md`, or `--control-lg` for large. Both follow touch screens (44px and 52px) and compact density (32px and 40px) with no rules of their own. The same property sets each stepper's width, so the steppers are always square.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__control" />
+
+`tabular-nums` gives every digit the same width, so stepping 9 to 10 to 11 doesn't make the digits jiggle.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__box[data-steppers] .number-field__control" />
+
+With steppers, the input's end padding is two field heights, so typed text stops where the first stepper begins.
+
+### The steppers
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step" />
+
+Each stepper is a square as tall as the field, over the input's end. Its hit area is the whole square, at least `--target-min` in every mode (24px with a mouse, 44px on touch), right up to the field's edge. The button draws nothing itself: no fill and no border, so the field's edge shows through it. The rest of the rule resets the browser's own button look, for pages with no CSS reset. `inset-inline-end` is a logical property: on a right-to-left page the steppers sit at the left.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step:not(:last-child)" />
+
+Decrease sits one square in from the end, beside Increase.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step::before" />
+
+The stepper's visible box is a pseudo-element inset 4px (`--space-1`) on every side, with rounded corners. The field's edge is never thicker than 3px (hot dog's 2px border plus the 1px inset shadow of an invalid field), so the box never covers it, in any theme or state. Its transparent border is the stepper's border: invisible normally, and the outline that shows it in Windows high contrast.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step:hover:not([data-disabled])::before" />
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step:active:not([data-disabled])::before" />
+
+Hover fills the box with `surface-hover`, as a ghost button does, and pressing darkens it to `track-hover`. The fill fades over `--duration-fast`. Neither applies at a limit. Hovering a stepper doesn't darken the field's edge: the shared rule darkens it only when the input itself is hovered.
+
+<Code file="components/NumberField/number-field.css" name=".number-field__step[data-disabled] .number-field__icon" />
+
+At a limit, or in a disabled field, the icon dims to 50%. The icon is `ink` on the field's `surface`: dimmed, that's 3.30:1 in light, 4.65:1 in dark, and 3.71:1 in hot dog, above the 3:1 an icon needs. `tokens/contrast.json` can't hold an opacity, so `pnpm check:contrast --probe ink:surface:3 --opacity 0.5 --page surface` checks it.
+
+**Hot dog mode** adds nothing. The field keeps the shared ink edge and hard shadow, and the steppers don't press into it, as a button would: the shadow belongs to the whole field.
+
+### Windows high contrast
+
+<Code file="components/NumberField/number-field.css" name="@media (forced-colors: active)" />
+
+Windows replaces every background, so a hover fill would vanish. Instead, each stepper shows as an outlined box in the field's text color, gray when it can't be used, and in the highlight color while hovered or pressed. The hover rule comes after the disabled one and leaves disabled steppers out, so it can't cover them up.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** The field is one Tab stop: the steppers are skipped.
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>What happens</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Up and Down</td><td>Plus or minus <code>step</code>, stopping at <code>min</code> and <code>max</code></td></tr>
+    <tr><td>Shift with Up or Down</td><td>Plus or minus <code>largeStep</code> (ten steps)</td></tr>
+    <tr><td>Alt with Up or Down</td><td>Plus or minus <code>smallStep</code> (one step)</td></tr>
+    <tr><td>Home and End</td><td>Jump to <code>min</code> and <code>max</code>, when they're set</td></tr>
+    <tr><td>Enter</td><td>Submits the form, as in any text field</td></tr>
+  </tbody>
+</table>
+
+Letters are refused. A minus sign is accepted even when `min` is 0, because a typed number outside the range is kept for the page to check.
+
+**Pointer.** A press on a stepper steps the value, and holding it repeats. With a mouse it also focuses the input, so the arrow keys work next; on a touch screen it doesn't, so the phone's keyboard doesn't open and cover the page.
+
+**Screen readers** announce the label as its name, "Number field", the value, then the description and any error. If it's `required`, `invalid`, or read-only, they say so too. On a touch screen, swiping forward from the field reaches "Decrease" and then "Increase".
+
+**Forms.** What `FormData` gets, from the hidden input:
+
+<table>
+  <thead>
+    <tr><th>The field is</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Showing "$85,000", with <code>name="salary"</code></td><td><code>salary=85000</code>: the plain number</td></tr>
+    <tr><td>Empty</td><td>An empty value: <code>salary=</code></td></tr>
+    <tr><td>Between steps (85,500 with a step of 1,000)</td><td><code>salary=85500</code></td></tr>
+    <tr><td>Outside the range (150, with a <code>max</code> of 100)</td><td><code>score=150</code>, for the page to check. Without <code>noValidate</code>, the browser stops the form instead.</td></tr>
+    <tr><td>Read-only</td><td>Its value</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required and empty</td><td>The form doesn't submit, unless it has <code>noValidate</code></td></tr>
+  </tbody>
+</table>
+
+<Unstyled>
+  <Inspect hint="A read-only salary: formatted as currency, with a Read only note and no steppers. The hidden input still holds the plain number.">
+    <NumberField label="Salary" name="salary" readOnly defaultValue={85000} format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }} locale="en-US" />
+  </Inspect>
+</Unstyled>
+
+## The whole files
+
+<details>
+<summary><code>NumberField.tsx</code></summary>
+
+<Code file="components/NumberField/NumberField.tsx" />
+
+</details>
+
+<details>
+<summary><code>number-field.css</code></summary>
+
+<Code file="components/NumberField/number-field.css" />
+
+</details>
+
+<details>
+<summary><code>internal/text-field.css</code></summary>
+
+<Code file="internal/text-field.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/NumberField/index.ts" />
+
+</details>
