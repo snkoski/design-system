@@ -56,6 +56,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Meters and progress bars](#meters-and-progress-bars)
   - [Selects](#selects)
   - [Number fields](#number-fields)
+  - [Date pickers](#date-pickers)
 
 ## Choosing and building colors
 
@@ -138,6 +139,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators) and [Gauges](https://developer.apple.com/design/human-interface-guidelines/gauges) (A value within a range, with its current value and both ends labelled)
 - **Selects:** [Pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [Pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
 - **Number fields:** [Steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
+- **Date pickers:** [Pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
 
 ### Material Design 3 (Google)
 
@@ -160,6 +162,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines)
 - **Selects:** [Material Web select](https://material-web.dev/components/select/)
 - **Number fields:** [Text field](https://material-web.dev/components/text-field/) (material Web's text field, which takes type="number")
+- **Date pickers:** [Date pickers guidelines](https://m3.material.io/components/date-pickers/guidelines) and [Date pickers accessibility](https://m3.material.io/components/date-pickers/accessibility)
 
 ### GitHub Primer
 
@@ -186,6 +189,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [ProgressBar](https://primer.style/product/components/progress-bar/)
 - **Selects:** [Select guidelines](https://primer.style/product/components/select/guidelines/) and [SelectPanel](https://primer.style/product/components/select-panel/)
 - **Number fields:** [TextInput](https://primer.style/product/components/text-input)
+- **Date pickers:** [DatePicker (internal)](https://primer.style/product/internal-components/date-picker/) (gitHub's own; not for use outside GitHub)
 
 ### Atlassian Design System
 
@@ -214,6 +218,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
 - **Selects:** [Components for LLMs (Select)](https://atlassian.design/llms-components.txt)
 - **Number fields:** [Text field usage](https://atlassian.design/components/textfield/usage)
+- **Date pickers:** [Date picker usage](https://atlassian.design/components/datetime-picker/date-picker/usage) and [Date picker code](https://atlassian.design/components/datetime-picker/date-picker/code)
 
 ### IBM Carbon
 
@@ -239,6 +244,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 - **Selects:** [Select](https://carbondesignsystem.com/components/select/usage/) and [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/)
 - **Number fields:** [Number input usage](https://carbondesignsystem.com/components/number-input/usage/)
+- **Date pickers:** [Date picker usage](https://carbondesignsystem.com/components/date-picker/usage/)
 
 ### Microsoft Fluent 2
 
@@ -266,6 +272,7 @@ Everything we read from each system, grouped by topic.
 - **Meters and progress bars:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 - **Selects:** [Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
 - **Number fields:** [Spin button usage](https://fluent2.microsoft.design/components/web/react/core/spin/usage)
+- **Date pickers:** [DatePicker (compat)](https://storybooks.fluentui.dev/react/iframe.html?viewMode=docs&id=compat-components-datepicker--docs)
 
 ### Shopify Polaris
 
@@ -290,6 +297,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
 - **Selects:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
 - **Number fields:** [Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
+- **Date pickers:** [Date field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field)
 
 ### GOV.UK Design System
 
@@ -309,6 +317,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
 - **Selects:** [Select](https://design-system.service.gov.uk/components/select/)
 - **Number fields:** [Text input](https://design-system.service.gov.uk/components/text-input/)
+- **Date pickers:** [Date input](https://design-system.service.gov.uk/components/date-input/) and [Dates pattern](https://design-system.service.gov.uk/patterns/dates/)
 
 ### U.S. Web Design System
 
@@ -331,6 +340,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)
 - **Selects:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
 - **Number fields:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
+- **Date pickers:** [Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)
 
 ## Design systems, by topic
 
@@ -620,3 +630,15 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Shopify Polaris:** [Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
 - **GOV.UK Design System:** [Text input](https://design-system.service.gov.uk/components/text-input/)
 - **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
+
+### Date pickers
+
+- **Apple Human Interface Guidelines:** [Pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
+- **Material Design 3 (Google):** [Date pickers guidelines](https://m3.material.io/components/date-pickers/guidelines) and [Date pickers accessibility](https://m3.material.io/components/date-pickers/accessibility)
+- **GitHub Primer:** [DatePicker (internal)](https://primer.style/product/internal-components/date-picker/) (gitHub's own; not for use outside GitHub)
+- **Atlassian Design System:** [Date picker usage](https://atlassian.design/components/datetime-picker/date-picker/usage) and [Date picker code](https://atlassian.design/components/datetime-picker/date-picker/code)
+- **IBM Carbon:** [Date picker usage](https://carbondesignsystem.com/components/date-picker/usage/)
+- **Microsoft Fluent 2:** [DatePicker (compat)](https://storybooks.fluentui.dev/react/iframe.html?viewMode=docs&id=compat-components-datepicker--docs)
+- **Shopify Polaris:** [Date field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field)
+- **GOV.UK Design System:** [Date input](https://design-system.service.gov.uk/components/date-input/) and [Dates pattern](https://design-system.service.gov.uk/patterns/dates/)
+- **U.S. Web Design System:** [Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)

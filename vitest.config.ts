@@ -28,6 +28,9 @@ export default mergeConfig(
             include: ["src/**/*.test.{ts,tsx}"],
             setupFiles: ["./tests/setup.ts"],
             restoreMocks: true,
+            // A zone far from UTC, so code that reads "2026-11-12" as UTC midnight shows the 11th and a test fails.
+            // src/internal/time-zone.test.ts proves it took effect.
+            env: { TZ: "America/Anchorage" },
           },
         },
         {
@@ -39,6 +42,9 @@ export default mergeConfig(
           optimizeDeps: {
             include: [
               "@base-ui/react/*",
+              "@daypicker/react",
+              "date-fns",
+              "date-fns/locale",
               "@tiptap/react",
               "@tiptap/starter-kit",
               "@tiptap/markdown",

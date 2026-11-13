@@ -1,0 +1,264 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as DatePickerStories from "./DatePicker.stories";
+import { DatePicker } from "@/components/DatePicker/DatePicker";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+import { LocalePair, StartDateForm } from "@/how-it-works/components/DatePicker";
+
+<Meta of={DatePickerStories} name="How it works" />
+
+# How Date picker works
+
+A date picker is a text field for one date. People can type the date in several forms, or pick it from a month calendar that opens from a button at the end of the field. Its value, and what the form submits, is a date-only `yyyy-mm-dd` string, so time zones can't shift it. Around that, it's a text field like [Input](?path=/docs/components-input--how-it-works): the same label, help text, error, edge, states, and themes. This page covers what's different. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>DatePicker.tsx</code></td><td>The component. It keeps the field's text and the value, reads typed dates, tidies them when you leave the field, opens the calendar in a popover, and submits the value from a hidden input.</td></tr>
+    <tr><td><code>date-picker.css</code></td><td>The look that's its own: the height, the room for the button and where it sits, and the popup.</td></tr>
+    <tr><td><code>src/internal/dates.ts</code></td><td>Date-only strings: checking, reading, and formatting <code>yyyy-mm-dd</code> dates, and reading typed text.</td></tr>
+    <tr><td><code>src/internal/Calendar.tsx</code> and <code>calendar.css</code></td><td>The calendar: <a href="https://daypicker.dev">React DayPicker</a> with our classes, names, and chevrons, and its look.</td></tr>
+    <tr><td><code>src/internal/usePortalScope.ts</code></td><td>Carries the field's theme, pointer mode, density, motion setting, direction, and language into the popup, which is portalled out of the page.</td></tr>
+    <tr><td><code>src/internal/inset-button.css</code>, <code>text-field.css</code>, and <code>field.css</code></td><td>The calendar button's look, shared with NumberField's steppers and the calendar's month buttons; and the field's, shared with Input.</td></tr>
+    <tr><td><code>src/date-locales.ts</code></td><td>A second entry point, <code>design-system/date-locales</code>, that re-exports date-fns's locales, so an app never installs date-fns itself.</td></tr>
+  </tbody>
+</table>
+
+[Base UI](https://base-ui.com) has no date picker, so it's built from Base UI's `Field` parts (the label, help text, and error, linked to the input) and its `Popover` (the button, the popup, its focus, and closing on Escape or a click outside), with React DayPicker's calendar inside, as shadcn's Base UI date picker does.
+
+## What it renders
+
+Here's a real date picker in a real form. It's required, takes dates from Nov 3 to Dec 31, 2026, and checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then, after a failed submit, again on every keystroke.
+
+<Unstyled>
+  <Inspect hint="Select Save start date while it's empty. Type next Tuesday and watch the error change, then type 11/27/2026, leave the field, and watch it become Nov 27, 2026. Then open the calendar, pick a day, and save it.">
+    <StartDateForm />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="text-field date-picker" data-size&gt;</code></td><td>Base UI's <code>Field.Root</code></td><td>Holds the whole field. It has no <code>name</code>: Base UI would put it on the visible input too, and the form would send the date twice.</td></tr>
+    <tr><td><code>&lt;label class="date-picker__label"&gt;&lt;span id&gt;</code></td><td>Base UI's <code>Field.Label</code></td><td>The label. Its words are in a span with our own id, which the calendar button's name points at.</td></tr>
+    <tr><td><code>&lt;input type="text" class="date-picker__control" autocomplete="off"&gt;</code></td><td>Base UI's <code>Input</code></td><td>The field you type in. A text input, so it can show "Nov 12, 2026" and take any of the forms below. No <code>inputmode</code>, so phones show the full keyboard: month names need letters.</td></tr>
+    <tr><td><code>&lt;button class="inset-button date-picker__button" aria-labelledby aria-haspopup="dialog" aria-expanded&gt;</code></td><td>Base UI's <code>Popover.Trigger</code></td><td>Opens the calendar. Named "Choose date, Start date", from a visually hidden "Choose date," and the label, so two date fields don't give two identical buttons. A Tab stop, after the input.</td></tr>
+    <tr><td><code>&lt;div role="dialog" class="date-picker__popup"&gt;</code></td><td>Base UI's <code>Popover.Popup</code>, portalled to the end of <code>&lt;body&gt;</code></td><td>The calendar, named like the button. Not modal: the page still scrolls, and a click outside closes it.</td></tr>
+    <tr><td><code>&lt;table role="grid" class="calendar__grid"&gt;</code> and a <code>&lt;button&gt;</code> per day</td><td>React DayPicker</td><td>The month, as a grid. One day is the Tab stop; the arrows move between days. Each day is named in full: "Thursday, November 12, 2026, selected".</td></tr>
+    <tr><td><code>&lt;input type="hidden" name&gt;</code></td><td>Us</td><td>What the form submits: <code>2026-11-12</code>, never "Nov 12, 2026".</td></tr>
+  </tbody>
+</table>
+
+## From props to HTML
+
+### The props
+
+<Code file="components/DatePicker/DatePicker.tsx" name="OwnProps" />
+
+The value is a string. It's a `yyyy-mm-dd` date once what's typed reads as one, `""` when empty, and otherwise the text as typed, trimmed: "next Tuesday" stays "next Tuesday", so the page can tell "empty" from "not a real date". `onValueChange` is called on every keystroke, with the value read so far, which is how a page re-checks a field as it changes.
+
+<Code file="components/DatePicker/DatePicker.tsx" name="DatePickerChangeDetails" />
+
+<Code file="components/DatePicker/DatePicker.tsx" name="isDateValue" />
+
+The component never decides whether a date is acceptable: that's the page's choice, and its timing (on submit, then on every change) is the page's too. But it already knows whether the text is a real date, so it says so, in `details.isDate` and in `isDateValue`, which the page calls when it checks. A pattern like `/^\d{4}-\d{2}-\d{2}$/` isn't enough: "2026-11-31" matches it, and is kept as typed, because November has 30 days. The demo above checks with `isDateValue`.
+
+<Code file="components/DatePicker/DatePicker.tsx" name="dropped" />
+
+TypeScript refuses these, but JavaScript can still pass them. Each would check or shape the shown text, not the date, so they're removed first. `min` and `max` are our own props, and never reach the text input.
+
+### Dates are strings
+
+<Code file="internal/dates.ts" name="toDate" />
+
+A `yyyy-mm-dd` date becomes a `Date` only as local midnight. `new Date("2026-11-12")` would read it as midnight in London, which is the evening of the 11th anywhere west of it, and the calendar would choose the wrong day. The unit tests run in Alaska time, so that mistake fails a test.
+
+### Reading what's typed
+
+<Code file="internal/dates.ts" name="readDate" />
+
+The text is read on every keystroke, in the `locale`. The year must be four digits, so "11/12/26" is never guessed. Then, in order: the format the field shows; year first ("2026-11-12", "2026/11/12"); numbers in the locale's own order, taken from its short date pattern (month first in en-US, day first in en-GB and de); and a month name with the day and year in any order ("12 Nov 2026", "November 12th, 2026", "12-Nov-2026"). A date has to exist: "Feb 30, 2026" isn't rolled into March. Text that matches nothing stays as typed.
+
+<Code file="internal/dates.ts" name="shownPattern" />
+
+The field shows the locale's medium date with a four-digit year: "Nov 12, 2026" in en-US, "12 Nov 2026" in en-GB. Whatever it shows has to read back, so a unit test types the shown text back into the field in all 95 of date-fns's locales. In 8 of them, date-fns can't read its own month abbreviations, and the field shows numbers instead.
+
+<Unstyled>
+  <Inspect hint="The same date in two locales: the shown format follows locale. Open each calendar: the en-GB week starts on Monday.">
+    <LocalePair />
+  </Inspect>
+</Unstyled>
+
+### The component
+
+<Code file="components/DatePicker/DatePicker.tsx" name="DatePicker" />
+
+Reading it top to bottom:
+
+1. **Pulling props apart and warnings.** `warnIfUnnamed` catches an empty label. `min`, `max`, or `today` that isn't a real `yyyy-mm-dd` date warns and is ignored, and so does `min` after `max`, when no day could be picked. A `value` that isn't a date is fine: it's typed text.
+2. **The value and the text.** The component keeps the field's text as its own state, next to the value. Typing changes the text, reads it, and reports the result. **One rule ties them together:** if the text doesn't read as the value, it's replaced by the value's own text. A page that follows `onValueChange` always holds what the text reads as, so typing is left alone, even "11/1" halfway through a date. A page that ignores it undoes the keystroke, as a controlled `<input>` does. A page that sets a new value replaces the text.
+3. **Tidying.** Leaving the field, or pressing Enter, after an edit rewrites a date in the shown format. It doesn't call `onValueChange`: the value hasn't changed. Tabbing through without typing changes nothing.
+4. **Form reset.** An uncontrolled field goes back to `defaultValue` when its form is reset. The `reset` event fires before the browser resets the fields, so the component waits a moment.
+5. **The calendar.** Opening reads `today` (the browser's, unless the prop sets it) and picks the month: the value's, or today's, moved into the range from `min`'s month to `max`'s. Focus goes to the chosen day, or today, or the first day that can be picked. Picking a day closes the calendar and puts focus back on the button; picking the day already chosen just closes it. A read-only field has no button, and a field that becomes read-only or disabled closes its calendar.
+6. **The hidden input** submits the value. Disabled, it's disabled too, so nothing is submitted.
+
+### The calendar
+
+<Code file="internal/Calendar.tsx" name="classNames" />
+
+Every DayPicker part gets one of our classes, so no `rdp-` class ships, and DayPicker's own stylesheet is never loaded. The states (today, chosen, can't be picked) are styled from the attributes DayPicker renders: `data-today`, `aria-selected`, and `data-disabled`.
+
+<Code file="internal/Calendar.tsx" name="labelDayButton" />
+
+DayPicker names a day "Sunday, November 1st, 2026", which doesn't contain the "1" the button shows: that fails WCAG's Label in Name rule, which axe checks. So each day's name has its plain number.
+
+### Into the popup
+
+<Code file="internal/usePortalScope.ts" name="usePortalScope" />
+
+The popup is portalled to the end of `<body>`, so a dialog's or table's `overflow` can't clip it. But the theme, pointer mode, and density are attributes on the page's sections, and the popup would leave them behind: in a hot dog section, the calendar would be light-themed, and on touch, mouse-sized. So the component copies them from the field's nearest ancestors onto the portal, and follows any change while it's open.
+
+## How it looks
+
+The field's look is shared with Input in `internal/text-field.css`; [How Input works](?path=/docs/components-input--how-it-works) walks through it.
+
+### The field and the button
+
+<Code file="components/DatePicker/date-picker.css" name=".date-picker" />
+
+<Code file="components/DatePicker/date-picker.css" name=".date-picker__button" />
+
+The calendar button is a square as tall as the field, over its end, so its hit area is the field's full height. It's drawn by the shared inset button: nothing at rest but its icon, with a box inset 4px inside it that fills on hover and press, as NumberField's steppers do. [How Number field works](?path=/docs/components-number-field--how-it-works) explains that box.
+
+<Code file="components/DatePicker/date-picker.css" name=".date-picker__button:focus-visible" />
+
+Unlike a stepper, it's a Tab stop. Its focus outline is pulled inside its visible box, so it never touches the field's edge.
+
+<Code file="components/DatePicker/date-picker.css" name=".inset-button.date-picker__button[data-popup-open]::before" />
+
+While the calendar is open, the button keeps its pressed fill, so it's clear which field the calendar belongs to.
+
+### The popup
+
+<Code file="components/DatePicker/date-picker.css" name=".date-picker__popup" />
+
+The popup sets its own color, font, and background: a portal inherits them from `<html>`, not from the field. It has no side padding, because on touch each day is 44px, the calendar is 308px wide, and on a 320px screen only the popup's edge and Base UI's 4px from each side fit around it.
+
+<Code file="components/DatePicker/date-picker.css" name=".date-picker__popup[data-starting-style]" />
+
+It slides down from the field as it fades in, and back the same way, faster, as it leaves. Reduced motion makes the distance 0, so it only fades.
+
+### The days
+
+<Code file="internal/calendar.css" name=".calendar__day-button" />
+
+<Code file="internal/calendar.css" name=".calendar__day-button::before" />
+
+Each day's button fills its cell, which is `--control-md` square: 40px with a mouse, 44px on touch, 32px compact. Its visible box is inset 4px, so the visible days are 8px apart.
+
+<Code file="internal/calendar.css" name=".calendar__day-button:focus-visible" />
+
+Why the inset matters: the focus color and the chosen day's fill are the same color, so an outline that crossed into the next cell would vanish over a chosen day. Pulled in, the outline stays inside its own cell.
+
+<Code file='internal/calendar.css' name='.calendar__day[data-today] .calendar__day-button' />
+
+<Code file='internal/calendar.css' name='.calendar__day[data-today]:not([aria-selected="true"]) .calendar__day-button::before' />
+
+<Code file='internal/calendar.css' name='.calendar__day[data-disabled] .calendar__day-button' />
+
+<Code file='internal/calendar.css' name='.calendar__day[aria-selected="true"] .calendar__day-button' />
+
+Today has a ring and bold, a shape and not just a color. A day that can't be picked is muted and struck through, still readable rather than dimmed. The chosen day is filled with `action` and bold; it comes last, so a chosen day that can't be picked (a typed date outside `min` and `max`) keeps its fill, with its number struck through.
+
+**Hot dog mode** gives the popup the chunky ink edge and hard shadow, and today's ring is thick ink. Nothing presses: the button is part of the field, and the days are cells of one grid.
+
+### Windows high contrast
+
+<Code file="internal/calendar.css" name="@media (forced-colors: active)" />
+
+Windows replaces every background. The chosen day becomes the system highlight, with `forced-color-adjust: none` so its number stays on it. Today's ring is the text color, a day that can't be picked is gray, and hover adds a highlight edge. The days have no edge of their own: the popup's edge is the grid's border.
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** Two Tab stops: the input, then the calendar button. In the calendar, the arrows move by day and week, Page Up and Page Down by month, Shift with them by year, and Home and End to the start and end of the week. Enter or Space picks a day; Escape closes without picking. Tab moves between the month buttons and the chosen day, and tabbing past the last closes the calendar.
+
+**Screen readers** announce the label as the field's name, then the description and any error. The button is "Choose date, Start date", and opens a dialog. Each day is read in full, with "Today" and "selected"; moving to another month is announced, because the month and year are in a polite live region.
+
+**Forms.** What `FormData` gets, from the hidden input:
+
+<table>
+  <thead>
+    <tr><th>The field shows</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>"Nov 12, 2026", with <code>name="start"</code></td><td><code>start=2026-11-12</code></td></tr>
+    <tr><td>Nothing</td><td><code>start=</code></td></tr>
+    <tr><td>"next Tuesday"</td><td><code>start=next Tuesday</code>, for the page to check</td></tr>
+    <tr><td>Read-only</td><td>Its value</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required and empty</td><td>The form doesn't submit, unless it has <code>noValidate</code></td></tr>
+  </tbody>
+</table>
+
+<Unstyled>
+  <Inspect hint="A read-only date: no calendar button, and a Read only note. The hidden input still holds the date.">
+    <DatePicker label="Start date" name="start" readOnly defaultValue="2026-11-12" today="2026-11-13" />
+  </Inspect>
+</Unstyled>
+
+## The whole files
+
+<details>
+<summary><code>DatePicker.tsx</code></summary>
+
+<Code file="components/DatePicker/DatePicker.tsx" />
+
+</details>
+
+<details>
+<summary><code>date-picker.css</code></summary>
+
+<Code file="components/DatePicker/date-picker.css" />
+
+</details>
+
+<details>
+<summary><code>internal/dates.ts</code></summary>
+
+<Code file="internal/dates.ts" />
+
+</details>
+
+<details>
+<summary><code>internal/Calendar.tsx</code></summary>
+
+<Code file="internal/Calendar.tsx" />
+
+</details>
+
+<details>
+<summary><code>internal/calendar.css</code></summary>
+
+<Code file="internal/calendar.css" />
+
+</details>
+
+<details>
+<summary><code>internal/usePortalScope.ts</code></summary>
+
+<Code file="internal/usePortalScope.ts" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/DatePicker/index.ts" />
+
+</details>

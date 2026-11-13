@@ -1,0 +1,90 @@
+/* A square ghost icon button whose visible box is inset inside its hit area: NumberField's steppers, DatePicker's
+   calendar button, and the calendar's month buttons. The button itself draws nothing, so it can sit over a field's edge
+   and let the edge show through; its visible box is the ::before. Each component places and sizes the button itself
+   (position, width, height); this file draws it. Imported before the components' CSS, so at equal specificity a
+   component's own rule wins. */
+@layer components {
+  /* The browser's own button look is reset, for pages with no CSS reset */
+  .inset-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    font: inherit;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* The visible box: inset by space-1 (4px) on every side. A field's edge is never more than 3px (hot dog's 2px border
+     plus the 1px inset shadow of an invalid field), so the fill never covers it, in any theme or state. Its transparent
+     border is the button's border, which forced colors shows. */
+  .inset-button::before {
+    content: "";
+    position: absolute;
+    inset: var(--space-1);
+    border: var(--border-thin) solid transparent;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .inset-button__icon {
+    position: relative; /* above the ::before */
+    width: var(--icon-md);
+    height: var(--icon-md);
+    stroke-width: var(--icon-stroke);
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+
+  /* "Can't be used" is data-disabled (Base UI's steppers and popover trigger) or aria-disabled (DayPicker's month
+     buttons, which never set the disabled attribute) */
+  .inset-button:hover:not(:is([data-disabled], [aria-disabled="true"]))::before {
+    background-color: var(--surface-hover);
+  }
+  .inset-button:active:not(:is([data-disabled], [aria-disabled="true"]))::before {
+    background-color: var(--track-hover);
+  }
+
+  /* Can't be used: the icon dims. Dimmed ink on surface is 3.30:1 in light, 4.65:1 in dark, and 3.71:1 in hot dog,
+     above the 3:1 an icon needs. contrast.json can't hold an opacity, so check it with
+     `pnpm check:contrast --probe ink:surface:3 --opacity 0.5 --page surface`. */
+  .inset-button:is([data-disabled], [aria-disabled="true"]) {
+    cursor: not-allowed;
+  }
+  .inset-button:is([data-disabled], [aria-disabled="true"]) .inset-button__icon {
+    opacity: 0.5;
+  }
+
+  /* Windows Contrast themes: backgrounds are replaced, so each button shows as an outlined box in the field's text
+     color, gray when it can't be used, and in the highlight color on hover and press. The hover rule comes after the
+     unavailable one and excludes it, so it can't override it. */
+  @media (forced-colors: active) {
+    .inset-button {
+      color: FieldText;
+    }
+    .inset-button::before {
+      border-color: FieldText;
+    }
+    .inset-button:is([data-disabled], [aria-disabled="true"]) {
+      color: GrayText;
+    }
+    .inset-button:is([data-disabled], [aria-disabled="true"])::before {
+      border-color: GrayText;
+    }
+    .inset-button:is([data-disabled], [aria-disabled="true"]) .inset-button__icon {
+      opacity: 1;
+    }
+    .inset-button:hover:not(:is([data-disabled], [aria-disabled="true"])),
+    .inset-button:active:not(:is([data-disabled], [aria-disabled="true"])) {
+      color: Highlight;
+    }
+    .inset-button:hover:not(:is([data-disabled], [aria-disabled="true"]))::before,
+    .inset-button:active:not(:is([data-disabled], [aria-disabled="true"]))::before {
+      border-color: Highlight;
+    }
+  }
+}

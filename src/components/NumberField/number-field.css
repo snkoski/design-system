@@ -34,97 +34,18 @@
     padding-inline-end: calc(2 * var(--number-field-height));
   }
 
-  /* Each stepper is a square as tall as the field, over its end, so its hit area is the field's full height (at least
-     target-min in every mode) with no pseudo-element. The button itself draws nothing and lets the field's edge show
-     through it: its visible box is the ::before below. The browser's own button look is reset, for pages with no CSS
-     reset. */
+  /* Each stepper is an inset button (internal/inset-button.css draws it), a square as tall as the field, over its end,
+     so its hit area is the field's full height (at least target-min in every mode) with no pseudo-element. */
   .number-field__step {
     position: absolute;
     inset-block: 0;
     inset-inline-end: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: var(--number-field-height);
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    appearance: none;
-    font: inherit;
-    color: var(--ink);
-    cursor: pointer;
   }
   .number-field__step:not(:last-child) {
     inset-inline-end: var(--number-field-height);
   }
 
-  /* The stepper's visible box: inset by space-1 (4px) on every side. The field's edge is never more than 3px (hot
-     dog's 2px border plus the 1px inset shadow of an invalid field), so the fill never covers it, in any theme or
-     state. Its transparent border is the stepper's border, which forced colors shows. */
-  .number-field__step::before {
-    content: "";
-    position: absolute;
-    inset: var(--space-1);
-    border: var(--border-thin) solid transparent;
-    border-radius: var(--radius-sm);
-    transition: background-color var(--duration-fast) var(--ease-out);
-  }
-
-  .number-field__icon {
-    position: relative; /* above the ::before */
-    width: var(--icon-md);
-    height: var(--icon-md);
-    stroke-width: var(--icon-stroke);
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .number-field__step:hover:not([data-disabled])::before {
-    background-color: var(--surface-hover);
-  }
-  .number-field__step:active:not([data-disabled])::before {
-    background-color: var(--track-hover);
-  }
-
-  /* At min or max, or in a disabled field: the icon dims. Dimmed ink on surface is 3.30:1 in light, 4.65:1 in dark,
-     and 3.71:1 in hot dog, above the 3:1 an icon needs. contrast.json can't hold an opacity, so check it with
-     `pnpm check:contrast --probe ink:surface:3 --opacity 0.5 --page surface`. */
-  .number-field__step[data-disabled] {
-    cursor: not-allowed;
-  }
-  .number-field__step[data-disabled] .number-field__icon {
-    opacity: 0.5;
-  }
-
   /* Hot dog mode: nothing extra. The field keeps the shared ink edge and hard shadow, and the steppers don't press:
      the shadow belongs to the whole field. */
-
-  /* Windows Contrast themes: backgrounds are replaced, so each stepper shows as an outlined box in the field's text
-     color, gray when it can't be used, and in the highlight color on hover and press. The hover rule comes after the
-     disabled one and excludes it, so it can't override it. */
-  @media (forced-colors: active) {
-    .number-field__step {
-      color: FieldText;
-    }
-    .number-field__step::before {
-      border-color: FieldText;
-    }
-    .number-field__step[data-disabled] {
-      color: GrayText;
-    }
-    .number-field__step[data-disabled]::before {
-      border-color: GrayText;
-    }
-    .number-field__step[data-disabled] .number-field__icon {
-      opacity: 1;
-    }
-    .number-field__step:hover:not([data-disabled]),
-    .number-field__step:active:not([data-disabled]) {
-      color: Highlight;
-    }
-    .number-field__step:hover:not([data-disabled])::before,
-    .number-field__step:active:not([data-disabled])::before {
-      border-color: Highlight;
-    }
-  }
 }

@@ -270,6 +270,24 @@ Most systems with a web form component keep a native select for forms, because t
 
 Only Carbon, Fluent, Polaris, and Spectrum have a number field of their own; Material and Primer use the browser's `type="number"`, and GOV.UK avoids it, because the scroll wheel changes it and it accepts "e". Those with steppers put them in or beside the field and disable the one at a limit. They split on a typed number outside the range: Spectrum clamps it by default when you leave the field, while Polaris, GOV.UK, and Carbon keep it and show an error. Sherbet keeps it, so nobody's typing is silently changed, and the page says what's wrong. It builds on Base UI's NumberField, which reads separators and symbols as they're typed and formats the number when you leave the field, and it turns the scroll wheel off. Polaris, Carbon, and GOV.UK all say a code or an ID made of digits isn't a number; Sherbet agrees and hasn't decided yet what to use for those.
 
+## Date pickers
+
+| System | Component | Typed, picked, or both | Where the calendar opens | Min, max, and unavailable days | A calendar for dates people know by heart? | Value |
+| --- | --- | --- | --- | --- | --- | --- |
+| Apple | Date picker (compact, inline, wheels) | Mostly picked; a keypad can type | A popover or modal (compact), or inline | Not stated | Not stated | Not stated |
+| Material 3 | Docked date picker, modal date picker, modal date input | Both, in one field; formats on Enter or leaving the field, "Don't automatically format" while typing; accepts dashes, spaces, slashes, and dots | Below the field (docked), or a dialog, full screen on phones | Not stated | No: "Don't use a modal date picker … such as a date of birth" | Not stated |
+| Primer | None public (an internal DatePicker) | — | — | — | — | — |
+| Atlassian | Date picker | Both, in one field; typed dates aren't limited, "so validation is necessary" | A dropdown below the field; a calendar button is optional | `minDate`, `maxDate`, a list, and a filter function | Not stated | ISO string, or empty |
+| Carbon | Date picker (simple input, single, range) | Both, in one field; the simple input is typed only | A menu from the calendar icon or on focus | Min and max; days outside can't be picked | No: the simple input for "a date of birth or credit card expiration" | Not stated |
+| Fluent 2 | DatePicker (a "compat" component; not on the Fluent 2 design site) | Picked; typing is opt-in | A popup below, on click or focus | Min and max; out-of-bounds dates can't be picked or entered | Not stated | `Date` or null |
+| Polaris | Date field (web components) | Both: "always give users the option to enter the date using a text field" | A popover opened by a button, not by focusing the field | Allow and disallow lists, and days of the week | Not for dates "many years" away | `YYYY-MM-DD` string |
+| GOV.UK | Date input (day, month, and year fields) | Typed only | No calendar | Errors for a date "in the wrong time frame" | No: a calendar only for a date "in the near future or recent past", and "never" one that needs JavaScript as the only way in | Three fields |
+| USWDS | Date picker, date range picker, memorable date | Both: "Always allow a user to type in the date manually" | Opened by a calendar button | `data-min-date` and `data-max-date` | No: memorable date for "a date they know well" | `YYYY-MM-DD` attributes |
+| Spectrum | DatePicker (a DateField of segments, and a calendar) | Both; typed in segments | A popover, or a tray on phones | `minValue`, `maxValue`, `isDateUnavailable`; unavailable days "crossed out" | Not stated | Date objects |
+| **Sherbet** | **DatePicker** | **Both, in one field, read as you type and tidied when you leave it** | **A popover from a calendar button at the field's end** | **`min`, `max`, `isDateUnavailable`; typed dates outside them are kept for the page to check; unavailable days struck through** | **No: the guidance says to type it, and a memorable-date field is an open question** | **A `yyyy-mm-dd` string, or the typed text when it isn't a date** |
+
+Every system with a calendar also lets people type, except Fluent, where typing is opt-in, and most put the calendar behind a button at the field rather than opening it on focus. They agree a calendar is for dates near today: GOV.UK, Material, Carbon, USWDS, and Polaris all steer dates people know by heart, like a date of birth, to typing. Where the keys are documented (Material, USWDS), they match React DayPicker's, which Sherbet uses: arrows by day and week, Page Up and Page Down by month, and Shift for a year. Sherbet reads the date as it's typed and formats it on leaving the field, as Material asks, and keeps a typed date that isn't real or is out of range, so the page can say what's wrong, as Atlassian expects pages to. Its value is a date-only `yyyy-mm-dd` string, like Atlassian's and Polaris's, so time zones can't shift it.
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -352,3 +370,14 @@ Only Carbon, Fluent, Polaris, and Spectrum have a number field of their own; Mat
 - [GOV.UK Text input](https://design-system.service.gov.uk/components/text-input/)
 - [USWDS Text input](https://designsystem.digital.gov/components/text-input/)
 - [React Spectrum NumberField](https://react-spectrum.adobe.com/react-spectrum/NumberField.html)
+- [Apple pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
+- [Material 3 date pickers](https://m3.material.io/components/date-pickers/guidelines) and their [accessibility](https://m3.material.io/components/date-pickers/accessibility)
+- [Primer's internal DatePicker](https://primer.style/product/internal-components/date-picker/)
+- [Atlassian Date picker usage](https://atlassian.design/components/datetime-picker/date-picker/usage) and [code](https://atlassian.design/components/datetime-picker/date-picker/code)
+- [Carbon Date picker](https://carbondesignsystem.com/components/date-picker/usage/)
+- [Fluent UI DatePicker](https://storybooks.fluentui.dev/react/iframe.html?viewMode=docs&id=compat-components-datepicker--docs)
+- [Polaris Date field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field)
+- [GOV.UK Date input](https://design-system.service.gov.uk/components/date-input/) and the [dates pattern](https://design-system.service.gov.uk/patterns/dates/)
+- [USWDS Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)
+- [React Spectrum DatePicker](https://react-spectrum.adobe.com/react-spectrum/DatePicker.html)
+- [shadcn/ui date picker](https://ui.shadcn.com/docs/components/date-picker)
