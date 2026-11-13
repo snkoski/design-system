@@ -6,6 +6,7 @@
 @import "@/styles/base.css";
 @import "@/internal/field.css";
 @import "@/internal/text-field.css";
+@import "@/internal/inset-button.css";
 @import "@/internal/choice.css";
 @import "@/internal/choice-group.css";
 @import "@/internal/field-error.css";
