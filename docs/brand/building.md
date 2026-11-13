@@ -3,6 +3,7 @@
 ## Stack
 
 - **Static and content sites:** Astro. React components render to HTML at build time and ship no JavaScript unless marked as an island (`client:visible`, `client:load`).
+- **Controls that submit through a hidden input** (NumberField and DatePicker) show formatted text and submit the plain value from a hidden input that their JavaScript keeps in step. Without JavaScript (an Astro page with no island, or before hydration), what's typed doesn't reach the form, which sends the starting value. Make them part of an island.
 - **Apps:** React with Vite, or a server-rendered framework, using the same components.
 - **Components:** shadcn/ui on **Base UI** (the shadcn default for new projects). Base UI provides keyboard, focus, and screen-reader behavior; Sherbet provides the look. Components are copied into the repo and are ours to edit.
 - **Icons:** Lucide.

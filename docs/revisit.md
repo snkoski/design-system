@@ -261,3 +261,33 @@ Raised while building NativeSelect (2026-11-12).
 **To decide:** when Safari and Firefox support `base-select`, try it on NativeSelect in a Revisit comparison story, and check the keyboard, screen readers, and phones still behave as a native select does.
 
 Raised while building NativeSelect (2026-11-12).
+
+## A field for memorable dates
+
+**Today:** a date people know by heart, such as a date of birth, goes in a DatePicker, and the description says typing is fine. Its calendar is there but rarely helps.
+
+**Why it's in question:** GOV.UK, Material, Carbon, and USWDS all say not to use a calendar for these: typing is faster, and paging back decades is slow. GOV.UK and USWDS use three fields (day, month, and year); Carbon and Material use a plain typed date.
+
+**To decide:** when a page first asks for one: a DatePicker with no calendar button (a `calendar={false}` prop, like NumberField's `steppers={false}`), or a separate field with day, month, and year boxes, as GOV.UK and USWDS do.
+
+Raised while building DatePicker (2026-11-13).
+
+## Translating the system's own words
+
+**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", and DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected". DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
+
+**Why it's in question:** a page in another language would want them all in its language, and a screen reader reads mixed languages with one voice.
+
+**To decide:** when a page in another language uses the system: a provider or a prop that passes translated strings to every component, and whether DatePicker's words should then follow its `locale`.
+
+Raised while building DatePicker (2026-11-13).
+
+## Stacking order for popups and sticky page structure
+
+**Today:** DatePicker's calendar, the first popup, has no `z-index`. Portalled to the end of `<body>`, it paints over everything in normal flow and over positioned elements without a `z-index`. There's no stacking token.
+
+**Why it's in question:** a page's sticky header or a dialog with its own `z-index` could cover a popup, and every later popup (Popover, Menu, Select, Tooltip) and page-structure component (AppShell, PageHeader) needs an agreed order.
+
+**To decide:** when AppShell (roadmap Phase 5) or the first dialog is built: a small set of stacking tokens (such as sticky, overlay, popup, toast), and which component uses which.
+
+Raised while building DatePicker (2026-11-13).
