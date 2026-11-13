@@ -88,6 +88,8 @@ src/foundations/             Storybook docs pages (MDX) that render docs/brand, 
                              Not part of the published package.
 src/how-it-works/            the pieces of every "How it works" page: <Code> (real source, read when the page loads),
                              <Inspect> (a component's live HTML), and the demos components' pages use. Not published.
+src/test-pages/              <Tests>, which every component's "Tests" page renders, and the parser that reads the test
+                             and story files. Not published.
 .storybook/                  config and the Light / Dark / Hot dog theme switch
 ```
 
@@ -220,6 +222,7 @@ Build a new component with `/new-component <Name>` (`.claude/skills/new-componen
 8. Someone has looked at it. Passing tests don't show whether it looks right: run `pnpm look` (below) and check the `AllThemes` screenshots for alignment, every state, and hot dog mode by eye, and again with `data-pointer="coarse"` and inside `data-density="compact"`.
 9. A new rule or pattern it introduces is on the right page in `docs/brand/`. If people need help deciding when to use it or which variant to pick, a guidance page, `docs/brand/<topic>.md`, is rendered by a `<Name>.mdx` beside the stories (see `buttons.md` and `Button.mdx`). If the major design systems handle it differently, `docs/brand/industry.md` has a section or row with what Sherbet chose.
 10. A "How it works" page, `HowItWorks.mdx`, beside the stories (see "How it works pages").
+11. A "Tests" page, `Tests.mdx`, beside the stories (see "Tests pages").
 
 ### Looking at a component
 
@@ -334,6 +337,16 @@ Every component and experiment has a "How it works" page, `HowItWorks.mdx` besid
 - Demos call the real code. Shared pieces (`Slider`, the `.explain` panel, chart styles) are in `src/how-it-works/demo.tsx` and `demo.css`. A component's own demos go in `src/how-it-works/components/<Name>.tsx`, never in the component's folder, which is published and checked by `pnpm check`. An experiment's go in its folder as `explain.tsx`.
 - MDX: Markdown tables don't render, so use HTML `<table>`. Wrap demos in `<Unstyled>`.
 - Follow the writing style below, and explain every term the first time it's used.
+
+## Tests pages
+
+Every component has a "Tests" page, `Tests.mdx` beside its stories, that lists what its tests check, for people who want to know what's covered without reading the test files.
+
+- The page is `<Tests folder="components/<Name>" />` from `src/test-pages/Tests.tsx`, under a heading. Copy Button's `Tests.mdx` and change the name.
+- `<Tests>` reads every `*.test.tsx` and `*.stories.tsx` in the folder as text when the page loads, so it can't go out of date. Each `it(…)` is one line, grouped by its `describe` blocks, and opens to show its code. Only stories with a `play` function are listed, with their description; the page says that every story is rendered and checked with axe.
+- The line is the test's name, so name each test for what it checks, in plain words ("calls onClick once per click"). A file's one outer `describe` with the component's name is dropped. `it.each` shows its table, and a test using `expectTypeOf` is marked as checked by `pnpm typecheck`.
+- The parser finds `describe`, `it`, `test`, and `it.each(table)` calls that start a line, with the name as a string literal. `src/test-pages/parse.test.ts` fails if it misses any test in a component's test files, or if a component folder has no `Tests.mdx`.
+- The rows are native `<details>`, since Accordion is a planned component. Swap them for it once it exists.
 
 ## Foundations pages
 
