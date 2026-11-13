@@ -261,3 +261,13 @@ Raised while building NativeSelect (2026-11-12).
 **To decide:** when Safari and Firefox support `base-select`, try it on NativeSelect in a Revisit comparison story, and check the keyboard, screen readers, and phones still behave as a native select does.
 
 Raised while building NativeSelect (2026-11-12).
+
+## The rows on Tests pages
+
+**Today:** each test on a component's "Tests" page is a native `<details>` element, styled in `src/test-pages/tests.css`, that opens to show the test's code.
+
+**Why it's in question:** Accordion is a planned component, but the open questions in `docs/proposed-roadmap-job-tracker.md` block new components, so the Tests pages couldn't wait for it.
+
+**To decide:** once Accordion exists, whether the Tests pages switch to it, which would also show it working on a long list.
+
+Raised while adding the Tests pages (2026-11-13).
