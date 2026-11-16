@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from "storybook/test";
 import { Button } from "@/components/Button";
 import { NumberField } from "@/components/NumberField/NumberField";
 import numberFieldCss from "@/components/NumberField/number-field.css?inline";
+import insetButtonCss from "@/internal/inset-button.css?inline";
 import textFieldCss from "@/internal/text-field.css?inline";
 
 /** The px value of a length token, measured in the browser. Pass a parent to see its `data-pointer`. */
@@ -294,6 +295,7 @@ function ShadowNumberField() {
         createPortal(
           <>
             <style>{textFieldCss}</style>
+            <style>{insetButtonCss}</style>
             <style>{numberFieldCss}</style>
             <NumberField label="Guests" defaultValue={4} />
           </>,

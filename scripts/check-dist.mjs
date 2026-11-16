@@ -16,11 +16,19 @@ const walk = (dir) =>
 
 const ALIAS = /(?:\bfrom|\bimport|@import)\s*\(?\s*["'](@(?:docs|tokens|tests)?\/[^"']*)["']/g;
 const problems = [];
+// Both entry points, and their types (package.json's "exports" and "typesVersions" point at them)
+for (const file of ["index.js", "index.d.ts", "date-locales.js", "date-locales.d.ts"]) {
+  try {
+    statSync(join(dist, file));
+  } catch {
+    problems.push(`dist/${file} is missing`);
+  }
+}
 for (const file of walk(dist).filter((file) => /\.(js|ts|css)$/.test(file))) {
   for (const match of readFileSync(file, "utf8").matchAll(ALIAS)) problems.push(`${relative(root, file)}: ${match[1]}`);
 }
 if (problems.length) {
-  console.error(`dist/ imports through a repo alias, which apps can't resolve:\n${problems.join("\n")}`);
+  console.error(`dist/ is missing an entry point, or imports through a repo alias, which apps can't resolve:\n${problems.join("\n")}`);
   process.exit(1);
 }
-console.log("dist/: no repo aliases left in the published files");
+console.log("dist/: both entry points built, and no repo aliases left in the published files");

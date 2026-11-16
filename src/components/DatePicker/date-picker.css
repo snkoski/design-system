@@ -1,0 +1,112 @@
+/* DatePicker: what's its own. The label, description, edge, hover, focus, invalid, disabled, read-only, hot dog, and
+   forced colors rules of the field are shared with Input in internal/text-field.css and field.css. The calendar button
+   is drawn by internal/inset-button.css, and the calendar inside the popup by internal/calendar.css. This file adds the
+   height, the room for the button, where the button sits, and the popup. Where it sits and how wide it is is the
+   layout's job. */
+@layer components {
+  /* The field's height, which is also the calendar button's width, so the button is square */
+  .date-picker {
+    --date-picker-height: var(--control-md);
+  }
+  .date-picker[data-size="lg"] {
+    --date-picker-height: var(--control-lg);
+  }
+
+  /* Positions the button over the end of the input. A little more room between the text above and the field than
+     between the label and its description. The hidden input the form submits adds nothing to the layout. */
+  .date-picker__box {
+    position: relative;
+  }
+  .date-picker__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  /* One line, as tall as a button of the same size. Digits of equal width, so dates line up in a column. */
+  .date-picker__control {
+    height: var(--date-picker-height);
+    appearance: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Typed text stops where the button begins */
+  .date-picker__box[data-button] .date-picker__control {
+    padding-inline-end: var(--date-picker-height);
+  }
+
+  /* The calendar button: a square as tall as the field, over its end, so its hit area is the field's full height. It's
+     a Tab stop, so its focus outline is pulled inside its visible box, which starts space-1 in from the button's edge:
+     the field's edge (3px at most) is never under it. */
+  .date-picker__button {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: var(--date-picker-height);
+  }
+  /* Rounded only while focused, so the outline's corners follow the visible box's: rounding the button itself would
+     also round its hit area, which follows border-radius */
+  .date-picker__button:focus-visible {
+    border-radius: calc(var(--radius-sm) + var(--space-1));
+    outline-offset: calc(-1 * (var(--space-1) + var(--focus-width)));
+  }
+
+  /* While the calendar is open, the button keeps the pressed fill, so it's clear which field the calendar belongs to.
+     As specific as the shared hover rule, and later, so it wins while hovered too. */
+  .inset-button.date-picker__button[data-popup-open]::before {
+    background-color: var(--track-hover);
+  }
+
+  /* The popup: a card below the field, lined up with the button. It sets its own color, font, and background, since a
+     portal inherits them from <html>, not from the field. No side padding: at 320px wide on touch, the 308px calendar
+     only fits with nothing around it but the edge. */
+  .date-picker__popup {
+    box-sizing: border-box;
+    padding-block: var(--space-1);
+    border: var(--border-thin) solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+  }
+
+  /* It slides down into place from the field (up, when it opens above), and leaves the same way, faster. Reduced
+     motion makes the distance 0, so it fades. */
+  .date-picker__popup[data-starting-style],
+  .date-picker__popup[data-ending-style] {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--motion-distance)));
+  }
+  .date-picker__positioner[data-side="top"] .date-picker__popup[data-starting-style],
+  .date-picker__positioner[data-side="top"] .date-picker__popup[data-ending-style] {
+    transform: translateY(var(--motion-distance));
+  }
+  .date-picker__popup[data-ending-style] {
+    transition:
+      opacity var(--duration-fast) var(--ease-in),
+      transform var(--duration-fast) var(--ease-in);
+  }
+
+  /* Hot dog mode: the popup gets the chunky ink edge and hard shadow. Nothing in it presses: the calendar button is
+     part of the field, and the days are cells of one grid. */
+  [data-theme="hotdog"] .date-picker__popup {
+    border: var(--border-thick) solid var(--ink);
+  }
+
+  /* Windows Contrast themes: the popup's edge in the text color (its shadow disappears), and the open button in the
+     highlight color, like a hovered one */
+  @media (forced-colors: active) {
+    .date-picker__popup {
+      border-color: CanvasText;
+    }
+    .inset-button.date-picker__button[data-popup-open] {
+      color: Highlight;
+    }
+    .inset-button.date-picker__button[data-popup-open]::before {
+      border-color: Highlight;
+    }
+  }
+}

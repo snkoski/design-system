@@ -146,7 +146,7 @@ function withoutDropped<T extends object>(props: T): T {
 function MinusIcon() {
   return (
     <svg
-      className="number-field__icon"
+      className="inset-button__icon number-field__icon"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -164,7 +164,7 @@ function MinusIcon() {
 function PlusIcon() {
   return (
     <svg
-      className="number-field__icon"
+      className="inset-button__icon number-field__icon"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -285,10 +285,10 @@ export function NumberField(props: NumberFieldProps) {
           />
           {showSteppers && (
             <>
-              <BaseNumberField.Decrement className="number-field__step">
+              <BaseNumberField.Decrement className="inset-button number-field__step">
                 <MinusIcon />
               </BaseNumberField.Decrement>
-              <BaseNumberField.Increment className="number-field__step">
+              <BaseNumberField.Increment className="inset-button number-field__step">
                 <PlusIcon />
               </BaseNumberField.Increment>
             </>

@@ -196,6 +196,11 @@
       "id": "number-fields",
       "name": "Number fields",
       "group": "components"
+    },
+    {
+      "id": "date-pickers",
+      "name": "Date pickers",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2690,6 +2695,111 @@
       "system": "polaris",
       "topics": [
         "number-fields"
+      ]
+    },
+    {
+      "title": "Pickers",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/pickers",
+      "system": "apple",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date pickers guidelines",
+      "url": "https://m3.material.io/components/date-pickers/guidelines",
+      "system": "material",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date pickers accessibility",
+      "url": "https://m3.material.io/components/date-pickers/accessibility",
+      "system": "material",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "DatePicker (internal)",
+      "url": "https://primer.style/product/internal-components/date-picker/",
+      "system": "primer",
+      "topics": [
+        "date-pickers"
+      ],
+      "note": "GitHub's own; not for use outside GitHub."
+    },
+    {
+      "title": "Date picker usage",
+      "url": "https://atlassian.design/components/datetime-picker/date-picker/usage",
+      "system": "atlassian",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date picker code",
+      "url": "https://atlassian.design/components/datetime-picker/date-picker/code",
+      "system": "atlassian",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date picker usage",
+      "url": "https://carbondesignsystem.com/components/date-picker/usage/",
+      "system": "carbon",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "DatePicker (compat)",
+      "url": "https://storybooks.fluentui.dev/react/iframe.html?viewMode=docs&id=compat-components-datepicker--docs",
+      "system": "fluent",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date field",
+      "url": "https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field",
+      "system": "polaris",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date input",
+      "url": "https://design-system.service.gov.uk/components/date-input/",
+      "system": "govuk",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Dates pattern",
+      "url": "https://design-system.service.gov.uk/patterns/dates/",
+      "system": "govuk",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Date picker",
+      "url": "https://designsystem.digital.gov/components/date-picker/",
+      "system": "uswds",
+      "topics": [
+        "date-pickers"
+      ]
+    },
+    {
+      "title": "Memorable date",
+      "url": "https://designsystem.digital.gov/components/memorable-date/",
+      "system": "uswds",
+      "topics": [
+        "date-pickers"
       ]
     }
   ]

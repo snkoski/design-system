@@ -1,0 +1,158 @@
+/* The month calendar inside DatePicker's popup (internal/Calendar.tsx, React DayPicker with our classes). Each day is a
+   square button as big as a field (control-md: 40px with a mouse, 44px on touch, 32px compact), so at least target-min,
+   with its visible box inset space-1 (4px), like an inset button's. The days have no edge of their own: the grid is one
+   control, and the popup's edge is its border, as a segmented control's track is its options'. States come from
+   DayPicker's attributes: aria-selected (chosen), data-today, and data-disabled (can't be picked). */
+@layer components {
+  .calendar {
+    --calendar-cell: var(--control-md);
+  }
+
+  /* Previous month, the month and year, and Next month across the top; the grid below, all seven columns wide */
+  .calendar__month {
+    display: grid;
+    grid-template-columns: var(--calendar-cell) 1fr var(--calendar-cell);
+    align-items: center;
+  }
+
+  .calendar__caption-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--calendar-cell);
+  }
+  .calendar__caption {
+    font-weight: 600;
+  }
+
+  /* The month buttons are inset buttons (internal/inset-button.css draws them), one cell square. They're Tab stops, so
+     their focus outline is pulled inside their visible box. DayPicker marks one that can't go further with
+     aria-disabled, which the shared rules dim. */
+  .calendar__nav-button {
+    width: var(--calendar-cell);
+    height: var(--calendar-cell);
+  }
+  .calendar__nav-button:focus-visible {
+    outline-offset: calc(-1 * (var(--space-1) + var(--focus-width)));
+  }
+
+  /* The grid: a plain table of seven cell-wide columns across the whole month, with the browser's own table spacing
+     reset */
+  .calendar__grid {
+    grid-column: 1 / -1;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    width: calc(7 * var(--calendar-cell));
+  }
+  .calendar__weekday,
+  .calendar__day {
+    padding: 0;
+    text-align: center;
+  }
+  .calendar__weekday {
+    padding-block-end: var(--space-1);
+    font-size: var(--text-small);
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+
+  /* Each day: the button fills its cell, which is its hit area. Its visible box is the ::before, inset space-1, drawn
+     behind the number (isolation keeps it inside the button). */
+  .calendar__day-button {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--calendar-cell);
+    height: var(--calendar-cell);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    appearance: none;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .calendar__day-button::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: var(--space-1);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  /* Focus: the shared outline, pulled in so it sits focus-offset outside the visible box and stays inside the cell.
+     The days' boxes are 8px apart, so an outline never reaches a neighbor's box, where it would vanish over a chosen
+     day's fill (focus and action are the same color). */
+  .calendar__day-button:focus-visible {
+    outline-offset: calc(var(--focus-offset) - var(--space-1));
+  }
+  /* Rounded only while focused, so the outline's corners follow the visible box's: rounding the buttons themselves would
+     also round their hit areas, which follow border-radius */
+  .calendar__day-button:focus-visible,
+  .calendar__nav-button:focus-visible {
+    border-radius: calc(var(--radius-sm) + var(--space-1));
+  }
+
+  .calendar__day:not([aria-selected="true"]) .calendar__day-button:hover:not(:disabled)::before {
+    background-color: var(--surface-hover);
+  }
+
+  /* Today: a ring and bold. Its name already starts with "Today". */
+  .calendar__day[data-today] .calendar__day-button {
+    font-weight: 600;
+  }
+  .calendar__day[data-today]:not([aria-selected="true"]) .calendar__day-button::before {
+    border: var(--border-thin) solid var(--border-strong);
+  }
+
+  /* Can't be picked: muted and struck through, still readable (ink-muted on surface is 6.19:1 at worst), not dimmed */
+  .calendar__day[data-disabled] .calendar__day-button {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  /* Chosen: the action fill, bold. After the unavailable rule, so a chosen day that can't be picked (a typed date
+     outside min and max) keeps the fill, with its number struck through in on-action. */
+  .calendar__day[aria-selected="true"] .calendar__day-button {
+    color: var(--on-action);
+    font-weight: 600;
+  }
+  .calendar__day[aria-selected="true"] .calendar__day-button::before {
+    background-color: var(--action);
+  }
+
+  /* Hot dog mode: today's ring is a thick ink edge, like every edge there. Nothing presses. */
+  [data-theme="hotdog"] .calendar__day[data-today]:not([aria-selected="true"]) .calendar__day-button::before {
+    border: var(--border-thick) solid var(--ink);
+  }
+
+  /* Windows Contrast themes: fills are replaced, so the chosen day is the system's highlight, with its text kept on it
+     (forced-color-adjust: none, or the Canvas backplate behind the number hides it); today's ring is the text color;
+     a day that can't be picked is gray; and hover adds a highlight edge, after the unavailable rule and never on the
+     chosen day. */
+  @media (forced-colors: active) {
+    .calendar__day[data-today]:not([aria-selected="true"]) .calendar__day-button::before {
+      border-color: CanvasText;
+    }
+    .calendar__day[data-disabled] .calendar__day-button {
+      color: GrayText;
+    }
+    .calendar__day:not([aria-selected="true"]) .calendar__day-button:hover:not(:disabled)::before {
+      border: var(--border-thin) solid Highlight;
+    }
+    .calendar__day[aria-selected="true"] .calendar__day-button {
+      forced-color-adjust: none;
+      color: HighlightText;
+    }
+    .calendar__day[aria-selected="true"] .calendar__day-button::before {
+      background-color: Highlight;
+    }
+  }
+}

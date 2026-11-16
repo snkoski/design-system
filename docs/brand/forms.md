@@ -13,7 +13,8 @@ Forms are where accessibility and clear writing matter most. These rules follow 
 - Set `type`, `inputmode`, and `autocomplete` so browsers and phones can help.
 - To choose one option from a long list, use a **NativeSelect**: a real `<select>`, which opens the phone's own picker and works with any form. For which control fits how many options, see Choosing from options on NativeSelect's page in Storybook (`docs/brand/choices.md`).
 - **Numbers** that are amounts or quantities (a salary, a count of minutes) use a **NumberField**, which reads numbers typed with separators and symbols, formats them when you leave the field, and steps with the arrow keys and two buttons. For when and how, see Choosing a number field on NumberField's page in Storybook (`docs/brand/numbers.md`). Don't use `type="number"`: the scroll wheel changes it by accident, it accepts "e", and it drops leading zeros. Codes and IDs that happen to be digits aren't numbers (see "A text field for codes and IDs" in `docs/revisit.md`).
-- **Dates** use a **DatePicker**: a text field where the date can be typed, with a button that opens a calendar. It submits `yyyy-mm-dd`.
+- **Dates** near today, such as a start date or a deadline, use a **DatePicker**: a text field where the date can be typed, with a button that opens a calendar. It submits `yyyy-mm-dd` once what's typed reads as a date, and otherwise what was typed, so the page can say it isn't a real date. A date people know by heart, such as a date of birth, is typed, not picked: see Choosing a date field on DatePicker's page in Storybook (`docs/brand/dates.md`).
+- **Form libraries** drive a NumberField or a DatePicker as a controlled field, with `value` and `onValueChange` (react-hook-form's `Controller`): each shows formatted text while the form gets the plain value, so a library that reads the text field itself (`register`) would store "$85,000" or "Nov 12, 2026".
 
 ## Required and optional fields
 

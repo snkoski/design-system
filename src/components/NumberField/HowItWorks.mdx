@@ -136,23 +136,27 @@ With steppers, the input's end padding is two field heights, so typed text stops
 
 <Code file="components/NumberField/number-field.css" name=".number-field__step" />
 
-Each stepper is a square as tall as the field, over the input's end. Its hit area is the whole square, at least `--target-min` in every mode (24px with a mouse, 44px on touch), right up to the field's edge. The button draws nothing itself: no fill and no border, so the field's edge shows through it. The rest of the rule resets the browser's own button look, for pages with no CSS reset. `inset-inline-end` is a logical property: on a right-to-left page the steppers sit at the left.
+Each stepper is a square as tall as the field, over the input's end. Its hit area is the whole square, at least `--target-min` in every mode (24px with a mouse, 44px on touch), right up to the field's edge. `inset-inline-end` is a logical property: on a right-to-left page the steppers sit at the left. That's all NumberField's own CSS says about a stepper: how it's drawn is shared with DatePicker's calendar button and the calendar's month buttons, in `internal/inset-button.css`, and each stepper carries that file's class next to its own (`class="inset-button number-field__step"`).
+
+<Code file="internal/inset-button.css" name=".inset-button" />
+
+The button draws nothing itself: no fill and no border, so the field's edge shows through it. The rule resets the browser's own button look, for pages with no CSS reset.
 
 <Code file="components/NumberField/number-field.css" name=".number-field__step:not(:last-child)" />
 
 Decrease sits one square in from the end, beside Increase.
 
-<Code file="components/NumberField/number-field.css" name=".number-field__step::before" />
+<Code file="internal/inset-button.css" name=".inset-button::before" />
 
-The stepper's visible box is a pseudo-element inset 4px (`--space-1`) on every side, with rounded corners. The field's edge is never thicker than 3px (hot dog's 2px border plus the 1px inset shadow of an invalid field), so the box never covers it, in any theme or state. Its transparent border is the stepper's border: invisible normally, and the outline that shows it in Windows high contrast.
+Its visible box is a pseudo-element inset 4px (`--space-1`) on every side, with rounded corners. The field's edge is never thicker than 3px (hot dog's 2px border plus the 1px inset shadow of an invalid field), so the box never covers it, in any theme or state. Its transparent border is the stepper's border: invisible normally, and the outline that shows it in Windows high contrast.
 
-<Code file="components/NumberField/number-field.css" name=".number-field__step:hover:not([data-disabled])::before" />
+<Code file="internal/inset-button.css" name='.inset-button:hover:not(:is([data-disabled], [aria-disabled="true"]))::before' />
 
-<Code file="components/NumberField/number-field.css" name=".number-field__step:active:not([data-disabled])::before" />
+<Code file="internal/inset-button.css" name='.inset-button:active:not(:is([data-disabled], [aria-disabled="true"]))::before' />
 
-Hover fills the box with `surface-hover`, as a ghost button does, and pressing darkens it to `track-hover`. The fill fades over `--duration-fast`. Neither applies at a limit. Hovering a stepper doesn't darken the field's edge: the shared rule darkens it only when the input itself is hovered.
+Hover fills the box with `surface-hover`, as a ghost button does, and pressing darkens it to `track-hover`. The fill fades over `--duration-fast`. Neither applies at a limit (`data-disabled`, which Base UI sets; the calendar's month buttons use `aria-disabled` instead, so the shared rules check both). Hovering a stepper doesn't darken the field's edge: the shared rule darkens it only when the input itself is hovered.
 
-<Code file="components/NumberField/number-field.css" name=".number-field__step[data-disabled] .number-field__icon" />
+<Code file="internal/inset-button.css" name='.inset-button:is([data-disabled], [aria-disabled="true"]) .inset-button__icon' />
 
 At a limit, or in a disabled field, the icon dims to 50%. The icon is `ink` on the field's `surface`: dimmed, that's 3.30:1 in light, 4.65:1 in dark, and 3.71:1 in hot dog, above the 3:1 an icon needs. `tokens/contrast.json` can't hold an opacity, so `pnpm check:contrast --probe ink:surface:3 --opacity 0.5 --page surface` checks it.
 
@@ -160,7 +164,7 @@ At a limit, or in a disabled field, the icon dims to 50%. The icon is `ink` on t
 
 ### Windows high contrast
 
-<Code file="components/NumberField/number-field.css" name="@media (forced-colors: active)" />
+<Code file="internal/inset-button.css" name="@media (forced-colors: active)" />
 
 Windows replaces every background, so a hover fill would vanish. Instead, each stepper shows as an outlined box in the field's text color, gray when it can't be used, and in the highlight color while hovered or pressed. The hover rule comes after the disabled one and leaves disabled steppers out, so it can't cover them up.
 
@@ -223,6 +227,13 @@ Letters are refused. A minus sign is accepted even when `min` is 0, because a ty
 <summary><code>number-field.css</code></summary>
 
 <Code file="components/NumberField/number-field.css" />
+
+</details>
+
+<details>
+<summary><code>internal/inset-button.css</code></summary>
+
+<Code file="internal/inset-button.css" />
 
 </details>
 
