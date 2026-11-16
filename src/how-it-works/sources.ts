@@ -87,6 +87,23 @@ function scan(line: string, inside: Inside) {
   return { depth, inside };
 }
 
+/**
+ * The last line of a call or block that opens on line `start`: the first line where every bracket opened since has
+ * closed, not counting brackets in strings, comments, or regular expressions. For a test's `it(…)`, or a story's
+ * `play: …` property.
+ */
+export function blockEnd(lines: string[], start: number) {
+  let depth = 0;
+  let inside: Inside = "code";
+  for (let index = start; index < lines.length; index++) {
+    const line = scan(lines[index]!, inside);
+    depth += line.depth;
+    inside = line.inside;
+    if (inside === "code" && depth <= 0) return index;
+  }
+  return lines.length - 1;
+}
+
 /** A line that carries on the statement above it: indented, or starting with `.`, `|`, `&`, `?`, `:`, or a closing bracket */
 const continues = (line: string | undefined) => line !== undefined && /^(\s+\S|[.|&?:)\]}])/.test(line);
 

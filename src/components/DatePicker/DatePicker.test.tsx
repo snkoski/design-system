@@ -962,12 +962,9 @@ describe("DatePicker", () => {
       expect(isDateValue(value)).toBe(true);
     });
 
-    it.each(["", "2026-11-31", "2026-02-29", "2026-13-01", "2026-1-5", "Nov 12, 2026", "next Tuesday"])(
-      "is false for %j",
-      (value) => {
-        expect(isDateValue(value)).toBe(false);
-      },
-    );
+    it.each(["", "2026-11-31", "2026-02-29", "2026-13-01", "2026-1-5", "Nov 12, 2026", "next Tuesday"])("is false for %j", (value) => {
+      expect(isDateValue(value)).toBe(false);
+    });
 
     it("agrees with the field: every value it calls a date is one the field reads and shows as a date", () => {
       const onValueChange = vi.fn();

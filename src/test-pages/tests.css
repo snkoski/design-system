@@ -1,0 +1,94 @@
+/* "Tests" pages: a component's tests, one line each, that open to show the code */
+.tests {
+  color: var(--ink);
+}
+
+.tests__totals {
+  list-style: revert; /* Tailwind's reset takes the bullets off every list in the docs */
+}
+
+/* Storybook's docs styles set every heading's and block's margins, so the files are spaced with padding, and the
+   group headings opt out of the docs styles with sb-unstyled */
+.tests__file {
+  padding: var(--space-4) 0;
+}
+
+.tests__group {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tests__list {
+  border: var(--border-thin) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.tests__row + .tests__row {
+  border-top: var(--border-thin) solid var(--border);
+}
+
+/* The chevron, then the name and its notes, which wrap under the name on a narrow screen */
+.tests__summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-2);
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  list-style: none;
+}
+.tests__summary::-webkit-details-marker {
+  display: none;
+}
+/* A chevron that turns when the row opens, so open and closed differ by shape, not color */
+.tests__summary::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  /* Centered on the first line of the name */
+  margin: calc(0.5lh - 0.35em) var(--space-1) 0 0;
+  border-right: var(--border-thick) solid currentColor;
+  border-bottom: var(--border-thick) solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.tests__row[open] > .tests__summary::before {
+  transform: rotate(45deg);
+}
+.tests__summary:hover {
+  background-color: var(--surface-hover);
+}
+.tests__summary:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: calc(-1 * var(--focus-width));
+}
+
+.tests__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+}
+
+.tests__name {
+  flex: 1 1 16rem;
+  color: var(--ink);
+}
+
+.tests__note {
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
+.tests__body {
+  padding: 0 var(--space-3) var(--space-2);
+}
+
+.tests__description {
+  color: var(--ink-muted);
+}
+
