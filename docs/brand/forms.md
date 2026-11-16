@@ -24,6 +24,7 @@ The big systems disagree here: GOV.UK marks optional fields and bans asterisks, 
 - **Ask only for what you need.** Most fields should be required.
 - **Mark optional fields** by adding "(optional)" to the label.
 - **No asterisks.** They're color and symbol only, and many people don't know what they mean.
+- A single checkbox or switch that must be on, such as agreeing to the terms, isn't marked either: its label says what ticking it agrees to ("I agree to the terms and conditions").
 - The one exception is a group of checkboxes where at least one must be ticked: ARIA has no required state for groups, so say "(required)" in the group's label.
 - Use the `required` attribute on required inputs so browsers and screen readers know.
 

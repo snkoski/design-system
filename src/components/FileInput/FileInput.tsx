@@ -50,7 +50,7 @@ interface OwnProps {
   invalid?: boolean;
   /** Blocks choosing and removing, and takes the field out of the tab order. A disabled field isn't submitted. */
   disabled?: boolean;
-  /** Tells assistive technology and the form that a file must be chosen. Say so in the label too, in words. */
+  /** Tells assistive technology and the form that a file must be chosen. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). */
   required?: boolean;
   /** Identifies the field when the form is submitted. Each chosen file is sent under it. */
   name?: string;

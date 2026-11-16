@@ -144,7 +144,7 @@ export const Sizes: Story = {
 
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
-  args: { label: "Start date (required)", required: true, invalid: true, error: "Enter a start date." },
+  args: { label: "Start date", required: true, invalid: true, error: "Enter a start date." },
 };
 
 /** A disabled field can't be focused, changed, opened, or submitted. */

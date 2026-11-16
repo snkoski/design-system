@@ -360,7 +360,7 @@ To see it without Windows, open Chrome's DevTools, open the Rendering panel, and
 
 In a read-only group, the arrow keys move focus without choosing, and Space does nothing. In a disabled group, Tab can still reach the chosen option, and nothing else works.
 
-As you enter the group, a screen reader announces its name, from the legend through `aria-labelledby`, and its description and error, through `aria-describedby`. On each option it reads the option's name, that it's a radio button, whether it's checked (`aria-checked`), and the descriptions and error linked to it. `aria-required`, `aria-invalid`, and `aria-disabled` let it say, in its own words, that the group is required, invalid, or unavailable. Say "(required)" in the label too, so everyone sees it, not only screen reader users.
+As you enter the group, a screen reader announces its name, from the legend through `aria-labelledby`, and its description and error, through `aria-describedby`. On each option it reads the option's name, that it's a radio button, whether it's checked (`aria-checked`), and the descriptions and error linked to it. `aria-required`, `aria-invalid`, and `aria-disabled` let it say, in its own words, that the group is required, invalid, or unavailable. The label doesn't say so: as [Forms](?path=/docs/foundations-forms--docs) says, the fields that aren't required are the ones marked, with "(optional)".
 
 ## 5. In a form
 

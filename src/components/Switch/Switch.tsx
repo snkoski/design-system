@@ -32,7 +32,7 @@ interface OwnProps {
   disabled?: boolean;
   /** Keeps the switch focusable and readable, but blocks changes. Shows "Read only" beside the label. */
   readOnly?: boolean;
-  /** Tells assistive technology and the form that this switch must be on. Say so in the label too, in words. */
+  /** Tells assistive technology and the form that this switch must be on. Don't mark it in the label: the label already says what turning it on agrees to (see Forms). */
   required?: boolean;
   /** Marks the switch as failing validation. Pair it with `error` so the problem is in words, not just color. */
   invalid?: boolean;

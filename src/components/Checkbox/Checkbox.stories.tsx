@@ -53,7 +53,7 @@ export const WithDescription: Story = {
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
   args: {
-    children: "I accept the terms (required)",
+    children: "I accept the terms",
     required: true,
     invalid: true,
     error: "You need to accept the terms to continue.",

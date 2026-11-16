@@ -203,7 +203,7 @@ One convention per job. Never mix them.
 Follow `docs/brand/forms.md` and `docs/brand/voice.md`. The essentials:
 
 - Visible label above every field, no colon, never a placeholder as the label. Help text between label and field.
-- Mark optional fields with "(optional)"; no asterisks. A checkbox group that needs at least one choice says "(required)" in its label.
+- Mark optional fields with "(optional)"; no asterisks. A checkbox group that needs at least one choice says "(required)" in its label. A required field, and a single checkbox or switch that must be on, isn't marked.
 - Validate on submit, then re-check a field as it changes. Never re-check on blur: an error vanishing as focus moves to the submit button shifts the button out from under the click. Never disable the submit button to signal an incomplete form.
 - Errors in words next to the field, with `aria-invalid` and `aria-describedby`. An error summary at the top for two or more errors, focused on submit.
 - Buttons start with a verb, have no punctuation, and say exactly what happens. Error messages say what went wrong and how to fix it, with no blame, jokes, "invalid," or "oops."

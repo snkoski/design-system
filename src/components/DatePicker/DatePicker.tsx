@@ -107,7 +107,7 @@ interface OwnProps {
   disabled?: boolean;
   /** Keeps the field focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label, and no calendar button. */
   readOnly?: boolean;
-  /** Tells assistive technology and the form that the field must be filled in. Say so in the label too, in words. It only checks the field isn't empty. */
+  /** Tells assistive technology and the form that the field must be filled in. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). It only checks the field isn't empty. */
   required?: boolean;
   /** Identifies the field when the form is submitted. The form gets the `yyyy-mm-dd` date, not the shown text. */
   name?: string;
