@@ -66,9 +66,12 @@ Write the proposal. Keep it to what the user needs to decide.
 
 1. Write the proposal to a file in the scratchpad. Give a fresh agent only its path, the repo root, and the revision (`git rev-parse HEAD`), never your reasoning. Tell it the open questions are the user's, so it flags what they leave unclear rather than repeating them.
 2. Answer every question it raises that isn't the user's, checking by running code where you can, and fold the answers in. For a question about an open question's option, specify that option fully, so the user picks between complete designs. If that changes your recommendation, say so and why.
-3. Run a fresh agent on the new draft. Repeat until it reports no blocking questions.
+3. Run a fresh agent on the new draft, and give it a short list of what changed since the last round too. It still reads the whole proposal, to catch a change that makes an unchanged section wrong, but goes back to the repo only for the changed parts and what they reach, so a long proposal fits in its turns. Repeat until it reports no blocking questions.
+4. Then run one more fresh agent with no list of changes, a full read like the first, so a knock-on effect the shorter rounds missed is caught before the user sees it.
 
-**Then present it and stop.** Give the user the proposal and its open questions, and get an explicit pick for each; a general "yes" isn't approval of your recommendations. Record their answers as decisions, remove the options they didn't pick, and run a fresh junior engineer again. Keep looping, with the user for anything that's theirs, until neither has an open question. Continue only after the user approves; if they change the design later, update the proposal and confirm again.
+If an agent is stopped at its turn limit without a report, send it a message (SendMessage) asking it to report from what it has already read, rather than starting over.
+
+**Then present it and stop.** Give the user the proposal and its open questions, and get an explicit pick for each; a general "yes" isn't approval of your recommendations. Record their answers as decisions, remove the options they didn't pick, and run a fresh junior engineer again, with a list of what their answers changed, then a full read before showing them the result. Keep looping, with the user for anything that's theirs, until neither has an open question. Continue only after the user approves; if they change the design later, update the proposal and confirm again.
 
 ## Phase 3: Tests first
 
