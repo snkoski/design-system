@@ -556,6 +556,47 @@ describe("FileInput", () => {
       await user.upload(getInput(container), pdf());
       expect(ref.current?.files?.[0]?.name).toBe("cv.pdf");
     });
+
+    it("runs a callback ref's cleanup when the input goes, and never calls it with null", () => {
+      const calls: (HTMLInputElement | null)[] = [];
+      const cleanup = vi.fn();
+      const ref = (element: HTMLInputElement | null) => {
+        calls.push(element);
+        return cleanup;
+      };
+      const { container, unmount } = render(<FileInput label="Résumé" ref={ref} />);
+      expect(calls).toEqual([getInput(container)]);
+      expect(cleanup).not.toHaveBeenCalled();
+      unmount();
+      expect(cleanup).toHaveBeenCalledOnce();
+      expect(calls).toHaveLength(1);
+    });
+
+    it("calls a callback ref with no cleanup with the input, then null when it goes", () => {
+      const calls: (HTMLInputElement | null)[] = [];
+      const { container, unmount } = render(<FileInput label="Résumé" ref={(element) => void calls.push(element)} />);
+      expect(calls).toEqual([getInput(container)]);
+      unmount();
+      expect(calls).toEqual([expect.any(HTMLInputElement), null]);
+    });
+
+    it("cleans up the old callback ref and calls the new one when the ref changes", () => {
+      const first = vi.fn();
+      const second = vi.fn();
+      const { container, rerender } = render(<FileInput label="Résumé" ref={() => first} />);
+      rerender(<FileInput label="Résumé" ref={() => second} />);
+      expect(first).toHaveBeenCalledOnce();
+      expect(second).not.toHaveBeenCalled();
+      expect(getInput(container)).toBeInTheDocument();
+    });
+
+    it("empties an object ref when the input goes", () => {
+      const ref = createRef<HTMLInputElement>();
+      const { container, unmount } = render(<FileInput label="Résumé" ref={ref} />);
+      expect(ref.current).toBe(getInput(container));
+      unmount();
+      expect(ref.current).toBeNull();
+    });
   });
 
   describe("types", () => {

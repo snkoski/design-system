@@ -67,7 +67,8 @@ src/styles/                  index.css (layer order and imports), base.css, font
 src/components/<Name>/       Name.tsx, name.css, Name.test.tsx, Name.stories.tsx, index.ts
 src/internal/                pieces several components share (cx, FieldError and field-error.css, ReadOnlyNote and
                              read-only-note.css, SpinnerGraphic and spinner-graphic.css, bar.ts and bar.css for the look Meter and
-                             Progress share, useLoadingAnnouncement, warn, usePortalScope for popups, dates.ts and Calendar
+                             Progress share, useLoadingAnnouncement, warn, usePortalScope for popups, useMergedRef for a component that
+                             needs its own element and also forwards `ref`, dates.ts and Calendar
                              with calendar.css for DatePicker), with tests, the CSS
                              form controls share (field.css, text-field.css, choice.css, choice-group.css,
                              inset-button.css), and

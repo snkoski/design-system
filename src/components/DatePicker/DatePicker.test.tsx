@@ -887,6 +887,47 @@ describe("DatePicker", () => {
       expect(ref.current).toBeInstanceOf(HTMLInputElement);
       expect(ref.current).toBe(getInput());
     });
+
+    it("runs a callback ref's cleanup when the input goes, and never calls it with null", () => {
+      const calls: (HTMLInputElement | null)[] = [];
+      const cleanup = vi.fn();
+      const ref = (element: HTMLInputElement | null) => {
+        calls.push(element);
+        return cleanup;
+      };
+      const { unmount } = render(<DatePicker label="Start date" ref={ref} today={today} />);
+      expect(calls).toEqual([getInput()]);
+      expect(cleanup).not.toHaveBeenCalled();
+      unmount();
+      expect(cleanup).toHaveBeenCalledOnce();
+      expect(calls).toHaveLength(1);
+    });
+
+    it("calls a callback ref with no cleanup with the input, then null when it goes", () => {
+      const calls: (HTMLInputElement | null)[] = [];
+      const { unmount } = render(<DatePicker label="Start date" ref={(element) => void calls.push(element)} today={today} />);
+      expect(calls).toEqual([getInput()]);
+      unmount();
+      expect(calls).toEqual([expect.any(HTMLInputElement), null]);
+    });
+
+    it("cleans up the old callback ref and calls the new one when the ref changes", () => {
+      const first = vi.fn();
+      const second = vi.fn();
+      const { rerender } = render(<DatePicker label="Start date" ref={() => first} today={today} />);
+      rerender(<DatePicker label="Start date" ref={() => second} today={today} />);
+      expect(first).toHaveBeenCalledOnce();
+      expect(second).not.toHaveBeenCalled();
+      expect(getInput()).toBeInTheDocument();
+    });
+
+    it("empties an object ref when the input goes", () => {
+      const ref = createRef<HTMLInputElement>();
+      const { unmount } = render(<DatePicker label="Start date" ref={ref} today={today} />);
+      expect(ref.current).toBe(getInput());
+      unmount();
+      expect(ref.current).toBeNull();
+    });
   });
 
   describe("server rendering", () => {
