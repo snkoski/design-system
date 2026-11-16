@@ -2,7 +2,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import type { ChangeEvent, DragEvent, InputHTMLAttributes, ReactNode, Ref } from "react";
+import type { ChangeEvent, DragEvent, InputHTMLAttributes, MouseEvent, ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
 import { FieldError } from "@/internal/FieldError";
 import { warnIfUnnamed } from "@/internal/warn";
@@ -106,6 +106,28 @@ function withoutDropped<T extends object>(props: T): T {
 }
 
 /** Lucide's X. Its line width comes from the CSS. */
+/** The names of the files an input holds */
+const namesOf = (files: FileList | null | undefined) => [...(files ?? [])].map((file) => file.name);
+
+/** Lucide's upload icon, before the field's words. Decorative: the field's name already says what it's for. */
+function UploadIcon() {
+  return (
+    <svg
+      className="file-input__upload"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      focusable="false"
+    >
+      <path d="M12 3v12" />
+      <path d="m17 8-5-5-5 5" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    </svg>
+  );
+}
+
 function RemoveIcon() {
   return (
     <svg
@@ -131,10 +153,12 @@ function announceChange(input: HTMLInputElement) {
 }
 
 /**
- * A field for choosing one file, or several, to send with a form: the browser's own file input, drawn as a text field
- * with its "Choose file" button inside, a label, a description, and an error. While a file is chosen, a Remove button at
- * the end of the field empties it again, which the browser's input can't do. The page checks each file's kind and size
- * and uploads it; `accept` only filters the picker. Built on Base UI's Field and Input, like Input.
+ * A field for choosing one file, or several, to send with a form: the browser's own file input, drawn as one button
+ * that says "Choose file", then the chosen file's name or how many, with a label, a description, and an error. The
+ * words are drawn over the input, the same in every browser; screen readers hear the browser's. While a file is
+ * chosen, a Remove button at the end of the field empties it again, which the browser's input can't do. The page checks
+ * each file's kind and size and uploads it; `accept` only filters the picker. Built on Base UI's Field and Input, like
+ * Input.
  */
 export function FileInput(props: FileInputProps) {
   const {
@@ -165,11 +189,12 @@ export function FileInput(props: FileInputProps) {
     [ref],
   );
 
-  // How many files are chosen, for the Remove button. Read from the input, never assumed: on mount (a browser may
-  // restore files after Back), on every change, and after a form reset.
-  const [count, setCount] = useState(0);
-  const readCount = useCallback(() => setCount(inputRef.current?.files?.length ?? 0), []);
-  useEffect(readCount, [readCount]);
+  // The chosen files' names, for the words on the field and the Remove button. Read from the input, never assumed: on
+  // mount (a browser may restore files after Back), on every change, and after a form reset.
+  const [names, setNames] = useState<string[]>([]);
+  const readNames = useCallback(() => setNames(namesOf(inputRef.current?.files)), []);
+  useEffect(readNames, [readNames]);
+  const count = names.length;
 
   // Form reset empties the input but fires no change. The reset event fires before the browser resets the fields.
   useEffect(() => {
@@ -177,20 +202,29 @@ export function FileInput(props: FileInputProps) {
     if (!formElement) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const onReset = () => {
-      timer = setTimeout(readCount, 0);
+      timer = setTimeout(readNames, 0);
     };
     formElement.addEventListener("reset", onReset);
     return () => {
       formElement.removeEventListener("reset", onReset);
       clearTimeout(timer);
     };
-  }, [form, readCount]);
+  }, [form, readNames]);
 
   const handleChange = (event: Parameters<NonNullable<BaseInput.Props["onChange"]>>[0]) => {
     const files = [...(event.currentTarget.files ?? [])];
-    setCount(files.length);
+    setNames(files.map((file) => file.name));
     onChange?.(event);
     onFilesChange?.(files, event);
+  };
+
+  // Clicking the label focuses the field, as a text field's label does, instead of opening the picker, which is what a
+  // label does to a file input by default. The ring shows, as it would for a text field. A link in the label still
+  // works.
+  const focusFromLabel = (event: MouseEvent<HTMLLabelElement>) => {
+    if (event.target instanceof Element && event.target.closest("a, button, input, select, textarea")) return;
+    event.preventDefault();
+    inputRef.current?.focus({ focusVisible: true });
   };
 
   const remove = () => {
@@ -238,7 +272,7 @@ export function FileInput(props: FileInputProps) {
       invalid={invalid}
     >
       {label !== undefined && (
-        <Field.Label className="field-label file-input__label">
+        <Field.Label className="field-label file-input__label" onClick={focusFromLabel}>
           <span id={labelTextId}>{label}</span>
         </Field.Label>
       )}
@@ -254,6 +288,10 @@ export function FileInput(props: FileInputProps) {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
+        <span className="file-input__face" aria-hidden="true">
+          <UploadIcon />
+          <span className="file-input__words">{count === 0 ? "Choose file" : count === 1 ? names[0] : `${count} files`}</span>
+        </span>
         <BaseInput
           {...rest}
           ref={setInputRef}

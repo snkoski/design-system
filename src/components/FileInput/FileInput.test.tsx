@@ -25,6 +25,39 @@ function serverHtml(element: ReactElement) {
 
 describe("FileInput", () => {
   describe("rendering", () => {
+    it("draws its own icon and words before the input, hidden from screen readers", () => {
+      const { container } = render(<FileInput label="Résumé" description="PDF, up to 5 MB." />);
+      const face = getBox(container).querySelector(".file-input__face");
+      expect(face).toBeInTheDocument();
+      expect(face).toHaveAttribute("aria-hidden", "true");
+      expect(face?.querySelector("svg.file-input__upload")).toBeInTheDocument();
+      expect(face?.nextElementSibling).toBe(getInput(container));
+      expect(getInput(container)).toHaveAccessibleName("Résumé");
+      expect(getInput(container)).toHaveAccessibleDescription("PDF, up to 5 MB.");
+    });
+
+    it.each([
+      [[], "Choose file"],
+      [["cv.pdf"], "cv.pdf"],
+      [["essay.pdf", "letter.pdf"], "2 files"],
+    ])("with %j chosen, says %s", async (names, words) => {
+      const user = userEvent.setup();
+      const { container } = render(<FileInput label="Résumé" multiple />);
+      if (names.length > 0) await user.upload(getInput(container), names.map((name) => pdf(name)));
+      expect(getBox(container).querySelector(".file-input__words")).toHaveTextContent(new RegExp(`^${words.replace(".", "\\.")}$`));
+    });
+
+    // After a form reset too, which needs a real browser: see the FormReset story
+    it("says Choose file again after Remove", async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FileInput label="Résumé" />);
+      const words = () => getBox(container).querySelector(".file-input__words");
+      await user.upload(getInput(container), pdf());
+      expect(words()).toHaveTextContent("cv.pdf");
+      await user.click(queryRemove()!);
+      expect(words()).toHaveTextContent("Choose file");
+    });
+
     it("renders a native file input named by its label", () => {
       const { container } = render(<FileInput label="Résumé" />);
       expect(screen.getByLabelText("Résumé")).toBe(getInput(container));
@@ -156,12 +189,47 @@ describe("FileInput", () => {
       expect(names).toEqual(["cv.pdf"]);
     });
 
-    it("activates the input when the label is clicked", async () => {
+    it("focuses the input when the label is clicked, without opening the picker", async () => {
       const onClick = vi.fn();
       const user = userEvent.setup();
-      render(<FileInput label="Résumé" onClick={onClick} />);
+      const { container } = render(<FileInput label="Résumé" onClick={onClick} />);
       await user.click(screen.getByText("Résumé"));
+      expect(getInput(container)).toHaveFocus();
+      expect(onClick).not.toHaveBeenCalled();
+      await user.click(getInput(container));
       expect(onClick).toHaveBeenCalledOnce();
+    });
+
+    it("lets a link in the label work when it's clicked", async () => {
+      const user = userEvent.setup();
+      let prevented: boolean | undefined;
+      const listen = (event: MouseEvent) => {
+        prevented = event.defaultPrevented;
+        event.preventDefault(); // jsdom can't navigate
+      };
+      document.addEventListener("click", listen);
+      onTestFinished(() => document.removeEventListener("click", listen));
+      render(
+        <FileInput
+          label={
+            <>
+              Résumé (<a href="#formats">which formats</a>)
+            </>
+          }
+        />,
+      );
+      await user.click(screen.getByRole("link", { name: "which formats" }));
+      expect(prevented).toBe(false);
+    });
+
+    it("doesn't focus or open a disabled input when the label is clicked", async () => {
+      const onClick = vi.fn();
+      const user = userEvent.setup();
+      const { container } = render(<FileInput label="Résumé" disabled onClick={onClick} />);
+      expect(getInput(container)).toBeDisabled();
+      await user.click(screen.getByText("Résumé"));
+      expect(getInput(container)).not.toHaveFocus();
+      expect(onClick).not.toHaveBeenCalled();
     });
 
     it("marks the box while files are chosen", async () => {

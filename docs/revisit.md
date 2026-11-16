@@ -274,7 +274,7 @@ Raised while building DatePicker (2026-11-13).
 
 ## Translating the system's own words
 
-**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", and FileInput's "Remove file" and "Remove files". FileInput's "Choose File" and "No file chosen" are the browser's, in the browser's language, and differ between browsers. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
+**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", and FileInput's "Choose file", "2 files" (for any count), "Remove file", and "Remove files". What screen readers hear from FileInput's input ("No file chosen", a count) is the browser's, in the browser's language. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
 
 **Why it's in question:** a page in another language would want them all in its language, and a screen reader reads mixed languages with one voice.
 
@@ -304,7 +304,7 @@ Raised while adding the Tests pages (2026-11-13).
 
 ## Dragon users and the browser's file input
 
-**Today:** FileInput is the browser's own `<input type="file">`, styled. GOV.UK's File upload page says "Users of Dragon, a speech recognition tool, cannot activate their browser's native file inputs" with voice commands, so they have to use several mouse or keyboard commands instead.
+**Today:** FileInput is the browser's own `<input type="file">`, with its own words drawn over it; the click still lands on the browser's input. GOV.UK's File upload page says "Users of Dragon, a speech recognition tool, cannot activate their browser's native file inputs" with voice commands, so they have to use several mouse or keyboard commands instead.
 
 **Why it's in question:** GOV.UK's improved File upload hides the input behind its own "Choose file" button, which Dragon can press, though "due to browser security features, this may not work right away". GOV.UK plans to make it the default in its next major release. Carbon also hides the input behind a button.
 
@@ -324,7 +324,7 @@ Raised while building FileInput (2026-11-16).
 
 ## Naming each chosen file in FileInput
 
-**Today:** with `multiple`, the browser's status text says how many files are chosen ("2 files"), not which. Remove empties them all.
+**Today:** with `multiple`, the field says how many files are chosen ("2 files"), not which. Remove empties them all.
 
 **Why it's in question:** someone choosing several files can't check which ones they chose, or remove just one. USWDS lists names and thumbnails, and Carbon a row per file with its own remove button.
 
@@ -332,12 +332,3 @@ Raised while building FileInput (2026-11-16).
 
 Raised while building FileInput (2026-11-16).
 
-## The gap after WebKit's file button
-
-**Today:** FileInput leaves `space-3` (12px) between the browser's "Choose File" button and the status text. Chromium and Firefox lay it out; WebKit (Safari) computes the margin but draws its status text about 4px after the button whatever the margin, so the two sit closer there.
-
-**Why it's in question:** it's the one place the field looks different in Safari, though the text stays readable. No CSS that was tried moves WebKit's status text (`margin-right`, the `-webkit-file-upload-button` pseudo-element, or `gap` on the input).
-
-**To decide:** whether a later WebKit honors the margin, or whether the gap matters enough to draw the status text ourselves, which is the "our own button" design in "Dragon users and the browser's file input".
-
-Raised while building FileInput (2026-11-16).

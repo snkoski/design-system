@@ -35,6 +35,6 @@ People clear the field themselves with Remove. A page clears it with `form.reset
 
 ## What the browser decides
 
-The button's words and the status beside it are the browser's own, in the browser's language, and they differ: Chrome and Edge say "Choose File" and "No file chosen", Firefox "Browse…" and "No file selected.", and Safari "Choose File" and "no file selected". With several files, the status is a count ("2 files"). Long names are shortened by the browser. Safari puts its status a little closer to the button than the others (see `docs/revisit.md`).
+The field's words are FileInput's own, the same in every browser: "Choose file", then the chosen file's name (shortened with "…" if it's long), or how many ("2 files"). They're English for now (see `docs/revisit.md`). Screen readers hear the browser's own words instead, in the browser's language: Chrome's "No file chosen", Firefox's "No file selected.", and so on. The picker is the system's.
 
 FileInput was checked in Chrome's engine by its tests, and looked at once in Firefox and Safari's engines.

@@ -133,10 +133,23 @@ export const States: Story = {
       <FileInput {...args} label={undefined} description={undefined} aria-label="Profile photo" />
     </div>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     await expect(canvas.getByRole("button", { name: "Remove file, One file chosen" })).toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Remove files, Two files chosen" })).toBeInTheDocument();
     await expect(canvas.getByRole("button", { name: "Remove file, Disabled with a file" })).toBeDisabled();
+    // Everything the browser draws is at size 0; the field's own words say what's chosen, at body size
+    const empty = canvas.getByLabelText("Empty", { selector: "input" }) as HTMLInputElement;
+    const chosen = canvas.getByLabelText("One file chosen", { selector: "input" }) as HTMLInputElement;
+    const body = measure("--text-body", canvasElement);
+    await expect(body).toBeGreaterThan(0);
+    for (const input of [empty, chosen]) {
+      await expect(getComputedStyle(input).fontSize).toBe("0px");
+      await expect(getComputedStyle(input, "::file-selector-button").fontSize).toBe("0px");
+      await expect(parseFloat(getComputedStyle(faceOf(input).words).fontSize)).toBeCloseTo(body, 1);
+    }
+    await expect(faceOf(empty).words).toHaveTextContent("Choose file");
+    await expect(faceOf(chosen).words).toHaveTextContent("cv.pdf");
+    await expect(faceOf(canvas.getByLabelText("Two files chosen", { selector: "input" }) as HTMLInputElement).words).toHaveTextContent("2 files");
   },
 };
 
@@ -170,7 +183,7 @@ export const Sizes: Story = {
   },
 };
 
-/** With `multiple`, several files can be chosen at once. The browser says how many; Remove empties them all. */
+/** With `multiple`, several files can be chosen at once. The field says how many; Remove empties them all. */
 export const Multiple: Story = {
   args: { label: "Writing samples (optional)", description: "Up to 3 PDFs, 5 MB each.", accept: ".pdf", multiple: true },
   play: async ({ canvas, args }) => {
@@ -287,9 +300,11 @@ export const FormReset: Story = {
     const input = canvas.getByLabelText("Résumé", { selector: "input" }) as HTMLInputElement;
     choose(input, [pdf()]);
     await expect(canvas.getByRole("button", { name: "Remove file, Résumé" })).toBeInTheDocument();
+    await expect(faceOf(input).words).toHaveTextContent("cv.pdf");
     await userEvent.click(canvas.getByRole("button", { name: "Clear form" }));
     await expect(input.files).toHaveLength(0);
     await waitFor(() => expect(canvas.queryByRole("button", { name: /^Remove/ })).toBeNull());
+    await expect(faceOf(input).words).toHaveTextContent("Choose file");
   },
 };
 
@@ -350,24 +365,26 @@ export const NarrowScreen: Story = {
     const input = canvas.getByLabelText("Résumé", { selector: "input" }) as HTMLInputElement;
     await expect(input.files).toHaveLength(1);
     await expect(input.scrollWidth).toBeLessThanOrEqual(input.clientWidth);
-    // The text's room ends where Remove begins: the content box's end is at or before Remove's start
-    const style = getComputedStyle(input);
-    const contentEnd = input.getBoundingClientRect().right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth);
+    // The long name is shortened, and ends before Remove begins
+    const { words } = faceOf(input);
+    await expect(words.textContent).toContain("jordan-rivera");
+    await expect(words.scrollWidth).toBeGreaterThan(words.clientWidth);
     const remove = canvas.getByRole("button", { name: "Remove file, Résumé" });
-    await expect(contentEnd).toBeLessThanOrEqual(remove.getBoundingClientRect().left + 0.5);
+    await expect(words.getBoundingClientRect().right).toBeLessThanOrEqual(remove.getBoundingClientRect().left + 0.5);
     const container = canvasElement.querySelector<HTMLElement>("[data-pointer]")!;
     await expect(input.getBoundingClientRect().right).toBeLessThanOrEqual(container.getBoundingClientRect().right);
   },
 };
 
-/** The inner button's box, from the browser, and the field's rect */
-function innerButton(input: HTMLInputElement) {
-  const style = getComputedStyle(input, "::file-selector-button");
-  return { height: parseFloat(style.height), padding: parseFloat(getComputedStyle(input).paddingTop) };
+/** The field's own icon and words, drawn over the input */
+function faceOf(input: HTMLInputElement) {
+  const face = input.parentElement!.querySelector<HTMLElement>(".file-input__face")!;
+  return { face, icon: face.querySelector("svg")!.getBoundingClientRect(), words: face.querySelector<HTMLElement>(".file-input__words")! };
 }
 
 /**
- * The whole field opens the picker, and the inner button is drawn inside it, `space-1` from its outer edge. Remove's hit
+ * The whole field opens the picker, its icon and words included. They're centered in the field, the words `space-2`
+ * after the icon, and stay centered while Remove shows. Remove's hit
  * area is a square as tall as the field, right up to its end. Checked with a real hit-test, with a mouse and on touch,
  * in both densities, at both sizes. Edges are tested at their middles: the field's rounded corners aren't part of it.
  */
@@ -393,23 +410,33 @@ export const HitAreas: Story = {
         await withMouseAndTouch(canvasElement, async (floor) => {
           const target = measure("--target-min", canvasElement);
           await expect(target).toBeGreaterThanOrEqual(floor);
-          const inset = measure("--space-1", canvasElement);
           for (const input of [...empty, ...chosen]) {
             const field = input.getBoundingClientRect();
             await expect(field.height).toBeGreaterThanOrEqual(target);
-            // The inner button: space-1 in from the outer edge, top and bottom
-            const inner = innerButton(input);
-            await expect(inner.height).toBeCloseTo(field.height - 2 * inset, 0);
-            const edge = parseFloat(getComputedStyle(input).borderTopWidth);
-            await expect(inner.padding + edge).toBeCloseTo(inset, 0);
+            // The icon and words, centered across and down, the words space-2 after the icon
+            const iconSize = measure("--icon-md", canvasElement);
+            const gap = measure("--space-2", canvasElement);
+            await expect(iconSize).toBeGreaterThan(0);
+            await expect(gap).toBeGreaterThan(0);
+            const { icon, words } = faceOf(input);
+            const text = words.getBoundingClientRect();
+            await expect(icon.width).toBeCloseTo(iconSize, 0);
+            await expect(text.left - icon.right).toBeCloseTo(gap, 0);
+            await expect((icon.left + text.right) / 2).toBeCloseTo(field.left + field.width / 2, 0);
+            await expect(icon.top + icon.height / 2).toBeCloseTo(field.top + field.height / 2, 0);
+            await expect(text.top + text.height / 2).toBeCloseTo(field.top + field.height / 2, 0);
           }
           for (const input of empty) {
             const field = input.getBoundingClientRect();
             const midX = field.left + field.width / 2;
             const midY = field.top + field.height / 2;
+            const iconBox = faceOf(input).icon;
+            const wordsBox = faceOf(input).words.getBoundingClientRect();
+            await expect(iconBox.width).toBeGreaterThan(0);
             const points: [number, number][] = [
               [midX, midY],
-              [field.left + inset + 8, midY], // the inner button
+              [iconBox.left + iconBox.width / 2, midY], // the upload icon
+              [wordsBox.left + wordsBox.width / 2, midY], // "Choose file"
               [midX, field.top + 1],
               [midX, field.bottom - 1],
               [field.left + 1, midY],
@@ -466,8 +493,7 @@ function ShadowFileInput() {
 /**
  * On a site with no CSS reset, the browser draws its own "Choose file" button, with its own fill, edge, padding, and
  * font. Storybook loads Tailwind's reset, which restyles it too, so this field sits in a shadow root with only its own
- * CSS. The inner button still has the surface fill, a 1px strong edge, its own padding and corners, and the field's
- * font.
+ * CSS. Everything the browser draws is still hidden: its button has no fill, edge, padding, or size left.
  */
 export const WithoutCssReset: Story = {
   render: () => <ShadowFileInput />,
@@ -477,14 +503,19 @@ export const WithoutCssReset: Story = {
     await waitFor(() => expect(host.shadowRoot?.querySelector('input[type="file"]')).toBeTruthy());
     const input = fileInputOf(host.shadowRoot!);
     const style = getComputedStyle(input, "::file-selector-button");
-    await expect(style.backgroundColor).toBe(tokenColor("--surface", canvasElement));
-    await expect(style.borderTopColor).toBe(tokenColor("--border-strong", canvasElement));
-    await expect(style.borderTopWidth).toBe("1px");
-    await expect(parseFloat(style.paddingLeft)).toBeCloseTo(measure("--space-3", canvasElement), 1);
+    await expect(style.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    await expect(style.borderTopWidth).toBe("0px");
+    await expect(style.borderLeftWidth).toBe("0px");
+    await expect(parseFloat(style.paddingLeft)).toBe(0);
     await expect(parseFloat(style.marginLeft)).toBe(0);
-    await expect(parseFloat(style.marginRight)).toBeCloseTo(measure("--space-3", canvasElement), 1);
-    await expect(parseFloat(style.borderTopLeftRadius)).toBeCloseTo(measure("--radius-sm", canvasElement), 1);
-    await expect(style.fontFamily).toBe(getComputedStyle(input).fontFamily);
+    await expect(parseFloat(style.marginRight)).toBe(0);
+    await expect(style.fontSize).toBe("0px");
+    await expect(getComputedStyle(input).fontSize).toBe("0px");
+    // The field's own words still show, in ink, at body size
+    const { words } = faceOf(input);
+    await expect(words).toHaveTextContent("Choose file");
+    await expect(getComputedStyle(words).color).toBe(tokenColor("--ink", canvasElement));
+    await expect(parseFloat(getComputedStyle(words).fontSize)).toBeCloseTo(measure("--text-body", canvasElement), 1);
   },
 };
 
