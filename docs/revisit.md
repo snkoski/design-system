@@ -45,7 +45,7 @@ Raised while building TextArea (2026-10-21). RichText added (2026-10-21).
 
 **Why it's in question:** in every other theme the edge itself changes, so this is the one combination where it doesn't. It's rare: hot dog is a joke theme, and forced colors replaces its colors anyway.
 
-**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), which would be one change in `src/internal/text-field.css` now that Input, TextArea, and NativeSelect share it.
+**To decide:** whether it's worth a different edge there (for example, a dashed or double border for invalid fields in forced colors), which would be one change in `src/internal/text-field.css` now that Input, TextArea, NativeSelect, NumberField, DatePicker, and FileInput share it.
 
 Raised while building TextArea (2026-10-21).
 
@@ -242,15 +242,15 @@ Raised while building Progress (2026-11-06).
 
 Raised after checking tree shaking (2026-11-12).
 
-## A read-only NativeSelect
+## Read-only NativeSelect and FileInput
 
-**Today:** NativeSelect has no `readOnly` prop, and drops it if passed anyway. To show a value that can't be changed, a page uses `disabled` (dimmed, skipped by Tab, and not submitted) or shows the value as text. Every other form control has a read-only state, with the "Read only" note beside its label.
+**Today:** NativeSelect and FileInput have no `readOnly` prop, and drop it if passed anyway. To show a value that can't be changed, a page uses `disabled` (dimmed, skipped by Tab, and not submitted) or shows the value as text. Every other form control has a read-only state, with the "Read only" note beside its label.
 
-**Why it's in question:** browsers ignore `readonly` on a `<select>`: the value still changes and is submitted. Chromium doesn't expose `aria-readonly` on a select either, so screen readers wouldn't hear it. Blocking the keys and clicks ourselves (Carbon's way) hand-rolls keyboard handling, misses typing a letter and phones' pickers, and still isn't announced.
+**Why it's in question:** browsers ignore `readonly` on a `<select>` and on a file input: a select's value still changes and is submitted, and a file input still opens the picker. Chromium doesn't expose `aria-readonly` on a select either, so screen readers wouldn't hear it. Blocking the keys and clicks ourselves (Carbon's way) hand-rolls keyboard handling, misses typing a letter and phones' pickers, and still isn't announced.
 
-**To decide:** when an app needs a read-only select, build it by rendering a read-only text field in its place: the chosen option's words in the same box, with no arrow, the "Read only" note, and a hidden input that submits the value. The design was worked out on 2026-11-12: the component keeps its own copy of an uncontrolled value, so turning read-only on shows what was last picked; `ref` points at the hidden input, so form libraries read the value, not the words; and `Field.Root` doesn't get `name` while read-only, because Base UI copies it onto the control and the words would be submitted too. Or wait, if browsers start honoring `readonly` on a select.
+**To decide:** when an app needs a read-only select, build it by rendering a read-only text field in its place: the chosen option's words in the same box, with no arrow, the "Read only" note, and a hidden input that submits the value. The design was worked out on 2026-11-12: the component keeps its own copy of an uncontrolled value, so turning read-only on shows what was last picked; `ref` points at the hidden input, so form libraries read the value, not the words; and `Field.Root` doesn't get `name` while read-only, because Base UI copies it onto the control and the words would be submitted too. Or wait, if browsers start honoring `readonly` on a select. For FileInput, when a page needs to show a file that can't be changed: the file's name as text in the same box, with the "Read only" note, no picker, and no Remove button.
 
-Raised while building NativeSelect (2026-11-12).
+Raised while building NativeSelect (2026-11-12); FileInput added while building it (2026-11-16).
 
 ## Styling a select's open list
 
@@ -274,7 +274,7 @@ Raised while building DatePicker (2026-11-13).
 
 ## Translating the system's own words
 
-**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", and DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected". DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
+**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", and FileInput's "Remove file" and "Remove files". FileInput's "Choose File" and "No file chosen" are the browser's, in the browser's language, and differ between browsers. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
 
 **Why it's in question:** a page in another language would want them all in its language, and a screen reader reads mixed languages with one voice.
 
@@ -301,3 +301,43 @@ Raised while building DatePicker (2026-11-13).
 **To decide:** once Accordion exists, whether the Tests pages switch to it, which would also show it working on a long list.
 
 Raised while adding the Tests pages (2026-11-13).
+
+## Dragon users and the browser's file input
+
+**Today:** FileInput is the browser's own `<input type="file">`, styled. GOV.UK's File upload page says "Users of Dragon, a speech recognition tool, cannot activate their browser's native file inputs" with voice commands, so they have to use several mouse or keyboard commands instead.
+
+**Why it's in question:** GOV.UK's improved File upload hides the input behind its own "Choose file" button, which Dragon can press, though "due to browser security features, this may not work right away". GOV.UK plans to make it the default in its next major release. Carbon also hides the input behind a button.
+
+**To decide:** when GOV.UK makes its improved version the default, or publishes research on it: whether FileInput switches to its own button. The design for that was worked out on 2026-11-16 (in the FileInput proposal): the server's HTML stays the browser's input, and after JavaScript runs a real button takes its place, with a live region for each choice and its own drop handling. It would be a breaking change: focus and keyboard handlers would be typed for a different element, `ref.focus()` would stop working, and `id` would move to the button.
+
+Raised while building FileInput (2026-11-16).
+
+## A drop zone for FileInput
+
+**Today:** FileInput takes a dropped file the way the browser's input does, onto the field itself, with no visible target while dragging. A file dropped on its Remove button goes to the field too.
+
+**Why it's in question:** GOV.UK's improved File upload, USWDS, Carbon, Polaris, and Spectrum offer a larger drop area, and GOV.UK notes its basic version "does not show a visual target area when dragging". Every one of them keeps a button as the way in, as WCAG 2.5.7 asks.
+
+**To decide:** once FileInput is in use, when a page has people dropping files often: a drop zone around the field, with its own design (a prop or a separate component, its words on touch, the drag-over state, forced colors, and hot dog). Consider it together with "Naming each chosen file in FileInput", below.
+
+Raised while building FileInput (2026-11-16).
+
+## Naming each chosen file in FileInput
+
+**Today:** with `multiple`, the browser's status text says how many files are chosen ("2 files"), not which. Remove empties them all.
+
+**Why it's in question:** someone choosing several files can't check which ones they chose, or remove just one. USWDS lists names and thumbnails, and Carbon a row per file with its own remove button.
+
+**To decide:** a list of the chosen files under the field, its place next to the error, the size format, a Remove for each file, and what shows before JavaScript runs. Wanted; it may come with the drop zone (see "A drop zone for FileInput").
+
+Raised while building FileInput (2026-11-16).
+
+## The gap after WebKit's file button
+
+**Today:** FileInput leaves `space-3` (12px) between the browser's "Choose File" button and the status text. Chromium and Firefox lay it out; WebKit (Safari) computes the margin but draws its status text about 4px after the button whatever the margin, so the two sit closer there.
+
+**Why it's in question:** it's the one place the field looks different in Safari, though the text stays readable. No CSS that was tried moves WebKit's status text (`margin-right`, the `-webkit-file-upload-button` pseudo-element, or `gap` on the input).
+
+**To decide:** whether a later WebKit honors the margin, or whether the gap matters enough to draw the status text ourselves, which is the "our own button" design in "Dragon users and the browser's file input".
+
+Raised while building FileInput (2026-11-16).

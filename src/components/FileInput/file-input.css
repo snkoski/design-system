@@ -1,0 +1,115 @@
+/* FileInput: what's its own. The label, description, edge, hover, focus, invalid, disabled, hot dog, and forced colors
+   rules of the field are shared with Input in internal/text-field.css and field.css, and the Remove button is drawn by
+   internal/inset-button.css. This file adds the height, the browser's own "Choose file" button inside the field, the room
+   for Remove, and where Remove sits. Where the field sits and how wide it is is the layout's job.
+
+   Disabled dims the whole field to 50% over the page, as every text field does, which WCAG exempts. Measured with
+   `pnpm check:contrast --probe ink:surface:4.5 border-strong:surface:3 --opacity 0.5 --page bg`: ink on surface is 3.35:1
+   in light, 4.60:1 in dark, and 4.03:1 in hot dog; the edge 1.98:1, 2.55:1, and 4.03:1. */
+@layer components {
+  /* The field's height, which is also Remove's width, so the button is square */
+  .file-input {
+    --file-input-height: var(--control-md);
+  }
+  .file-input[data-size="lg"] {
+    --file-input-height: var(--control-lg);
+  }
+
+  /* Positions Remove over the end of the input. A little more room between the text above and the field than between
+     the label and its description. */
+  .file-input__box {
+    position: relative;
+  }
+  .file-input__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  /* The field. Its block padding and start padding are space-1 less the edge, so the inner button's box sits space-1 in
+     from the field's outer edge on every side, whatever the edge (hot dog's is thicker). The line is as tall as the
+     inner button, which centers the browser's status text beside it. The whole field opens the picker. */
+  .file-input__control {
+    height: var(--file-input-height);
+    padding-block: calc(var(--space-1) - var(--text-field-edge));
+    line-height: calc(var(--file-input-height) - 2 * var(--space-1));
+    appearance: none;
+    cursor: pointer;
+  }
+  /* As specific as the shared lg rule, so neither size's shared padding wins at the start */
+  .file-input[data-size] .file-input__control {
+    padding-inline-start: calc(var(--space-1) - var(--text-field-edge));
+  }
+
+  /* The browser's own "Choose file" button. Every property is set here, because a page's CSS reset (Tailwind's
+     preflight, for one) restyles it, and a page with no reset shows the browser's own. Its edge stays thin in hot dog
+     too (border-strong is ink there): the field around it already has the thick edge and the shadow. */
+  .file-input__control::file-selector-button {
+    box-sizing: border-box;
+    height: calc(var(--file-input-height) - 2 * var(--space-1));
+    margin: 0;
+    margin-inline-end: var(--space-3);
+    padding-block: 0;
+    padding-inline: var(--space-3);
+    border: var(--border-thin) solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    line-height: 1;
+    vertical-align: top;
+    cursor: inherit;
+    appearance: none;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  .file-input[data-size="lg"] .file-input__control::file-selector-button {
+    padding-inline: var(--space-4);
+  }
+
+  /* Hovering or pressing anywhere on the field shows on the inner button, since the whole field opens the picker. The
+     danger edge of an invalid field still shows. */
+  .file-input__control:hover:not(:disabled)::file-selector-button {
+    background-color: var(--surface-hover);
+  }
+  .file-input__control:active:not(:disabled)::file-selector-button {
+    background-color: var(--track-hover);
+  }
+
+  /* While files are chosen, the status text stops where Remove begins */
+  .file-input__box[data-has-files] .file-input__control {
+    padding-inline-end: var(--file-input-height);
+  }
+
+  /* Remove: a square as tall as the field, over its end, so its hit area is the field's full height. It's a Tab stop,
+     so its focus outline is pulled inside its visible box, which starts space-1 in from the button's edge. */
+  .file-input__remove {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: var(--file-input-height);
+  }
+  /* Rounded only while focused, so the outline's corners follow the visible box's */
+  .file-input__remove:focus-visible {
+    border-radius: calc(var(--radius-sm) + var(--space-1));
+    outline-offset: calc(-1 * (var(--space-1) + var(--focus-width)));
+  }
+
+  /* Windows Contrast themes: the inner button is a system button, its edge and text in the highlight color on hover and
+     press, gray when disabled. Its fill never changes, so its text stays readable. */
+  @media (forced-colors: active) {
+    .file-input__control::file-selector-button {
+      border-color: ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+    .file-input__control:hover:not(:disabled)::file-selector-button,
+    .file-input__control:active:not(:disabled)::file-selector-button {
+      border-color: Highlight;
+      background: ButtonFace;
+      color: Highlight;
+    }
+    .file-input__control:disabled::file-selector-button {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

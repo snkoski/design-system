@@ -25,6 +25,7 @@
 @import "@/components/NativeSelect/native-select.css";
 @import "@/components/NumberField/number-field.css";
 @import "@/components/DatePicker/date-picker.css";
+@import "@/components/FileInput/file-input.css";
 @import "@/components/SegmentedControl/segmented-control.css";
 @import "@/components/Spinner/spinner.css";
 @import "@/components/Separator/separator.css";

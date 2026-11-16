@@ -8,6 +8,7 @@ export * from "@/components/TextArea";
 export * from "@/components/NativeSelect";
 export * from "@/components/NumberField";
 export * from "@/components/DatePicker";
+export * from "@/components/FileInput";
 export * from "@/components/SegmentedControl";
 export * from "@/components/Spinner";
 export * from "@/components/Separator";

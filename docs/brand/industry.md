@@ -288,6 +288,24 @@ Only Carbon, Fluent, Polaris, and Spectrum have a number field of their own; Mat
 
 Every system with a calendar also lets people type, except Fluent, where typing is opt-in, and most put the calendar behind a button at the field rather than opening it on focus. They agree a calendar is for dates near today: GOV.UK, Material, Carbon, USWDS, and Polaris all steer dates people know by heart, like a date of birth, to typing. Where the keys are documented (Material, USWDS), they match React DayPicker's, which Sherbet uses: arrows by day and week, Page Up and Page Down by month, and Shift for a year. Sherbet reads the date as it's typed and formats it on leaving the field, as Material asks, and keeps a typed date that isn't real or is out of range, so the page can say what's wrong, as Atlassian expects pages to. Its value is a date-only `yyyy-mm-dd` string, like Atlassian's and Polaris's, so time zones can't shift it.
 
+## File inputs
+
+| System | Component | The input | Several files | Drag and drop | Chosen files | Errors |
+| --- | --- | --- | --- | --- | --- | --- |
+| Apple | None (image wells on macOS, and the system file browser) | — | — | "Offer alternative ways to accomplish drag-and-drop actions" | — | — |
+| Material 3 | None | — | — | — | — | — |
+| Primer | None public | — | — | — | — | — |
+| Atlassian | None (Pragmatic drag and drop is a general library) | — | — | — | — | — |
+| Carbon | File uploader, and a drag and drop file uploader | A real button, with the input hidden behind it | Rows stacked under it | A separate variant | A row per file, with loading, success, and uploaded states, and an "x" named after the file | Per file; a notification for the whole uploader |
+| Fluent 2 | None | — | — | — | — | — |
+| Polaris | Drop zone | Built on the native input, with a focusable zone and an "Add file" button | `allowMultiple` | The main way; a button is required as the alternative | The app builds its own | The zone's error ("File size must be less than 20MB") |
+| GOV.UK | File upload | Basic: the visible native input. Improved (opt-in since 2025, to become the default): the input is hidden behind a "Choose file" button and "No file chosen" status | `multiple` | Basic: the browser's own, with no visible target. Improved: a drop zone that's always visible | Status text only | One for the field: "Select a report", "The selected file must be smaller than 2MB" |
+| USWDS | File input | The native input, stretched over a drawn drop target, with the browser's button hidden | Opt-in: "some users might not know how to select multiple files" | On by default on desktop; "Choose from folder" on touch | Names and thumbnails; "Change file" replaces them all | One for the field |
+| Spectrum | DropZone and FileTrigger | DropZone is a drop area; FileTrigger makes any button open the picker | `allowsMultiple` | DropZone's main way, "commonly paired" with a FileTrigger button | The app shows them | Not stated |
+| **Sherbet** | **FileInput** | **The visible native input, drawn as a text field, its own button restyled with `::file-selector-button`** | **`multiple`** | **The browser's own (a drop zone is an open question)** | **The browser's status text, and a Remove button that empties the field** | **One for the field, fix first: "Choose a file smaller than 5 MB"** |
+
+Only five of the systems have a file component, and every one keeps a button as the way in, even beside a drop zone, as WCAG 2.5.7 asks of anything done by dragging. They agree on putting the allowed kinds and the size limit in the hint, and on the page checking each file, since `accept` only filters the picker. They split on whether the browser's own input stays visible (GOV.UK's basic version, USWDS, and shadcn's Input) or hides behind a custom button (GOV.UK's improved version, Carbon). GOV.UK's reason for hiding it: people using Dragon, a speech recognition tool, can't press a browser's file input by voice. Sherbet keeps the browser's input for now, which works without JavaScript and needs no announcements of its own, and records the Dragon gap in `docs/revisit.md`. Remove is Sherbet's own: once a file is chosen, a browser's input can't be emptied. shadcn only styles `type="file"` in its Input, and Base UI has no file component.
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -381,3 +399,11 @@ Every system with a calendar also lets people type, except Fluent, where typing 
 - [USWDS Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)
 - [React Spectrum DatePicker](https://react-spectrum.adobe.com/react-spectrum/DatePicker.html)
 - [shadcn/ui date picker](https://ui.shadcn.com/docs/components/date-picker)
+- [GOV.UK File upload](https://design-system.service.gov.uk/components/file-upload/)
+- [USWDS File input](https://designsystem.digital.gov/components/file-input/)
+- [Carbon File uploader](https://carbondesignsystem.com/components/file-uploader/usage/) and its [accessibility notes](https://carbondesignsystem.com/components/file-uploader/accessibility/)
+- [Polaris Drop zone](https://shopify.dev/docs/api/app-home/web-components/forms/drop-zone.md)
+- [React Spectrum DropZone](https://react-spectrum.adobe.com/react-spectrum/DropZone.html) and [React Aria FileTrigger](https://react-aria.adobe.com/FileTrigger)
+- [Apple drag and drop](https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
+- [WCAG 2.2: Understanding Dragging Movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html)
+- [shadcn/ui Input](https://ui.shadcn.com/docs/components/input)

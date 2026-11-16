@@ -201,6 +201,11 @@
       "id": "date-pickers",
       "name": "Date pickers",
       "group": "components"
+    },
+    {
+      "id": "file-inputs",
+      "name": "File inputs",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2800,6 +2805,63 @@
       "system": "uswds",
       "topics": [
         "date-pickers"
+      ]
+    },
+    {
+      "title": "File upload",
+      "url": "https://design-system.service.gov.uk/components/file-upload/",
+      "system": "govuk",
+      "topics": [
+        "file-inputs"
+      ]
+    },
+    {
+      "title": "File input",
+      "url": "https://designsystem.digital.gov/components/file-input/",
+      "system": "uswds",
+      "topics": [
+        "file-inputs"
+      ]
+    },
+    {
+      "title": "File uploader usage",
+      "url": "https://carbondesignsystem.com/components/file-uploader/usage/",
+      "system": "carbon",
+      "topics": [
+        "file-inputs"
+      ]
+    },
+    {
+      "title": "File uploader accessibility",
+      "url": "https://carbondesignsystem.com/components/file-uploader/accessibility/",
+      "system": "carbon",
+      "topics": [
+        "file-inputs",
+        "accessibility"
+      ]
+    },
+    {
+      "title": "Drop zone",
+      "url": "https://shopify.dev/docs/api/app-home/web-components/forms/drop-zone.md",
+      "system": "polaris",
+      "topics": [
+        "file-inputs"
+      ]
+    },
+    {
+      "title": "Drag and drop",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/drag-and-drop",
+      "system": "apple",
+      "topics": [
+        "file-inputs"
+      ]
+    },
+    {
+      "title": "Understanding Dragging Movements",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html",
+      "topics": [
+        "wcag",
+        "file-inputs"
       ]
     }
   ]

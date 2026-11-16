@@ -57,6 +57,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Selects](#selects)
   - [Number fields](#number-fields)
   - [Date pickers](#date-pickers)
+  - [File inputs](#file-inputs)
 
 ## Choosing and building colors
 
@@ -93,6 +94,7 @@ Each design system's own accessibility pages are under Accessibility in the desi
 - [Understanding WCAG: Target size (minimum)](https://w3c.github.io/wcag/understanding/target-size-minimum.html): where the 24px minimum comes from.
 - [Understanding WCAG: Focus not obscured](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html)
 - [Understanding WCAG: Focus appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html)
+- [Understanding Dragging Movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html)
 
 ### ARIA Authoring Practices Guide
 
@@ -140,6 +142,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [Pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
 - **Number fields:** [Steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
 - **Date pickers:** [Pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
+- **File inputs:** [Drag and drop](https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
 
 ### Material Design 3 (Google)
 
@@ -228,7 +231,7 @@ Everything we read from each system, grouped by topic.
 - **Spacing, layout, and grids:** [Spacing](https://carbondesignsystem.com/elements/spacing/overview/) and [2x Grid](https://carbondesignsystem.com/elements/2x-grid/overview/)
 - **Motion:** [Motion](https://carbondesignsystem.com/elements/motion/overview/)
 - **Writing and content:** [Writing style](https://carbondesignsystem.com/guidelines/content/writing-style/)
-- **Accessibility:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/)
+- **Accessibility:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/) and [File uploader accessibility](https://carbondesignsystem.com/components/file-uploader/accessibility/)
 - **Buttons:** [Button usage](https://carbondesignsystem.com/components/button/usage/) (emphasis levels, one primary per page, and danger buttons) and [Button style](https://carbondesignsystem.com/components/button/style/)
 - **Checkboxes:** [Checkbox](https://www.carbondesignsystem.com/building-blocks/core/components/checkbox/guidelines)
 - **Radio buttons:** [Radio button](https://www.carbondesignsystem.com/building-blocks/core/components/radio-button)
@@ -245,6 +248,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Select](https://carbondesignsystem.com/components/select/usage/) and [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/)
 - **Number fields:** [Number input usage](https://carbondesignsystem.com/components/number-input/usage/)
 - **Date pickers:** [Date picker usage](https://carbondesignsystem.com/components/date-picker/usage/)
+- **File inputs:** [File uploader usage](https://carbondesignsystem.com/components/file-uploader/usage/) and [File uploader accessibility](https://carbondesignsystem.com/components/file-uploader/accessibility/)
 
 ### Microsoft Fluent 2
 
@@ -298,6 +302,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
 - **Number fields:** [Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
 - **Date pickers:** [Date field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field)
+- **File inputs:** [Drop zone](https://shopify.dev/docs/api/app-home/web-components/forms/drop-zone.md)
 
 ### GOV.UK Design System
 
@@ -318,6 +323,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Select](https://design-system.service.gov.uk/components/select/)
 - **Number fields:** [Text input](https://design-system.service.gov.uk/components/text-input/)
 - **Date pickers:** [Date input](https://design-system.service.gov.uk/components/date-input/) and [Dates pattern](https://design-system.service.gov.uk/patterns/dates/)
+- **File inputs:** [File upload](https://design-system.service.gov.uk/components/file-upload/)
 
 ### U.S. Web Design System
 
@@ -341,6 +347,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
 - **Number fields:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
 - **Date pickers:** [Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)
+- **File inputs:** [File input](https://designsystem.digital.gov/components/file-input/)
 
 ## Design systems, by topic
 
@@ -433,7 +440,7 @@ The same links as the by-system section, grouped so each topic can be compared a
 - **Apple Human Interface Guidelines:** [Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
 - **GitHub Primer:** [Accessibility](https://primer.style/accessibility), [Color considerations](https://primer.style/accessibility/design-guidance/color-considerations/), [Focus management](https://primer.style/accessibility/design-guidance/focus-management/), [Links and buttons](https://primer.style/accessibility/design-guidance/links-and-buttons/), [Motion and animation](https://primer.style/accessibility/design-guidance/motion-and-animation/), [Text resize and spacing](https://primer.style/accessibility/design-guidance/text-resize-and-spacing/), and [Mobile checklist](https://primer.style/accessibility/tools-and-resources/checklists/mobile-checklist/)
 - **Atlassian Design System:** [Accessibility](https://atlassian.design/foundations/accessibility)
-- **IBM Carbon:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/)
+- **IBM Carbon:** [Accessibility](https://carbondesignsystem.com/guidelines/accessibility/overview/) and [File uploader accessibility](https://carbondesignsystem.com/components/file-uploader/accessibility/)
 - **Microsoft Fluent 2:** [Accessibility](https://fluent2.microsoft.design/accessibility)
 - **Shopify Polaris:** [Accessibility](https://polaris-react.shopify.com/foundations/accessibility) and [App accessibility](https://shopify.dev/docs/apps/build/accessibility)
 - **GOV.UK Design System:** [Accessibility strategy](https://design-system.service.gov.uk/accessibility/accessibility-strategy/)
@@ -642,3 +649,11 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Shopify Polaris:** [Date field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/date-field)
 - **GOV.UK Design System:** [Date input](https://design-system.service.gov.uk/components/date-input/) and [Dates pattern](https://design-system.service.gov.uk/patterns/dates/)
 - **U.S. Web Design System:** [Date picker](https://designsystem.digital.gov/components/date-picker/) and [Memorable date](https://designsystem.digital.gov/components/memorable-date/)
+
+### File inputs
+
+- **Apple Human Interface Guidelines:** [Drag and drop](https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
+- **IBM Carbon:** [File uploader usage](https://carbondesignsystem.com/components/file-uploader/usage/) and [File uploader accessibility](https://carbondesignsystem.com/components/file-uploader/accessibility/)
+- **Shopify Polaris:** [Drop zone](https://shopify.dev/docs/api/app-home/web-components/forms/drop-zone.md)
+- **GOV.UK Design System:** [File upload](https://design-system.service.gov.uk/components/file-upload/)
+- **U.S. Web Design System:** [File input](https://designsystem.digital.gov/components/file-input/)
