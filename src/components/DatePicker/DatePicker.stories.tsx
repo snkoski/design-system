@@ -191,6 +191,7 @@ export const MinAndMax: Story = {
     await expect(popup.querySelector('[data-day="2026-11-02"] button')).toBeDisabled();
     await expect(popup.querySelector('[aria-label="Previous month"]')).toHaveAttribute("aria-disabled", "true");
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
   },
 };
 
@@ -207,6 +208,7 @@ export const UnavailableDays: Story = {
     const popup = await openCalendar(canvas.getByRole("button", { name: /^Choose date/ }), (el) => userEvent.click(el));
     await expect(popup.querySelector('[data-day="2026-11-14"] button')).toBeDisabled();
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
   },
 };
 
@@ -219,6 +221,7 @@ export const Locale: Story = {
     const popup = await openCalendar(canvas.getByRole("button", { name: /^Choose date/ }), (el) => userEvent.click(el));
     await expect(popup.querySelector("th")).toHaveAttribute("aria-label", "Monday");
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
   },
 };
 
@@ -325,6 +328,7 @@ export const InheritsScope: Story = {
     await expect(measure("--target-min", hotdog!)).toBeGreaterThanOrEqual(44); // the touch floor
     await expect(popup.querySelector(".calendar__day-button")!.getBoundingClientRect().height).toBeCloseTo(cell, 0);
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
   },
 };
 
@@ -346,6 +350,7 @@ export const NarrowScreen: Story = {
     const popup = await openCalendar(canvas.getByRole("button", { name: /^Choose date/ }), (el) => userEvent.click(el));
     await expect(popup.getBoundingClientRect().width).toBeLessThanOrEqual(budget + 0.5);
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
   },
 };
 
