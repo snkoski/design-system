@@ -27,6 +27,7 @@
     font-size: var(--text-body);
     line-height: var(--leading-control);
     transition:
+      background-color var(--duration-fast) var(--ease-out),
       border-color var(--duration-fast) var(--ease-out),
       box-shadow var(--duration-fast) var(--ease-out);
   }
@@ -36,7 +37,9 @@
     opacity: 1; /* Firefox fades placeholders by default */
   }
 
-  .text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"]) {
+  /* Hovering the field darkens its edge. Browsers also count the pointer over a <label> as over its control; the field
+     ignores that, so only the field itself, not its label, looks like it reacts. */
+  .text-field:not(:has(.field-label:hover)) .text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"]) {
     border-color: var(--ink);
   }
 
