@@ -118,6 +118,7 @@ Fix what looks wrong and check again.
 - The proposal's "When to use each variant" becomes a guidance page, `docs/brand/<topic>.md`, rendered by `src/components/<Name>/<Name>.mdx` (`buttons.md` and `Button.mdx` are the pattern).
 - The "How other systems do it" table goes in `docs/brand/industry.md`, with sources. Every link added there also goes in `docs/reading-list.json` under the component's topic (add the topic if it's new); then run `pnpm reading-list`. A link whose system isn't in the JSON's `systems` list won't show in the component sections, so say so rather than adding it with no system.
 - Write `src/components/<Name>/HowItWorks.mdx` following "How it works pages" in `CLAUDE.md`: the files and Base UI parts it's built from, an `<Inspect>` of the real component in its main states, how its props become attributes, and its CSS rule by rule (states, focus, forced colors, hot dog, touch sizes, and motion). Check it in Storybook with no console errors.
+- Add `src/components/<Name>/Tests.mdx`, a copy of Button's with the name changed (see "Tests pages" in `CLAUDE.md`). It lists the tests by name, so name each `it(…)` for what it checks.
 
 ## Phase 9: Independent review
 
