@@ -252,6 +252,24 @@ Most systems stretch one progress bar to cover both jobs; only Spectrum and Appl
 
 Most systems with a web form component keep a native select for forms, because the browser and the phone draw the open list and the keyboard works as everywhere else, and add a custom-drawn one for richer options. Sherbet does the same, and builds the native one first. Every system with guidance prefers radios for a few options, but they disagree on how few: from fewer than 3 (Carbon) to fewer than 7 (USWDS), with GOV.UK avoiding selects whenever it can. Sherbet follows Primer's line of 6, close to the middle. Polaris and GOV.UK take options as an array, as Sherbet does; the others take `<option>` children. Only Carbon has a read-only select, by stopping the list from opening; it doesn't stop every way the value can change, and browsers ignore `readonly` on a select, so Sherbet leaves read-only out until it can be done properly.
 
+## Number fields
+
+| System | Component | Steppers | Typed value outside min and max | Scroll wheel | Says not for codes and IDs |
+| --- | --- | --- | --- | --- | --- |
+| Apple | Stepper, a separate control beside a field | Separate | Not stated | Not stated | Not stated |
+| Material 3 | None: a text field with `type="number"` | The browser's own; `noSpinner` hides them | Not stated | Not stated | Not stated |
+| Primer | None: TextInput with `type="number"` | Not stated | Not stated | Not stated | Not stated |
+| Atlassian | None: Textfield | Not stated | Not stated | Not stated | Not stated |
+| Carbon | Number input | Subtract and add, in the field | An error; the helper text gives the range | Not stated | Not for continuous values like prices: use a text input |
+| Fluent 2 | Spin button | Yes; the one at a limit is disabled, never the input | Not stated | Not stated | Not stated |
+| Polaris | Number field | Yes | Kept, not clamped ("Implement validation") | Not stated | Not for product codes or phone numbers |
+| GOV.UK | None: a text input with `inputmode` | None | Shown as an error | Warns that `type="number"` changes on scroll | Codes and IDs use `inputmode`, not a number field |
+| USWDS | None: a text input or an input mask | Not stated | Not stated | Not stated | Not stated |
+| Spectrum | NumberField | In the field; `hideStepper` hides them | Clamped on leaving the field by default; `"validate"` keeps it | On in its web components | Not stated |
+| **Sherbet** | **NumberField** | **In the field, at the end; `steppers={false}` leaves them out, and a read-only field has none** | **Kept; the page shows an error** | **Off, and not a prop** | **Yes: it points to the open item in `docs/revisit.md`** |
+
+Only Carbon, Fluent, Polaris, and Spectrum have a number field of their own; Material and Primer use the browser's `type="number"`, and GOV.UK avoids it, because the scroll wheel changes it and it accepts "e". Those with steppers put them in or beside the field and disable the one at a limit. They split on a typed number outside the range: Spectrum clamps it by default when you leave the field, while Polaris, GOV.UK, and Carbon keep it and show an error. Sherbet keeps it, so nobody's typing is silently changed, and the page says what's wrong. It builds on Base UI's NumberField, which reads separators and symbols as they're typed and formats the number when you leave the field, and it turns the scroll wheel off. Polaris, Carbon, and GOV.UK all say a code or an ID made of digits isn't a number; Sherbet agrees and hasn't decided yet what to use for those.
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -324,3 +342,13 @@ Most systems with a web form component keep a native select for forms, because t
 - [Material Web select](https://material-web.dev/components/select/)
 - [Apple pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
 - [React Spectrum Picker](https://react-spectrum.adobe.com/react-spectrum/Picker.html)
+- [Apple steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
+- [Material Web text field](https://material-web.dev/components/text-field/)
+- [Primer TextInput](https://primer.style/product/components/text-input)
+- [Atlassian Text field usage](https://atlassian.design/components/textfield/usage)
+- [Carbon Number input](https://carbondesignsystem.com/components/number-input/usage/)
+- [Fluent 2 Spin button](https://fluent2.microsoft.design/components/web/react/core/spin/usage)
+- [Polaris Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
+- [GOV.UK Text input](https://design-system.service.gov.uk/components/text-input/)
+- [USWDS Text input](https://designsystem.digital.gov/components/text-input/)
+- [React Spectrum NumberField](https://react-spectrum.adobe.com/react-spectrum/NumberField.html)

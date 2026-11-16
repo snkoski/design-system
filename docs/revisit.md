@@ -169,7 +169,7 @@ Raised while making links inside components neutral (Q3, 2026-11-04).
 
 ## A text field for codes and IDs
 
-**Today:** numbers that are quantities or money get a NumberField, built on Base UI's NumberField (planned, Q7). Input has no `inputMode` guidance and no numeric type: `type` allows text, email, password, search, tel, and url.
+**Today:** numbers that are quantities or money get a NumberField, built on Base UI's NumberField (built). Input has no `inputMode` guidance and no numeric type: `type` allows text, email, password, search, tel, and url.
 
 **Why it's in question:** some numbers aren't quantities: a verification code, a postcode, an account or card number. They can start with 0, shouldn't step up and down or get thousands separators, and still want the phone's number keyboard. GOV.UK uses a text input with `inputmode="numeric"` for these rather than `type="number"`. Input already passes `inputMode` through, so this may only need guidance, not a new component.
 

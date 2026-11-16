@@ -12,7 +12,7 @@ Forms are where accessibility and clear writing matter most. These rules follow 
 - Size fields to their expected input: a postcode field is narrow, an address field is wide.
 - Set `type`, `inputmode`, and `autocomplete` so browsers and phones can help.
 - To choose one option from a long list, use a **NativeSelect**: a real `<select>`, which opens the phone's own picker and works with any form. For which control fits how many options, see Choosing from options on NativeSelect's page in Storybook (`docs/brand/choices.md`).
-- **Numbers** that are amounts or quantities (a salary, a count of minutes) use a **NumberField**, which can format as you type and step with the arrow keys. Don't use `type="number"`: the scroll wheel changes it by accident, it accepts "e", and it drops leading zeros. Codes and IDs that happen to be digits aren't numbers (see "A text field for codes and IDs" in `docs/revisit.md`).
+- **Numbers** that are amounts or quantities (a salary, a count of minutes) use a **NumberField**, which reads numbers typed with separators and symbols, formats them when you leave the field, and steps with the arrow keys and two buttons. For when and how, see Choosing a number field on NumberField's page in Storybook (`docs/brand/numbers.md`). Don't use `type="number"`: the scroll wheel changes it by accident, it accepts "e", and it drops leading zeros. Codes and IDs that happen to be digits aren't numbers (see "A text field for codes and IDs" in `docs/revisit.md`).
 - **Dates** use a **DatePicker**: a text field where the date can be typed, with a button that opens a calendar. It submits `yyyy-mm-dd`.
 
 ## Required and optional fields

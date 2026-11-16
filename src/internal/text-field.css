@@ -1,4 +1,4 @@
-/* What Input, TextArea, and NativeSelect share: the wrapper, the field's edge, every state, hot dog mode, and forced
+/* What Input, TextArea, NativeSelect, and NumberField share: the wrapper, the field's edge, every state, hot dog mode, and forced
    colors. Each part carries a shared class next to its own (`text-field__control input__control`), and each
    component's own CSS keeps only what's different: heights, icons, padding, and resizing. Imported before the
    components' CSS, so at equal specificity a component's own rule wins. */

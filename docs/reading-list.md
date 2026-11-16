@@ -55,6 +55,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Badges](#badges)
   - [Meters and progress bars](#meters-and-progress-bars)
   - [Selects](#selects)
+  - [Number fields](#number-fields)
 
 ## Choosing and building colors
 
@@ -136,6 +137,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Notifications (badging)](https://developer.apple.com/design/human-interface-guidelines/notifications) (apple's badge is only the unread count on an app icon)
 - **Meters and progress bars:** [Progress indicators](https://developer.apple.com/design/human-interface-guidelines/progress-indicators) and [Gauges](https://developer.apple.com/design/human-interface-guidelines/gauges) (A value within a range, with its current value and both ends labelled)
 - **Selects:** [Pop-up buttons](https://developer.apple.com/design/human-interface-guidelines/pop-up-buttons) and [Pull-down buttons](https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons)
+- **Number fields:** [Steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
 
 ### Material Design 3 (Google)
 
@@ -157,6 +159,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Badges (MDC-Android)](https://github.com/material-components/material-components-android/blob/master/docs/components/BadgeDrawable.md) (material's badge is a count or dot on navigation and icons)
 - **Meters and progress bars:** [Progress indicators](https://m3.material.io/components/progress-indicators/guidelines)
 - **Selects:** [Material Web select](https://material-web.dev/components/select/)
+- **Number fields:** [Text field](https://material-web.dev/components/text-field/) (material Web's text field, which takes type="number")
 
 ### GitHub Primer
 
@@ -182,6 +185,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Label](https://primer.style/product/components/label/) (ten variants, and a warning not to rely on the variant's color alone)
 - **Meters and progress bars:** [ProgressBar](https://primer.style/product/components/progress-bar/)
 - **Selects:** [Select guidelines](https://primer.style/product/components/select/guidelines/) and [SelectPanel](https://primer.style/product/components/select-panel/)
+- **Number fields:** [TextInput](https://primer.style/product/components/text-input)
 
 ### Atlassian Design System
 
@@ -209,6 +213,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Lozenge](https://atlassian.design/components/lozenge/usage) (atlassian's status label (its Badge is a count): sentence case, never interactive)
 - **Meters and progress bars:** [Progress bar](https://atlassian.design/components/progress-bar/usage)
 - **Selects:** [Components for LLMs (Select)](https://atlassian.design/llms-components.txt)
+- **Number fields:** [Text field usage](https://atlassian.design/components/textfield/usage)
 
 ### IBM Carbon
 
@@ -233,6 +238,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Tag](https://carbondesignsystem.com/components/tag/usage/) (twelve colors, under 20 characters, and long text cut off with a tooltip)
 - **Meters and progress bars:** [Progress bar](https://carbondesignsystem.com/components/progress-bar/usage/) (under 5 seconds, use a loading spinner instead) and [Progress bar accessibility](https://carbondesignsystem.com/components/progress-bar/accessibility/) (announces its helper text in a polite live region)
 - **Selects:** [Select](https://carbondesignsystem.com/components/select/usage/) and [Dropdown](https://carbondesignsystem.com/components/dropdown/usage/)
+- **Number fields:** [Number input usage](https://carbondesignsystem.com/components/number-input/usage/)
 
 ### Microsoft Fluent 2
 
@@ -259,6 +265,7 @@ Everything we read from each system, grouped by topic.
 - **Badges:** [Badge](https://fluent2.microsoft.design/components/web/react/core/badge/usage) (eight colors, four looks, six sizes, and an optional icon; CounterBadge for counts)
 - **Meters and progress bars:** [ProgressBar](https://fluent2.microsoft.design/components/web/react/core/progressbar/usage)
 - **Selects:** [Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
+- **Number fields:** [Spin button usage](https://fluent2.microsoft.design/components/web/react/core/spin/usage)
 
 ### Shopify Polaris
 
@@ -282,6 +289,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Divider (web components)](https://shopify.dev/docs/api/app-home/polaris-web-components/layout-and-structure/divider) (whitespace often groups better than lines, and too many add clutter)
 - **Badges:** [Badge](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/feedback-indicators/badge.mdx) (one or two words, past tense; warning and critical only when really needed)
 - **Selects:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
+- **Number fields:** [Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
 
 ### GOV.UK Design System
 
@@ -300,6 +308,7 @@ Everything we read from each system, grouped by topic.
 - **Separators:** [Section break](https://design-system.service.gov.uk/styles/section-break/) (an <hr> whose margin is the point; the line is optional)
 - **Badges:** [Tag](https://design-system.service.gov.uk/components/tag/) (never a link or button; made lighter because tags were mistaken for buttons)
 - **Selects:** [Select](https://design-system.service.gov.uk/components/select/)
+- **Number fields:** [Text input](https://design-system.service.gov.uk/components/text-input/)
 
 ### U.S. Web Design System
 
@@ -321,6 +330,7 @@ Everything we read from each system, grouped by topic.
 - **Tooltips:** [Tooltip](https://designsystem.digital.gov/components/tooltip/)
 - **Badges:** [Tag](https://designsystem.digital.gov/components/tag/) (static, and announced with a live region when loaded after the page)
 - **Selects:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
+- **Number fields:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
 
 ## Design systems, by topic
 
@@ -598,3 +608,15 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Shopify Polaris:** [Select (docs source)](https://github.com/Shopify/polaris/blob/main/polaris.shopify.com/content/components/selection-and-input/select.mdx)
 - **GOV.UK Design System:** [Select](https://design-system.service.gov.uk/components/select/)
 - **U.S. Web Design System:** [Select](https://designsystem.digital.gov/components/select/) and [Combo box](https://designsystem.digital.gov/components/combo-box/)
+
+### Number fields
+
+- **Apple Human Interface Guidelines:** [Steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
+- **Material Design 3 (Google):** [Text field](https://material-web.dev/components/text-field/) (material Web's text field, which takes type="number")
+- **GitHub Primer:** [TextInput](https://primer.style/product/components/text-input)
+- **Atlassian Design System:** [Text field usage](https://atlassian.design/components/textfield/usage)
+- **IBM Carbon:** [Number input usage](https://carbondesignsystem.com/components/number-input/usage/)
+- **Microsoft Fluent 2:** [Spin button usage](https://fluent2.microsoft.design/components/web/react/core/spin/usage)
+- **Shopify Polaris:** [Number field](https://shopify.dev/docs/api/app-home/latest/web-components/forms/number-field)
+- **GOV.UK Design System:** [Text input](https://design-system.service.gov.uk/components/text-input/)
+- **U.S. Web Design System:** [Text input](https://designsystem.digital.gov/components/text-input/) (text areas are a section of this page)
