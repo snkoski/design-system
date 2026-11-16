@@ -41,6 +41,8 @@ export const Playground: Story = {
     await expect(canvas.getByRole("img", { name: /hamburger for the Sun/ })).toBeVisible();
     await expect(canvasElement.querySelectorAll("g[data-planet] > .solar-system__body")).toHaveLength(9);
     await expect(canvasElement.querySelectorAll("[data-moon]")).toHaveLength(21);
+    // Measure in the final font: Geist swaps in when it loads, and the centered caption shifts with the text's width
+    await document.fonts.ready;
     const button = canvas.getByRole("button", { name: "Pause" });
     const date = canvasElement.querySelector(".solar-system__date")!;
     const before = { width: button.getBoundingClientRect().width, date: date.getBoundingClientRect().left };
@@ -60,6 +62,8 @@ export const Playground: Story = {
 export const FastForward: Story = {
   args: { speed: 3650 },
   play: async ({ canvas }) => {
+    // In the final font, so a font swap can't move the button between frames
+    await document.fonts.ready;
     const button = canvas.getByRole("button", { name: "Pause" });
     const places = new Set<number>();
     for (let frame = 0; frame < 30; frame++) {
