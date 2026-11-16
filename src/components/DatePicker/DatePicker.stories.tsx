@@ -52,7 +52,10 @@ const dialog = () => document.querySelector<HTMLElement>('[role="dialog"]');
 const openCalendar = async (button: HTMLElement, click: (el: HTMLElement) => Promise<void>) => {
   await click(button);
   await waitFor(() => expect(dialog()).not.toBeNull());
-  return dialog()!;
+  // Wait for the popup's slide in to finish. Mid-slide, its fractional translate makes a 44px button measure 43.99997.
+  const popup = dialog()!;
+  await Promise.all(popup.getAnimations({ subtree: true }).map((animation) => animation.finished));
+  return popup;
 };
 
 // Fields fill their container, so give single stories a realistic width. (Defined outside meta: written
