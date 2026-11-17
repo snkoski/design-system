@@ -1,10 +1,13 @@
 import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
+import { useRef } from "react";
 import type { ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
 import { FieldError } from "@/internal/FieldError";
 import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { useMergedRef } from "@/internal/useMergedRef";
+import { useResettableValue } from "@/internal/useResettableValue";
 import { warnIfUnnamed } from "@/internal/warn";
 
 export type SegmentedControlSize = "md" | "lg";
@@ -87,6 +90,8 @@ export function SegmentedControl({
   disabled,
   name,
   size = "md",
+  value,
+  defaultValue,
   onValueChange,
   className,
   ref,
@@ -95,14 +100,24 @@ export function SegmentedControl({
 }: SegmentedControlProps) {
   warnIfUnnamed("SegmentedControl", label, rest, "Give it a label or an aria-label.");
 
+  // The group always gives Base UI its value, so a form reset can put the radios and the form's data back together
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const setGroupRef = useMergedRef(groupRef, ref);
+  const { controlled, shown, setOwnValue } = useResettableValue({ value, defaultValue, groupRef, form: rest.form });
+
   return (
     <Field.Root className={cx("choice-group", "segmented-control", className)} data-size={size} name={name} disabled={disabled} invalid={invalid}>
       <Fieldset.Root className="choice-group__group segmented-control__group" render={
           // null is how a controlled control says nothing is chosen; a person's choice is never null
           <BaseRadioGroup<string | null>
             {...rest}
-            ref={ref}
-            onValueChange={(value, eventDetails) => value !== null && onValueChange?.(value, eventDetails)}
+            ref={setGroupRef}
+            value={shown}
+            onValueChange={(next, eventDetails) => {
+              if (next === null) return;
+              onValueChange?.(next, eventDetails);
+              if (!controlled && !eventDetails.isCanceled) setOwnValue(next);
+            }}
           />
         }>
         {label !== undefined && (
