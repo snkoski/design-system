@@ -1,4 +1,4 @@
-/* What CheckboxGroup, RadioGroup, and SegmentedControl share: the wrapper, the group, and the stack of options. The
+/* What CheckboxGroup, RadioGroup, SegmentedControl, and Rating share: the wrapper, the group, and the stack of options. The
    label and description are field.css. Each part carries a shared class next to its own
    (`choice-group__group radio-group__group`), and each component's own CSS keeps only what's different. */
 @layer components {

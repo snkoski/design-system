@@ -5,7 +5,7 @@ A **NumberField** is for amounts and quantities: a salary, a number of guests, a
 ## When not to use it
 
 - **Codes and IDs made of digits aren't amounts.** A verification code, a postcode, or an account, card, or phone number can start with 0, and must never step or get separators. Don't use a NumberField for them. What to use instead is still open: see "A text field for codes and IDs" in `docs/revisit.md`.
-- **Picking from a few fixed values** is a choice, not a number: use a RadioGroup or a SegmentedControl.
+- **Picking from a few fixed values** is a choice, not a number: use a RadioGroup or a SegmentedControl. A score on a short scale where more is better (1 to 5) is a Rating.
 
 ## Setting it up
 

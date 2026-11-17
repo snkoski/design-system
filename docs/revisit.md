@@ -15,7 +15,7 @@ Where an answer comes from looking, Storybook's **Revisit** section shows the op
 - Is it deliberate in Base UI, or a bug that will change in a later version?
 - If we want it skipped, can that be done through Base UI's own props rather than by overriding focus ourselves?
 
-SegmentedControl is built on the same RadioGroup and behaves the same way, so whatever is decided applies to both. Rendering the radios as native buttons isn't the answer: Base UI makes the chosen radio the Tab stop, so a chosen, disabled button would hide the whole group from Tab, even with other options enabled.
+SegmentedControl and Rating are built on the same RadioGroup and behave the same way, so whatever is decided applies to all three. Rendering the radios as native buttons isn't the answer: Base UI makes the chosen radio the Tab stop, so a chosen, disabled button would hide the whole group from Tab, even with other options enabled.
 
 Raised while building RadioGroup (2026-10-20).
 
@@ -274,7 +274,7 @@ Raised while building DatePicker (2026-11-13).
 
 ## Translating the system's own words
 
-**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", and FileInput's "Choose file", "2 files" (for any count), "Remove file", and "Remove files". What screen readers hear from FileInput's input ("No file chosen", a count) is the browser's, in the browser's language. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
+**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", FileInput's "Choose file", "2 files" (for any count), "Remove file", and "Remove files", and Rating's star names ("1 star", "3 stars") and "Clear rating". What screen readers hear from FileInput's input ("No file chosen", a count) is the browser's, in the browser's language. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
 
 **Why it's in question:** a page in another language would want them all in its language, and a screen reader reads mixed languages with one voice.
 
@@ -332,3 +332,32 @@ Raised while building FileInput (2026-11-16).
 
 Raised while building FileInput (2026-11-16).
 
+## Showing a rating nobody can change
+
+**Today:** Rating is a form control for a person's own score. There's no component for showing a score on its own, such as an average of 4.3 from 120 reviews. A read-only Rating shows whole stars and is announced as a radio group, which suits a person's own score in a form they can't change right now, not an average.
+
+**Why it's in question:** an average needs half (or partial) stars, the number in words beside them, and to be announced as one thing ("4.3 out of 5 stars"), not as five radios. Fluent has a separate RatingDisplay for this (`role="img"`), and MUI's read-only Rating becomes one image.
+
+**To decide:** when a page first shows an average: a RatingDisplay component (stars drawn from a number, with its words), or a Meter.
+
+Raised while building Rating (2026-11-17).
+
+## The arrow keys wrap from the last star to the first
+
+**Today:** in a Rating, Right on the last star chooses the first, and Left on the first chooses the last. That's Base UI's RadioGroup, and the ARIA Authoring Practices' radio pattern (its rating example wraps too). Base UI has no option to stop it, and CLAUDE.md says never to hand-roll a component's keyboard handling.
+
+**Why it's in question:** on a scale, pressing Right at 5 stars and landing on 1 is a surprise; a slider stops at its ends.
+
+**To decide:** whether it bothers people in practice. If it does, whether Base UI adds a way to stop wrapping, or whether a rating should stop at its ends some other way.
+
+Raised while building Rating (2026-11-17).
+
+## Arrow keys in right-to-left pages
+
+**Today:** RadioGroup, SegmentedControl, and Rating take their arrow-key direction from Base UI's `DirectionProvider`, not from the `dir` attribute. Under `dir="rtl"` alone, Right still moves to the next option in the DOM, which is drawn to its left.
+
+**Why it's in question:** in a right-to-left page, Right should move to the option on the right. The components copy `dir` to popups (`usePortalScope`), but nothing sets Base UI's direction.
+
+**To decide:** when a page in a right-to-left language uses the system: wrap the app in Base UI's `DirectionProvider`, and say so in the docs, or have the components read `dir` themselves.
+
+Raised while building Rating (2026-11-17).

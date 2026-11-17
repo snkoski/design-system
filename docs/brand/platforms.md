@@ -10,7 +10,7 @@ A fingertip covers about 8–10mm and can't hover. A mouse pointer is a single p
 | `control-sm` | 32px | 32px visible, 44px hit area | Small controls stay compact; the hit area grows invisibly |
 | `control-md` | 40px | 44px | Desktop systems use 32–40px (Primer, Carbon, Atlassian); touch systems 44–48px |
 | `control-lg` | 48px | 52px | Prominent actions |
-| `target-gap` | 8px | 8px | Material and Apple both ask for 8px between targets |
+| `target-gap` | 8px | 8px | Material and Apple both ask for 8px between targets. Targets that are each at least `target-min` can touch, as WCAG 2.5.8 allows |
 
 **How it switches:** `tokens.css` uses `@media (any-pointer: coarse)`. "Any" matters: GitHub's Primer warns against relying on the *primary* pointer, because a touchscreen laptop reports a mouse but is often used by touch. With `any-pointer`, any device that has a touch screen gets the touch sizes, and only mouse-and-keyboard setups get the compact ones.
 

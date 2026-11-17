@@ -36,7 +36,7 @@ These sit where the big systems cluster: around 480–640px for large phones, ab
 See **Mouse, touch, and screen size** for the full reasoning. In short:
 
 - Every interactive element's hit area is at least `target-min`: **24px with a mouse or trackpad, 44px whenever a touch screen is present.** The visible control can be smaller; padding or an invisible pseudo-element makes up the difference.
-- Separate small targets are at least `target-gap` (8px) apart.
+- Separate small targets are at least `target-gap` (8px) apart. Targets that are each at least `target-min` can touch, like choice rows and a rating's stars.
 - Control heights: `control-sm` 32px, `control-md` 40px (44px on touch), and `control-lg` 48px (52px on touch). Text inputs use the same heights as buttons so they line up in a row.
 - Checkboxes and other small choice controls use `radius-sm` and the `choice` size (24px). Each row is `choice-row` tall (32px with a mouse, 44px on touch), and the whole label is the target, so rows stack with no gap.
 

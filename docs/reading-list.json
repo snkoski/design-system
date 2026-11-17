@@ -206,6 +206,11 @@
       "id": "file-inputs",
       "name": "File inputs",
       "group": "components"
+    },
+    {
+      "id": "ratings",
+      "name": "Ratings",
+      "group": "components"
     }
   ],
   "systems": [
@@ -2862,6 +2867,38 @@
       "topics": [
         "wcag",
         "file-inputs"
+      ]
+    },
+    {
+      "title": "Rating indicators",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/rating-indicators",
+      "system": "apple",
+      "topics": [
+        "ratings"
+      ]
+    },
+    {
+      "title": "Rating",
+      "url": "https://fluent2.microsoft.design/components/web/react/core/rating/usage",
+      "system": "fluent",
+      "topics": [
+        "ratings"
+      ]
+    },
+    {
+      "title": "Rating radio group example",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio-rating/",
+      "topics": [
+        "ratings",
+        "aria-patterns"
+      ]
+    },
+    {
+      "title": "Rating slider example",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-rating/",
+      "topics": [
+        "ratings",
+        "aria-patterns"
       ]
     }
   ]

@@ -9,6 +9,7 @@ When people pick from a set of options, how many there are and whether they need
 | `NativeSelect` | One choice from more options than fit comfortably on screen, or where space is tight | "Status": Saved, Applied, Interview, Offer, Rejected |
 | `CheckboxGroup` | Any number of choices, including none | "Skills": TypeScript, React, CSS |
 | `Switch` or `Checkbox` | One thing on or off | "Email me about new jobs" |
+| `Rating` | One score on a short scale where more is better, with no words for each step | "Interest": 1 to 5 stars |
 
 ## Why radios before a select
 

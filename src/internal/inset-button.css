@@ -1,6 +1,7 @@
 /* A square ghost icon button whose visible box is inset inside its hit area: NumberField's steppers, DatePicker's
-   calendar button, the calendar's month buttons, and FileInput's Remove button. The button itself draws nothing, so it can sit over a field's edge
-   and let the edge show through; its visible box is the ::before. Each component places and sizes the button itself
+   calendar button, the calendar's month buttons, FileInput's Remove button, and Rating's Clear button. The button
+   itself draws nothing, so it can sit over a field's edge and let the edge show through; its visible box is the
+   ::before. Each component places and sizes the button itself
    (position, width, height); this file draws it. Imported before the components' CSS, so at equal specificity a
    component's own rule wins. */
 @layer components {
