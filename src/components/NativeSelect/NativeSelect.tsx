@@ -71,7 +71,7 @@ interface OwnProps {
   invalid?: boolean;
   /** Blocks changes and removes the select from the tab order. A disabled select isn't submitted. */
   disabled?: boolean;
-  /** Tells assistive technology and the form that a choice must be made. Say so in the label too, in words. */
+  /** Tells assistive technology and the form that a choice must be made. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). */
   required?: boolean;
   /** Identifies the field when the form is submitted. */
   name?: string;

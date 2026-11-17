@@ -52,7 +52,7 @@ export const WithDescription: Story = {
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
   args: {
-    children: "Share my portfolio publicly (required)",
+    children: "Share my portfolio publicly",
     required: true,
     invalid: true,
     error: "Turn this on to publish your portfolio.",

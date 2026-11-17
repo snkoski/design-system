@@ -83,7 +83,7 @@ export const WithDescription: Story = {
 
 /**
  * `required` announces the group as required and stops the form from submitting until a radio is selected.
- * Say "(required)" in the label too. To show your own error, give the form `noValidate`, then set `invalid` and `error`.
+ * Don't mark it in the label: mark the fields that aren't required "(optional)" instead. To show your own error, give the form `noValidate`, then set `invalid` and `error`.
  */
 export const Required: Story = {
   render: function Render(args) {
@@ -100,7 +100,7 @@ export const Required: Story = {
       >
         <RadioGroup
           {...args}
-          label="Plan (required)"
+          label="Plan"
           required
           defaultValue={undefined}
           value={value}
@@ -123,7 +123,7 @@ export const Required: Story = {
 
 /** Pair `invalid` with `error`: every circle gets a danger edge, and the message has words and an icon. */
 export const Invalid: Story = {
-  args: { label: "Plan (required)", defaultValue: undefined, invalid: true, error: "Choose a plan." },
+  args: { label: "Plan", defaultValue: undefined, invalid: true, error: "Choose a plan." },
 };
 
 /** A disabled group can't be changed and isn't submitted. Its selected radio can still be reached with Tab, announced as disabled. */

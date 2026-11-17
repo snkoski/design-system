@@ -206,7 +206,7 @@ export const BetweenSteps: Story = {
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
   args: {
-    label: "Guests (required)",
+    label: "Guests",
     required: true,
     invalid: true,
     error: "Enter how many guests are coming.",
@@ -337,7 +337,7 @@ function Matrix() {
       <NumberField label="Amount paid" steppers={false} defaultValue={1249.5} format={{ style: "currency", currency: "USD" }} locale="en-US" />
       <NumberField label="At its highest" defaultValue={20} max={20} />
       <NumberField aria-label="Quantity" defaultValue={1} min={1} />
-      <NumberField label="Score (required)" required invalid defaultValue={150} min={0} max={100} error="Enter a number from 0 to 100." />
+      <NumberField label="Score" required invalid defaultValue={150} min={0} max={100} error="Enter a number from 0 to 100." />
       <NumberField label="Disabled" disabled defaultValue={4} />
       <NumberField label="Read only" readOnly defaultValue={4} />
     </div>

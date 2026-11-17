@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, InputHTMLAttributes, MouseEvent, ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
 import { FieldError } from "@/internal/FieldError";
+import { useMergedRef } from "@/internal/useMergedRef";
 import { warnIfUnnamed } from "@/internal/warn";
 
 export type FileInputSize = "md" | "lg";
@@ -49,7 +50,7 @@ interface OwnProps {
   invalid?: boolean;
   /** Blocks choosing and removing, and takes the field out of the tab order. A disabled field isn't submitted. */
   disabled?: boolean;
-  /** Tells assistive technology and the form that a file must be chosen. Say so in the label too, in words. */
+  /** Tells assistive technology and the form that a file must be chosen. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). */
   required?: boolean;
   /** Identifies the field when the form is submitted. Each chosen file is sent under it. */
   name?: string;
@@ -180,14 +181,7 @@ export function FileInput(props: FileInputProps) {
   warnIfUnnamed("FileInput", label, rest, "Give it a label or an aria-label.");
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const setInputRef = useCallback(
-    (element: HTMLInputElement | null) => {
-      inputRef.current = element;
-      if (typeof ref === "function") ref(element);
-      else if (ref) ref.current = element;
-    },
-    [ref],
-  );
+  const setInputRef = useMergedRef(inputRef, ref);
 
   // The chosen files' names, for the words on the field and the Remove button. Read from the input, never assumed: on
   // mount (a browser may restore files after Back), on every change, and after a form reset.

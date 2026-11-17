@@ -2,7 +2,7 @@ import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import { Popover } from "@base-ui/react/popover";
 import type { Locale } from "date-fns";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { ChangeEventHandler, InputHTMLAttributes, ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
@@ -10,6 +10,7 @@ import { Calendar, openingMonth } from "@/internal/Calendar";
 import { formatShown, isRealDate, monthOf, readValue, textOf, todayIso } from "@/internal/dates";
 import { FieldError } from "@/internal/FieldError";
 import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { useMergedRef } from "@/internal/useMergedRef";
 import { usePortalScope } from "@/internal/usePortalScope";
 import { warn, warnIfUnnamed } from "@/internal/warn";
 
@@ -106,7 +107,7 @@ interface OwnProps {
   disabled?: boolean;
   /** Keeps the field focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label, and no calendar button. */
   readOnly?: boolean;
-  /** Tells assistive technology and the form that the field must be filled in. Say so in the label too, in words. It only checks the field isn't empty. */
+  /** Tells assistive technology and the form that the field must be filled in. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). It only checks the field isn't empty. */
   required?: boolean;
   /** Identifies the field when the form is submitted. The form gets the `yyyy-mm-dd` date, not the shown text. */
   name?: string;
@@ -248,14 +249,7 @@ export function DatePicker(props: DatePickerProps) {
   if (text !== valueText && textReadsAs !== currentValue) setText(valueText);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const setInputRef = useCallback(
-    (element: HTMLInputElement | null) => {
-      inputRef.current = element;
-      if (typeof ref === "function") ref(element);
-      else if (ref) ref.current = element;
-    },
-    [ref],
-  );
+  const setInputRef = useMergedRef(inputRef, ref);
 
   const change = (next: string, reason: DatePickerChangeDetails["reason"], shown: string) => {
     if (!controlled) setOwnValue(next);
