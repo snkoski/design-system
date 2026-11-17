@@ -86,7 +86,7 @@ export function SubmitDemo() {
         </div>
         <div className="checkbox-demo__row">
           <Checkbox name="terms" required>
-            I accept the terms (required)
+            I accept the terms
           </Checkbox>
           <code>name="terms" required</code>
         </div>
@@ -131,7 +131,7 @@ export function TermsDemo() {
         invalid={invalid}
         error="You need to accept the terms to continue."
       >
-        I accept the terms (required)
+        I accept the terms
       </Checkbox>
       <Button type="submit">Create account</Button>
     </form>

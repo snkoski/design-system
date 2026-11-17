@@ -49,7 +49,7 @@ interface OwnProps {
   disabled?: boolean;
   /** Keeps the text area focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label. */
   readOnly?: boolean;
-  /** Tells assistive technology and the form that the field must be filled in. Say so in the label too, in words. */
+  /** Tells assistive technology and the form that the field must be filled in. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms). */
   required?: boolean;
   /** Identifies the field when the form is submitted. */
   name?: string;

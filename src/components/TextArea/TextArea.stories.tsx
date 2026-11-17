@@ -141,7 +141,7 @@ export const WithDescription: Story = {
 
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
-  args: { label: "Message (required)", required: true, invalid: true, error: "Write a message before sending." },
+  args: { label: "Message", required: true, invalid: true, error: "Write a message before sending." },
 };
 
 /** Placeholders show an example. They never replace the label, because they disappear as you type. */

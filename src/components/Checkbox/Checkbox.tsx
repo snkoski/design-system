@@ -46,7 +46,7 @@ interface OwnProps {
   /** Keeps the checkbox focusable and readable, but blocks changes. Shows "Read only" beside the label. Inside a read-only CheckboxGroup it is always read-only, and the group's label shows the note instead. */
   readOnly?: boolean;
   /**
-   * Tells assistive technology and the form that this box must be ticked. Say so in the label too, in words.
+   * Tells assistive technology and the form that this box must be ticked. Don't mark it in the label: the label already says what ticking it agrees to (see Forms).
    * Ignored inside a CheckboxGroup.
    */
   required?: boolean;

@@ -248,9 +248,9 @@ Its position is the input's side padding plus its edge, so it lines up with wher
 
 ### Hover, focus, and invalid
 
-<Code file="internal/text-field.css" name='.text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
+<Code file="internal/text-field.css" name='.text-field:not(:has(.field-label:hover)) .text-field__control:hover:not(:disabled, [readonly], [aria-invalid="true"])' />
 
-Hover darkens the edge to `ink`. The `:not()` matters. `:hover` makes a selector more specific, so without it, a hovered invalid field would lose its red edge, and a disabled or read-only field would look as if it could be changed.
+Hover darkens the edge to `ink`. Browsers count the pointer over a `<label>` as over its control, so the first `:not()` leaves the edge alone while the pointer is on the label: only the field itself looks like it reacts. The second `:not()` matters too. `:hover` makes a selector more specific, so without it, a hovered invalid field would lose its red edge, and a disabled or read-only field would look as if it could be changed.
 
 <Code file="internal/text-field.css" name=".text-field__control:focus-visible" />
 

@@ -243,7 +243,7 @@ export const WithDescription: Story = {
 
 /** Pair `invalid` with `error`: the message has an icon and words, and the track's edge turns thicker. */
 export const Invalid: Story = {
-  args: { label: "Billing (required)", defaultValue: undefined, required: true, invalid: true, error: "Choose how to pay." },
+  args: { label: "Billing", defaultValue: undefined, required: true, invalid: true, error: "Choose how to pay." },
 };
 
 /** A disabled control can't be changed, and isn't submitted. Its label stays readable. Tab still reaches its chosen option, which is announced as disabled. */

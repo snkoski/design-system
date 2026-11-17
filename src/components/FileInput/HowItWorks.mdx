@@ -1,0 +1,198 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as FileInputStories from "./FileInput.stories";
+import { FileInput } from "@/components/FileInput/FileInput";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+import { ResumeForm } from "@/how-it-works/components/FileInput";
+
+<Meta of={FileInputStories} name="How it works" />
+
+# How File input works
+
+A file input is a field for choosing files from the device to send with a form. It's the browser's own `<input type="file">`: the browser opens the system's file picker and sends the files with the form. FileInput draws the whole field as one button, with its own icon and words over the input, centered: "Choose file", then the chosen file's name or how many. Around it, it's a text field like [Input](?path=/docs/components-input--how-it-works): the same label, help text, error, edge, states, and themes. It adds one thing the browser's input can't do: once a file is chosen, a Remove button empties the field again. This page covers what's different, and links to the Input page for the rest. Every code block is read from the source files when the page loads, so it's always the code that ships, and every demo is the real component.
+
+## What it's made of
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>FileInput.tsx</code></td><td>The component. It renders Base UI's input as a file input, reports chosen files as an array, counts them, and draws the Remove button while there are any.</td></tr>
+    <tr><td><code>file-input.css</code></td><td>The look that's its own: the height, the browser's button drawn as plain words, hiding the empty status, the fill on hover and press, the room for Remove, and where Remove sits.</td></tr>
+    <tr><td><code>src/internal/text-field.css</code> and <code>field.css</code></td><td>The look it shares with Input and the other text fields (the field, its edge, every state, hot dog mode, and Windows high contrast) and with every form control (the label and description).</td></tr>
+    <tr><td><code>src/internal/inset-button.css</code></td><td>The look of Remove, shared with NumberField's steppers and DatePicker's calendar button: a square button with its visible box drawn inside it.</td></tr>
+    <tr><td><code>index.ts</code></td><td>What the package exports: <code>FileInput</code> and the <code>FileInputProps</code> and <code>FileInputSize</code> types.</td></tr>
+    <tr><td><code>src/internal/FieldError.tsx</code>, <code>warn.ts</code>, and <code>cx.ts</code></td><td>The shared error message, the development warnings, and the class name helper. Not exported.</td></tr>
+    <tr><td><code>FileInput.test.tsx</code> and <code>FileInput.stories.tsx</code></td><td>The unit tests, and the stories, which also run as tests in a real browser.</td></tr>
+  </tbody>
+</table>
+
+It uses Base UI's `Field.Root`, `Field.Label`, `Field.Description`, `Field.Error` (through `FieldError`), and `Input`, as Input does, and Base UI's `Button` for Remove. [Base UI](https://base-ui.com), the unstyled library underneath, links the label and help text to the input and handles the ARIA attributes. Base UI has no file component of its own.
+
+## What it renders
+
+Here's a real file field in a real form. It's required, has a description, and checks itself the way [Forms](?path=/docs/foundations-forms--docs) says: when the form is submitted, then, after a failed submit, again each time the choice changes.
+
+<Unstyled>
+  <Inspect hint="Select Send application with no file chosen. Then choose a file, and watch the error go or change. Then remove it with the × button.">
+    <ResumeForm />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Element</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>&lt;div class="text-field file-input" data-size&gt;</code></td><td>Base UI's <code>Field.Root</code>, with our classes</td><td>Holds the whole field. <code>data-size</code> comes from the <code>size</code> prop. Base UI adds the field's state, such as <code>data-invalid</code> and <code>data-disabled</code>.</td></tr>
+    <tr><td><code>&lt;label class="file-input__label" for&gt;</code> with a <code>&lt;span id&gt;</code></td><td>Base UI's <code>Field.Label</code>, and us</td><td><code>for</code> points at the input, which names it. Clicking a file input's label would open the picker, so FileInput stops that and focuses the field instead, as a text field's label does; a link in the label still works. The span's <code>id</code> lets Remove use the label's words in its own name.</td></tr>
+    <tr><td><code>&lt;p class="file-input__description" id&gt;</code></td><td>Base UI's <code>Field.Description</code></td><td>Help text between the label and the field, read before choosing: the kinds of file and the size limit.</td></tr>
+    <tr><td><code>&lt;div class="file-input__box" data-has-files&gt;</code></td><td>Us</td><td>Holds the words, the input, and Remove, so the words and Remove can sit over the input. <code>data-has-files</code> is set while a file is chosen, and keeps the words clear of Remove.</td></tr>
+    <tr><td><code>&lt;span class="file-input__face" aria-hidden="true"&gt;</code>, with an <code>&lt;svg class="file-input__upload"&gt;</code> and a <code>&lt;span class="file-input__words"&gt;</code></td><td>Us</td><td>The upload icon and the field's words, "Choose file", the file's name, or how many ("2 files"), centered over the input. Hidden from screen readers, which hear the input's own words, and clicks go through them to the input.</td></tr>
+    <tr><td><code>&lt;input type="file" class="file-input__control"&gt;</code></td><td>Base UI's <code>Input</code></td><td>The field. <code>aria-labelledby</code>, <code>aria-describedby</code>, <code>aria-invalid</code>, <code>required</code>, and the <code>data-*</code> state come from Base UI; <code>accept</code>, <code>multiple</code>, and <code>capture</code> from the props.</td></tr>
+    <tr><td><code>&lt;button class="inset-button file-input__remove" aria-labelledby&gt;</code></td><td>Base UI's <code>Button</code>, while a file is chosen</td><td>Remove. Its name is a hidden "Remove file," (or "Remove files,") and the label's words: "Remove file, Résumé". With no visible label, it's an <code>aria-label</code> built the same way.</td></tr>
+    <tr><td><code>&lt;svg aria-hidden="true"&gt;</code></td><td>Us</td><td>Remove's ×. Decorative: the button's name already says what it does.</td></tr>
+  </tbody>
+</table>
+
+The chosen files live in the input's `files` property. The browser also draws a button and words inside the input ("Choose File", "No file chosen"), where no HTML or CSS class reaches them: CSS reaches the button through one pseudo-element, `::file-selector-button`, and the words only through the input's own font and color. FileInput hides both, and shows the names it reads from `files` in its own words instead.
+
+## From props to HTML
+
+### The props
+
+A file field needs a name: a visible label, or an `aria-label`. The props type requires one of the two.
+
+<Code file="components/FileInput/FileInput.tsx" name="Labelled" />
+
+<Code file="components/FileInput/FileInput.tsx" name="OwnProps" />
+
+The rest are Base UI's input props, less the ones a file input can't use. A file input's value can only be emptied, so there's no `value`, `defaultValue`, or `onValueChange` (which would report the browser's made-up path, `C:\fakepath\cv.pdf`). Browsers ignore `readonly` on a file input, so there's no `readOnly`. Text field attributes such as `placeholder` and `pattern` don't apply.
+
+<Code file="components/FileInput/FileInput.tsx" name="FileInputProps" />
+
+Anything left out of the type but passed anyway, from plain JavaScript, is dropped if it would throw or quietly do the wrong thing:
+
+<Code file="components/FileInput/FileInput.tsx" name="dropped" />
+
+### The component
+
+<Code file="components/FileInput/FileInput.tsx" name="FileInput" />
+
+Some things to notice:
+
+- **The chosen files' names.** The only state is the names of the chosen files, for the field's words and Remove, read from the input, never assumed: once when it first renders (a browser can put files back after the Back button), on every change, and after a form reset. A reset empties the input without a change event, and fires before it empties it, so the count is read on the next turn.
+- **Remove** sets the input's value to `""`, the one value a page may give a file input, then fires `input` and `change`, as a person's choice does, so `onChange`, `onFilesChange`, form libraries, and anything else listening hear it. Then focus goes back to the input.
+- **A file dropped on Remove** goes to the field. Remove sits over the field's end, so a file dragged there lands on the button, not the input, and the browser would otherwise open the file in the tab and leave the form.
+
+<Code file="components/FileInput/FileInput.tsx" name="announceChange" />
+
+## How it looks
+
+The field, its edge, and its states are the shared text field look, explained on [Input's page](?path=/docs/components-input--how-it-works).
+
+### The field
+
+<Code file="components/FileInput/file-input.css" name=".file-input" />
+
+The field's height is a custom property, so Remove can be exactly as wide as the field is tall.
+
+<Code file="components/FileInput/file-input.css" name=".file-input__control" />
+
+<Code file="components/FileInput/file-input.css" name=".file-input .file-input__control, .file-input[data-size] .file-input__control" />
+
+The browser draws a "Choose File" button and words beside it ("No file chosen") inside the input, worded differently in every browser, and won't center them. So all of it is drawn at size 0, and the field draws its own words over it instead. Making it transparent would also hide it, but Windows high contrast themes replace every text color, and it would come back. Screen readers still hear the browser's words.
+
+<Code file="components/FileInput/file-input.css" name=".file-input__control::file-selector-button" />
+
+Every property of the browser's button is set, because a page's CSS reset (Storybook loads Tailwind's) restyles it too, and a page with no reset shows the browser's own gray box.
+
+Hovering or pressing anywhere on the field fills it, as it would a secondary button, since the whole field opens the picker. Browsers count hovering the label as hovering the input, so the rule leaves the field alone then: clicking the label only focuses the field.
+
+<Code file="components/FileInput/file-input.css" name=".file-input:not(:has(.file-input__label:hover)) .file-input__control:hover:not(:disabled)" />
+
+### The icon and words
+
+<Code file="components/FileInput/file-input.css" name=".file-input__face" />
+
+The icon and words sit over the whole field, centered across and down, and `pointer-events: none` lets a click anywhere on them reach the input, so it opens the picker. While a file is chosen, their padding on both sides is as wide as Remove, so they stay centered and never run under it.
+
+<Code file="components/FileInput/file-input.css" name=".file-input__words" />
+
+A long file name is shortened with "…". "Choose file" is bold, like a button's label; a chosen file's name is a value, so it isn't:
+
+<Code file="components/FileInput/file-input.css" name=".file-input__box:not([data-has-files]) .file-input__words" />
+
+### Remove
+
+<Code file="components/FileInput/file-input.css" name=".file-input__remove" />
+
+<Code file="components/FileInput/file-input.css" name=".file-input__remove:focus-visible" />
+
+The rest of its look is the shared inset button:
+
+<Code file="internal/inset-button.css" name=".inset-button::before" />
+
+### Windows high contrast
+
+<Code file="components/FileInput/file-input.css" name="@media (forced-colors: active)" />
+
+## Keyboard, screen readers, and forms
+
+**Keyboard.** It's the browser's own file input: Tab moves to it, and Enter or Space opens the system's file picker, as a click anywhere on the field does. While a file is chosen, Remove is the next Tab stop; Enter or Space empties the field and moves focus back to it. A disabled field, and its Remove, are skipped by Tab.
+
+**Screen readers** announce the label as its name, that it's a button (the words depend on the screen reader and browser), the browser's own status ("No file chosen", the file's name, or how many, in the browser's language), then the description and any error. The words drawn on the field are hidden from them, so nothing is read twice.
+
+**Browsers** all look the same: the words on the field are FileInput's, not the browser's (Chrome's "Choose File", Firefox's "Browse…"). They're English for now (see `docs/revisit.md`).
+
+**Forms.** What `FormData` gets:
+
+<table>
+  <thead>
+    <tr><th>The field has</th><th>What the form sends</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>One file chosen, with <code>name="resume"</code></td><td><code>resume=</code> and the file</td></tr>
+    <tr><td>Several files chosen, with <code>multiple</code></td><td>One <code>resume=</code> entry per file</td></tr>
+    <tr><td>Nothing chosen, or files removed</td><td>An empty file: <code>resume=</code> with no name and no bytes</td></tr>
+    <tr><td>Disabled</td><td>Nothing</td></tr>
+    <tr><td>Required, with nothing chosen</td><td>The form doesn't submit, unless it has <code>noValidate</code>: the browser's own validation stops it</td></tr>
+  </tbody>
+</table>
+
+<Unstyled>
+  <Inspect hint="A file field with no visible label, named by aria-label, such as a photo in a table row. Choose a file and look at Remove's name.">
+    <FileInput aria-label="Profile photo" accept="image/*" />
+  </Inspect>
+</Unstyled>
+
+## The whole files
+
+<details>
+<summary><code>FileInput.tsx</code></summary>
+
+<Code file="components/FileInput/FileInput.tsx" />
+
+</details>
+
+<details>
+<summary><code>file-input.css</code></summary>
+
+<Code file="components/FileInput/file-input.css" />
+
+</details>
+
+<details>
+<summary><code>internal/inset-button.css</code></summary>
+
+<Code file="internal/inset-button.css" />
+
+</details>
+
+<details>
+<summary><code>index.ts</code></summary>
+
+<Code file="components/FileInput/index.ts" />
+
+</details>

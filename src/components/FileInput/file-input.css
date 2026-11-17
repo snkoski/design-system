@@ -1,0 +1,139 @@
+/* FileInput: what's its own. The label, description, edge, hover, focus, invalid, disabled, hot dog, and forced colors
+   rules of the field are shared with Input in internal/text-field.css and field.css, and the Remove button is drawn by
+   internal/inset-button.css. This file adds the height, hides everything the browser draws inside the field, draws the
+   field's own icon and words over it, centered, fills the field on hover and press, and places Remove. Where the field
+   sits and how wide it is is the layout's job.
+
+   Disabled dims the whole field to 50% over the page, as every text field does, which WCAG exempts. Measured with
+   `pnpm check:contrast --probe ink:surface:4.5 border-strong:surface:3 --opacity 0.5 --page bg`: ink on surface is 3.35:1
+   in light, 4.60:1 in dark, and 4.03:1 in hot dog; the edge 1.98:1, 2.55:1, and 4.03:1. */
+@layer components {
+  /* The field's height, which is also Remove's width, so the button is square */
+  .file-input {
+    --file-input-height: var(--control-md);
+  }
+  .file-input[data-size="lg"] {
+    --file-input-height: var(--control-lg);
+  }
+
+  /* Positions the words and Remove over the input. A little more room between the text above and the field than
+     between the label and its description. */
+  .file-input__box {
+    position: relative;
+  }
+  .file-input__box:not(:first-child) {
+    margin-block-start: var(--space-1);
+  }
+
+  /* The field: the browser's input, which opens the picker wherever it's clicked. Everything the browser draws inside it
+     (its "Choose File" button and the "No file chosen" beside it, worded differently in every browser) is drawn at size
+     0, and the field's own words are drawn over it instead. Screen readers still hear the browser's. Not hidden with
+     color: Windows Contrast themes would bring the color back. */
+  .file-input__control {
+    height: var(--file-input-height);
+    appearance: none;
+    cursor: pointer;
+  }
+  /* As specific as the shared lg rule, which sets a larger size */
+  .file-input .file-input__control,
+  .file-input[data-size] .file-input__control {
+    font-size: 0;
+  }
+
+  /* The browser's button, with nothing left of it. Every property is set here, because a page's CSS reset (Tailwind's
+     preflight, for one) restyles it, and a page with no reset shows the browser's own gray box. */
+  .file-input__control::file-selector-button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 0;
+    appearance: none;
+    cursor: inherit;
+  }
+
+  /* Hovering or pressing anywhere on the field fills it, as it would a secondary button, since the whole field opens the
+     picker. The danger edge of an invalid field still shows. Hovering the label doesn't: browsers count it as hovering
+     the input, but clicking the label only focuses the field. */
+  .file-input:not(:has(.file-input__label:hover)) .file-input__control:hover:not(:disabled) {
+    background-color: var(--surface-hover);
+  }
+  .file-input:not(:has(.file-input__label:hover)) .file-input__control:active:not(:disabled) {
+    background-color: var(--track-hover);
+  }
+
+  /* The field's own icon and words, centered over it, letting clicks through to the input. The padding keeps them clear
+     of the edge, and while Remove shows, clear of it on both sides, so they stay centered. A long name is shortened. */
+  .file-input__face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+    color: var(--ink);
+    font-size: var(--text-body);
+    line-height: var(--leading-control);
+    pointer-events: none;
+  }
+  .file-input[data-size="lg"] .file-input__face {
+    padding-inline: var(--space-4);
+    font-size: var(--text-body-lg);
+  }
+  .file-input__box[data-has-files] .file-input__face {
+    padding-inline: var(--file-input-height);
+  }
+  .file-input__upload {
+    flex: none;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    stroke-width: var(--icon-stroke);
+  }
+  .file-input__words {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* "Choose file" is the action, so it's bold, like a button's label; a chosen file's name is a value */
+  .file-input__box:not([data-has-files]) .file-input__words {
+    font-weight: 600;
+  }
+  .file-input[data-disabled] .file-input__face {
+    opacity: 0.5;
+  }
+
+  /* Remove: a square as tall as the field, over its end, so its hit area is the field's full height. It's a Tab stop,
+     so its focus outline is pulled inside its visible box, which starts space-1 in from the button's edge. */
+  .file-input__remove {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: var(--file-input-height);
+  }
+  /* Rounded only while focused, so the outline's corners follow the visible box's */
+  .file-input__remove:focus-visible {
+    border-radius: calc(var(--radius-sm) + var(--space-1));
+    outline-offset: calc(-1 * (var(--space-1) + var(--focus-width)));
+  }
+
+  /* Windows Contrast themes: the field keeps its system fill, and its icon and words turn the highlight color on hover
+     and press, gray when disabled. */
+  @media (forced-colors: active) {
+    .file-input:not(:has(.file-input__label:hover)) .file-input__control:hover:not(:disabled),
+    .file-input:not(:has(.file-input__label:hover)) .file-input__control:active:not(:disabled) {
+      background: Field;
+    }
+    .file-input__face {
+      color: FieldText;
+    }
+    .file-input:not(:has(.file-input__label:hover)) .file-input__box:has(.file-input__control:is(:hover, :active):not(:disabled)) .file-input__face {
+      color: Highlight;
+    }
+    .file-input[data-disabled] .file-input__face {
+      opacity: 1;
+      color: GrayText;
+    }
+  }
+}

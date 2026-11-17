@@ -32,7 +32,7 @@ interface OwnProps {
   /** Identifies the field when the form is submitted. The selected radio submits its `value` under this name. */
   name?: string;
   /**
-   * Tells assistive technology and the form that a choice must be made. Say so in the label too, in words.
+   * Tells assistive technology and the form that a choice must be made. Don't mark it in the label: mark the fields that aren't required "(optional)" instead (see Forms).
    * The browser then blocks the form from submitting until a radio is selected. To show your own error instead,
    * give the form `noValidate`, and set `invalid` and `error` when nothing is selected.
    */

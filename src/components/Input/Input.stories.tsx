@@ -109,7 +109,7 @@ export const WithDescription: Story = {
 /** Pair `invalid` with `error`: the message has an icon and words, so the problem isn't only red. */
 export const Invalid: Story = {
   args: {
-    label: "Email (required)",
+    label: "Email",
     type: "email",
     required: true,
     invalid: true,
