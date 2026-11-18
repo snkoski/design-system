@@ -69,7 +69,7 @@ src/internal/                pieces several components share (cx, FieldError and
                              read-only-note.css, SpinnerGraphic and spinner-graphic.css, bar.ts and bar.css for the look Meter and
                              Progress share, useLoadingAnnouncement, warn, usePortalScope for popups, useMergedRef for a component that
                              needs its own element and also forwards `ref`, useResettableValue for a group of radios to
-                             follow a form reset, dates.ts and Calendar
+                             follow a form reset, star.ts (the star Rating draws), dates.ts and Calendar
                              with calendar.css for DatePicker), with tests, the CSS
                              form controls share (field.css, text-field.css, choice.css, choice-group.css,
                              inset-button.css), and
