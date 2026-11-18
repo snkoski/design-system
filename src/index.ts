@@ -11,6 +11,7 @@ export * from "@/components/DatePicker";
 export * from "@/components/FileInput";
 export * from "@/components/SegmentedControl";
 export * from "@/components/Rating";
+export * from "@/components/RatingSlider";
 export * from "@/components/Spinner";
 export * from "@/components/Separator";
 export * from "@/components/Badge";

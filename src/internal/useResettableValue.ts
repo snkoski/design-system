@@ -7,22 +7,23 @@ interface Options<T> {
   value: T | null | undefined;
   /** Where an uncontrolled control starts, and goes back to on a form reset */
   defaultValue: T | undefined;
-  /** The element holding the control's hidden radio inputs */
+  /** The element holding the control (and any hidden radio inputs); the form is found from it */
   groupRef: RefObject<HTMLElement | null>;
   /** The id of a `<form>` the control submits with, when it sits outside that form */
   form: string | undefined;
 }
 
 /**
- * The value a group of radios shows (RadioGroup, SegmentedControl, Rating), kept in step with a form reset. The
- * component passes `shown` to Base UI's RadioGroup as `value` every time, so Base UI never keeps a value of its own,
- * and calls `setOwnValue` when an uncontrolled value changes.
+ * The value a group of radios shows (RadioGroup, SegmentedControl, Rating), or RatingSlider's slider, kept in step with
+ * a form reset. The component passes `shown` to Base UI as `value` every time, so Base UI never keeps a value of its
+ * own, and calls `setOwnValue` when an uncontrolled value changes.
  *
  * A form reset puts each hidden radio back as it was when the page loaded, but Base UI's state doesn't follow: the
- * radios kept showing the last choice while the form sent the first one. So once the browser has reset the fields,
- * an uncontrolled control goes back to `defaultValue` (or none), a controlled one keeps `value`, and the hidden
- * radios are set to match. No change is reported: the person didn't choose anything, and a page that wants to know
- * listens for the form's reset itself. Internal: not exported from the package.
+ * radios kept showing the last choice while the form sent the first one, and a slider keeps its value through a reset.
+ * So once the browser has reset the fields, an uncontrolled control goes back to `defaultValue` (or none), a
+ * controlled one keeps `value`, and any hidden radios are set to match. No change is reported: the person didn't
+ * choose anything, and a page that wants to know listens for the form's reset itself. Internal: not exported from the
+ * package.
  */
 export function useResettableValue<T extends string | number>({ value, defaultValue, groupRef, form }: Options<T>) {
   const controlled = value !== undefined;

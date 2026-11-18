@@ -7,7 +7,7 @@
 - Meaningful icons meet 3:1 contrast against their background.
 - Lines are `icon-stroke` (2). `icon-stroke-bold` (2.75) is the icon version of bold text, for an icon that has to show a state by itself. A chosen segment doesn't need it: its border shows the choice, so its icons stay at `icon-stroke`.
 - An icon-only button always has an accessible name (`aria-label`). Decorative icons get `aria-hidden="true"`.
-- A rating's star is the one filled icon, because filling is its state: an outlined Lucide star when empty, and the same star filled in when chosen.
+- A rating's star is the one filled icon, because filling is its state: an outlined Lucide star when empty, and the same star filled in when chosen. In a RatingSlider a star can be part filled, clipped from the right at a half or a quarter.
 - No emoji in UI.
 
 ## Logo

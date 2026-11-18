@@ -1,0 +1,91 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as RatingSliderStories from "./RatingSlider.stories";
+import { RatingSlider } from "@/components/RatingSlider/RatingSlider";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+
+<Meta of={RatingSliderStories} name="How it works" />
+
+# How RatingSlider works
+
+A rating slider is a row of stars that works as a slider: drag across it, click anywhere on it, or use the arrow keys, and the stars fill to the value, in whole, half, or quarter stars. Underneath, it's Base UI's Slider: one `<input type="range">` holds the value, and the stars are only a drawing of it. [Rating's How it works page](?path=/docs/components-rating--how-it-works) covers the star and the shared pieces; this page covers what's different.
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>RatingSlider.tsx</code></td><td>The component: a field, Base UI's slider locked left to right, the stars drawn from the value, the hover preview, and the words beside them.</td></tr>
+    <tr><td><code>rating-slider.css</code></td><td>The look: the frame that sizes it, the padding that makes a click fill to the end of its slice, the clipped fill, every state, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>src/internal/star.ts</code></td><td>The star's path, shared with Rating.</td></tr>
+    <tr><td><code>src/internal/useResettableValue.ts</code></td><td>The value, kept in step with a form reset (section 4).</td></tr>
+    <tr><td><code>src/internal/choice-group.css</code> and <code>field.css</code></td><td>The wrapper, the group, the label, and the description, shared with the other groups.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts: `Field.Root`, `Field.Label` (as a `<div>`), `Field.Description`, `Field.Error` (through `FieldError`), `DirectionProvider`, and `Slider.Root`, `Slider.Control`, `Slider.Track`, and `Slider.Thumb`. Every code block here is read from the files when the page loads.
+
+## 1. What it renders
+
+<Unstyled>
+  <Inspect hint="Drag across the stars, click them, or focus the slider and use the arrow keys, Home, and End.">
+    <RatingSlider label="Interest" name="interest" defaultValue={3.5} />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<div role=\"group\" class=\"choice-group__group rating-slider__root\">"}</code></td><td><code>Slider.Root</code></td><td>Base UI's slider root is a group named by the label. Extra props you pass land here.</td></tr>
+    <tr><td><code>{"<div class=\"rating-slider__frame\" dir=\"ltr\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>The container the stars are measured in (section 5), always left to right.</td></tr>
+    <tr><td><code>{"<span class=\"rating-slider__star\" style=\"--rating-slider-fill: 0.5\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>One star, with how much of it is filled. The stars are <code>aria-hidden</code>: the input says the value.</td></tr>
+    <tr><td><code>{"<input type=\"range\" aria-valuetext=\"3.5 stars\">"}</code></td><td><code>Slider.Thumb</code></td><td>The value. Screen readers hear "Interest, slider, 3.5 stars", or "No rating" at 0. Your <code>id</code>, <code>ref</code>, and <code>aria-readonly</code> for read-only land here too.</td></tr>
+    <tr><td><code>{"<span class=\"rating-slider__value\" aria-hidden=\"true\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>"3.5 of 5", with <code>showValue</code>. Hidden from screen readers, which already hear it.</td></tr>
+  </tbody>
+</table>
+
+## 2. The component
+
+<Code file="components/RatingSlider/RatingSlider.tsx" name="RatingSlider" />
+
+In order, it:
+
+- Checks it has a name and a usable `max` (5 if not), as Rating does.
+- Gets its value from `useResettableValue`, so it always gives Base UI the value; 0 and `null` both mean no rating.
+- Snaps the value to the nearest step and into range, so the stars, the input, and the form agree, and warns in development when the page's value wasn't on a step.
+- Works out the hover preview from the pointer: the control's box minus its padding, as Base UI measures a press, rounded to the step. Only for a mouse or pen, not while a button is held, and cleared by a key press until the pointer moves again.
+- Cancels every change while read-only, since Base UI's slider has no read-only state, and reports changes with `null` for 0 otherwise.
+- Sets your `id` and `aria-readonly` on the input itself (Base UI passes only a few props to it), and focuses the input when the label is clicked, since Base UI's label looks the input up by the id it gave it.
+- Wraps the slider in a left-to-right `DirectionProvider` and puts `dir="ltr"` on the stars, so Base UI's pointer math and keys match the drawing in a right-to-left page.
+
+<Code file="components/RatingSlider/RatingSlider.tsx" name="describeStars" />
+
+## 3. The props
+
+<Code file="components/RatingSlider/RatingSlider.tsx" name="OwnProps" />
+
+## 4. Following a form reset
+
+Base UI's slider keeps its value through a form reset, because React keeps the input's `value` attribute in step with it. `useResettableValue` listens for the form's `reset` and puts an uncontrolled slider back to `defaultValue`; a controlled one keeps `value`.
+
+## 5. The CSS
+
+The frame has a width of its own, the no-rating strip and the stars at `choice-row` each, and shrinks to fit a narrower parent. It's the container the cell is measured in, so the stars narrow with it.
+
+<Code file="components/RatingSlider/rating-slider.css" name=".rating-slider__frame" />
+
+Base UI maps a press across the control's content box and rounds to the nearest step. The padding starts the content box half a step before the stars and ends it half a step before their end, so a press anywhere on a step's slice fills to the end of that slice, and anything left of the stars is 0.
+
+<Code file="components/RatingSlider/rating-slider.css" name=".rating-slider__control" />
+
+Each star is an outline with a solid star on top, clipped from the right by how much of it is filled. The clip reaches past every edge by `border-thick`, so the line's overhang is never cut.
+
+<Code file="components/RatingSlider/rating-slider.css" name=".rating-slider__fill" />
+
+<Code file="components/RatingSlider/rating-slider.css" name=".rating-slider[data-disabled] .rating-slider__control" />
+
+<Code file="components/RatingSlider/rating-slider.css" name='[data-theme="hotdog"] .rating-slider__outline' />
+
+<Code file="components/RatingSlider/rating-slider.css" name="@media (forced-colors: active)" />

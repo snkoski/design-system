@@ -28,6 +28,7 @@
 @import "@/components/FileInput/file-input.css";
 @import "@/components/SegmentedControl/segmented-control.css";
 @import "@/components/Rating/rating.css";
+@import "@/components/RatingSlider/rating-slider.css";
 @import "@/components/Spinner/spinner.css";
 @import "@/components/Separator/separator.css";
 @import "@/components/Badge/badge.css";

@@ -36,9 +36,9 @@
     { "fg": "warning", "bg": "warning-soft", "min": 4.5, "use": "A warning Badge's words and icon" },
     { "fg": "danger", "bg": "surface-tint", "min": 4.5, "use": "Error text on tinted panels" },
 
-    { "fg": "border-strong", "bg": "bg", "min": 3, "use": "Control edges on the page, and a rating's empty star" },
-    { "fg": "border-strong", "bg": "surface", "min": 3, "use": "Control edges on cards, the unticked checkbox box, the unselected radio circle, the switch thumb when off, today's ring in the calendar, and a rating's empty star on a card" },
-    { "fg": "border-strong", "bg": "surface-tint", "min": 3, "use": "Control edges on tinted panels, and a rating's empty star there" },
+    { "fg": "border-strong", "bg": "bg", "min": 3, "use": "Control edges on the page, and a rating's empty star (Rating and RatingSlider)" },
+    { "fg": "border-strong", "bg": "surface", "min": 3, "use": "Control edges on cards, the unticked checkbox box, the unselected radio circle, the switch thumb when off, today's ring in the calendar, and a rating's empty star on a card (Rating and RatingSlider)" },
+    { "fg": "border-strong", "bg": "surface-tint", "min": 3, "use": "Control edges on tinted panels, and a rating's empty star there (Rating and RatingSlider)" },
     { "fg": "border-strong", "bg": "surface-hover", "min": 3, "use": "Edges of hovered controls (checkbox box, radio circle, secondary button), and the switch thumb when off and hovered" },
     { "fg": "focus", "bg": "bg", "min": 3, "use": "Focus outline on the page" },
     { "fg": "focus", "bg": "surface", "min": 3, "use": "Focus outline on cards" },
@@ -46,15 +46,15 @@
     { "fg": "focus", "bg": "track-hover", "min": 3, "use": "The calendar button's and a file input's Remove button's focus outline over its pressed or open fill" },
     { "fg": "focus", "bg": "surface-tint", "min": 3, "use": "Focus outline on tinted panels" },
     { "fg": "action", "bg": "track", "min": 3, "use": "A Meter or Progress fill against its track" },
-    { "fg": "action", "bg": "surface", "min": 3, "use": "The chosen calendar day's fill, which shows the choice, against the calendar, and a rating's filled star on a card" },
-    { "fg": "action", "bg": "bg", "min": 3, "use": "A rating's filled star on the page" },
-    { "fg": "action", "bg": "surface-tint", "min": 3, "use": "A rating's filled star on a tinted panel" },
+    { "fg": "action", "bg": "surface", "min": 3, "use": "The chosen calendar day's fill, which shows the choice, against the calendar, and a rating's filled star on a card (Rating and RatingSlider)" },
+    { "fg": "action", "bg": "bg", "min": 3, "use": "A rating's filled star on the page (Rating and RatingSlider)" },
+    { "fg": "action", "bg": "surface-tint", "min": 3, "use": "A rating's filled star on a tinted panel (Rating and RatingSlider)" },
     { "fg": "success", "bg": "track", "min": 3, "use": "A success Meter's fill against its track" },
     { "fg": "warning", "bg": "track", "min": 3, "use": "A warning Meter's fill against its track" },
     { "fg": "danger", "bg": "track", "min": 3, "use": "A danger Meter's fill against its track" },
     { "fg": "focus", "bg": "track", "min": 3, "use": "Focus outline of a segment, where it crosses the track" },
     { "fg": "ink", "bg": "track", "min": 3, "use": "The chosen segment's ink border, against the track around it" },
-    { "fg": "danger", "bg": "surface", "min": 3, "use": "Invalid control edge on cards, and an invalid rating's empty star there" },
-    { "fg": "danger", "bg": "bg", "min": 3, "use": "A danger secondary button's edge on the page, and an invalid rating's empty star" }
+    { "fg": "danger", "bg": "surface", "min": 3, "use": "Invalid control edge on cards, and an invalid rating's empty star there (Rating and RatingSlider)" },
+    { "fg": "danger", "bg": "bg", "min": 3, "use": "A danger secondary button's edge on the page, and an invalid rating's empty star (Rating and RatingSlider)" }
   ]
 }

@@ -8,6 +8,7 @@ A rating is a row of stars where someone gives one score on a short scale: how i
 - **RadioGroup:** when each answer needs words, such as how satisfied someone was ("Very satisfied" to "Very dissatisfied"), or the steps aren't "more is better". Stars can't say what 3 means; words can. GOV.UK's own feedback pages ask about satisfaction with radios in words.
 - **SegmentedControl:** a short set of named options that isn't a scale ("List" or "Board").
 - **NumberField:** an exact number, or a wide range ("Years of experience").
+- **RatingSlider:** the same kind of score, in half or quarter stars, set by dragging, clicking, or the arrow keys. See "Rating or RatingSlider" below.
 - **Showing an average** someone can't change, such as "4.3 out of 5 from 120 reviews", isn't a Rating. That needs a display with half stars and the number in words, which isn't built yet (see `docs/revisit.md`). A read-only Rating is for a person's own score in a form they can't change right now.
 
 ## Using a Rating
@@ -29,3 +30,20 @@ A rating is a row of stars where someone gives one score on a short scale: how i
 ## Screen readers
 
 A rating is announced as a radio group with its label, and each star as a radio button: "Interest, radio group. 3 stars, radio button, checked, 3 of 5." The label is heard twice on the way in ("Interest, group", then "Interest, radio group"), because the stars sit in their own radio group beside the Clear button. Clear is announced as "Clear rating, Interest, button".
+
+## Rating or RatingSlider
+
+They ask the same question. Pick by what the answer needs.
+
+- **Rating:** whole stars, chosen with a click or the arrow keys. Each star is a radio, so screen readers hear five choices ("3 stars, 3 of 5"), and a visible Clear button empties an optional rating. The simpler of the two: use it unless part stars matter.
+- **RatingSlider:** half stars by default (`step` 0.5), quarters (`step` 0.25), or whole stars (`step` 1). It's one slider: drag across the stars, click anywhere on them, or use the arrow keys, and the stars fill to the value; screen readers hear "Interest, slider, 3.5 stars" (the label may be heard twice on the way in, since the slider sits in a group named by the same label). Its `id` and its read-only state reach the slider once JavaScript runs. The strip left of the stars, or Home, is no rating, so there's no Clear button; the form gets `0` for none. With a mouse, hovering fills the stars a click would choose.
+
+Using a RatingSlider:
+
+- **Keep `showValue`** (the words beside the stars, "3.5 of 5"), especially with quarters: 1.75 and 2 stars look nearly alike. Turn it off only for whole stars where space is tight.
+- **Quarters are fine-grained:** on a phone a quarter of a star is about 11px wide. Use them only when the difference matters.
+- **Width:** at full size each star is 32px with a mouse and 44px on touch, plus one more for the no-rating strip. In a narrower space the stars get narrower, so 10 stars still fit a phone; keep to 5 where you can.
+- **No `required`:** a slider always has a value, so the browser can't require one, and ARIA has no required state for a slider. If a rating is needed, check for `null` (or `0`) when the form is sent, and set `invalid` and `error`: "Choose how interested you are."
+- **Read-only** looks the same as editable, with "Read only" beside the label; it can still be focused and is sent with the form.
+- **Always left to right:** the stars fill from the left even in a right-to-left page, so a click always gives the star under it.
+

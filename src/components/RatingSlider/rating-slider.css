@@ -1,0 +1,219 @@
+/* RatingSlider: the stars, the no-rating strip, and the value in words. The wrapper, group, label, and description are
+   shared with the other groups in internal/choice-group.css and field.css, and the error is .field-error. Where it
+   sits (margin) is the layout's job. */
+@layer components {
+  /* The component's own props, set inline from React; these are the defaults */
+  .rating-slider {
+    --rating-slider-step: 0.5;
+    --rating-slider-max: 5;
+  }
+
+  /* Stretched to the group's width (the group places its parts at their own width), so the frame's max-width has a
+     width to stop at. In a parent that sizes things by their content, the group is as wide as the row's content. */
+  .rating-slider__row {
+    justify-self: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--space-3);
+    min-width: 0;
+  }
+
+  /* The frame sizes the control: the strip and the stars at choice-row each (32px with a mouse, 44px on touch), or
+     narrower when its parent is. Its width is its own, never its children's, so it can be the container the cell is
+     measured in, and a parent that sizes things by their content still gets the full size. */
+  .rating-slider__frame {
+    --rating-slider-cell: calc(100cqi / (var(--rating-slider-max) + 1));
+    container-type: inline-size;
+    width: calc((var(--rating-slider-max) + 1) * var(--choice-row));
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* The control is the whole target: never shorter than target-min. Base UI maps the pointer to a value across its
+     content box and rounds to the nearest step. The content box starts half a step before the stars and ends half a
+     step before their end, so a press anywhere on a step's slice of a star fills to the end of that slice, and
+     anything left of the stars is 0. It has no border of its own: the stars and the ban icon are its edges. */
+  .rating-slider__control {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    height: var(--choice-row);
+    padding-inline-start: calc(var(--rating-slider-cell) * (1 - var(--rating-slider-step) / 2));
+    padding-inline-end: calc(var(--rating-slider-cell) * var(--rating-slider-step) / 2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    touch-action: none; /* a swipe on the stars drags them, rather than scrolling the page */
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .rating-slider__root[data-dragging] .rating-slider__control {
+    cursor: grabbing;
+  }
+  .rating-slider__control:has(:focus-visible) {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  .rating-slider__track {
+    position: relative;
+    flex: 1;
+  }
+
+  /* The thumb holds the input, the value, and the focus, but isn't drawn: the stars show the value */
+  .rating-slider__thumb {
+    width: 0;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* The strip left of the stars, which means no rating: a slashed circle, ink while nothing is chosen */
+  .rating-slider__zero {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    display: grid;
+    place-items: center;
+    width: var(--rating-slider-cell);
+    color: var(--border-strong);
+    pointer-events: none;
+  }
+  .rating-slider__zero[data-active] {
+    color: var(--ink);
+  }
+  .rating-slider__zero-icon {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    stroke-width: var(--icon-stroke);
+  }
+
+  .rating-slider__stars {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--rating-slider-cell);
+    display: flex;
+    pointer-events: none;
+  }
+
+  .rating-slider__star {
+    --rating-slider-fill: 0;
+    display: grid;
+    place-items: center;
+    width: var(--rating-slider-cell);
+  }
+  .rating-slider__star > * {
+    grid-area: 1 / 1;
+  }
+
+  /* The star's view box is cropped to the star, so 20px draws it the size of Rating's */
+  .rating-slider__outline,
+  .rating-slider__solid {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    overflow: visible;
+    stroke-width: var(--icon-stroke);
+    stroke-linejoin: round;
+  }
+  .rating-slider__outline {
+    fill: none;
+    stroke: var(--border-strong);
+  }
+
+  /* The fill: a solid star on top of the outline, clipped from the right by how much of this star the value covers.
+     The clip reaches border-thick past every edge, so the stroke's overhang is never cut; on the right that margin
+     shrinks to nothing as the fill does. */
+  .rating-slider__fill {
+    display: grid;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    clip-path: inset(
+      calc(-1 * var(--border-thick))
+        calc((1 - var(--rating-slider-fill)) * (100% + 2 * var(--border-thick)) - var(--border-thick))
+        calc(-1 * var(--border-thick)) calc(-1 * var(--border-thick))
+    );
+  }
+  .rating-slider__solid {
+    fill: var(--action);
+    stroke: var(--action);
+  }
+
+  /* The value in words: hidden from screen readers, which hear the slider's own value text */
+  .rating-slider__value {
+    display: inline-grid;
+    font-size: var(--text-small);
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  /* The words and two invisible copies of the longest they can be, stacked, so the width never changes */
+  .rating-slider__value > * {
+    grid-area: 1 / 1;
+  }
+  .rating-slider__value-sizer {
+    visibility: hidden;
+  }
+
+  /* Invalid: the empty outlines and the ban icon turn danger; the error's words say what's wrong */
+  .rating-slider:has(input[aria-invalid="true"]) .rating-slider__outline {
+    stroke: var(--danger);
+  }
+  .rating-slider:has(input[aria-invalid="true"]) .rating-slider__zero {
+    color: var(--danger);
+  }
+
+  /* Read-only looks the same, apart from the cursor: the "Read only" note beside the label is the cue. A swipe
+     scrolls the page, since nothing can change. */
+  .rating-slider:has(input[aria-readonly="true"]) .rating-slider__control,
+  .rating-slider:has(input[aria-readonly="true"]) .rating-slider__root[data-dragging] .rating-slider__control {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  /* Disabled: the stars dim. The label, description, and value stay at full strength, as for every group: the
+     slider's group is named by the label, and axe fails a dimmed one. */
+  .rating-slider[data-disabled] .rating-slider__control {
+    cursor: not-allowed;
+    touch-action: auto;
+  }
+  .rating-slider[data-disabled] .rating-slider__frame {
+    opacity: 0.5;
+  }
+
+  /* Hot dog mode: the chunky ink outline every hot dog control has. The solid star is on top of the outline, so its
+     line is as wide, to cover the outline's edge. No shadow and no press: a hard shadow belongs to a box. */
+  [data-theme="hotdog"] .rating-slider__outline,
+  [data-theme="hotdog"] .rating-slider__solid,
+  [data-theme="hotdog"] .rating-slider__zero-icon {
+    stroke-width: var(--icon-stroke-bold);
+  }
+
+  /* Windows Contrast themes: outlines and the ban icon in ButtonText, the fill in Highlight, a disabled slider in
+     GrayText at full opacity. The invalid rules outrank the base ones, so they're repeated. */
+  @media (forced-colors: active) {
+    .rating-slider__outline,
+    .rating-slider:has(input[aria-invalid="true"]) .rating-slider__outline {
+      stroke: ButtonText;
+    }
+    .rating-slider__zero,
+    .rating-slider__zero[data-active],
+    .rating-slider:has(input[aria-invalid="true"]) .rating-slider__zero {
+      color: ButtonText;
+    }
+    .rating-slider__solid {
+      fill: Highlight;
+      stroke: Highlight;
+    }
+    .rating-slider[data-disabled] .rating-slider__frame {
+      opacity: 1;
+    }
+    .rating-slider[data-disabled] .rating-slider__outline,
+    .rating-slider[data-disabled] .rating-slider__zero {
+      stroke: GrayText;
+      color: GrayText;
+    }
+    .rating-slider[data-disabled] .rating-slider__solid {
+      fill: GrayText;
+      stroke: GrayText;
+    }
+  }
+}
