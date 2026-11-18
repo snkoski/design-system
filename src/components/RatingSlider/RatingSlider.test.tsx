@@ -89,6 +89,40 @@ describe("RatingSlider", () => {
       expect(container.querySelector(".rating-slider__value")).toBeNull();
     });
 
+    it("draws the no-rating strip by default, marked data-clear", () => {
+      const { container } = render(<RatingSlider label="Interest" />);
+      expect(container.firstElementChild).toHaveAttribute("data-clear");
+      expect(container.querySelector(".rating-slider__zero")).toHaveAttribute("aria-hidden", "true");
+    });
+
+    it("leaves the no-rating strip out with showClear={false}, still drawing every star", () => {
+      const { container } = render(<RatingSlider label="Interest" defaultValue={2} showClear={false} />);
+      expect(fills(container)).toEqual([1, 1, 0, 0, 0]);
+      expect(container.firstElementChild).toHaveClass("rating-slider");
+      expect(container.firstElementChild).not.toHaveAttribute("data-clear");
+      expect(container.querySelector(".rating-slider__zero")).toBeNull();
+    });
+
+    it("still reaches no rating with Home and the left arrow with showClear={false}", async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      const { container } = render(
+        <RatingSlider label="Interest" defaultValue={1} showClear={false} onValueChange={onValueChange} />,
+      );
+      await user.tab();
+      expect(getSlider()).toHaveFocus();
+      await user.keyboard("{Home}");
+      expect(getSlider()).toHaveAttribute("aria-valuenow", "0");
+      expect(getSlider()).toHaveAttribute("aria-valuetext", "No rating");
+      expect(onValueChange).toHaveBeenLastCalledWith(null, expect.anything());
+      expect(fills(container)).toEqual([0, 0, 0, 0, 0]);
+      await user.keyboard("{End}{Home}");
+      expect(getSlider()).toHaveAttribute("aria-valuenow", "0");
+      await user.keyboard("{ArrowRight}{ArrowRight}{ArrowLeft}{ArrowLeft}");
+      expect(getSlider()).toHaveAttribute("aria-valuenow", "0");
+      expect(container.querySelector(".rating-slider__value-text")).toHaveTextContent("No rating");
+    });
+
     it("puts the shared group classes next to its own", () => {
       const { container } = render(<RatingSlider label="Interest" description="How much you want this job." />);
       expect(container.firstElementChild).toHaveClass("choice-group", "rating-slider");
@@ -721,6 +755,10 @@ describe("RatingSlider", () => {
 
     it("forwards ref to an input", () => {
       expectTypeOf<RatingSliderProps["ref"]>().toEqualTypeOf<React.Ref<HTMLInputElement> | undefined>();
+    });
+
+    it("takes a boolean showClear", () => {
+      expectTypeOf<RatingSliderProps["showClear"]>().toEqualTypeOf<boolean | undefined>();
     });
 
     it("takes gold, brand, or any CSS color as its color", () => {

@@ -51,6 +51,12 @@ interface OwnProps {
   name?: string;
   /** Shows the rating in words beside the stars ("3.5 of 5"). Turn it off only where the stars are whole and space is tight. Default: `true`. */
   showValue?: boolean;
+  /**
+   * Shows the slashed circle left of the stars: a star-wide place to click or drag to for no rating. It's a drawing,
+   * not a button. Turn it off for just the stars: a sliver left of the first star (half a step wide) still means no
+   * rating, and so does dragging past the left edge, Home, or the left arrow. Default: `true`.
+   */
+  showClear?: boolean;
   /** Help text between the label and the stars, read before choosing. Linked to the slider. */
   description?: ReactNode;
   /** The message shown between the description and the stars when `invalid` is true, with an icon. Linked to the slider. */
@@ -109,7 +115,8 @@ export type RatingSliderProps = Labelled &
 
 /**
  * A row of stars that works as a slider: drag across it, click anywhere on it, or use the arrow keys, and the stars
- * fill to the rating, in whole, half, or quarter stars. Dragging (or pressing Home) to the far left is no rating. With
+ * fill to the rating, in whole, half, or quarter stars. Dragging (or pressing Home) to the far left is no rating,
+ * marked by a slashed circle unless `showClear` is off. With
  * a mouse, hovering fills the stars a click would choose. Built on Base UI's Slider and Field, so screen readers
  * announce one slider ("Interest, slider, 3.5 stars"), the label, description, and error are linked to it, and it
  * takes part in forms. For whole stars with a Clear button, use a Rating.
@@ -131,6 +138,7 @@ export function RatingSlider({
   onValueChange,
   onValueCommitted,
   showValue = true,
+  showClear = true,
   className,
   color,
   ref,
@@ -234,6 +242,7 @@ export function RatingSlider({
       disabled={disabled}
       invalid={invalid}
       data-color={starColor["data-color"]}
+      data-clear={showClear || undefined}
       style={{ ...starColor.style, "--rating-slider-step": step, "--rating-slider-max": count } as CSSProperties}
     >
       {/* Locked left to right, both the drawing (dir) and Base UI's pointer math and keys (DirectionProvider): a
@@ -274,9 +283,11 @@ export function RatingSlider({
                 onPointerDown={() => setPreview(null)}
               >
                 {/* The no-rating strip and the stars are drawing only: the thumb's input holds the value */}
-                <span className="rating-slider__zero" aria-hidden="true" data-active={drawn === 0 || undefined}>
-                  <BanIcon />
-                </span>
+                {showClear && (
+                  <span className="rating-slider__zero" aria-hidden="true" data-active={drawn === 0 || undefined}>
+                    <BanIcon />
+                  </span>
+                )}
                 <span className="rating-slider__stars" aria-hidden="true">
                   {stars.map((star) => (
                     <span

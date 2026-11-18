@@ -41,6 +41,7 @@ The Base UI parts: `Field.Root`, `Field.Label` (as a `<div>`), `Field.Descriptio
   <tbody>
     <tr><td><code>{"<div role=\"group\" class=\"choice-group__group rating-slider__root\">"}</code></td><td><code>Slider.Root</code></td><td>Base UI's slider root is a group named by the label. Extra props you pass land here.</td></tr>
     <tr><td><code>{"<div class=\"rating-slider__frame\" dir=\"ltr\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>The container the stars are measured in (section 5), always left to right.</td></tr>
+    <tr><td><code>{"<span class=\"rating-slider__zero\" aria-hidden=\"true\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>The no-rating strip: a slashed circle left of the stars, ink at 0. Left out with <code>showClear={"{false}"}</code>.</td></tr>
     <tr><td><code>{"<span class=\"rating-slider__star\" style=\"--rating-slider-fill: 0.5\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>One star, with how much of it is filled. The stars are <code>aria-hidden</code>: the input says the value.</td></tr>
     <tr><td><code>{"<input type=\"range\" aria-valuetext=\"3.5 stars\">"}</code></td><td><code>Slider.Thumb</code></td><td>The value. Screen readers hear "Interest, slider, 3.5 stars", or "No rating" at 0. Your <code>id</code>, <code>ref</code>, and <code>aria-readonly</code> for read-only land here too.</td></tr>
     <tr><td><code>{"<span class=\"rating-slider__value\" aria-hidden=\"true\">"}</code></td><td><code>RatingSlider.tsx</code></td><td>"3.5 of 5", with <code>showValue</code>. Hidden from screen readers, which already hear it.</td></tr>
@@ -73,11 +74,15 @@ Base UI's slider keeps its value through a form reset, because React keeps the i
 
 ## 5. The CSS
 
-The frame has a width of its own, the no-rating strip and the stars at `choice-row` each, and shrinks to fit a narrower parent. It's the container the cell is measured in, so the stars narrow with it.
+The frame has a width of its own, the stars at `choice-row` each plus the space left of them, and shrinks to fit a narrower parent. It's the container the cell is measured in, so the stars narrow with it.
+
+The space left of the stars is `--rating-slider-lead` cells wide. With `showClear`, the default, the wrapper has `data-clear` and the lead is a whole cell, the no-rating strip with its slashed circle. With `showClear={false}` the strip isn't rendered and the lead is half a step, so the stars sit almost at the edge.
+
+<Code file="components/RatingSlider/rating-slider.css" name='.rating-slider[data-clear]' />
 
 <Code file="components/RatingSlider/rating-slider.css" name=".rating-slider__frame" />
 
-Base UI maps a press across the control's content box and rounds to the nearest step. The padding starts the content box half a step before the stars and ends it half a step before their end, so a press anywhere on a step's slice fills to the end of that slice, and anything left of the stars is 0.
+Base UI maps a press across the control's content box and rounds to the nearest step. The padding starts the content box half a step before the stars and ends it half a step before their end, so a press anywhere on a step's slice fills to the end of that slice, and anything left of the stars is 0. That holds with or without the strip: without it, the half-step sliver is all that's left of the stars, and a drag past the left edge also ends at 0, since Base UI keeps a drag's value inside the range.
 
 <Code file="components/RatingSlider/rating-slider.css" name=".rating-slider__control" />
 

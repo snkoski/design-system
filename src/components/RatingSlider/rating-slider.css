@@ -9,6 +9,12 @@
     --rating-slider-step: 0.5;
     --rating-slider-max: 5;
     --rating-color: var(--rating-gold);
+    /* How many cells wide the space left of the stars is: half a step without the no-rating strip, a whole cell with
+       it (showClear, the default) */
+    --rating-slider-lead: calc(var(--rating-slider-step) / 2);
+  }
+  .rating-slider[data-clear] {
+    --rating-slider-lead: 1;
   }
   .rating-slider[data-color="brand"] {
     --rating-color: var(--rating-brand);
@@ -25,13 +31,13 @@
     min-width: 0;
   }
 
-  /* The frame sizes the control: the strip and the stars at choice-row each (32px with a mouse, 44px on touch), or
-     narrower when its parent is. Its width is its own, never its children's, so it can be the container the cell is
+  /* The frame sizes the control: the stars at choice-row each (32px with a mouse, 44px on touch), and the space left
+     of them in the same cells, or narrower when its parent is. Its width is its own, never its children's, so it can be the container the cell is
      measured in, and a parent that sizes things by their content still gets the full size. */
   .rating-slider__frame {
-    --rating-slider-cell: calc(100cqi / (var(--rating-slider-max) + 1));
+    --rating-slider-cell: calc(100cqi / (var(--rating-slider-max) + var(--rating-slider-lead)));
     container-type: inline-size;
-    width: calc((var(--rating-slider-max) + 1) * var(--choice-row));
+    width: calc((var(--rating-slider-max) + var(--rating-slider-lead)) * var(--choice-row));
     min-width: 0;
     max-width: 100%;
   }
@@ -39,14 +45,15 @@
   /* The control is the whole target: never shorter than target-min. Base UI maps the pointer to a value across its
      content box and rounds to the nearest step. The content box starts half a step before the stars and ends half a
      step before their end, so a press anywhere on a step's slice of a star fills to the end of that slice, and
-     anything left of the stars is 0. It has no border of its own: the stars and the ban icon are its edges. */
+     anything left of the stars is 0: the strip, or without it the half-step sliver. It has no border of its own: the
+     stars and the ban icon are its edges. */
   .rating-slider__control {
     position: relative;
     box-sizing: border-box;
     display: flex;
     width: 100%;
     height: var(--choice-row);
-    padding-inline-start: calc(var(--rating-slider-cell) * (1 - var(--rating-slider-step) / 2));
+    padding-inline-start: calc(var(--rating-slider-cell) * (var(--rating-slider-lead) - var(--rating-slider-step) / 2));
     padding-inline-end: calc(var(--rating-slider-cell) * var(--rating-slider-step) / 2);
     border-radius: var(--radius-sm);
     cursor: pointer;
@@ -97,7 +104,7 @@
   .rating-slider__stars {
     position: absolute;
     inset-block: 0;
-    inset-inline-start: var(--rating-slider-cell);
+    inset-inline-start: calc(var(--rating-slider-cell) * var(--rating-slider-lead));
     display: flex;
     pointer-events: none;
   }

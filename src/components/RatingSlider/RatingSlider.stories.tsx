@@ -40,6 +40,7 @@ const meta = {
     max: 5,
     step: 0.5,
     showValue: true,
+    showClear: true,
     disabled: false,
     readOnly: false,
     invalid: false,
@@ -77,6 +78,7 @@ export const States: Story = {
       <RatingSlider {...args} label="Disabled" name="disabled" disabled />
       <RatingSlider {...args} label="Read only" name="read-only" readOnly />
       <RatingSlider {...args} label="Without the words" name="no-words" showValue={false} />
+      <RatingSlider {...args} label="Without the no-rating strip" name="no-strip" showClear={false} />
     </div>
   ),
 };
@@ -100,6 +102,56 @@ export const WholeStars: Story = {
       await userEvent.pointer([{ keys: "[MouseLeft>]", target: control(canvasElement), coords: pointOnStar(canvasElement, 3, 0.1) }, { keys: "[/MouseLeft]" }]);
       await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "3 stars"));
       await userEvent.pointer([{ keys: "[MouseLeft>]", target: control(canvasElement), coords: pointOnStrip(canvasElement) }, { keys: "[/MouseLeft]" }]);
+      await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "No rating"));
+    };
+    await check();
+    canvasElement.dataset.pointer = "coarse";
+    try {
+      await check();
+    } finally {
+      delete canvasElement.dataset.pointer;
+    }
+  },
+};
+
+/**
+ * With `showClear={false}` there's no slashed circle, just the stars. A sliver left of the first star, half a step
+ * wide, still means no rating, and so does dragging past the left edge, Home, or the left arrow. Every star fills as
+ * it does with the strip. The story checks the sizes, a click in the sliver, a click on star 1, and a drag off the left
+ * edge, with a mouse and on touch.
+ */
+export const WithoutClear: Story = {
+  args: { showClear: false },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const slider = canvas.getByRole("slider", { name: "Interest" });
+    await expect(canvasElement.querySelector(".rating-slider__zero")).toBeNull();
+    const check = async () => {
+      const row = measure("--choice-row", canvasElement);
+      const box = control(canvasElement).getBoundingClientRect();
+      const first = canvasElement.querySelector(".rating-slider__star")!.getBoundingClientRect();
+      await expect(Math.abs(box.width - 5.25 * row)).toBeLessThan(0.5);
+      await expect(Math.abs(first.width - row)).toBeLessThan(0.5);
+      await expect(Math.abs(first.left - box.left - 0.25 * row)).toBeLessThan(0.5);
+
+      // A real hit-test of the sliver: it's part of the control, so a press there reaches it
+      const sliver = { clientX: (box.left + first.left) / 2, clientY: box.top + box.height / 2 };
+      await expect(control(canvasElement).contains(document.elementFromPoint(sliver.clientX, sliver.clientY))).toBe(true);
+      await userEvent.pointer([{ keys: "[MouseLeft>]", target: control(canvasElement), coords: pointOnStar(canvasElement, 3, 0.9) }, { keys: "[/MouseLeft]" }]);
+      await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "3 stars"));
+      await userEvent.pointer([{ keys: "[MouseLeft>]", target: control(canvasElement), coords: sliver }, { keys: "[/MouseLeft]" }]);
+      await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "No rating"));
+
+      // Star 1's slices are unchanged: its left half is half a star, not no rating
+      await userEvent.pointer([{ keys: "[MouseLeft>]", target: control(canvasElement), coords: pointOnStar(canvasElement, 1, 0.25) }, { keys: "[/MouseLeft]" }]);
+      await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "0.5 stars"));
+
+      // A drag that ends past the left edge is no rating
+      const start = pointOnStar(canvasElement, 3, 0.9);
+      await userEvent.pointer([
+        { keys: "[MouseLeft>]", target: control(canvasElement), coords: start },
+        { coords: { clientX: box.left - 40, clientY: start.clientY } },
+        { keys: "[/MouseLeft]" },
+      ]);
       await waitFor(() => expect(slider).toHaveAttribute("aria-valuetext", "No rating"));
     };
     await check();
@@ -446,6 +498,8 @@ function Matrix() {
       <RatingSlider label="Disabled" disabled defaultValue={2.5} />
       <RatingSlider label="Read only" readOnly defaultValue={4.5} />
       <RatingSlider label="Without the words" showValue={false} defaultValue={3} />
+      <RatingSlider label="Without the no-rating strip" showClear={false} defaultValue={2.5} />
+      <RatingSlider label="Without the strip, no rating" showClear={false} />
       <RatingSlider label="Brand color" color="brand" defaultValue={3.5} />
       <RatingSlider label="Custom color" color="hsl(210 80% 46%)" defaultValue={3.5} />
     </div>
