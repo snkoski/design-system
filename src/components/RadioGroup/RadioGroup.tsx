@@ -1,10 +1,13 @@
 import { Field } from "@base-ui/react/field";
 import { Fieldset } from "@base-ui/react/fieldset";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
+import { useRef } from "react";
 import type { ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
 import { FieldError } from "@/internal/FieldError";
 import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
+import { useMergedRef } from "@/internal/useMergedRef";
+import { useResettableValue } from "@/internal/useResettableValue";
 import { warnIfUnnamed } from "@/internal/warn";
 
 /** A group needs a name a screen reader can announce: a visible label, or an `aria-label`. */
@@ -78,6 +81,8 @@ export function RadioGroup({
   invalid,
   disabled,
   name,
+  value,
+  defaultValue,
   onValueChange,
   className,
   ref,
@@ -86,14 +91,24 @@ export function RadioGroup({
 }: RadioGroupProps) {
   warnIfUnnamed("RadioGroup", label, rest, "Give it a label or an aria-label.");
 
+  // The group always gives Base UI its value, so a form reset can put the radios and the form's data back together
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const setGroupRef = useMergedRef(groupRef, ref);
+  const { controlled, shown, setOwnValue } = useResettableValue({ value, defaultValue, groupRef, form: rest.form });
+
   return (
     <Field.Root className={cx("choice-group", "radio-group", className)} name={name} disabled={disabled} invalid={invalid}>
       <Fieldset.Root className="choice-group__group radio-group__group" render={
           // null is how a controlled group says nothing is selected; a person's choice is never null
           <BaseRadioGroup<string | null>
             {...rest}
-            ref={ref}
-            onValueChange={(value, eventDetails) => value !== null && onValueChange?.(value, eventDetails)}
+            ref={setGroupRef}
+            value={shown}
+            onValueChange={(next, eventDetails) => {
+              if (next === null) return;
+              onValueChange?.(next, eventDetails);
+              if (!controlled && !eventDetails.isCanceled) setOwnValue(next);
+            }}
           />
         }>
         {label !== undefined && (

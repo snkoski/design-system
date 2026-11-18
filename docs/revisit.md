@@ -15,7 +15,7 @@ Where an answer comes from looking, Storybook's **Revisit** section shows the op
 - Is it deliberate in Base UI, or a bug that will change in a later version?
 - If we want it skipped, can that be done through Base UI's own props rather than by overriding focus ourselves?
 
-SegmentedControl is built on the same RadioGroup and behaves the same way, so whatever is decided applies to both. Rendering the radios as native buttons isn't the answer: Base UI makes the chosen radio the Tab stop, so a chosen, disabled button would hide the whole group from Tab, even with other options enabled.
+SegmentedControl and Rating are built on the same RadioGroup and behave the same way, so whatever is decided applies to all three. Rendering the radios as native buttons isn't the answer: Base UI makes the chosen radio the Tab stop, so a chosen, disabled button would hide the whole group from Tab, even with other options enabled.
 
 Raised while building RadioGroup (2026-10-20).
 
@@ -203,7 +203,7 @@ Raised while building Separator (2026-11-05).
 
 **Why it's in question:** some badges name kinds rather than states (a team, a category, a label someone made), and an app may want them told apart by color as well as words. Most systems offer this: Carbon has 12 colors, Atlassian's Lozenge has accent colors, and Primer's issue labels take any color.
 
-**To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd be the one place a component uses palette hues, so `CLAUDE.md` and `color.md` would need an exception. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
+**To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd use palette hues, as a rating's stars now do (`rating-gold` and `rating-brand`, the exception `CLAUDE.md` and `color.md` already describe), so a Badge color prop would follow that precedent. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
 
 Raised while building Badge (2026-11-05).
 
@@ -274,7 +274,7 @@ Raised while building DatePicker (2026-11-13).
 
 ## Translating the system's own words
 
-**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", and FileInput's "Choose file", "2 files" (for any count), "Remove file", and "Remove files". What screen readers hear from FileInput's input ("No file chosen", a count) is the browser's, in the browser's language. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
+**Today:** the words the components supply themselves are English on every page: Base UI's "Increase" and "Decrease", FieldError's "Error:", ReadOnlyNote's "Read only", DatePicker's "Choose date", "Previous month", "Next month", "Today", and "selected", FileInput's "Choose file", "2 files" (for any count), "Remove file", and "Remove files", Rating's star names ("1 star", "3 stars") and "Clear rating", and RatingSlider's "No rating", "3.5 stars", and "3.5 of 5" (its numbers aren't formatted for the locale either: "3.5", not "3,5"). What screen readers hear from FileInput's input ("No file chosen", a count) is the browser's, in the browser's language. DatePicker's month and weekday names, and its dates, follow its `locale`, so a day's name can mix languages ("Today, 12 listopada 2026, selected").
 
 **Why it's in question:** a page in another language would want them all in its language, and a screen reader reads mixed languages with one voice.
 
@@ -332,3 +332,64 @@ Raised while building FileInput (2026-11-16).
 
 Raised while building FileInput (2026-11-16).
 
+## Showing a rating nobody can change
+
+**Today:** Rating is a form control for a person's own score. There's no component for showing a score on its own, such as an average of 4.3 from 120 reviews. A read-only Rating shows whole stars and is announced as a radio group, which suits a person's own score in a form they can't change right now, not an average.
+
+**Why it's in question:** an average needs half (or partial) stars, the number in words beside them, and to be announced as one thing ("4.3 out of 5 stars"), not as five radios. Fluent has a separate RatingDisplay for this (`role="img"`), and MUI's read-only Rating becomes one image.
+
+**To decide:** when a page first shows an average: a RatingDisplay component (stars drawn from a number, with its words), or a Meter.
+
+Raised while building Rating (2026-11-17).
+
+## The arrow keys wrap from the last star to the first
+
+**Today:** in a Rating, Right on the last star chooses the first, and Left on the first chooses the last. That's Base UI's RadioGroup, and the ARIA Authoring Practices' radio pattern (its rating example wraps too). Base UI has no option to stop it, and CLAUDE.md says never to hand-roll a component's keyboard handling.
+
+**Why it's in question:** on a scale, pressing Right at 5 stars and landing on 1 is a surprise; a slider stops at its ends.
+
+**To decide:** whether it bothers people in practice. If it does, whether Base UI adds a way to stop wrapping, or whether a rating should stop at its ends some other way.
+
+Raised while building Rating (2026-11-17).
+
+## Arrow keys in right-to-left pages
+
+**Today:** RadioGroup, SegmentedControl, and Rating take their arrow-key direction from Base UI's `DirectionProvider`, not from the `dir` attribute. Under `dir="rtl"` alone, Right still moves to the next option in the DOM, which is drawn to its left.
+
+**Why it's in question:** in a right-to-left page, Right should move to the option on the right. The components copy `dir` to popups (`usePortalScope`), but nothing sets Base UI's direction.
+
+**To decide:** when a page in a right-to-left language uses the system: wrap the app in Base UI's `DirectionProvider`, and say so in the docs, or have the components read `dir` themselves.
+
+RatingSlider is locked left to right instead (`dir="ltr"` on its stars, and its own left-to-right `DirectionProvider`): Base UI measures a slider press from the side its direction says, so under `dir="rtl"` alone a click on the first star would submit the last. Its stars fill from the left in every language, and Right always adds. Whether a right-to-left page wants stars filling from the right is part of the same decision.
+
+Raised while building Rating (2026-11-17).
+
+## A swipe that starts on a RatingSlider doesn't scroll the page
+
+**Today:** RatingSlider's stars take every touch (`touch-action: none`), so a swipe that starts on them drags the rating and doesn't scroll the page, while it can be changed (read-only and disabled sliders let the page scroll). Base UI sets the value as soon as a touch starts, so letting vertical swipes scroll (`pan-y`) would still set a rating on every scroll that began on the stars.
+
+**Why it's in question:** on a phone, the stars are 264px of a 320px screen that a thumb can't scroll from.
+
+**To decide:** once it's used on a real page on a phone: whether that strip is a problem, and if so whether Base UI can wait for a horizontal move before setting the value.
+
+Raised while building RatingSlider (2026-11-17).
+
+## A RatingSlider's id and read-only state arrive with JavaScript
+
+**Today:** Base UI's slider passes only a few props to its `<input type="range">`, and gives it an id of its own. So RatingSlider puts the page's `id` and `aria-readonly` on the input itself once it's on the page (a layout effect). Server-rendered HTML has neither until JavaScript runs: a link to `#id` (such as a future error summary's) doesn't reach the field, and a read-only slider isn't announced as read-only. Before JavaScript runs, a slider can't be dragged either, so only the link and the announcement are affected. Tests check both the server HTML and hydration.
+
+**Why it's in question:** an Astro page that renders RatingSlider without an island never gets them.
+
+**To decide:** when a page renders it without JavaScript, or when Base UI lets a slider's input take an id and `aria-readonly`: pass them through then.
+
+Raised while building RatingSlider (2026-11-17).
+
+## Rating stars that follow a rebrand
+
+**Today:** a rating's `color="brand"` uses `rating-brand`, a token set from Sherbet's tangerines (darkened in light mode to meet 3:1) and ketchup in hot dog. It doesn't read `--brand`, so a site that loads a brand file changing `brand` has to redefine `rating-brand` too (`docs/brand/building.md` says so).
+
+**Why it's in question:** it's one more token to remember when rebranding, and a brand file that forgets it gets tangerine stars on another brand's page.
+
+**To decide:** when the first site rebrands: whether `rating-brand` should be worked out from `--brand` (CSS relative colors, darkened until it meets 3:1), or stay a token the brand file sets.
+
+Raised while adding the color prop to Rating and RatingSlider (2026-11-18).

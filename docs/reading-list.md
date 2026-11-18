@@ -58,6 +58,7 @@ Design system links appear twice on purpose: once by system, to see everything o
   - [Number fields](#number-fields)
   - [Date pickers](#date-pickers)
   - [File inputs](#file-inputs)
+  - [Ratings](#ratings)
 
 ## Choosing and building colors
 
@@ -109,6 +110,8 @@ How each kind of component should work with a keyboard and screen reader. Read t
 - [APG pattern: Combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/)
 - [WAI-ARIA 1.2: the meter role](https://www.w3.org/TR/wai-aria-1.2/#meter)
 - [Meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)
+- [Rating radio group example](https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio-rating/)
+- [Rating slider example](https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-rating/)
 
 ## Design systems, by system
 
@@ -143,6 +146,7 @@ Everything we read from each system, grouped by topic.
 - **Number fields:** [Steppers](https://developer.apple.com/design/human-interface-guidelines/steppers)
 - **Date pickers:** [Pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
 - **File inputs:** [Drag and drop](https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
+- **Ratings:** [Rating indicators](https://developer.apple.com/design/human-interface-guidelines/rating-indicators)
 
 ### Material Design 3 (Google)
 
@@ -277,6 +281,7 @@ Everything we read from each system, grouped by topic.
 - **Selects:** [Select](https://fluent2.microsoft.design/components/web/react/core/select/usage) and [Dropdown](https://fluent2.microsoft.design/components/web/react/core/dropdown/usage)
 - **Number fields:** [Spin button usage](https://fluent2.microsoft.design/components/web/react/core/spin/usage)
 - **Date pickers:** [DatePicker (compat)](https://storybooks.fluentui.dev/react/iframe.html?viewMode=docs&id=compat-components-datepicker--docs)
+- **Ratings:** [Rating](https://fluent2.microsoft.design/components/web/react/core/rating/usage)
 
 ### Shopify Polaris
 
@@ -657,3 +662,8 @@ Each system's page for the same kind of component. The names differ: Atlassian's
 - **Shopify Polaris:** [Drop zone](https://shopify.dev/docs/api/app-home/web-components/forms/drop-zone.md)
 - **GOV.UK Design System:** [File upload](https://design-system.service.gov.uk/components/file-upload/)
 - **U.S. Web Design System:** [File input](https://designsystem.digital.gov/components/file-input/)
+
+### Ratings
+
+- **Apple Human Interface Guidelines:** [Rating indicators](https://developer.apple.com/design/human-interface-guidelines/rating-indicators)
+- **Microsoft Fluent 2:** [Rating](https://fluent2.microsoft.design/components/web/react/core/rating/usage)

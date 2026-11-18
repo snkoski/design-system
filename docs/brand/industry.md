@@ -14,7 +14,7 @@ Systems compared: **Apple** Human Interface Guidelines, Google **Material** 3, G
 | Fluent | 44px web, 44pt iOS, 48dp Android | — | |
 | Polaris | 44px | — | |
 | Primer | 44px recommended on mobile | 24px minimum | Warns against switching sizes on the *primary* pointer |
-| **Sherbet** | **44px** | **24px** | Switches with `any-pointer: coarse`; 8px between targets |
+| **Sherbet** | **44px** | **24px** | Switches with `any-pointer: coarse`; 8px between separate targets, and targets that are each at least 24px (44px on touch) can touch, like choice rows and a rating's stars |
 
 ## Control heights
 
@@ -306,6 +306,28 @@ Every system with a calendar also lets people type, except Fluent, where typing 
 
 Only five of the systems have a file component, and every one keeps a button as the way in, even beside a drop zone, as WCAG 2.5.7 asks of anything done by dragging. They agree on putting the allowed kinds and the size limit in the hint, and on the page checking each file, since `accept` only filters the picker. They split on whether the browser's own input stays visible (GOV.UK's basic version, USWDS, and shadcn's Input) or hides behind a custom button (GOV.UK's improved version, Carbon). GOV.UK's reason for hiding it: people using Dragon, a speech recognition tool, can't press a browser's file input by voice. Sherbet keeps the browser's input for now, which works without JavaScript and needs no announcements of its own, and records the Dragon gap in `docs/revisit.md`. It draws its own words over the input, so the field looks the same in every browser and can be centered; screen readers still hear the browser's. Remove is Sherbet's own: once a file is chosen, a browser's input can't be emptied. shadcn only styles `type="file"` in its Input, and Base UI has no file component.
 
+## Ratings
+
+| System | Component | Built as | Each star's name | Clearing | Half values | Hover preview | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Apple | Rating indicator (macOS) | `NSLevelIndicator`'s rating style | Not stated | Not stated | No: rounds to whole symbols | Not stated | Not stated |
+| Material 3 | None | — | — | — | — | — | — |
+| Primer | None | — | — | — | — | — | — |
+| Atlassian | None | — | — | — | — | — | — |
+| Carbon | None | — | — | — | — | — | — |
+| Fluent 2 | Rating, and a separate RatingDisplay (`role="img"`) | Radio group | "1", "2" (`itemLabel`) | None | `step` 0.5 | Yes | `max`, 5 |
+| Polaris | None | — | — | — | — | — | — |
+| GOV.UK | None; its own feedback pages ask about satisfaction with radios in words | — | — | — | — | — | — |
+| USWDS | None | — | — | — | — | — | — |
+| Spectrum | Rating, with read-only | A range input (slider) | None: one "Rating" slider | Not stated | Decimals | An underline | Always 5 |
+| MUI | Rating, with read-only (`role="img"`) | Hidden radios, plus a hidden "Empty" radio | "1 Star", "2 Stars" | Click the chosen star again (pointer only), or arrow to "Empty" | `precision` | Yes | `max`, 5 |
+| Ant Design | Rate | Radios (from its source) | None | `allowClear`, on by default: click again | `allowHalf` | Yes | `count`, 5 |
+| WAI-ARIA APG | Examples only | A radio group for 5; a slider for 10 (radios for 7 or fewer) | "one star" … | Not stated | No | No | 5 |
+| **Sherbet** | **Rating** | **A radio group (Base UI's)** | **"1 star", "2 stars"** | **A Clear button after the stars, for every input method** | **No** | **Yes** | **`max`, 5** |
+| **Sherbet** | **RatingSlider** | **A slider (Base UI's), drawn as stars** | **None: one slider, "3.5 stars"** | **Drag to the strip left of the stars (`showClear`, on by default) or past their left edge, or press Home** | **`step` 0.5 (default) or 0.25** | **Yes, to the step under the pointer** | **`max`, 5** |
+
+Most of the compared systems have no rating at all. Those that do, and the libraries beside them, mostly build it from radios, as the APG's example does, so each star is a radio with a name and the group submits one value. Sherbet does too. They split on clearing: MUI and Ant clear when the chosen star is clicked again, which only works with a pointer and can't be discovered; Fluent can't clear at all. Sherbet adds a Clear button after the stars, as FileInput has Remove, so clearing works with a keyboard and a screen reader too. Fluent keeps showing an average (RatingDisplay) separate from the input; Sherbet hasn't built a display yet (`docs/revisit.md`). For part stars, Sherbet also has RatingSlider, built as a slider like Spectrum's Rating and the APG's 10-point example rather than with more radios (Fluent's `step`, MUI's `precision`, Ant's `allowHalf`): one control that's dragged, clicked, or stepped with the keys, cleared by going to 0. Sherbet's stars are gold by default, the one color its components draw outside gray and the status colors, and take `color="brand"` or any CSS color (`docs/brand/ratings.md`).
+
 ## Sources
 
 - [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/accessibility)
@@ -407,3 +429,9 @@ Only five of the systems have a file component, and every one keeps a button as 
 - [Apple drag and drop](https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
 - [WCAG 2.2: Understanding Dragging Movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html)
 - [shadcn/ui Input](https://ui.shadcn.com/docs/components/input)
+- [Apple rating indicators](https://developer.apple.com/design/human-interface-guidelines/rating-indicators)
+- [Fluent 2 Rating](https://fluent2.microsoft.design/components/web/react/core/rating/usage) and its [source](https://github.com/microsoft/fluentui/tree/master/packages/react-components/react-rating/library/src)
+- [Spectrum CSS Rating](https://github.com/adobe/spectrum-css/tree/main/components/rating/stories) and [Spectrum design data](https://opensource.adobe.com/spectrum-design-data/components/rating/)
+- [MUI Rating](https://mui.com/material-ui/react-rating/) and its [API](https://mui.com/material-ui/api/rating/)
+- [Ant Design Rate](https://ant.design/components/rate)
+- [WAI-ARIA APG: rating radio group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/examples/radio-rating/) and [rating slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/examples/slider-rating/)

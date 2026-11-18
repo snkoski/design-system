@@ -253,9 +253,10 @@ export function FileInput(props: FileInputProps) {
   const labelTextId = useId();
   const ariaLabel = rest["aria-label"];
   const removeWords = count === 1 ? "Remove file" : "Remove files";
+  // Whatever names the field: an aria-label, the visible label, or the elements aria-labelledby points at
   const removeName = ariaLabel
     ? { "aria-label": `${removeWords}, ${ariaLabel}` }
-    : { "aria-labelledby": `${removeTextId} ${labelTextId}` };
+    : { "aria-labelledby": `${removeTextId} ${label !== undefined ? labelTextId : (rest["aria-labelledby"] ?? "")}`.trim() };
 
   return (
     <Field.Root

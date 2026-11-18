@@ -101,7 +101,8 @@ This is RadioGroup's function with two changes: `size` becomes `data-size` on th
 
 - `Field.Root` gets `name`, `disabled`, and `invalid`, and passes them to every part inside.
 - `Fieldset.Root` renders Base UI's `RadioGroup` in place of its own element, so one `<div>` is both the fieldset and the radio group.
-- `{...rest}` passes `value`, `defaultValue`, `required`, `readOnly`, `form`, `aria-label`, and other attributes to Base UI's RadioGroup.
+- The value comes from `useResettableValue`, as in RadioGroup, and always reaches Base UI's RadioGroup as `value`, so a form reset puts the options and the form's data back together.
+- `{...rest}` passes `required`, `readOnly`, `form`, `aria-label`, and other attributes to Base UI's RadioGroup.
 - `value={null}` means nothing is chosen in a controlled control. `undefined` would make it uncontrolled. Your `onValueChange` only ever gets a string.
 
 <Code file="components/SegmentedControl/SegmentedControl.tsx" name="SegmentedControlSize" />

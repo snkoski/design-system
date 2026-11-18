@@ -1,0 +1,137 @@
+import { Meta, Unstyled } from "@storybook/addon-docs/blocks";
+import * as RatingStories from "./Rating.stories";
+import { Rating } from "@/components/Rating/Rating";
+import { Code } from "@/how-it-works/Code";
+import { Inspect } from "@/how-it-works/Inspect";
+
+<Meta of={RatingStories} name="How it works" />
+
+# How Rating works
+
+A rating is a row of stars where someone gives one score, such as their interest in a job. Underneath, it's a radio group: each star is a radio, the group submits one number, and the keyboard is a radio group's. Read [RadioGroup's How it works page](?path=/docs/components-radio-group--how-it-works) first. This one covers what's different: the stars are made from a number, the stars up to the chosen one fill in, a Clear button empties it again, and hovering previews a choice.
+
+It's made of these files:
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Its job</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Rating.tsx</code></td><td>The component: a field, a fieldset with the label, description, and error, and a row holding the stars' radio group and the Clear button. It draws the stars itself from <code>max</code>.</td></tr>
+    <tr><td><code>rating.css</code></td><td>The look: the stars' squares, outline and fill, every state, the preview, Clear's square, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>src/internal/ratingColor.ts</code></td><td>The <code>color</code> prop, turned into <code>data-color</code> or an inline color, shared with RatingSlider (section 6).</td></tr>
+    <tr><td><code>src/internal/useResettableValue.ts</code></td><td>The value the stars show, kept in step with a form reset. RadioGroup and SegmentedControl use it too (section 4).</td></tr>
+    <tr><td><code>src/internal/choice-group.css</code>, <code>field.css</code>, and <code>inset-button.css</code></td><td>The wrapper, the group, the label, and the description, shared with the other groups, and Clear's look, shared with FileInput's Remove button. Part of the published stylesheet.</td></tr>
+    <tr><td><code>index.ts</code></td><td>Exports the component and its props type from the package.</td></tr>
+  </tbody>
+</table>
+
+The Base UI parts: `Field.Root`, `Fieldset.Root`, `Fieldset.Legend`, `Field.Description`, `Field.Error` (through the shared `FieldError`), `RadioGroup`, and for each star `Field.Item` and `Radio.Root`, plus `Button` for Clear. Every code block on this page is read from the files when the page loads, so it's always the code that runs.
+
+## 1. What it renders
+
+The demo is the real component, with the HTML it has rendered underneath. The HTML updates as you use it, and an attribute that just changed is underlined.
+
+<Unstyled>
+  <Inspect hint="Choose a star, use the arrow keys, then press Clear.">
+    <Rating label="Interest" name="interest" defaultValue={3} />
+  </Inspect>
+</Unstyled>
+
+<table>
+  <thead>
+    <tr><th>Part</th><th>Set by</th><th>Why</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>{"<fieldset class=\"choice-group__group rating__group\">"}</code></td><td><code>Fieldset.Root</code></td><td>A real fieldset, named by the legend. In RadioGroup the fieldset <em>is</em> the radio group. Here the radio group sits inside it, because Clear sits beside the stars and a button can't be inside a radio group (axe fails a radio group with anything but radios in it).</td></tr>
+    <tr><td><code>{"<span class=\"rating__label-text\" id>"}</code></td><td><code>Rating.tsx</code></td><td>The label's words in their own span, so Clear's name can point at them and leave out the "Read only" note.</td></tr>
+    <tr><td><code>{"<div role=\"radiogroup\" class=\"rating__stars\">"}</code></td><td><code>RadioGroup</code></td><td>The stars. Base UI names it from the legend and describes it with the description and error, even though it isn't the fieldset itself. <code>ref</code> reaches this element.</td></tr>
+    <tr><td><code>{"<span role=\"radio\" aria-label=\"3 stars\">"}</code></td><td><code>Radio.Root</code></td><td>One star, named by its number. A screen reader adds its place: "3 stars, radio button, checked, 3 of 5".</td></tr>
+    <tr><td><code>{"<svg class=\"rating__icon\" aria-hidden=\"true\">"}</code></td><td><code>StarIcon</code></td><td>The drawing, hidden from screen readers: the star's name already says it all.</td></tr>
+    <tr><td><code>{"<input type=\"radio\" value=\"3\">"}</code></td><td>Base UI</td><td>The hidden input that submits the number as text.</td></tr>
+    <tr><td><code>{"<button class=\"inset-button rating__clear\">"}</code></td><td><code>Rating.tsx</code></td><td>Clear, only while there's a rating to clear. Named "Clear rating, Interest" from a hidden span and the label's words.</td></tr>
+  </tbody>
+</table>
+
+## 2. The component
+
+<Code file="components/Rating/Rating.tsx" name="Rating" />
+
+In order, it:
+
+- Checks it has a name, as every form control does, and that `max` is a whole number of 1 or more. A `max` that isn't falls back to 5 and prints a warning in development.
+- Gets the value to show from `useResettableValue`, and passes it to Base UI's RadioGroup every time, never a `defaultValue`. That's what lets Clear empty it: a radio can't be unchecked, but a group given `null` shows none.
+- Warns in development when the value isn't one of the stars (7 of 5, or 2.5): no star would show, and the form would send nothing.
+- Calls `onValueChange` when a star is chosen, with Base UI's details. If the page cancels the change, an uncontrolled rating stays as it was.
+- Shows Clear while there's a value and the rating isn't required, read-only, or disabled. Pressing it calls `onValueChange(null)`.
+- Moves focus back to the stars when Clear disappears while it has focus, whether it was pressed or the page took it away. React sends no blur for an element it removes, so a ref set on focus still says Clear had it.
+
+The star is Lucide's, twice: a filled shape underneath and the outline on top, so the outline (bold in hot dog) covers the fill's edge.
+
+<Code file="components/Rating/Rating.tsx" name="StarIcon" />
+
+The path is shared with RatingSlider, so the two draw the same star:
+
+<Code file="internal/star.ts" name="starPath" />
+
+## 3. The props
+
+<Code file="components/Rating/Rating.tsx" name="OwnProps" />
+
+`onValueChange` gets a number, or `null` from Clear. A star's change passes Base UI's details as a second argument; a clear has none. There's no `size`: a star is a choice control's size (`--choice`, 24px), like a checkbox's box.
+
+## 4. Following a form reset
+
+<Code file="internal/useResettableValue.ts" name="useResettableValue" />
+
+A form reset puts each hidden radio back as it was when the page loaded, but Base UI's state doesn't follow it: the stars kept showing the last choice while the form sent the first. So the hook listens for the form's `reset` event, waits for the browser to finish, puts an uncontrolled rating back to `defaultValue` (a controlled one keeps `value`), and sets the hidden radios to match what's shown. It reports no change: nobody chose anything. Building Rating found the same problem in RadioGroup and SegmentedControl, which use this hook too.
+
+## 5. The CSS
+
+The squares touch: each is `choice-row` (32px with a mouse, 44px on touch), at least `target-min`, so they need no gap. The square is the hit area and what the focus ring goes around; the drawing inside takes no clicks.
+
+<Code file="components/Rating/rating.css" name=".rating__star" />
+
+<Code file="components/Rating/rating.css" name=".rating__icon" />
+
+The outline is `border-strong` when empty and `--rating-color` when filled (gold unless `color` says otherwise; section 6). The fill is a mark, like a radio's dot: it fades in over `duration-base` and out faster.
+
+<Code file="components/Rating/rating.css" name=".rating__fill" />
+
+Filled stars are worked out from `aria-checked`: the chosen star, and every star whose item comes before the chosen one's (`:has(~ …)`). So what's drawn and what a screen reader hears can't disagree.
+
+<Code file="components/Rating/rating.css" name='.rating__star[aria-checked="true"], .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__star' />
+
+Invalid turns the empty stars' outlines red; the filled rule comes later and wins, so filled stars stay as they are.
+
+<Code file="components/Rating/rating.css" name='.rating__star[aria-invalid="true"]' />
+
+### The preview
+
+While the pointer is on a star, the stars are drawn as choosing it would leave them. It's the one hover rule in the system that covers up a state, on purpose. It's off when the rating is read-only or disabled, and while a star has keyboard focus, so the arrow keys always show their own choice.
+
+<Code file="components/Rating/rating.css" name='.rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__star' />
+
+### Disabled, Clear, hot dog, and forced colors
+
+<Code file="components/Rating/rating.css" name=".rating[data-disabled]" />
+
+<Code file="components/Rating/rating.css" name=".rating__clear" />
+
+<Code file="components/Rating/rating.css" name='[data-theme="hotdog"] .rating__outline' />
+
+In forced colors, empty stars are `ButtonText`, filled ones `Highlight`, and a disabled rating's stars `GrayText`. The star's outline is its edge, drawn in `currentColor`, so it shows without a border of its own. The build merges the filled selectors into one `:is()`, as specific as its most specific part, so the disabled rule names enough classes to win.
+
+<Code file="components/Rating/rating.css" name="@media (forced-colors: active)" />
+
+## 6. The color
+
+The `color` prop is turned into what the wrapper renders by a helper Rating and RatingSlider share. A keyword (`"gold"`, the default, or `"brand"`, ignoring case and spaces) becomes `data-color`. Anything else is a CSS color, set inline as `--rating-color` and used as given in every theme, with `data-color="custom"`. In the browser it asks `CSS.supports` whether the value is a color, and warns in development if not; the CSS-wide keywords such as `inherit` warn too, since on a variable they reset it rather than color anything, and so does `transparent`, which hides the stars.
+
+<Code file="internal/ratingColor.ts" name="ratingColor" />
+
+The component's CSS sets `--rating-color` on the wrapper from the matching token: `rating-gold` (deep amber in light, bright gold in dark, ketchup in hot dog) or `rating-brand`. Both are checked for 3:1 against the page, cards, and tinted panels in every theme. An inline `--rating-color` beats both rules. Because the wrapper sets the variable itself, a parent can't: the prop is the way in, and a brand file changes `--rating-gold` or `--rating-brand` instead.
+
+<Code file="components/Rating/rating.css" name=".rating" />
+
+<Code file="components/Rating/rating.css" name='.rating[data-color="brand"]' />

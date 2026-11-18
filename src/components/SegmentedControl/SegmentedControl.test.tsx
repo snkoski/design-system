@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
@@ -811,6 +811,97 @@ describe("SegmentedControl", () => {
         </>,
       );
       expect(submitted(screen.getByTestId("outside-form") as HTMLFormElement)).toEqual(["yearly"]);
+    });
+  });
+
+  describe("form reset", () => {
+    /** Waits for the reset's timer, which runs after the browser has reset the fields */
+    const reset = async (form: HTMLFormElement) => {
+      await act(async () => {
+        form.reset();
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
+    };
+
+    it("goes back to defaultValue, in the options and in what the form submits, without reporting a change", async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <form data-testid="form">
+          <SegmentedControl label="Billing" name="billing" defaultValue="monthly" onValueChange={onValueChange}>
+            {options}
+          </SegmentedControl>
+        </form>,
+      );
+      await user.click(getOption("Lifetime"));
+      onValueChange.mockClear();
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      await waitFor(() => expect(chosen()).toEqual(["Monthly"]));
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual(["monthly"]);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("goes back to nothing chosen when there's no defaultValue", async () => {
+      const user = userEvent.setup();
+      render(
+        <form data-testid="form">
+          <SegmentedControl label="Billing" name="billing">
+            {options}
+          </SegmentedControl>
+        </form>,
+      );
+      await user.click(getOption("Lifetime"));
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      await waitFor(() => expect(chosen()).toEqual([]));
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual([]);
+    });
+
+    it("leaves a controlled value alone, with the form submitting what's shown, and doesn't report a change", async () => {
+      const onValueChange = vi.fn();
+      function Controlled() {
+        const [value, setValue] = useState<string | null>("monthly");
+        return (
+          <form data-testid="form">
+            <SegmentedControl
+              label="Billing"
+              name="billing"
+              value={value}
+              onValueChange={(next) => {
+                onValueChange(next);
+                setValue(next);
+              }}
+            >
+              {options}
+            </SegmentedControl>
+          </form>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      await user.click(getOption("Lifetime"));
+      onValueChange.mockClear();
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      expect(chosen()).toEqual(["Lifetime"]);
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual(["lifetime"]);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("resets with a form it sits outside of, through form", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <form id="outside" data-testid="outside-form" />
+          <SegmentedControl label="Billing" name="billing" form="outside" defaultValue="monthly">
+            {options}
+          </SegmentedControl>
+        </>,
+      );
+      const form = screen.getByTestId("outside-form") as HTMLFormElement;
+      await user.click(getOption("Lifetime"));
+      expect(submitted(form)).toEqual(["lifetime"]);
+      await reset(form);
+      await waitFor(() => expect(chosen()).toEqual(["Monthly"]));
+      expect(submitted(form)).toEqual(["monthly"]);
     });
   });
 

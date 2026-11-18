@@ -4,11 +4,12 @@ Two tiers. **Primitives** (`tangerine-500`, `gray-900`, `mint-200`…) are the r
 
 ## Neutral components, brand in the layout
 
-Components are drawn in black, white, and grays. The brand colors belong to the page around them: hero bands, feature panels, illustrations, highlights, and small flourishes. That includes the app shell and page header: they're neutral components, and an app that wants its brand there sets a `brand` or `surface-tint` background on their wrapper with its own CSS.
+Components are drawn in black, white, and grays, with one exception: a rating's filled stars (below). The brand colors belong to the page around them: hero bands, feature panels, illustrations, highlights, and small flourishes. That includes the app shell and page header: they're neutral components, and an app that wants its brand there sets a `brand` or `surface-tint` background on their wrapper with its own CSS.
 
 - **Why:** a component that carries no brand color fits any brand, so the same components can serve another site or a work system with its own palette. It also leaves the brand colors free for the layout. A tangerine primary button on a tangerine hero band would disappear into it; a black one stands out on any band.
 - Every token a component reads is neutral: `surface`, `surface-hover`, `track`, `track-hover`, `ink`, `ink-muted`, `border`, `border-strong`, `action`, `action-hover`, `on-action`, and `focus`. The scale behind them is pure gray (`gray-50` to `gray-950`, no hue), so they don't pick up a tint from the palette.
-- The brand tokens are `brand` (with `on-brand` for text on it), `surface-tint`, `highlight`, `link`, and the page ground `bg`. Components never use any of them except `bg` behind them: no `brand`, `surface-tint`, `link`, or `highlight`.
+- **The exception: rating stars.** Rating's and RatingSlider's filled stars are `rating-gold` by default (deep amber in light, bright gold in dark, ketchup in hot dog), or `rating-brand` with `color="brand"` (tangerine, darkened in light to meet 3:1), or any CSS color the page passes. A row of gray stars reads as unfinished, and gold stars are a mark people recognize. Both tokens meet 3:1 on `bg`, `surface`, and `surface-tint` in every theme; a custom color is the page's to check. `rating-brand` is set from the palette, not from `brand`, so a brand file that changes `brand` must redefine it too.
+- The brand tokens are `brand` (with `on-brand` for text on it), `surface-tint`, `highlight`, `link`, and the page ground `bg`. Components never use any of them except `bg` behind them: no `brand`, `surface-tint`, `link`, or `highlight`. (A rating's `color="brand"` uses its own `rating-brand` token, not `brand`.)
 - Status colors (`success`, `warning`, `danger`) aren't brand colors. Components use them for what they mean, always with an icon or a word.
 
 ## Tokens
@@ -34,7 +35,7 @@ Components are drawn in black, white, and grays. The brand colors belong to the 
 | `hotdog` | Ketchup and mustard, chunky | `mustard-400` / `char-950` / `ketchup-600` |
 
 - Light or dark follows the visitor's system setting until they choose. Hot dog mode is only ever an explicit choice.
-- Hot dog mode is a joke that is built properly: it passes the same contrast checks, and it swaps soft shadows for hard offset shadows and `border-thick` outlines. The one exception is Skeleton's placeholder shapes, which get a thin ink edge, so they don't look like real controls. Its controls are black and white like everyone else's; the ketchup and mustard are in the page.
+- Hot dog mode is a joke that is built properly: it passes the same contrast checks, and it swaps soft shadows for hard offset shadows and `border-thick` outlines. The one exception is Skeleton's placeholder shapes, which get a thin ink edge, so they don't look like real controls. Its controls are black and white like everyone else's; the ketchup and mustard are in the page. A rating's filled stars are the exception: ketchup, since gold would vanish on mustard.
 
 ## Dark mode
 
@@ -50,7 +51,7 @@ Components are drawn in black, white, and grays. The brand colors belong to the 
 | --- | --- | --- |
 | Body and UI text | 4.5:1 | `ink` and `ink-muted` on `bg`, `surface`, `surface-tint`, and `surface-hover` |
 | Large text (24px+, or 19px+ bold) | 3:1 | Headings use `ink`, so they exceed this |
-| Control borders, focus outlines, and meaningful icons | 3:1 | `border-strong` and `focus` |
+| Control borders, focus outlines, and meaningful icons | 3:1 | `border-strong` and `focus`, and a rating's filled stars in `rating-gold` and `rating-brand` |
 | High-contrast theme (future) | 7:1 | Not built yet |
 
 Every system studied (Apple, Material, Primer, Atlassian, Carbon, Fluent, Polaris, GOV.UK, and USWDS) uses these same WCAG AA numbers.

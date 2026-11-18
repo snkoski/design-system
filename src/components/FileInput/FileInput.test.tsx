@@ -259,6 +259,18 @@ describe("FileInput", () => {
       expect(queryRemove()).toHaveAccessibleName("Remove file, Résumé");
     });
 
+    it("names it Remove file, then the field's name, when aria-labelledby names the field", async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <>
+          <h2 id="resume-heading">Résumé</h2>
+          <FileInput aria-label="" aria-labelledby="resume-heading" />
+        </>,
+      );
+      await user.upload(getInput(container), pdf());
+      expect(queryRemove()).toHaveAccessibleName("Remove file, Résumé");
+    });
+
     it("names it Remove files for several", async () => {
       const user = userEvent.setup();
       const { container } = render(<FileInput label="Writing samples" multiple />);

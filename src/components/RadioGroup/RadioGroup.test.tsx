@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
@@ -755,6 +755,97 @@ describe("RadioGroup", () => {
         </>,
       );
       expect(submitted(screen.getByTestId("outside-form") as HTMLFormElement)).toEqual(["team"]);
+    });
+  });
+
+  describe("form reset", () => {
+    /** Waits for the reset's timer, which runs after the browser has reset the fields */
+    const reset = async (form: HTMLFormElement) => {
+      await act(async () => {
+        form.reset();
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
+    };
+
+    it("goes back to defaultValue, in the radios and in what the form submits, without reporting a change", async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <form data-testid="form">
+          <RadioGroup label="Plan" name="plan" defaultValue="free" onValueChange={onValueChange}>
+            {options}
+          </RadioGroup>
+        </form>,
+      );
+      await user.click(getRadio("Business"));
+      onValueChange.mockClear();
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      await waitFor(() => expect(selected()).toEqual(["Free"]));
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual(["free"]);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("goes back to nothing chosen when there's no defaultValue", async () => {
+      const user = userEvent.setup();
+      render(
+        <form data-testid="form">
+          <RadioGroup label="Plan" name="plan">
+            {options}
+          </RadioGroup>
+        </form>,
+      );
+      await user.click(getRadio("Business"));
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      await waitFor(() => expect(selected()).toEqual([]));
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual([]);
+    });
+
+    it("leaves a controlled value alone, with the form submitting what's shown, and doesn't report a change", async () => {
+      const onValueChange = vi.fn();
+      function Controlled() {
+        const [value, setValue] = useState<string | null>("free");
+        return (
+          <form data-testid="form">
+            <RadioGroup
+              label="Plan"
+              name="plan"
+              value={value}
+              onValueChange={(next) => {
+                onValueChange(next);
+                setValue(next);
+              }}
+            >
+              {options}
+            </RadioGroup>
+          </form>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      await user.click(getRadio("Business"));
+      onValueChange.mockClear();
+      await reset(screen.getByTestId("form") as HTMLFormElement);
+      expect(selected()).toEqual(["Business"]);
+      expect(submitted(screen.getByTestId("form") as HTMLFormElement)).toEqual(["business"]);
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it("resets with a form it sits outside of, through form", async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <form id="outside" data-testid="outside-form" />
+          <RadioGroup label="Plan" name="plan" form="outside" defaultValue="free">
+            {options}
+          </RadioGroup>
+        </>,
+      );
+      const form = screen.getByTestId("outside-form") as HTMLFormElement;
+      await user.click(getRadio("Business"));
+      expect(submitted(form)).toEqual(["business"]);
+      await reset(form);
+      await waitFor(() => expect(selected()).toEqual(["Free"]));
+      expect(submitted(form)).toEqual(["free"]);
     });
   });
 

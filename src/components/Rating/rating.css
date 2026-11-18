@@ -1,0 +1,198 @@
+/* Rating: the row of stars and the Clear button. The wrapper, label, and description are shared with the other groups
+   in internal/choice-group.css and field.css (.choice-group, .choice-group__group, .field-label, .field-description),
+   the error is .field-error, and Clear's look is internal/inset-button.css. Where the rating sits (margin) is the
+   layout's job. */
+@layer components {
+  /* The filled stars' color, from the color prop: gold by default, data-color="brand" for the brand's, and any other
+     color set inline as --rating-color, which beats both. Only the prop sets it; a brand file changes --rating-gold or
+     --rating-brand instead. */
+  .rating {
+    --rating-color: var(--rating-gold);
+  }
+  .rating[data-color="brand"] {
+    --rating-color: var(--rating-brand);
+  }
+
+  /* Unlike the other groups, the fieldset isn't the radio group: the stars' radio group sits inside it, beside Clear.
+     So it's a real <fieldset>, and the browser's own border, padding, margin, and minimum width go. */
+  .rating__group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+
+  /* The stars, then Clear. Both wrap rather than push the page wider: the stars inside their own row, and Clear onto
+     the next line. Clear sits target-gap after the last star; wrapped lines touch, since every square is at least
+     target-min tall. */
+  .rating__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--target-gap);
+    min-width: 0;
+  }
+
+  .rating__stars {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .rating__item {
+    display: flex;
+  }
+
+  /* One star: a choice-row square (32px with a mouse, 44px on touch), which is its whole hit area and what the focus
+     ring goes around. The squares touch: each is at least target-min, so they need no gap between them. A star's own
+     outline is its edge, so it has no border; forced colors draws the outline. */
+  .rating__star {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--choice-row);
+    height: var(--choice-row);
+    border-radius: var(--radius-sm);
+    color: var(--border-strong);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  /* The drawing doesn't take clicks, so the square under it does */
+  .rating__icon {
+    width: var(--choice);
+    height: var(--choice);
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .rating__outline {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: var(--icon-stroke);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The fill is a mark, like a radio's dot: it appears over duration-base and leaves faster, with ease-in. A transition
+     takes the timing of the state it ends in, so this rule is the leaving one and the filled rule below the arriving one. */
+  .rating__fill {
+    fill: currentColor;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-in);
+  }
+
+  .rating__star:focus-visible {
+    z-index: 1; /* above the stars next to it */
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Invalid: the outline of every empty star turns danger. Filled stars stay as they are (the rules below win), and
+     the error's words say what's wrong. */
+  .rating__star[aria-invalid="true"] {
+    color: var(--danger);
+  }
+
+  /* Filled: the chosen star and every star before it. Worked out from aria-checked, so what shows and what a screen
+     reader announces can't disagree. Filling turns the outline into a solid shape, which is the cue that isn't color. */
+  .rating__star[aria-checked="true"],
+  .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__star {
+    color: var(--rating-color);
+  }
+  .rating__star[aria-checked="true"] .rating__fill,
+  .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__fill {
+    opacity: 1;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  /* The preview: while the pointer is on a star, the stars are drawn as choosing it would leave them, filled up to it
+     and empty after it, whatever is chosen. This is the one hover rule in the system that covers up a state (the
+     chosen stars after the pointer), on purpose: it shows what a click will do. The invalid outline still shows. No
+     preview when the rating is read-only or disabled, or while a star has keyboard focus, so arrowing with the mouse
+     resting on a star shows the arrow's choice. */
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__star {
+    color: var(--border-strong);
+  }
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__star[aria-invalid="true"] {
+    color: var(--danger);
+  }
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__fill {
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-in);
+  }
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(.rating__star:hover) .rating__star,
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(~ .rating__item .rating__star:hover) .rating__star {
+    color: var(--rating-color);
+  }
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(.rating__star:hover) .rating__fill,
+  .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(~ .rating__item .rating__star:hover) .rating__fill {
+    opacity: 1;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  /* Read-only: every star stays at full strength, and a "Read only" note beside the label is the cue (ReadOnlyNote) */
+  .rating__star[data-readonly] {
+    cursor: default;
+  }
+
+  /* Disabled: the stars dim. The label and description stay at full strength. Tab can still reach a disabled chosen
+     star, and dimming it would dim its focus outline too, so the stars show at full strength while one has focus. */
+  .rating__star[data-disabled] {
+    cursor: not-allowed;
+  }
+  .rating[data-disabled] .rating__stars:not(:has(:focus-visible)) {
+    opacity: 0.5;
+  }
+
+  /* Clear: a square the size of a star, with inset-button's hover box inside it. Its ring goes around the square, with
+     the stars' rounded corners: it isn't inside a field, so it doesn't need the inward ring a field's buttons have. */
+  .rating__clear {
+    width: var(--choice-row);
+    height: var(--choice-row);
+    border-radius: var(--radius-sm);
+  }
+  .rating__clear:focus-visible {
+    outline: var(--focus-width) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Hot dog mode: the chunky ink outline every hot dog control has. No shadow and no press: a hard shadow belongs to a
+     box, and a star isn't one. */
+  [data-theme="hotdog"] .rating__outline {
+    stroke-width: var(--icon-stroke-bold);
+  }
+
+  /* Windows Contrast themes: system colors. Empty stars in ButtonText, filled ones in Highlight, disabled ones in
+     GrayText. The danger and preview rules outrank the base rule, so they're repeated here. */
+  @media (forced-colors: active) {
+    .rating__star,
+    .rating__star[aria-invalid="true"] {
+      color: ButtonText;
+    }
+    .rating__star[aria-checked="true"],
+    .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__star {
+      color: Highlight;
+    }
+    .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__star,
+    .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)):has(.rating__star:hover) .rating__star[aria-invalid="true"] {
+      color: ButtonText;
+    }
+    .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(.rating__star:hover) .rating__star,
+    .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(~ .rating__item .rating__star:hover) .rating__star {
+      color: Highlight;
+    }
+    /* Every star of a disabled rating, filled or not. The filled rule's :has() makes it as specific as four classes, so
+       this one names five to win. */
+    .rating[data-disabled] .rating__stars .rating__item .rating__star {
+      color: GrayText;
+    }
+    .rating[data-disabled] .rating__stars:not(:has(:focus-visible)) {
+      opacity: 1;
+    }
+  }
+}
