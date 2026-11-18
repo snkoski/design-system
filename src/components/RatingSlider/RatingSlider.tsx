@@ -4,6 +4,8 @@ import { Slider } from "@base-ui/react/slider";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent, PointerEvent, ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
+import { ratingColor } from "@/internal/ratingColor";
+import type { RatingColor } from "@/internal/ratingColor";
 import { FieldError } from "@/internal/FieldError";
 import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
 import { starPath } from "@/internal/star";
@@ -68,6 +70,17 @@ interface OwnProps {
   id?: string;
   /** More ids of elements that describe the slider, read after its own description and error. */
   "aria-describedby"?: string;
+  /**
+   * The color of the filled stars. `"gold"` (the default) is a deep amber in light mode, bright gold in dark, and
+   * ketchup red in hot dog. `"brand"` is Sherbet's tangerine, darkened in light mode, and ketchup in hot dog. Both are
+   * checked for 3:1 on the page, cards, and tinted panels in every theme, but not on a `brand` band, where brand stars
+   * vanish; keywords ignore case and spaces. Any other value is a CSS
+   * color, like `"hsl(210 80% 46%)"` or `"var(--my-star)"`, used as given in every theme: check that it reaches 3:1
+   * against the page in each theme you support. A value the browser can't use, or `"transparent"`, warns in
+   * development. Windows Contrast themes ignore it. To change gold or brand everywhere, set
+   * `--rating-gold` or `--rating-brand` in your brand file instead.
+   */
+  color?: RatingColor;
   /** Applied to the outer wrapper, so it's the place for layout classes such as margin. */
   className?: string;
   /** Reaches the range input, the one focusable element. */
@@ -119,12 +132,14 @@ export function RatingSlider({
   onValueCommitted,
   showValue = true,
   className,
+  color,
   ref,
   "aria-describedby": ariaDescribedBy,
   "aria-label": ariaLabel,
   ...rest
 }: RatingSliderProps) {
   warnIfUnnamed("RatingSlider", label, { ...rest, "aria-label": ariaLabel }, "Give it a label or an aria-label.");
+  const starColor = ratingColor("RatingSlider", color);
 
   // A max that can't be counted would leave no stars, so it falls back to the default
   const maxIsValid = Number.isInteger(max) && max >= 1;
@@ -218,7 +233,8 @@ export function RatingSlider({
       className={cx("choice-group", "rating-slider", className)}
       disabled={disabled}
       invalid={invalid}
-      style={{ "--rating-slider-step": step, "--rating-slider-max": count } as CSSProperties}
+      data-color={starColor["data-color"]}
+      style={{ ...starColor.style, "--rating-slider-step": step, "--rating-slider-max": count } as CSSProperties}
     >
       {/* Locked left to right, both the drawing (dir) and Base UI's pointer math and keys (DirectionProvider): a
           right-to-left page would otherwise get stars filling from the left and presses measured from the right */}

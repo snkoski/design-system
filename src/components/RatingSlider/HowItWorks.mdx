@@ -18,6 +18,7 @@ A rating slider is a row of stars that works as a slider: drag across it, click 
     <tr><td><code>RatingSlider.tsx</code></td><td>The component: a field, Base UI's slider locked left to right, the stars drawn from the value, the hover preview, and the words beside them.</td></tr>
     <tr><td><code>rating-slider.css</code></td><td>The look: the frame that sizes it, the padding that makes a click fill to the end of its slice, the clipped fill, every state, hot dog mode, and forced colors.</td></tr>
     <tr><td><code>src/internal/star.ts</code></td><td>The star's path, shared with Rating.</td></tr>
+    <tr><td><code>src/internal/ratingColor.ts</code></td><td>The <code>color</code> prop, turned into <code>data-color</code> or an inline color, shared with Rating (section 6).</td></tr>
     <tr><td><code>src/internal/useResettableValue.ts</code></td><td>The value, kept in step with a form reset (section 4).</td></tr>
     <tr><td><code>src/internal/choice-group.css</code> and <code>field.css</code></td><td>The wrapper, the group, the label, and the description, shared with the other groups.</td></tr>
   </tbody>
@@ -89,3 +90,17 @@ Each star is an outline with a solid star on top, clipped from the right by how 
 <Code file="components/RatingSlider/rating-slider.css" name='[data-theme="hotdog"] .rating-slider__outline' />
 
 <Code file="components/RatingSlider/rating-slider.css" name="@media (forced-colors: active)" />
+
+## 6. The color
+
+The `color` prop is turned into what the wrapper renders by a helper Rating and RatingSlider share. A keyword (`"gold"`, the default, or `"brand"`, ignoring case and spaces) becomes `data-color`. Anything else is a CSS color, set inline as `--rating-color` and used as given in every theme, with `data-color="custom"`. In the browser it asks `CSS.supports` whether the value is a color, and warns in development if not; the CSS-wide keywords such as `inherit` warn too, since on a variable they reset it rather than color anything, and so does `transparent`, which hides the stars.
+
+<Code file="internal/ratingColor.ts" name="ratingColor" />
+
+The component's CSS sets `--rating-color` on the wrapper from the matching token: `rating-gold` (deep amber in light, bright gold in dark, ketchup in hot dog) or `rating-brand`. Both are checked for 3:1 against the page, cards, and tinted panels in every theme. An inline `--rating-color` beats both rules. Because the wrapper sets the variable itself, a parent can't: the prop is the way in, and a brand file changes `--rating-gold` or `--rating-brand` instead.
+
+<Code file="components/RatingSlider/rating-slider.css" name=".rating-slider" />
+
+<Code file="components/RatingSlider/rating-slider.css" name='.rating-slider[data-color="brand"]' />
+
+The solid star is drawn in `currentColor`, with the color set on its clipping box, so a color the browser can't use falls back to the inherited ink, as Rating's does.

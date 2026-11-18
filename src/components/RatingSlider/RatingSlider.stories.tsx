@@ -51,6 +51,11 @@ const meta = {
     max: { control: { type: "number", min: 1, max: 10, step: 1 } },
     value: { control: false },
     ref: { control: false },
+    color: {
+      control: "select",
+      options: ["gold (default)", "brand", "custom"],
+      mapping: { "gold (default)": undefined, brand: "brand", custom: "hsl(210 80% 46%)" },
+    },
     description: { control: "text" },
     error: { control: "text" },
   },
@@ -393,6 +398,41 @@ export const RightToLeft: Story = {
   },
 };
 
+/** The color a CSS value resolves to, from a probe inside the given element, so its theme applies */
+function resolveColor(value: string, parent: HTMLElement) {
+  const probe = document.createElement("span");
+  probe.style.color = value;
+  parent.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+/**
+ * The filled stars are gold by default, the brand's hue with `color="brand"`, or any CSS color. Gold and brand are
+ * tokens checked against every background in every theme; a custom color is up to the page. Shown in the light theme,
+ * whatever the toolbar says, since gold and brand are both ketchup in hot dog.
+ */
+export const Colors: Story = {
+  render: () => (
+    <div data-theme="light" className="grid gap-6 p-4" style={{ background: "var(--bg)", color: "var(--ink)" }}>
+      <RatingSlider label="Gold, the default" name="gold" defaultValue={3.5} />
+      <RatingSlider label="Brand" name="brand" color="brand" defaultValue={3.5} />
+      <RatingSlider label="Custom" name="custom" color="hsl(210 80% 46%)" defaultValue={3.5} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const theme = canvasElement.querySelector<HTMLElement>("[data-theme]")!;
+    const ratings = [...theme.querySelectorAll<HTMLElement>(".rating-slider")];
+    await expect(ratings).toHaveLength(3);
+    const [gold, brand, custom] = ratings.map((rating) => getComputedStyle(rating.querySelector(".rating-slider__solid")!).fill);
+    await expect(gold).toBe(resolveColor("var(--rating-gold)", theme));
+    await expect(brand).toBe(resolveColor("var(--rating-brand)", theme));
+    await expect(custom).toBe(resolveColor("hsl(210 80% 46%)", theme));
+    await expect(gold).not.toBe(brand);
+  },
+};
+
 function Matrix() {
   return (
     <div className="grid gap-4">
@@ -406,6 +446,8 @@ function Matrix() {
       <RatingSlider label="Disabled" disabled defaultValue={2.5} />
       <RatingSlider label="Read only" readOnly defaultValue={4.5} />
       <RatingSlider label="Without the words" showValue={false} defaultValue={3} />
+      <RatingSlider label="Brand color" color="brand" defaultValue={3.5} />
+      <RatingSlider label="Custom color" color="hsl(210 80% 46%)" defaultValue={3.5} />
     </div>
   );
 }

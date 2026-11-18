@@ -6,6 +6,8 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import type { ReactNode, Ref } from "react";
 import { cx } from "@/internal/cx";
+import { ratingColor } from "@/internal/ratingColor";
+import type { RatingColor } from "@/internal/ratingColor";
 import { FieldError } from "@/internal/FieldError";
 import { ReadOnlyNote } from "@/internal/ReadOnlyNote";
 import { starPath } from "@/internal/star";
@@ -62,6 +64,17 @@ interface OwnProps {
   disabled?: boolean;
   /** Keeps the rating focusable, readable, and submitted, but blocks changes. Shows "Read only" beside the label, and no Clear button. The arrow keys move focus without choosing. */
   readOnly?: boolean;
+  /**
+   * The color of the filled stars. `"gold"` (the default) is a deep amber in light mode, bright gold in dark, and
+   * ketchup red in hot dog. `"brand"` is Sherbet's tangerine, darkened in light mode, and ketchup in hot dog. Both are
+   * checked for 3:1 on the page, cards, and tinted panels in every theme, but not on a `brand` band, where brand stars
+   * vanish; keywords ignore case and spaces. Any other value is a CSS
+   * color, like `"hsl(210 80% 46%)"` or `"var(--my-star)"`, used as given in every theme: check that it reaches 3:1
+   * against the page in each theme you support. A value the browser can't use, or `"transparent"`, warns in
+   * development. Windows Contrast themes ignore it. To change gold or brand everywhere, set
+   * `--rating-gold` or `--rating-brand` in your brand file instead.
+   */
+  color?: RatingColor;
   /** The id of a `<form>` to submit with, when the rating sits outside that form. */
   form?: string;
   /** Applied to the outer wrapper, so it's the place for layout classes such as margin. */
@@ -99,10 +112,12 @@ export function Rating({
   defaultValue,
   onValueChange,
   className,
+  color,
   ref,
   ...rest
 }: RatingProps) {
   warnIfUnnamed("Rating", label, rest, "Give it a label or an aria-label.");
+  const starColor = ratingColor("Rating", color);
 
   // A max that can't be counted would leave no stars, or a broken row, so it falls back to the default
   const maxIsValid = Number.isInteger(max) && max >= 1;
@@ -165,7 +180,14 @@ export function Rating({
   const stars = Array.from({ length: count }, (_, index) => index + 1);
 
   return (
-    <Field.Root className={cx("choice-group", "rating", className)} name={name} disabled={disabled} invalid={invalid}>
+    <Field.Root
+      className={cx("choice-group", "rating", className)}
+      data-color={starColor["data-color"]}
+      style={starColor.style}
+      name={name}
+      disabled={disabled}
+      invalid={invalid}
+    >
       <Fieldset.Root className="choice-group__group rating__group">
         {label !== undefined && (
           <Fieldset.Legend className="field-label rating__label">

@@ -3,6 +3,16 @@
    the error is .field-error, and Clear's look is internal/inset-button.css. Where the rating sits (margin) is the
    layout's job. */
 @layer components {
+  /* The filled stars' color, from the color prop: gold by default, data-color="brand" for the brand's, and any other
+     color set inline as --rating-color, which beats both. Only the prop sets it; a brand file changes --rating-gold or
+     --rating-brand instead. */
+  .rating {
+    --rating-color: var(--rating-gold);
+  }
+  .rating[data-color="brand"] {
+    --rating-color: var(--rating-brand);
+  }
+
   /* Unlike the other groups, the fieldset isn't the radio group: the stars' radio group sits inside it, beside Clear.
      So it's a real <fieldset>, and the browser's own border, padding, margin, and minimum width go. */
   .rating__group {
@@ -92,7 +102,7 @@
      reader announces can't disagree. Filling turns the outline into a solid shape, which is the cue that isn't color. */
   .rating__star[aria-checked="true"],
   .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__star {
-    color: var(--action);
+    color: var(--rating-color);
   }
   .rating__star[aria-checked="true"] .rating__fill,
   .rating__item:has(~ .rating__item [aria-checked="true"]) .rating__fill {
@@ -117,7 +127,7 @@
   }
   .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(.rating__star:hover) .rating__star,
   .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(~ .rating__item .rating__star:hover) .rating__star {
-    color: var(--action);
+    color: var(--rating-color);
   }
   .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(.rating__star:hover) .rating__fill,
   .rating__stars:not([aria-readonly="true"], [aria-disabled="true"], :has(:focus-visible)) .rating__item:has(~ .rating__item .rating__star:hover) .rating__fill {

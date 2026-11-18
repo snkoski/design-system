@@ -2,10 +2,16 @@
    shared with the other groups in internal/choice-group.css and field.css, and the error is .field-error. Where it
    sits (margin) is the layout's job. */
 @layer components {
-  /* The component's own props, set inline from React; these are the defaults */
+  /* The component's own props, set inline from React; these are the defaults. The filled stars' color comes from the
+     color prop: gold by default, data-color="brand" for the brand's, and any other color set inline as --rating-color,
+     which beats both. Only the prop sets it; a brand file changes --rating-gold or --rating-brand instead. */
   .rating-slider {
     --rating-slider-step: 0.5;
     --rating-slider-max: 5;
+    --rating-color: var(--rating-gold);
+  }
+  .rating-slider[data-color="brand"] {
+    --rating-color: var(--rating-brand);
   }
 
   /* Stretched to the group's width (the group places its parts at their own width), so the frame's max-width has a
@@ -122,9 +128,11 @@
 
   /* The fill: a solid star on top of the outline, clipped from the right by how much of this star the value covers.
      The clip reaches border-thick past every edge, so the stroke's overhang is never cut; on the right that margin
-     shrinks to nothing as the fill does. */
+     shrinks to nothing as the fill does. The star is drawn in currentColor, so a color the browser can't use falls
+     back to the inherited ink, as Rating's does. */
   .rating-slider__fill {
     display: grid;
+    color: var(--rating-color);
     width: var(--icon-md);
     height: var(--icon-md);
     clip-path: inset(
@@ -134,8 +142,8 @@
     );
   }
   .rating-slider__solid {
-    fill: var(--action);
-    stroke: var(--action);
+    fill: currentColor;
+    stroke: currentColor;
   }
 
   /* The value in words: hidden from screen readers, which hear the slider's own value text */

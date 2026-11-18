@@ -44,7 +44,7 @@ The "Blocks" column says what can't be built well until the question is answered
 
 ### Q3. Brand colors near components
 
-**Decided (2026-11-04):** neutral versions inside components, for now. A link inside a component (a breadcrumb, a terms link in a checkbox label) is `ink` and underlined; a tag or chip is gray. `link` and `highlight` stay brand colors for the page around components, and `pnpm check` now fails if a component uses `link`, `highlight`, or `on-highlight`. Form controls already style any link in their label, description, or error this way (`src/internal/field.css`). Badge colors are part of Q6. More color can come back later, once the components are built. Recorded in `docs/brand/color.md`, `tokens/tokens.json`, and `CLAUDE.md`.
+**Decided (2026-11-04):** neutral versions inside components, for now. A link inside a component (a breadcrumb, a terms link in a checkbox label) is `ink` and underlined; a tag or chip is gray. `link` and `highlight` stay brand colors for the page around components, and `pnpm check` now fails if a component uses `link`, `highlight`, or `on-highlight`. Form controls already style any link in their label, description, or error this way (`src/internal/field.css`). Badge colors are part of Q6. More color can come back later, once the components are built. Recorded in `docs/brand/color.md`, `tokens/tokens.json`, and `CLAUDE.md`. **Changed (2026-11-18):** a rating's filled stars (Rating and RatingSlider) are the one exception: gold by default (`rating-gold`), the brand's hue with `color="brand"` (`rating-brand`, its own token, darkened in light to meet 3:1), or any CSS color. Every other component stays neutral, and `link`, `highlight`, and `brand` are still never used in components.
 
 ### Q4. A danger style for buttons
 
@@ -73,7 +73,7 @@ Recorded in `CLAUDE.md` (the Base UI rule now allows a well-tested library where
 
 ### Q9. A layouts tier where brand colors are allowed
 
-**Decided (2026-11-04):** no layouts tier for now. AppShell and PageHeader are ordinary components in `src/components/`, neutral like everything else, with the same rules and checks. An app that wants its brand in the shell sets it with its own CSS on the wrapper (a `brand` or `surface-tint` background), and the components inside stay neutral. If brand color should be built in later, allowing brand tokens for those few files would turn this into a layouts tier. Recorded in `CLAUDE.md` and `docs/brand/color.md`.
+**Decided (2026-11-04):** no layouts tier for now. AppShell and PageHeader are ordinary components in `src/components/`, neutral like everything else, with the same rules and checks. An app that wants its brand in the shell sets it with its own CSS on the wrapper (a `brand` or `surface-tint` background), and the components inside stay neutral. If brand color should be built in later, allowing brand tokens for those few files would turn this into a layouts tier. Recorded in `CLAUDE.md` and `docs/brand/color.md`. **Changed (2026-11-18):** still no layouts tier, but rating stars now have color inside the component (see Q3).
 
 ### Q10. Is a native select allowed?
 

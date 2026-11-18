@@ -203,7 +203,7 @@ Raised while building Separator (2026-11-05).
 
 **Why it's in question:** some badges name kinds rather than states (a team, a category, a label someone made), and an app may want them told apart by color as well as words. Most systems offer this: Carbon has 12 colors, Atlassian's Lozenge has accent colors, and Primer's issue labels take any color.
 
-**To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd be the one place a component uses palette hues, so `CLAUDE.md` and `color.md` would need an exception. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
+**To decide:** whether to add a `color` prop, and what it takes. Named colors as tokens, each a fill and words pair checked for contrast in every theme, keep the contrast promise; they'd use palette hues, as a rating's stars now do (`rating-gold` and `rating-brand`, the exception `CLAUDE.md` and `color.md` already describe), so a Badge color prop would follow that precedent. A free CSS color can't be checked and can't change with the theme. This ties in with the categorical palette `color.md` says waits for a chart that needs one.
 
 Raised while building Badge (2026-11-05).
 
@@ -384,3 +384,12 @@ Raised while building RatingSlider (2026-11-17).
 
 Raised while building RatingSlider (2026-11-17).
 
+## Rating stars that follow a rebrand
+
+**Today:** a rating's `color="brand"` uses `rating-brand`, a token set from Sherbet's tangerines (darkened in light mode to meet 3:1) and ketchup in hot dog. It doesn't read `--brand`, so a site that loads a brand file changing `brand` has to redefine `rating-brand` too (`docs/brand/building.md` says so).
+
+**Why it's in question:** it's one more token to remember when rebranding, and a brand file that forgets it gets tangerine stars on another brand's page.
+
+**To decide:** when the first site rebrands: whether `rating-brand` should be worked out from `--brand` (CSS relative colors, darkened until it meets 3:1), or stay a token the brand file sets.
+
+Raised while adding the color prop to Rating and RatingSlider (2026-11-18).

@@ -531,6 +531,51 @@ describe("RatingSlider", () => {
     });
   });
 
+  describe("color", () => {
+    const wrapper = (container: HTMLElement) => {
+      const element = container.querySelector<HTMLElement>(".rating-slider");
+      expect(element).toBeInTheDocument();
+      return element!;
+    };
+
+    it("is gold with no color prop, set by the CSS rather than inline", () => {
+      const { container } = render(<RatingSlider label="Interest" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "gold");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("");
+    });
+
+    it("marks the brand color with data-color, not inline", () => {
+      const { container } = render(<RatingSlider label="Interest" color="brand" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "brand");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("");
+    });
+
+    it("sets any other color inline on the wrapper, as data-color custom", () => {
+      const { container } = render(<RatingSlider label="Interest" color="hsl(210 80% 46%)" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "custom");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("hsl(210 80% 46%)");
+      expect(wrapper(container).style.getPropertyValue("--rating-slider-step")).toBe("0.5");
+      expect(wrapper(container).style.getPropertyValue("--rating-slider-max")).toBe("5");
+    });
+
+    it("never puts a color attribute on any element", () => {
+      const { container } = render(<RatingSlider label="Interest" color="hsl(210 80% 46%)" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "custom");
+      expect(container.querySelector("[color]")).toBeNull();
+    });
+
+    it("warns, naming RatingSlider, when the browser can't read the color", () => {
+      vi.stubGlobal("CSS", { supports: () => false });
+      onTestFinished(() => {
+        vi.unstubAllGlobals();
+      });
+      render(<RatingSlider label="Interest" color="sparkly" />);
+      expect(takeWarnings()).toEqual([
+        '[design-system] RatingSlider: color must be "gold", "brand", or a CSS color, like "hsl(210 80% 46%)". Got "sparkly".',
+      ]);
+    });
+  });
+
   describe("id, label, and ref", () => {
     it("puts id on the range input, which the label still names", () => {
       render(<RatingSlider label="Interest" id="interest" />);
@@ -676,6 +721,13 @@ describe("RatingSlider", () => {
 
     it("forwards ref to an input", () => {
       expectTypeOf<RatingSliderProps["ref"]>().toEqualTypeOf<React.Ref<HTMLInputElement> | undefined>();
+    });
+
+    it("takes gold, brand, or any CSS color as its color", () => {
+      expectTypeOf<RatingSliderProps["color"]>().toEqualTypeOf<"gold" | "brand" | (string & {}) | undefined>();
+      expectTypeOf<{ label: string; color: "gold" }>().toExtend<RatingSliderProps>();
+      expectTypeOf<{ label: string; color: "hsl(210 80% 46%)" }>().toExtend<RatingSliderProps>();
+      expectTypeOf<{ label: string; color: 3 }>().not.toExtend<RatingSliderProps>();
     });
   });
 });

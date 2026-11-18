@@ -27,6 +27,18 @@ A rating is a row of stars where someone gives one score on a short scale: how i
 - **The keyboard:** Tab reaches the stars once, on the chosen star, then Clear. The arrow keys move between stars and choose them, wrapping from the last to the first. Enter or Space on Clear empties the rating and puts focus back on the stars.
 - **Read-only** keeps every star at full strength, with "Read only" beside the label. **Disabled** dims the stars.
 
+## Color
+
+Filled stars are the one place a component draws in a color that isn't gray or a status color: a row of gray stars reads as unfinished, and gold stars are a mark people recognize. Rating and RatingSlider take the same `color` prop.
+
+- **Gold, the default.** Leave `color` out. It's a deep amber in light mode (a bright yellow star is only 1.6:1 on the cream page, short of the 3:1 a star needs), bright gold in dark, and ketchup in hot dog, where gold would vanish on the mustard page.
+- **`color="brand"`** draws the stars in the brand's hue: tangerine, darkened in light mode to reach 3:1, and ketchup in hot dog. Use it where gold would clash with the page. Neither gold nor brand is checked on a `brand` band: brand stars vanish there and gold ones nearly do, so keep ratings on the page, cards, or tinted panels.
+- **Any CSS color,** such as `color="hsl(210 80% 46%)"` or `color="var(--team-color)"`, is used as given in every theme. Check it reaches 3:1 against the page, cards, and tinted panels in each theme the site offers; nothing checks it for you. A value the browser can't use, or `transparent`, warns in development.
+- **Keywords ignore case and spaces:** `"Gold"` is gold, not CSS's own bright `gold`.
+- **To change gold or brand across a whole site,** redefine `--rating-gold` or `--rating-brand` in its brand file, under `:root` and each `[data-theme]`, rather than passing a color everywhere (see Building).
+- **Windows Contrast themes** ignore the color: filled stars use the system's highlight color, as every chosen control does.
+- Color is never the only cue. A filled star is a solid shape and an empty one an outline, so the rating reads the same in any color.
+
 ## Screen readers
 
 A rating is announced as a radio group with its label, and each star as a radio button: "Interest, radio group. 3 stars, radio button, checked, 3 of 5." The label is heard twice on the way in ("Interest, group", then "Interest, radio group"), because the stars sit in their own radio group beside the Clear button. Clear is announced as "Clear rating, Interest, button".

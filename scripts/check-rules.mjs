@@ -51,6 +51,9 @@ const tokens = JSON.parse(read(join(root, "tokens/tokens.json")));
 const primitives = tokens.color.tokens.filter((token) => /^Primitive\./.test(token.usage)).map((token) => token.name);
 // Brand colors belong to the layout around components, never to a component (docs/brand/color.md)
 const BRAND_TOKENS = ["brand", "on-brand", "surface-tint", "link", "highlight", "on-highlight"];
+// The one exception: a rating's stars have their own tokens with a hue, which only the two rating stylesheets may use
+const RATING_TOKENS = ["rating-gold", "rating-brand"];
+const RATING_FILES = ["src/components/Rating/rating.css", "src/components/RatingSlider/rating-slider.css"];
 
 const cssFiles = [...walk(join(root, "src/components")), ...walk(join(root, "src/internal"))].filter((file) => file.endsWith(".css"));
 // Custom properties a shared stylesheet in src/internal defines (such as --text-field-edge) are valid in every
@@ -93,6 +96,13 @@ for (const file of cssFiles) {
   for (const brand of BRAND_TOKENS) {
     for (const match of css.matchAll(new RegExp(`var\\(\\s*--${brand}\\s*[,)]`, "g"))) {
       report(file, lineOf(css, match.index), "brand-token", `--${brand} is a brand color for layouts; components are neutral`);
+    }
+  }
+  if (!RATING_FILES.some((allowed) => file.endsWith(allowed))) {
+    for (const token of RATING_TOKENS) {
+      for (const match of css.matchAll(new RegExp(`var\\(\\s*--${token}\\s*[,)]`, "g"))) {
+        report(file, lineOf(css, match.index), "rating-token", `--${token} is only for a rating's stars (Rating and RatingSlider); components are neutral`);
+      }
     }
   }
 

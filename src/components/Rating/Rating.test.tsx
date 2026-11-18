@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef, useState } from "react";
-import { describe, expect, expectTypeOf, it, vi } from "vitest";
+import { describe, expect, expectTypeOf, it, onTestFinished, vi } from "vitest";
 import { takeWarnings } from "@tests/warnings";
 import { Rating } from "@/components/Rating/Rating";
 import type { RatingProps } from "@/components/Rating/Rating";
@@ -855,6 +855,49 @@ describe("Rating", () => {
     });
   });
 
+  describe("color", () => {
+    const wrapper = (container: HTMLElement) => {
+      const element = container.querySelector<HTMLElement>(".rating");
+      expect(element).toBeInTheDocument();
+      return element!;
+    };
+
+    it("is gold with no color prop, set by the CSS rather than inline", () => {
+      const { container } = render(<Rating label="Interest" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "gold");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("");
+    });
+
+    it("marks the brand color with data-color, not inline", () => {
+      const { container } = render(<Rating label="Interest" color="brand" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "brand");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("");
+    });
+
+    it("sets any other color inline on the wrapper, as data-color custom", () => {
+      const { container } = render(<Rating label="Interest" color="hsl(210 80% 46%)" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "custom");
+      expect(wrapper(container).style.getPropertyValue("--rating-color")).toBe("hsl(210 80% 46%)");
+    });
+
+    it("never puts a color attribute on any element", () => {
+      const { container } = render(<Rating label="Interest" color="hsl(210 80% 46%)" />);
+      expect(wrapper(container)).toHaveAttribute("data-color", "custom");
+      expect(container.querySelector("[color]")).toBeNull();
+    });
+
+    it("warns, naming Rating, when the browser can't read the color", () => {
+      vi.stubGlobal("CSS", { supports: () => false });
+      onTestFinished(() => {
+        vi.unstubAllGlobals();
+      });
+      render(<Rating label="Interest" color="sparkly" />);
+      expect(takeWarnings()).toEqual([
+        '[design-system] Rating: color must be "gold", "brand", or a CSS color, like "hsl(210 80% 46%)". Got "sparkly".',
+      ]);
+    });
+  });
+
   describe("refs", () => {
     it("forwards ref to the radio group element", () => {
       const ref = createRef<HTMLDivElement>();
@@ -984,6 +1027,13 @@ describe("Rating", () => {
       expectTypeOf<RatingProps["required"]>().toEqualTypeOf<boolean | undefined>();
       expectTypeOf<RatingProps["name"]>().toEqualTypeOf<string | undefined>();
       expectTypeOf<RatingProps["form"]>().toEqualTypeOf<string | undefined>();
+    });
+
+    it("takes gold, brand, or any CSS color as its color", () => {
+      expectTypeOf<RatingProps["color"]>().toEqualTypeOf<"gold" | "brand" | (string & {}) | undefined>();
+      expectTypeOf<{ label: string; color: "gold" }>().toExtend<RatingProps>();
+      expectTypeOf<{ label: string; color: "hsl(210 80% 46%)" }>().toExtend<RatingProps>();
+      expectTypeOf<{ label: string; color: 3 }>().not.toExtend<RatingProps>();
     });
   });
 });

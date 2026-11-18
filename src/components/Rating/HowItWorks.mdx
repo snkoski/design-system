@@ -19,6 +19,7 @@ It's made of these files:
   <tbody>
     <tr><td><code>Rating.tsx</code></td><td>The component: a field, a fieldset with the label, description, and error, and a row holding the stars' radio group and the Clear button. It draws the stars itself from <code>max</code>.</td></tr>
     <tr><td><code>rating.css</code></td><td>The look: the stars' squares, outline and fill, every state, the preview, Clear's square, hot dog mode, and forced colors.</td></tr>
+    <tr><td><code>src/internal/ratingColor.ts</code></td><td>The <code>color</code> prop, turned into <code>data-color</code> or an inline color, shared with RatingSlider (section 6).</td></tr>
     <tr><td><code>src/internal/useResettableValue.ts</code></td><td>The value the stars show, kept in step with a form reset. RadioGroup and SegmentedControl use it too (section 4).</td></tr>
     <tr><td><code>src/internal/choice-group.css</code>, <code>field.css</code>, and <code>inset-button.css</code></td><td>The wrapper, the group, the label, and the description, shared with the other groups, and Clear's look, shared with FileInput's Remove button. Part of the published stylesheet.</td></tr>
     <tr><td><code>index.ts</code></td><td>Exports the component and its props type from the package.</td></tr>
@@ -93,7 +94,7 @@ The squares touch: each is `choice-row` (32px with a mouse, 44px on touch), at l
 
 <Code file="components/Rating/rating.css" name=".rating__icon" />
 
-The outline is `border-strong` when empty and `action` when filled. The fill is a mark, like a radio's dot: it fades in over `duration-base` and out faster.
+The outline is `border-strong` when empty and `--rating-color` when filled (gold unless `color` says otherwise; section 6). The fill is a mark, like a radio's dot: it fades in over `duration-base` and out faster.
 
 <Code file="components/Rating/rating.css" name=".rating__fill" />
 
@@ -122,3 +123,15 @@ While the pointer is on a star, the stars are drawn as choosing it would leave t
 In forced colors, empty stars are `ButtonText`, filled ones `Highlight`, and a disabled rating's stars `GrayText`. The star's outline is its edge, drawn in `currentColor`, so it shows without a border of its own. The build merges the filled selectors into one `:is()`, as specific as its most specific part, so the disabled rule names enough classes to win.
 
 <Code file="components/Rating/rating.css" name="@media (forced-colors: active)" />
+
+## 6. The color
+
+The `color` prop is turned into what the wrapper renders by a helper Rating and RatingSlider share. A keyword (`"gold"`, the default, or `"brand"`, ignoring case and spaces) becomes `data-color`. Anything else is a CSS color, set inline as `--rating-color` and used as given in every theme, with `data-color="custom"`. In the browser it asks `CSS.supports` whether the value is a color, and warns in development if not; the CSS-wide keywords such as `inherit` warn too, since on a variable they reset it rather than color anything, and so does `transparent`, which hides the stars.
+
+<Code file="internal/ratingColor.ts" name="ratingColor" />
+
+The component's CSS sets `--rating-color` on the wrapper from the matching token: `rating-gold` (deep amber in light, bright gold in dark, ketchup in hot dog) or `rating-brand`. Both are checked for 3:1 against the page, cards, and tinted panels in every theme. An inline `--rating-color` beats both rules. Because the wrapper sets the variable itself, a parent can't: the prop is the way in, and a brand file changes `--rating-gold` or `--rating-brand` instead.
+
+<Code file="components/Rating/rating.css" name=".rating" />
+
+<Code file="components/Rating/rating.css" name='.rating[data-color="brand"]' />
